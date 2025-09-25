@@ -1,0 +1,30 @@
+{
+    "post": {
+        "go_to_list_page": "Đến bài đăng",
+        "list": "Danh sách bài đăng",
+        "failed_to_load_posts": "Tải danh sách bài đăng thất bại",
+        "no_posts_available": "Không có bài đăng nào tồn tại",
+        "not_found": "Không tìm thấy bài đăng",
+        "create": "Tạo mới",
+        "refresh": "Tải lại",
+        "view_detail": "Xem chi tiết",
+        "update": "Chỉnh sửa",
+        "delete": "Xoá",
+        "title": "Tiêu đề",
+        "title_is_required": "Tiêu đề bắt buộc",
+        "body": "Nội dung",
+        "body_is_required": "Nội dung bắt buộc"
+    },
+    "success": {
+        "create": "Tạo thành công",
+        "update": "Cập nhật thành công",
+        "delete": "Xoá thành công",
+        "refresh": "Tải lại thành công"
+    },
+    "failed": {
+        "create": "Tạo thất bại",
+        "update": "Cập nhật thất bại",
+        "delete": "Xoá thất bại",
+        "refresh": "Tải lại thất bại"
+    }
+}

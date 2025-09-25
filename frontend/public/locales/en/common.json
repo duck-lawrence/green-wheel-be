@@ -1,0 +1,30 @@
+{
+    "post": {
+        "go_to_list_page": "Go to Post list",
+        "list": "Post list",
+        "failed_to_load_posts": "Failed to load posts",
+        "no_posts_available": "No posts available",
+        "not_found": "Post not found",
+        "create": "Create",
+        "refresh": "Refresh",
+        "view_detail": "View detail",
+        "update": "Update",
+        "delete": "Delete",
+        "title": "Title",
+        "title_is_required": "Title is required",
+        "body": "Body",
+        "body_is_required": "Body is required"
+    },
+    "success": {
+        "create": "Created",
+        "update": "Updated",
+        "delete": "Deleted",
+        "refresh": "Refreshed"
+    },
+    "failed": {
+        "create": "Failed to create",
+        "update": "Failed to update",
+        "delete": "Failed to delete",
+        "refresh": "Failed to refresh"
+    }
+}
