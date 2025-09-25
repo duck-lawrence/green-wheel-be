@@ -1,3 +1,5 @@
+﻿
+using API.Extentions;
 
 namespace API
 {
@@ -13,6 +15,20 @@ namespace API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            //kết nối DB
+            builder.Services.AddInfrastructue(builder.Configuration.GetConnectionString("DefaultConnection")!);
+            //Cache
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = builder.Configuration["Redis:Configuration"];
+                options.InstanceName = builder.Configuration["Redis:InstanceName"];
+            });
+
+
+
+
+
+
 
             var app = builder.Build();
 

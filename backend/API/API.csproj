@@ -11,9 +11,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Extentions\" />
+    <Folder Include="Controllers\" />
     <Folder Include="Middlewares\" />
     <Folder Include="Policies\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
