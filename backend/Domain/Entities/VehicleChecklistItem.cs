@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Domain.Commons;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class VehicleChecklistItem
+public partial class VehicleChecklistItem : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
@@ -15,7 +16,7 @@ public partial class VehicleChecklistItem
 
     public int Status { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid ComponentId { get; set; }
 

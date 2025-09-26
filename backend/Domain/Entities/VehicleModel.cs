@@ -32,7 +32,7 @@ public partial class VehicleModel : SorfDeletedEntity, IEntity
 
     public decimal SportRangeKm { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid BrandId { get; set; }
 

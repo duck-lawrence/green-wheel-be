@@ -20,8 +20,6 @@ public partial class Deposit : SorfDeletedEntity, IEntity
 
     public int Status { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
-
     public Guid InvoiceId { get; set; }
 
     public virtual Invoice Invoice { get; set; } = null!;

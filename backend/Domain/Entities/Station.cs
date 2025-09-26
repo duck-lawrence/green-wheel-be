@@ -16,7 +16,7 @@ public partial class Station : SorfDeletedEntity, IEntity
 
     public string Address { get; set; } = null!;
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public virtual ICollection<DispatchRequest> DispatchRequestFromStations { get; set; } = new List<DispatchRequest>();
 

@@ -28,8 +28,6 @@ public partial class CitizenIdentity : SorfDeletedEntity, IEntity
 
     public string ImagePublicId { get; set; } = null!;
 
-    public DateTimeOffset? DeletedAt { get; set; }
-
     public Guid UserId { get; set; }
 
     public virtual User User { get; set; } = null!;

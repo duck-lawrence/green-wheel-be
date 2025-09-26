@@ -2,7 +2,6 @@
 {
     public abstract class SorfDeletedEntity
     {
-        public DateTimeOffset? DeletedAt { get; set; }
-        
+        public  DateTimeOffset? DeletedAt { get; set; }
     }
 }

@@ -16,7 +16,7 @@ public partial class StationFeedback : SorfDeletedEntity, IEntity
 
     public int Rating { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid CustomerId { get; set; }
 

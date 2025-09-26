@@ -20,7 +20,7 @@ public partial class InvoiceItem : SorfDeletedEntity, IEntity
 
     public int Type { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid InvoiceId { get; set; }
 

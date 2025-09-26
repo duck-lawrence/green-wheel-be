@@ -8,7 +8,7 @@ public partial class Staff : SorfDeletedEntity
 {
     public Guid UserId { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid StationId { get; set; }
 

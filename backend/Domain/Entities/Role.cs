@@ -16,7 +16,7 @@ public partial class Role : SorfDeletedEntity, IEntity
 
     public string Description { get; set; } = null!;
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

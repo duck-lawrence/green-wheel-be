@@ -20,7 +20,5 @@ public partial class Brand : SorfDeletedEntity, IEntity
 
     public int FoundedYear { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
-
     public virtual ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
 }

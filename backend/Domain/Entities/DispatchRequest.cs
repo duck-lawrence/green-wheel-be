@@ -16,7 +16,7 @@ public partial class DispatchRequest : SorfDeletedEntity, IEntity
 
     public int Status { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid RequestAdminId { get; set; }
 

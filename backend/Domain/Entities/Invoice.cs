@@ -28,7 +28,7 @@ public partial class Invoice : SorfDeletedEntity, IEntity
 
     public DateTimeOffset? ExpiresAt { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid ContractId { get; set; }
 

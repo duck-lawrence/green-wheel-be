@@ -32,13 +32,19 @@ namespace Infrastructure.Repository
 
         public async Task<bool> DeleteAsync(Guid id)
         {
-            var entityFromDb = await GetByIdAsync(id);
-            if(entityFromDb == null)
-            {
-                throw new Exception($"{typeof(T).Name} is not found");
-            }
+            var entityFromDb = await GetByIdAsync(id)
+        ?? throw new Exception($"{typeof(T).Name} is not found");
 
-            _dbSet.Remove(entityFromDb);
+            if (entityFromDb is SorfDeletedEntity softEntity && softEntity.DeletedAt == null)
+            {
+                // Gán DeletedAt thông qua softEntity (compiler hiểu type rồi)
+                softEntity.DeletedAt = DateTime.UtcNow;
+                //chỉ cần chỉnh hoai, savechange tự update
+            }
+            else
+            {
+                _dbSet.Remove(entityFromDb);
+            }
             await _dbContext.SaveChangesAsync();
             return entityFromDb != null;
         }

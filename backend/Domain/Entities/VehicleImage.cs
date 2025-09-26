@@ -16,7 +16,7 @@ public partial class VehicleImage : SorfDeletedEntity, IEntity
 
     public string PublicId { get; set; } = null!;
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid VehicleId { get; set; }
 

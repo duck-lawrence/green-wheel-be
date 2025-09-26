@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Commons;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
@@ -21,7 +22,7 @@ public partial class SupportRequest : SorfDeletedEntity, IEntity
 
     public int Type { get; set; }
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid CustomerId { get; set; }
 

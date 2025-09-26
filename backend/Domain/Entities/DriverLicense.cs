@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Commons;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
@@ -29,7 +30,7 @@ public partial class DriverLicense : SorfDeletedEntity, IEntity
 
     public string ImagePublicId { get; set; } = null!;
 
-    public DateTimeOffset? DeletedAt { get; set; }
+    
 
     public Guid UserId { get; set; }
 

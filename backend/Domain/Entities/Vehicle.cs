@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Commons;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
@@ -14,8 +15,6 @@ public partial class Vehicle : SorfDeletedEntity, IEntity
     public string LicensePlate { get; set; } = null!;
 
     public int Status { get; set; }
-
-    public DateTimeOffset? DeletedAt { get; set; }
 
     public Guid ModelId { get; set; }
 
