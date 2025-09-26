@@ -8,7 +8,7 @@ namespace API.Extentions
     {
         public static void AddInfrastructue(this IServiceCollection services, string mssqlConnectionString)
         {
-            services.AddDbContext<IAppDbContext, AppDbContext>(options =>
+            services.AddDbContext<IGreenWheelDbContext, GreenWheelDbContext>(options =>
             {
                 options.UseSqlServer(mssqlConnectionString);
             });
