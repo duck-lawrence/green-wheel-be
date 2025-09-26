@@ -63,6 +63,30 @@ CREATE TABLE [staffs] (
   CONSTRAINT fk_staff_stations FOREIGN KEY ([station_id]) REFERENCES [stations]([id])
 )
 GO
+CREATE INDEX idx_staffs_station_id ON staffs (station_id);
+GO
+
+CREATE TABLE [staff_reports] (
+  [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+  [created_at] datetimeoffset NOT NULL,
+  [updated_at] datetimeoffset NOT NULL,
+
+  [name] nvarchar(255) NOT NULL,
+  [description] nvarchar(max) NOT NULL,
+  [reply] nvarchar(max),
+  [status] int NOT NULL DEFAULT 0,
+  [deleted_at] datetimeoffset,
+
+  [staff_id] uniqueidentifier NOT NULL,
+  [admin_id] uniqueidentifier,
+  
+  CONSTRAINT fk_staff_reports_staffs FOREIGN KEY ([staff_id]) REFERENCES [staffs]([user_id]),
+  CONSTRAINT fk_staff_reports_admin FOREIGN KEY ([admin_id]) REFERENCES [staffs]([user_id])
+)
+GO
+CREATE INDEX idx_staff_reports_staff_id ON staff_reports (staff_id);
+CREATE INDEX idx_staff_reports_admin_id ON staff_reports (admin_id);
+GO
 
 CREATE TABLE [refresh_tokens] (
   [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
