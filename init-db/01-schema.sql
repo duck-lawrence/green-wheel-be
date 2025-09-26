@@ -78,14 +78,14 @@ CREATE TABLE [support_requests] (
   [type] INT NOT NULL, -- Technical, Payment, Other
   [deleted_at] datetimeoffset,
 
-  [user_id] uniqueidentifier NOT NULL,
+  [customer_id] uniqueidentifier NOT NULL,
   [staff_id] uniqueidentifier,
 
-  CONSTRAINT fk_support_requests_user FOREIGN KEY ([user_id]) REFERENCES [users]([id]),
+  CONSTRAINT fk_support_requests_user FOREIGN KEY ([customer_id]) REFERENCES [users]([id]),
   CONSTRAINT fk_support_requests_staff FOREIGN KEY ([staff_id]) REFERENCES [staffs]([user_id])
 );
 GO
-CREATE INDEX idx_support_requests_user_id ON support_requests (user_id);
+CREATE INDEX idx_support_requests_user_id ON support_requests (customer_id);
 CREATE INDEX idx_support_requests_staff_id ON support_requests (staff_id);
 GO
 
@@ -183,14 +183,14 @@ CREATE TABLE [station_feedbacks] (
   [rating] int NOT NULL,
   
   [deleted_at] datetimeoffset,
-  [renter_id] uniqueidentifier NOT NULL,
+  [customer_id] uniqueidentifier NOT NULL,
   [station_id] uniqueidentifier NOT NULL,
 
-  CONSTRAINT fk_feedback_users FOREIGN KEY ([renter_id]) REFERENCES [users]([id]),
+  CONSTRAINT fk_feedback_users FOREIGN KEY ([customer_id]) REFERENCES [users]([id]),
   CONSTRAINT fk_feedback_stations FOREIGN KEY ([station_id]) REFERENCES [stations]([id])
 )
 GO
-CREATE INDEX idx_station_feedbacks_renter_id ON station_feedbacks (renter_id);
+CREATE INDEX idx_station_feedbacks_customer_id ON station_feedbacks (customer_id);
 CREATE INDEX idx_station_feedbacks_station_id ON station_feedbacks (station_id);
 GO
 
@@ -317,23 +317,23 @@ CREATE TABLE [rental_contracts] (
     [end_date] datetimeoffset NOT NULL,
     [actual_end_date] datetimeoffset,
     [is_signed_by_staff] bit NOT NULL DEFAULT (0),
-    [is_signed_by_renter] bit NOT NULL DEFAULT (0),
+    [is_signed_by_customer] bit NOT NULL DEFAULT (0),
     [status] int NOT NULL DEFAULT 0, -- Pending, Active, Completed,  Cancelled
     [deleted_at] datetimeoffset,
 
     [vehicle_id] uniqueidentifier NOT NULL,
-    [renter_id] uniqueidentifier NOT NULL,
+    [customer_id] uniqueidentifier NOT NULL,
     [handover_staff_id] uniqueidentifier,
     [return_staff_id] uniqueidentifier,
 
     CONSTRAINT fk_rental_contracts_vehicles FOREIGN KEY ([vehicle_id]) REFERENCES [vehicles]([id]),
-    CONSTRAINT fk_rental_contracts_renters FOREIGN KEY ([renter_id]) REFERENCES [users]([id]),
+    CONSTRAINT fk_rental_contracts_customers FOREIGN KEY ([customer_id]) REFERENCES [users]([id]),
     CONSTRAINT fk_rental_contracts_handover_staffs FOREIGN KEY ([handover_staff_id]) REFERENCES [staffs]([user_id]),
     CONSTRAINT fk_rental_contracts_return_staffs FOREIGN KEY ([return_staff_id]) REFERENCES [staffs]([user_id])
 );
 GO
 CREATE INDEX idx_rental_contracts_vehicle_id ON rental_contracts (vehicle_id);
-CREATE INDEX idx_rental_contracts_renter_id ON rental_contracts (renter_id);
+CREATE INDEX idx_rental_contracts_customer_id ON rental_contracts (customer_id);
 CREATE INDEX idx_rental_contracts_handover_staff_id ON rental_contracts (handover_staff_id);
 CREATE INDEX idx_rental_contracts_return_staff_id ON rental_contracts (return_staff_id);
 GO
@@ -344,22 +344,22 @@ CREATE TABLE [vehicle_checklists] (
     [updated_at] datetimeoffset NOT NULL,
     [description] nvarchar(255),
     [is_signed_by_staff] bit NOT NULL DEFAULT (0),
-    [is_signed_by_renter] bit NOT NULL DEFAULT (0),
+    [is_signed_by_customer] bit NOT NULL DEFAULT (0),
     [deleted_at] datetimeoffset,
 
     [staff_id] uniqueidentifier NOT NULL,
-    [renter_id] uniqueidentifier NULL,
+    [customer_id] uniqueidentifier NULL,
     [vehicle_id] uniqueidentifier NOT NULL,
     [contract_id] uniqueidentifier,
 
     CONSTRAINT fk_vehicle_checklists_staffs FOREIGN KEY ([staff_id]) REFERENCES [staffs]([user_id]),
-    CONSTRAINT fk_vehicle_checklists_users FOREIGN KEY ([renter_id]) REFERENCES [users]([id]),
+    CONSTRAINT fk_vehicle_checklists_users FOREIGN KEY ([customer_id]) REFERENCES [users]([id]),
     CONSTRAINT fk_vehicle_checklists_vehicles FOREIGN KEY ([vehicle_id]) REFERENCES [vehicles]([id]),
     CONSTRAINT fk_vehicle_checklists_contracts FOREIGN KEY ([contract_id]) REFERENCES [rental_contracts]([id])
 );
 GO
 CREATE INDEX idx_vehicle_checklists_staff_id ON vehicle_checklists (staff_id);
-CREATE INDEX idx_vehicle_checklists_renter_id ON vehicle_checklists (renter_id);
+CREATE INDEX idx_vehicle_checklists_customer_id ON vehicle_checklists (customer_id);
 CREATE INDEX idx_vehicle_checklists_vehicle_id ON vehicle_checklists (vehicle_id);
 CREATE INDEX idx_vehicle_checklists_contract_id ON vehicle_checklists (contract_id);
 GO
