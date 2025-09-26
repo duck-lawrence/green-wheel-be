@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Domain.Commons;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class VehicleModel
+public partial class VehicleModel : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
