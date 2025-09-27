@@ -19,7 +19,6 @@ namespace API.Middleware
         }
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            
             try
             {
                 await next(context);
@@ -27,6 +26,10 @@ namespace API.Middleware
             catch (ValidationException vEx) // System.ComponentModel.DataAnnotations
             {
                 await WriteProblemDetailsAsync(context, 400, "Validation Failed", vEx.Message);
+            }
+            catch (BadRequestException bEx) // System.ComponentModel.DataAnnotations
+            {
+                await WriteProblemDetailsAsync(context, 400, "Bad Request", bEx.Message);
             }
             catch (UnauthorizedAccessException uaeEx)
             {
@@ -56,10 +59,12 @@ namespace API.Middleware
             catch (HttpRequestException httpEx)
             {
                 await WriteProblemDetailsAsync(context, 502, "External Request Failed", httpEx.Message);
-            }catch (RateLimitExceededException rEEx)
+            }
+            catch (RateLimitExceededException rEEx)
             {
                 await WriteProblemDetailsAsync(context, 429, "Too Many Requests", rEEx.Message);
-            }catch(ConflictDuplicateException cDEx)
+            }
+            catch (ConflictDuplicateException cDEx)
             {
                 await WriteProblemDetailsAsync(context, 409, "Too Many Requests", cDEx.Message);
             }

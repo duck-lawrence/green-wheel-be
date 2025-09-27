@@ -50,7 +50,14 @@ namespace Application
             _cache = cache;
         }
 
-       
+        
+        /*
+         Login fuction
+         this func receive UserLoginReq (dto) form controller incluce (user email and password)
+         -> got user from Db by email
+            -> null <=> wrong email or password => throw Unauthorize Exception (401)
+            -> !null <=> correct email and password => generate refreshToken (set to cookie) and accessToken return to frontend
+         */
         public async Task<string?> Login(UserLoginReq user)
         {
             User userFromDB = await _userRepository.GetByEmailAsync(user.Email);
@@ -66,11 +73,32 @@ namespace Application
             }
             throw new UnauthorizedAccessException(Message.User.InvalidEmailOrPassword);
         }
+
+        /*
+         Generate Access Token Func
+        this func recieve userId
+        use jwtHelper and give userID, accesstoken secret key, type: accesstoken, access token expired time, isser and audience
+        to generate access token
+         */
         public string GenerateAccessToken(Guid userId)
         {
 
             return JwtHelper.GenerateUserIDToken(userId, _jwtSettings.AccessTokenKey, TokenType.AccessToken.ToString(), _jwtSettings.AccessTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
         }
+
+
+
+        /*
+         Generate Refresh Token Func
+         This func recieve userId and a ClaimsPrincipal if any 
+            - When we use refresh token to got a new access token, we will generate a new refresh 
+              token with expired time of old refresh token if it was not expired
+              so that we will give a ClaimsPricipal for that func
+        It use jwt helper to generate a token
+        then verify this token to got a claimPricipal to take Iat (created time), Exp (expired time) to save this toke to DB
+        
+        Then set this token to cookie
+         */
         public async Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims)
         {
             var _context = _contextAccessor.HttpContext;
@@ -107,6 +135,16 @@ namespace Application
             return token;
 
         }
+
+        /*
+         Send OTP Func
+        This function recieve email from controller
+        User can got 1 Otp per minutes
+        if it func call > 1 turn per minutes -> throw Rate Limit Exceeded Exception (429)
+        Remove old OTP in DB before save new Otp
+        generate new otp -> save to DB
+        send this otp to user email
+         */
         public async Task SendOTP(string email)
         {
             int count = await _otpRepository.CountRateLimitAsync(email);
@@ -122,8 +160,24 @@ namespace Application
             await EmailHelper.SendEmailAsync(_emailSettings, email, subject, body);
         }
 
-        //hàm này sẽ giúp verify otp và gưi ra token tương ứng
-        public async Task<string> VerifyOTPAndEmail(VerifyOTPReq verifyOTPDto, TokenType type, string cookieKey)
+        /*
+         Verify OTP function
+         this function recieve verifyOTPDto from controller include OTP and email
+            Token type (type of token to generate) and cookieKey (name of token to save to cookie
+
+        First we use email to take otp from DB
+            - Null => this email do not have OTP -> throw Unauthorize Exception (401)
+            - !null => this email got a OTP
+
+        Next check OTP & OTP form DB
+            - if != => count number of times entered & throw Unauthorize Exception (401) 
+                       if count > number of entries allowed -> delete otp form DB
+        
+        Then generate token by email belong to token type and set it to cookie
+            - Register token when register account
+            - forgot password token when user forgot thier password
+        */
+        public async Task<string> VerifyOTP(VerifyOTPReq verifyOTPDto, TokenType type, string cookieKey)
         {
             string? otpFromRedis = await _otpRepository.GetOtpAsync(verifyOTPDto.Email);
             if (otpFromRedis == null)
@@ -166,6 +220,20 @@ namespace Application
             return token;
         }
 
+
+        /*
+         Register account func
+         This function receive token from controller ( register token ) => done verify otp And userRegisterReq 
+                                                                                            include user info
+         it map userRegisterReq to user
+         Then verify this token 
+            -   401 : invalid token
+            - If success -> got claimsPricipal of this token
+         got email form this claimPrincipal
+         try got user form Db by email
+            - != null -> throw Duplicate Exception (409)
+            - == null -> create new account =>  generate refreshToken (set to cookie) and accessToken return to frontend
+         */
         public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
         {
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
@@ -197,7 +265,19 @@ namespace Application
             return accesstoken;
         }
 
-        public async Task ChangePassword(ClaimsPrincipal userClaims, string password, string oldPassword)
+
+        /*
+         Change password func
+         This func use for change password use case
+         IT recieve userClaims from token of accessToken, oldPassword and new password => verify => take user ID from claims
+         got user from DB by id 
+            - null -> throw unauthorized exception (401) (invalid accesstoken)
+            - != null  -> verify password in DB == old password ?
+                - == -> set new passwrd
+                - != return unauthorized (401) (old password is incorrect)
+            
+         */
+        public async Task ChangePassword(ClaimsPrincipal userClaims, UserChangePasswordReq userChangePasswordReq)
         {
             var userID = userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             var userFromDB = await _userRepository.GetByIdAsync(Guid.Parse(userID));
@@ -205,14 +285,27 @@ namespace Application
             {
                 throw new UnauthorizedAccessException(Message.User.Unauthorized);
             }
-            if (!PasswordHelper.VerifyPassword(oldPassword, userFromDB.Password))
+            if (!PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
             {
                 throw new UnauthorizedAccessException(Message.User.OldPasswordIsIncorrect);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userID);
-            userFromDB.Password = PasswordHelper.HashPassword(password);
+            userFromDB.Password = PasswordHelper.HashPassword(userChangePasswordReq.Password);
             await _userRepository.UpdateAsync(userFromDB);
         }
+        
+        /*
+         Reset Password Func
+         This function use for forgot password use case
+         it recieve forgotPasswordToken (after verify email) and password from Controller
+         verify this token 
+            - 401 : Invalid token
+           
+         if success -> got a claims -> take email form claim -> find user in DB by email
+            - == null -> throw unAuthorized exception (401) : invalid token (hacker)
+            - != null => revoke all refresh token of this account from DB and change password 
+            
+         */
         public async Task ResetPassword(string forgotPasswordToken, string password)
         {
             var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenKey,
@@ -221,7 +314,7 @@ namespace Application
             var userFromDB = await _userRepository.GetByEmailAsync(email);
             if (userFromDB == null)
             {
-                throw new BadHttpRequestException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.User.InvalidToken);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userFromDB.Id.ToString());
             userFromDB.Password = PasswordHelper.HashPassword(password);
@@ -229,12 +322,29 @@ namespace Application
 
         }
 
+
+        /*
+         Logout func
+         this function got refresh token from controller (cookie)
+         -> revoke this token
+         */
         public async Task<int> Logout(string refreshToken)
         {
             JwtHelper.VerifyToken(refreshToken, _jwtSettings.RefreshTokenKey, TokenType.RefreshToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
             return await _refreshTokenRepository.RevokeRefreshToken(refreshToken);
         }
 
+
+        /*
+         Refresh token func
+         this function use to got new accesstoken by refresh token 
+         it receive refreshToken from controller, and a bool variable (want to be got a revoked token)
+         verify this token
+            - 401 : invalid token
+         if success got a claim, got it token form BD by token
+            - == null => 401 exception
+           - != null -> generate new access token and refresh token with expired time = old refresh token expired time (use old claims)
+         */
         public async Task<string> RefreshToken(string refreshToken, bool getRevoked)
         {
 
