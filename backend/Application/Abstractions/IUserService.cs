@@ -23,9 +23,9 @@ namespace Application.Abstractions
 
         Task ChangePassword(ClaimsPrincipal userClaims, UserChangePasswordReq userChangePasswordDto);
         Task ResetPassword(string forgotPasswordToken, string password);
-        //Task<Dictionary<string, string>> LoginWithGoogle(string email);
+        Task<Dictionary<string, string>> LoginWithGoogle(string email);
 
-        //Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
+        Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
         //Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
     }

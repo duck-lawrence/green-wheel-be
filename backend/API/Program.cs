@@ -60,7 +60,7 @@ namespace API
             builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
-
+            builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
             
 
             //Mapper
@@ -76,17 +76,19 @@ namespace API
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
             //Otp
             builder.Services.Configure<OTPSettings>(builder.Configuration.GetSection("OTPSettings"));
+            //Google
+            builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("GoogleAuthSettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             //sử dụng cahce
             builder.Services.AddMemoryCache();
 
+            //thêm filter cho validation
             builder.Services.AddControllers(options =>
             {
                 // Thêm ValidationFilter vào pipeline
                 options.Filters.Add<ValidationFilter>();
             });
-
             //Fluentvalidator
             builder.Services.AddValidatorsFromAssemblyContaining(typeof(UserLoginReqValidator));
             //tắt validator tự ném lỗi

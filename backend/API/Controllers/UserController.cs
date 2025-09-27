@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.User.Request;
+using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +14,14 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
 
-        //private readonly IGoogleCredentialService _googleService;
+        private readonly IGoogleCredentialService _googleService;
 
         public UserController(IUserService service
-            //,IGoogleCredentialService googleCredentialService
+            ,IGoogleCredentialService googleCredentialService
             )
         {
             _userService = service;
-            //_googleService = googleCredentialService;
+            _googleService = googleCredentialService;
 
         }
         /*
@@ -183,6 +184,41 @@ namespace API.Controllers
             }
             return Unauthorized(Message.User.Unauthorized);
 
+        }
+
+        [HttpPost("login-google")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] LoginGoogleReq loginGoogleReqDto)
+        {
+            var payload = await _googleService.VerifyCredential(loginGoogleReqDto.Credential);
+
+            Dictionary<string, string> tokens = await _userService.LoginWithGoogle(payload.Email);
+            bool needSetPassword = true;
+            if (tokens.TryGetValue(TokenType.AccessToken.ToString(), out var token))
+            {
+                needSetPassword = false;
+            }
+            return Ok(new LoginGoogleRes
+            {
+                NeedSetPassword = needSetPassword,
+                AccessToken = token,
+                FirstName = payload.GivenName,
+                LastName = payload.FamilyName
+            });
+        }
+
+        [HttpPost("login-google/set-password")]
+        public async Task<IActionResult> SetPassword(GoogleSetPasswordReq googleSetPasswordReqDto)
+        {
+            if (Request.Cookies.TryGetValue(CookieKeys.SetPasswordToken, out var setPasswordToken))
+            {
+                string accesstoken = await _userService.SetPassword(setPasswordToken, googleSetPasswordReqDto.Password,
+                    googleSetPasswordReqDto.FirstName, googleSetPasswordReqDto.LastName);
+                return Ok(new
+                {
+                    AccessToken = accesstoken
+                });
+            }
+            return BadRequest();
         }
 
 

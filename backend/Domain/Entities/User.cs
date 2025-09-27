@@ -31,6 +31,7 @@ public partial class User : SorfDeletedEntity, IEntity
     public string? AvatarPublicId { get; set; }
 
     public Guid RoleId { get; set; }
+    public bool IsGoogleLinked { get; set; }
 
     public virtual CitizenIdentity? CitizenIdentity { get; set; }
 

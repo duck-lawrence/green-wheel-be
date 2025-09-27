@@ -372,5 +372,66 @@ namespace Application
 
             throw new UnauthorizedAccessException(Message.User.InvalidToken);
         }
+
+
+        public async Task<Dictionary<string, string>> LoginWithGoogle(string email)
+        {
+            var _context = _contextAccessor.HttpContext;
+            User user = await _userRepository.GetByEmailAsync(email);
+            if (user == null)
+            {
+                string setPasswordToken = JwtHelper.GenerateEmailToken(email, _jwtSettings.SetPasswordTokenKey, TokenType.SetPasswordToken.ToString(),
+                    _jwtSettings.SetPasswordTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
+                _context.Response.Cookies.Append(CookieKeys.SetPasswordToken, setPasswordToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,         // chỉ gửi qua HTTPS
+                    SameSite = SameSiteMode.Strict, // tránh CSRF
+                    Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.SetPasswordTokenExpiredTime) // hạn sử dụng
+                });
+                return new Dictionary<string, string>
+                {
+                    { TokenType.SetPasswordToken.ToString() , setPasswordToken }
+                };
+            }
+
+            if (user.IsGoogleLinked == false) user.IsGoogleLinked = true;
+            string accessToken = GenerateAccessToken(user.Id);
+            await GenerateRefreshToken(user.Id, null);
+            return new Dictionary<string, string>
+            {
+                { TokenType.AccessToken.ToString() , accessToken}
+            };
+
+        }
+
+        public async Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName)
+        {
+            var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenKey, TokenType.SetPasswordToken.ToString(),
+                _jwtSettings.Issuer, _jwtSettings.Audience);
+            string email = claims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString();
+            Guid id;
+            do
+            {
+                id = Guid.NewGuid();
+            } while (await _userRepository.GetByIdAsync(id) != null);
+            var roles = _cache.Get<List<Role>>("AllRoles");
+            var user = new User
+            {
+                Id = id,
+                FirstName = firstName,
+                LastName = lastName,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Email = email,
+                Password = PasswordHelper.HashPassword(password),
+                RoleId = roles.FirstOrDefault(r => r.Name == "Customer")!.Id,
+                IsGoogleLinked = true,
+                DeletedAt = null,
+            };
+            await _userRepository.AddAsync(user);
+            await GenerateRefreshToken(id, null);
+            return GenerateAccessToken(id);
+        }
     }
 }
