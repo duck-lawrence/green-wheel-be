@@ -318,10 +318,10 @@ CREATE TABLE [rental_contracts] (
     [actual_end_date] datetimeoffset,
     [is_signed_by_staff] bit NOT NULL DEFAULT (0),
     [is_signed_by_customer] bit NOT NULL DEFAULT (0),
-    [status] int NOT NULL DEFAULT 0, -- Pending, Active, Completed,    Cancelled
+    [status] int NOT NULL DEFAULT 0, -- Pending, Active, Completed, Cancelled
     [deleted_at] datetimeoffset,
 
-    [vehicle_id] uniqueidentifier NOT NULL,
+    [vehicle_id] uniqueidentifier,
     [customer_id] uniqueidentifier NOT NULL,
     [handover_staff_id] uniqueidentifier,
     [return_staff_id] uniqueidentifier,
