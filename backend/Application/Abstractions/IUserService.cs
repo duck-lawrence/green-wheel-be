@@ -18,14 +18,14 @@ namespace Application.Abstractions
         Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims);
 
         Task<string> RefreshToken(string refreshToken, bool getRevoked);
-        Task<string> VerifyOTPAndEmail(VerifyOTPReq verifyOTPDto, TokenType type, string cookiesKey);
+        Task<string> VerifyOTP(VerifyOTPReq verifyOTPDto, TokenType type, string cookiesKey);
         Task SendOTP(string email);
 
-        Task ChangePassword(ClaimsPrincipal userClaims, string password, string oldPassword);
+        Task ChangePassword(ClaimsPrincipal userClaims, UserChangePasswordReq userChangePasswordDto);
         Task ResetPassword(string forgotPasswordToken, string password);
-        //Task<Dictionary<string, string>> LoginWithGoogle(string email);
+        Task<Dictionary<string, string>> LoginWithGoogle(string email);
 
-        //Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
+        Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
         //Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
     }

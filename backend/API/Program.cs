@@ -1,5 +1,6 @@
 ﻿
 using API.Extentions;
+using API.Filters;
 using API.Middleware;
 using API.Policy;
 using Application;
@@ -11,6 +12,7 @@ using Application.Validators.User;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Threading.Tasks;
 
@@ -58,10 +60,8 @@ namespace API
             builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
-
-            //Fluentvalidator
-            builder.Services.AddValidatorsFromAssemblyContaining(typeof(UserLoginReqValidator));
-            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
+            
 
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
@@ -76,10 +76,26 @@ namespace API
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
             //Otp
             builder.Services.Configure<OTPSettings>(builder.Configuration.GetSection("OTPSettings"));
+            //Google
+            builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("GoogleAuthSettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             //sử dụng cahce
             builder.Services.AddMemoryCache();
+
+            //thêm filter cho validation
+            builder.Services.AddControllers(options =>
+            {
+                // Thêm ValidationFilter vào pipeline
+                options.Filters.Add<ValidationFilter>();
+            });
+            //Fluentvalidator
+            builder.Services.AddValidatorsFromAssemblyContaining(typeof(UserLoginReqValidator));
+            //tắt validator tự ném lỗi
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
 
 

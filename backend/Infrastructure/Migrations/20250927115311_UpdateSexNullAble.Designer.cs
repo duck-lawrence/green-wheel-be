@@ -4,6 +4,7 @@ using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    partial class GreenWheelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250927115311_UpdateSexNullAble")]
+    partial class UpdateSexNullAble
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1108,10 +1111,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("first_name");
-
-                    b.Property<bool>("IsGoogleLinked")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_google_linked");
 
                     b.Property<string>("LastName")
                         .IsRequired()
