@@ -36,8 +36,8 @@ CREATE TABLE [users] (
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [first_name] nvarchar(50) NOT NULL,
     [last_name] nvarchar(50) NOT NULL,
-    [email] varchar(255) NOT NULL,
-    [password] nvarchar(255) NOT NULL,
+    [email] varchar(255),
+    [password] nvarchar(255),
     [phone] varchar(15),
     [sex] int NOT NULL DEFAULT 0, -- Male, Female
     [date_of_birth] datetimeoffset,
