@@ -33,6 +33,16 @@ namespace API.Controllers
                 AccessToken = accessToken
             });
         }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            if (Request.Cookies.TryGetValue(CookieKeys.RefreshToken, out var refreshToken))
+            {
+                await _userService.Logout(refreshToken);
+                return Ok();
+            }
+            return Unauthorized(Message.User.Unauthorized);
+        }
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
         {
@@ -100,5 +110,23 @@ namespace API.Controllers
             return BadRequest();
 
         }
+
+        [HttpPost]
+        [Route("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            if (Request.Cookies.TryGetValue(CookieKeys.RefreshToken, out var refreshToken))
+            {
+                string accessToken = await _userService.RefreshToken(refreshToken, false);
+                return Ok(new
+                {
+                    AccessToken = accessToken
+                });
+            }
+            return Unauthorized(Message.User.Unauthorized);
+
+        }
+
+
     }
 }
