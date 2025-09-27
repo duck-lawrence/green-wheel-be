@@ -7,7 +7,6 @@ namespace Domain.Entities;
 public partial class StationFeedback : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
-
     public DateTimeOffset CreatedAt { get; set; }
 
     public DateTimeOffset UpdatedAt { get; set; }
@@ -15,8 +14,6 @@ public partial class StationFeedback : SorfDeletedEntity, IEntity
     public string? Content { get; set; }
 
     public int Rating { get; set; }
-
-    
 
     public Guid CustomerId { get; set; }
 

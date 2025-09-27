@@ -32,7 +32,7 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
 
     
 
-    public Guid VehicleId { get; set; }
+    public Guid? VehicleId { get; set; }
 
     public Guid CustomerId { get; set; }
 
