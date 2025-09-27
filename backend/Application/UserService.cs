@@ -196,5 +196,37 @@ namespace Application
 
             return accesstoken;
         }
+
+        public async Task ChangePassword(ClaimsPrincipal userClaims, string password, string oldPassword)
+        {
+            var userID = userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
+            var userFromDB = await _userRepository.GetByIdAsync(Guid.Parse(userID));
+            if (userFromDB == null)
+            {
+                throw new UnauthorizedAccessException(Message.User.Unauthorized);
+            }
+            if (!PasswordHelper.VerifyPassword(oldPassword, userFromDB.Password))
+            {
+                throw new UnauthorizedAccessException(Message.User.OldPasswordIsIncorrect);
+            }
+            await _refreshTokenRepository.RevokeRefreshTokenByUserID(userID);
+            userFromDB.Password = PasswordHelper.HashPassword(password);
+            await _userRepository.UpdateAsync(userFromDB);
+        }
+        public async Task ResetPassword(string forgotPasswordToken, string password)
+        {
+            var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenKey,
+                                                TokenType.ForgotPasswordToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+            string email = claims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
+            var userFromDB = await _userRepository.GetByEmailAsync(email);
+            if (userFromDB == null)
+            {
+                throw new BadHttpRequestException(Message.User.InvalidToken);
+            }
+            await _refreshTokenRepository.RevokeRefreshTokenByUserID(userFromDB.Id.ToString());
+            userFromDB.Password = PasswordHelper.HashPassword(password);
+            await _userRepository.UpdateAsync(userFromDB);
+
+        }
     }
 }

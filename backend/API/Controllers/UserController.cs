@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.User.Request;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -61,6 +62,43 @@ namespace API.Controllers
             {
                 return BadRequest();
             }
+        }
+
+        [HttpPut("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordReq userChangePasswordDto)
+        {
+            var user = HttpContext.User;
+            await _userService.ChangePassword(user, userChangePasswordDto.Password, userChangePasswordDto.OldPassword);
+            return Ok();
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] SendEmailReq sendEmailRequestDto)
+        {
+            await _userService.SendOTP(sendEmailRequestDto.Email);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("forgot-password/verify-otp")]
+        public async Task<IActionResult> ForgotPasswordVerifyOTP([FromBody] VerifyOTPReq verifyOTPDto)
+        {
+            await _userService.VerifyOTPAndEmail(verifyOTPDto, TokenType.ForgotPasswordToken, CookieKeys.ForgotPasswordToken);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] UserChangePasswordReq userChangePasswordDto)
+        {
+            if (Request.Cookies.TryGetValue(CookieKeys.ForgotPasswordToken, out var forgotPasswordToken))
+            {
+                await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
+                return Ok();
+            }
+            return BadRequest();
+
         }
     }
 }

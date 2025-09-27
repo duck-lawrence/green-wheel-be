@@ -21,8 +21,8 @@ namespace Application.Abstractions
         Task<string> VerifyOTPAndEmail(VerifyOTPReq verifyOTPDto, TokenType type, string cookiesKey);
         Task SendOTP(string email);
 
-        //Task ChangePassword(ClaimsPrincipal userClaims, string password, string oldPassword);
-        //Task ResetPassword(string forgotPasswordToken, string password);
+        Task ChangePassword(ClaimsPrincipal userClaims, string password, string oldPassword);
+        Task ResetPassword(string forgotPasswordToken, string password);
         //Task<Dictionary<string, string>> LoginWithGoogle(string email);
 
         //Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
