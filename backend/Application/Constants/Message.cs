@@ -15,6 +15,8 @@ namespace Application.Constants
             public const string InvalidOTP = "user.invalid_otp";
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
             public const string OTPMustHave6Digits = "user.otp.must.have.6.digits";
+            public const string RateLimitOtp = "user.rate_limit_otp";
+            public const string AttemptOtp = "user.attemp_otp";
             //register
             public const string EmailAlreadyExists = "user.email_already_exists";
             public const string EmailIsRequired = "user.email_is_required";
@@ -27,6 +29,7 @@ namespace Application.Constants
             public const string PhoneIsRequired = "user.phone_is_required";
             public const string FirstNameIsRequired = "user.first_name_is_required";
             public const string LastNameIsRequired = "user.last_name_is_required";
+            public const string DateOfBirthIsRequired = "user.date_of_birht_is_required";
             //change password
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
             public const string OldPasswordIsRequired = "user.ole_password_is_required";
@@ -40,6 +43,7 @@ namespace Application.Constants
         //Common error
         public static class Common
         {
+            public const string TooManyRequest = "Common.too_many_request";
             public const string UnexpectedError = "An unexpected error occurred. Please try again later.";
         }
         //change password

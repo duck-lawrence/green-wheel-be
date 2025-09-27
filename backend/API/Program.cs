@@ -52,7 +52,8 @@ namespace API
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
+            builder.Services.AddScoped<IOTPRepository, OTPRepository>();
+            builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
 
@@ -69,6 +70,10 @@ namespace API
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var _jwtSetting = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
             builder.Services.AddJwtTokenValidation(_jwtSetting!);
+            //Email
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            //Otp
+            builder.Services.Configure<OTPSettings>(builder.Configuration.GetSection("OTPSettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
 

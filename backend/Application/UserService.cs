@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
 using Application.Dtos.User.Request;
@@ -8,6 +9,7 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
@@ -18,29 +20,33 @@ namespace Application
     {
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly JwtSettings _jwtSettings;
-        //private readonly EmailSettings _emailSettings;
-        //private readonly IOTPRepository _otpRepository;
+        private readonly IOTPRepository _otpRepository;
         private readonly IHttpContextAccessor _contextAccessor;
-        //private readonly IMapper _mapper;
+        private readonly JwtSettings _jwtSettings;
+        private readonly EmailSettings _emailSettings;
+        private readonly OTPSettings _otpSettings;
+        private readonly IMapper _mapper;
         public UserService(IUserRepository repository, 
             IOptions<JwtSettings> jwtSettings,
             IRefreshTokenRepository refreshTokenRepository,
-             //IOptions<EmailSettings> emailSettings,
-             //IOTPRepository otpRepository,
-             IHttpContextAccessor httpContextAccessor
-             //,IMapper mapper
+             IOptions<EmailSettings> emailSettings,
+             IOTPRepository otpRepository,
+             IHttpContextAccessor httpContextAccessor,
+             IOptions<OTPSettings> otpSetting
+             ,IMapper mapper
             )
         {
             _userRepository = repository;
             _refreshTokenRepository = refreshTokenRepository;
-            //_otpRepository = otpRepository;
+            _otpRepository = otpRepository;
             _jwtSettings = jwtSettings.Value;
-            //_emailSettings = emailSettings.Value;
+            _emailSettings = emailSettings.Value;
             _contextAccessor = httpContextAccessor;
-            //_mapper = mapper;
+            _otpSettings = otpSetting.Value;
+            _mapper = mapper;
         }
 
+       
         public async Task<string?> Login(UserLoginReq user)
         {
             User userFromDB = await _userRepository.GetByEmailAsync(user.Email);
@@ -96,6 +102,92 @@ namespace Application
             });
             return token;
 
+        }
+        public async Task SendOTP(string email)
+        {
+            int count = await _otpRepository.CountRateLimitAsync(email);
+            if (count > _otpSettings.OtpRateLimit)
+            {
+                throw new RateLimitExceededException(Message.User.RateLimitOtp);
+            }
+            await _otpRepository.RemoveOTPAsync(email); //xoá cũ trước khi lưu cái ms
+            string otp = new Random().Next(100000, 900000).ToString();
+            await _otpRepository.SaveOTPAsyns(email, otp);
+            string subject = "Your OTP code";
+            string body = $"OTP: {otp} có quá oke khum người đẹp";
+            await EmailHelper.SendEmailAsync(_emailSettings, email, subject, body);
+        }
+
+        //hàm này sẽ giúp verify otp và gưi ra token tương ứng
+        public async Task<string> VerifyOTPAndEmail(VerifyOTPReq verifyOTPDto, TokenType type, string cookieKey)
+        {
+            string? otpFromRedis = await _otpRepository.GetOtpAsync(verifyOTPDto.Email);
+            if (otpFromRedis == null)
+            {
+                throw new UnauthorizedAccessException(Message.User.InvalidOTP);
+            }
+            if(verifyOTPDto.OTP != otpFromRedis)
+            {
+                int count = await _otpRepository.CountAttemptAsync(verifyOTPDto.Email);
+                if (count > _otpSettings.OtpAttempts)
+                {
+                    await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
+                    await _otpRepository.ResetAttemptAsync(verifyOTPDto.Email);
+                    throw new UnauthorizedAccessException(Message.Common.TooManyRequest);
+                }
+                throw new UnauthorizedAccessException(Message.User.InvalidOTP);
+            }
+            var _context = _contextAccessor.HttpContext;
+            await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
+            string secretKey = "";
+            int expiredTime;
+            if (type == TokenType.RegisterToken)
+            {
+                secretKey = _jwtSettings.RegisterTokenKey;
+                expiredTime = _jwtSettings.RefreshTokenExpiredTime;
+            }
+            else
+            {
+                secretKey = _jwtSettings.ForgotPasswordTokenKey;
+                expiredTime = _jwtSettings.ForgotPasswordTokenExpiredTime;
+            }
+            string token = JwtHelper.GenerateEmailToken(verifyOTPDto.Email, secretKey, type.ToString(), expiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
+            _context.Response.Cookies.Append(cookieKey, token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,         // chỉ gửi qua HTTPS
+                SameSite = SameSiteMode.Strict, // tránh CSRF
+                Expires = DateTime.UtcNow.AddMinutes(expiredTime) // hạn sử dụng
+            });
+            return token;
+        }
+
+        public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
+        {
+            var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
+            ClaimsPrincipal claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenKey, TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+            var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+            var userFromDB = await _userRepository.GetByEmailAsync(email);
+
+            if (userFromDB != null)
+            {
+                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists); //email đã tồn tại
+            }
+            Guid id;
+            do
+            {
+                id = Guid.NewGuid();
+            } while (await _userRepository.GetByIdAsync(id) != null);
+            user.Id = id;
+            user.CreatedAt = user.UpdatedAt = DateTime.UtcNow;
+            user.Email = email;
+            user.RoleId = (int)UserRoles.customer;
+            user.DeletedAt = null;
+            Guid userId = await _userRepository.AddAsync(user);
+            string accesstoken = GenerateAccessToken(userId);
+            string refreshToken = await GenerateRefreshToken(userId, null);
+
+            return accesstoken;
         }
     }
 }
