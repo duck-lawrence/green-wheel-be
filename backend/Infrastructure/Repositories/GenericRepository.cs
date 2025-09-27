@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Repository
+namespace Infrastructure.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class,IEntity
     {

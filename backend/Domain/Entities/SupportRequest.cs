@@ -21,9 +21,6 @@ public partial class SupportRequest : SorfDeletedEntity, IEntity
     public int Status { get; set; }
 
     public int Type { get; set; }
-
-    
-
     public Guid CustomerId { get; set; }
 
     public Guid? StaffId { get; set; }

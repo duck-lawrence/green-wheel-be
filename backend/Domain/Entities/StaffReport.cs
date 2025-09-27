@@ -22,8 +22,6 @@ public partial class StaffReport : SorfDeletedEntity, IEntity
 
     public int Type { get; set; }
 
-    
-
     public Guid? SupportRequestId { get; set; }
 
     public Guid StaffId { get; set; }

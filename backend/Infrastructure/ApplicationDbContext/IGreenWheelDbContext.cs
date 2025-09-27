@@ -12,57 +12,57 @@ namespace Infrastructure.ApplicationDbContext
 {
     public interface IGreenWheelDbContext
     {
-        DbSet<Brand> Brands { get; set; }
+         DbSet<Brand> Brands { get; set; }
 
-        DbSet<CitizenIdentity> CitizenIdentities { get; set; }
+         DbSet<CitizenIdentity> CitizenIdentities { get; set; }
 
-        DbSet<Deposit> Deposits { get; set; }
+         DbSet<Deposit> Deposits { get; set; }
 
-        DbSet<DispatchRequest> DispatchRequests { get; set; }
+         DbSet<DispatchRequest> DispatchRequests { get; set; }
 
-        DbSet<DispatchRequestStaff> DispatchRequestStaffs { get; set; }
+         DbSet<DispatchRequestStaff> DispatchRequestStaffs { get; set; }
 
-        DbSet<DispatchRequestVehicle> DispatchRequestVehicles { get; set; }
+         DbSet<DispatchRequestVehicle> DispatchRequestVehicles { get; set; }
 
-        DbSet<DriverLicense> DriverLicenses { get; set; }
+         DbSet<DriverLicense> DriverLicenses { get; set; }
 
-        DbSet<Invoice> Invoices { get; set; }
+         DbSet<Invoice> Invoices { get; set; }
 
-        DbSet<InvoiceItem> InvoiceItems { get; set; }
+         DbSet<InvoiceItem> InvoiceItems { get; set; }
 
-        DbSet<ModelComponent> ModelComponents { get; set; }
+         DbSet<ModelComponent> ModelComponents { get; set; }
 
-        DbSet<RefreshToken> RefreshTokens { get; set; }
+         DbSet<RefreshToken> RefreshTokens { get; set; }
 
-        DbSet<RentalContract> RentalContracts { get; set; }
+         DbSet<RentalContract> RentalContracts { get; set; }
 
-        DbSet<Role> Roles { get; set; }
+         DbSet<Role> Roles { get; set; }
 
-        DbSet<Staff> Staffs { get; set; }
+         DbSet<Staff> Staffs { get; set; }
 
-        DbSet<StaffReport> StaffReports { get; set; }
+         DbSet<StaffReport> StaffReports { get; set; }
 
-        DbSet<Station> Stations { get; set; }
+         DbSet<Station> Stations { get; set; }
 
-        DbSet<StationFeedback> StationFeedbacks { get; set; }
+         DbSet<StationFeedback> StationFeedbacks { get; set; }
 
-        DbSet<SupportRequest> SupportRequests { get; set; }
+         DbSet<SupportRequest> SupportRequests { get; set; }
 
-        DbSet<User> Users { get; set; }
+         DbSet<User> Users { get; set; }
 
-        DbSet<Vehicle> Vehicles { get; set; }
+         DbSet<Vehicle> Vehicles { get; set; }
 
-        DbSet<VehicleChecklist> VehicleChecklists { get; set; }
+         DbSet<VehicleChecklist> VehicleChecklists { get; set; }
 
-        DbSet<VehicleChecklistItem> VehicleChecklistItems { get; set; }
+         DbSet<VehicleChecklistItem> VehicleChecklistItems { get; set; }
 
-        DbSet<VehicleComponent> VehicleComponents { get; set; }
+         DbSet<VehicleComponent> VehicleComponents { get; set; }
 
-        DbSet<VehicleImage> VehicleImages { get; set; }
+         DbSet<VehicleImage> VehicleImages { get; set; }
 
-        DbSet<VehicleModel> VehicleModels { get; set; }
+         DbSet<VehicleModel> VehicleModels { get; set; }
 
-        DbSet<VehicleSegment> VehicleSegments { get; set; }
+         DbSet<VehicleSegment> VehicleSegments { get; set; }
 
         public DbSet<T> Set<T>() where T : class, IEntity;
 

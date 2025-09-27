@@ -1,8 +1,6 @@
 ﻿using Domain.Commons;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 
 namespace Infrastructure.ApplicationDbContext;
 
@@ -73,13 +71,11 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
     {
         return await base.SaveChangesAsync();
     }
-    
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Brand>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__brands__3213E83FC0821500");
+            entity.HasKey(e => e.Id).HasName("PK__brands__3213E83F268FE849");
 
             entity.ToTable("brands");
 
@@ -107,13 +103,13 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<CitizenIdentity>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__citizen___3213E83F496E3FD5");
+            entity.HasKey(e => e.Id).HasName("PK__citizen___3213E83FDB5A0581");
 
             entity.ToTable("citizen_identities");
 
-            entity.HasIndex(e => e.UserId, "UQ__citizen___B9BE370EDF8C7671").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__citizen___B9BE370E25FD9C10").IsUnique();
 
-            entity.HasIndex(e => e.Number, "UQ__citizen___FD291E4116DEC946").IsUnique();
+            entity.HasIndex(e => e.Number, "UQ__citizen___FD291E411CA2B7AB").IsUnique();
 
             entity.HasIndex(e => e.UserId, "uq_citizen_identities_user_id").IsUnique();
 
@@ -155,11 +151,11 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Deposit>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__deposits__3213E83F18D4D280");
+            entity.HasKey(e => e.Id).HasName("PK__deposits__3213E83F15782E11");
 
             entity.ToTable("deposits");
 
-            entity.HasIndex(e => e.InvoiceId, "UQ__deposits__F58DFD48434C32F2").IsUnique();
+            entity.HasIndex(e => e.InvoiceId, "UQ__deposits__F58DFD48B95264A6").IsUnique();
 
             entity.HasIndex(e => e.InvoiceId, "uq_deposits_invoice_id").IsUnique();
 
@@ -169,7 +165,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.Amount)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("amount");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
@@ -177,7 +175,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.RefundedAt).HasColumnName("refunded_at");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Invoice).WithOne(p => p.Deposit)
                 .HasForeignKey<Deposit>(d => d.InvoiceId)
@@ -187,7 +187,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DispatchRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83FD8F36F9F");
+            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83F8BB52086");
 
             entity.ToTable("dispatch_requests");
 
@@ -203,7 +203,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
             entity.Property(e => e.ApprovedAdminId).HasColumnName("approved_admin_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
@@ -212,7 +214,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.RequestAdminId).HasColumnName("request_admin_id");
             entity.Property(e => e.Status).HasColumnName("status");
             entity.Property(e => e.ToStationId).HasColumnName("to_station_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.ApprovedAdmin).WithMany(p => p.DispatchRequestApprovedAdmins)
                 .HasForeignKey(d => d.ApprovedAdminId)
@@ -236,7 +240,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DispatchRequestStaff>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83F753C8330");
+            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83F0DFB7CEF");
 
             entity.ToTable("dispatch_request_staffs");
 
@@ -247,11 +251,15 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.DispatchRequestId).HasColumnName("dispatch_request_id");
             entity.Property(e => e.StaffId).HasColumnName("staff_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.DispatchRequest).WithMany(p => p.DispatchRequestStaffs)
                 .HasForeignKey(d => d.DispatchRequestId)
@@ -266,7 +274,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DispatchRequestVehicle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83FF905DF02");
+            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83FDCB5F750");
 
             entity.ToTable("dispatch_request_vehicles");
 
@@ -277,10 +285,14 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.DispatchRequestId).HasColumnName("dispatch_request_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
             entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
 
             entity.HasOne(d => d.DispatchRequest).WithMany(p => p.DispatchRequestVehicles)
@@ -296,13 +308,13 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DriverLicense>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__driver_l__3213E83F72203F9E");
+            entity.HasKey(e => e.Id).HasName("PK__driver_l__3213E83F9882F5A0");
 
             entity.ToTable("driver_licenses");
 
-            entity.HasIndex(e => e.UserId, "UQ__driver_l__B9BE370ECBEA7C71").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__driver_l__B9BE370EAF079999").IsUnique();
 
-            entity.HasIndex(e => e.Number, "UQ__driver_l__FD291E412B4BD31D").IsUnique();
+            entity.HasIndex(e => e.Number, "UQ__driver_l__FD291E41057DDF24").IsUnique();
 
             entity.HasIndex(e => e.UserId, "uq_driver_licenses_user_id").IsUnique();
 
@@ -345,7 +357,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Invoice>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__invoices__3213E83F46DB64D7");
+            entity.HasKey(e => e.Id).HasName("PK__invoices__3213E83F3C6175A1");
 
             entity.ToTable("invoices");
 
@@ -392,7 +404,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<InvoiceItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__invoice___3213E83FD452BBE8");
+            entity.HasKey(e => e.Id).HasName("PK__invoice___3213E83FEFFF66A8");
 
             entity.ToTable("invoice_items");
 
@@ -406,7 +418,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
             entity.Property(e => e.ChecklistItemId).HasColumnName("checklist_item_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.Notes)
@@ -419,7 +433,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UnitPrice)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("unit_price");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.ChecklistItem).WithOne(p => p.InvoiceItem)
                 .HasForeignKey<InvoiceItem>(d => d.ChecklistItemId)
@@ -433,7 +449,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<ModelComponent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__model_co__3213E83F6C664639");
+            entity.HasKey(e => e.Id).HasName("PK__model_co__3213E83F3E460DA4");
 
             entity.ToTable("model_components");
 
@@ -445,10 +461,14 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
             entity.Property(e => e.ComponentId).HasColumnName("component_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.ModelId).HasColumnName("model_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Component).WithMany(p => p.ModelComponents)
                 .HasForeignKey(d => d.ComponentId)
@@ -463,7 +483,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<RefreshToken>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__refresh___3213E83F9E6969FA");
+            entity.HasKey(e => e.Id).HasName("PK__refresh___3213E83FBC3AE1EB");
 
             entity.ToTable("refresh_tokens");
 
@@ -494,7 +514,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<RentalContract>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__rental_c__3213E83FC10198CB");
+            entity.HasKey(e => e.Id).HasName("PK__rental_c__3213E83FA1754E1B");
 
             entity.ToTable("rental_contracts");
 
@@ -511,7 +531,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnName("id");
             entity.Property(e => e.ActualEndDate).HasColumnName("actual_end_date");
             entity.Property(e => e.ActualStartDate).HasColumnName("actual_start_date");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Description)
@@ -527,7 +549,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.ReturnStaffId).HasColumnName("return_staff_id");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
             entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
 
             entity.HasOne(d => d.Customer).WithMany(p => p.RentalContracts)
@@ -545,13 +569,12 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.HasOne(d => d.Vehicle).WithMany(p => p.RentalContracts)
                 .HasForeignKey(d => d.VehicleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_rental_contracts_vehicles");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__roles__3213E83F6CAE2586");
+            entity.HasKey(e => e.Id).HasName("PK__roles__3213E83F27F2E65B");
 
             entity.ToTable("roles");
 
@@ -575,7 +598,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Staff>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__staffs__B9BE370FA89B3DEB");
+            entity.HasKey(e => e.UserId).HasName("PK__staffs__B9BE370FCEC46396");
 
             entity.ToTable("staffs");
 
@@ -600,7 +623,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<StaffReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__staff_re__3213E83F6F077A31");
+            entity.HasKey(e => e.Id).HasName("PK__staff_re__3213E83FF23CAB38");
 
             entity.ToTable("staff_reports");
 
@@ -647,7 +670,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Station>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__stations__3213E83FD27F838E");
+            entity.HasKey(e => e.Id).HasName("PK__stations__3213E83F65C937F2");
 
             entity.ToTable("stations");
 
@@ -671,7 +694,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<StationFeedback>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__station___3213E83F5BCC48AD");
+            entity.HasKey(e => e.Id).HasName("PK__station___3213E83F33408F3E");
 
             entity.ToTable("station_feedbacks");
 
@@ -707,7 +730,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<SupportRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__support___3213E83F5907B145");
+            entity.HasKey(e => e.Id).HasName("PK__support___3213E83FAF7946B7");
 
             entity.ToTable("support_requests");
 
@@ -747,7 +770,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__users__3213E83F2E5D4AD9");
+            entity.HasKey(e => e.Id).HasName("PK__users__3213E83FFB353554");
 
             entity.ToTable("users");
 
@@ -798,11 +821,11 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Vehicle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicles__3213E83F3C4B151C");
+            entity.HasKey(e => e.Id).HasName("PK__vehicles__3213E83FC71D3EDF");
 
             entity.ToTable("vehicles");
 
-            entity.HasIndex(e => e.LicensePlate, "UQ__vehicles__F72CD56EBF33DBF3").IsUnique();
+            entity.HasIndex(e => e.LicensePlate, "UQ__vehicles__F72CD56EE1C45A04").IsUnique();
 
             entity.HasIndex(e => e.ModelId, "idx_vehicles_model_id");
 
@@ -811,7 +834,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.LicensePlate)
                 .HasMaxLength(15)
@@ -819,7 +844,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.ModelId).HasColumnName("model_id");
             entity.Property(e => e.StationId).HasColumnName("station_id");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Model).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.ModelId)
@@ -834,7 +861,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleChecklist>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F83A7B660");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F15B22915");
 
             entity.ToTable("vehicle_checklists");
 
@@ -850,7 +877,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
             entity.Property(e => e.ContractId).HasColumnName("contract_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Description)
@@ -859,7 +888,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.IsSignedByCustomer).HasColumnName("is_signed_by_customer");
             entity.Property(e => e.IsSignedByStaff).HasColumnName("is_signed_by_staff");
             entity.Property(e => e.StaffId).HasColumnName("staff_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
             entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
 
             entity.HasOne(d => d.Contract).WithMany(p => p.VehicleChecklists)
@@ -883,7 +914,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleChecklistItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F85D0CBAB");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FC33F6FF3");
 
             entity.ToTable("vehicle_checklist_items");
 
@@ -896,13 +927,17 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnName("id");
             entity.Property(e => e.ChecklistId).HasColumnName("checklist_id");
             entity.Property(e => e.ComponentId).HasColumnName("component_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Notes)
                 .HasMaxLength(255)
                 .HasColumnName("notes");
             entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Checklist).WithMany(p => p.VehicleChecklistItems)
                 .HasForeignKey(d => d.ChecklistId)
@@ -917,14 +952,16 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleComponent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F8F3ACB32");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FFAC07EE1");
 
             entity.ToTable("vehicle_components");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
@@ -932,28 +969,34 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
         });
 
         modelBuilder.Entity<VehicleImage>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F8A36CCF9");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FE59545DD");
 
             entity.ToTable("vehicle_images");
 
-            entity.HasIndex(e => e.Url, "UQ__vehicle___DD778417E94F4592").IsUnique();
+            entity.HasIndex(e => e.Url, "UQ__vehicle___DD778417A8A510F3").IsUnique();
 
             entity.HasIndex(e => e.VehicleId, "idx_vehicle_images_vehicle_id");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.PublicId)
                 .HasMaxLength(255)
                 .HasColumnName("public_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
             entity.Property(e => e.Url)
                 .HasMaxLength(500)
                 .HasColumnName("url");
@@ -967,7 +1010,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleModel>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FE1EEBD85");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F3EC26636");
 
             entity.ToTable("vehicle_models");
 
@@ -1027,7 +1070,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleSegment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FE1959573");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FC8B2ADFF");
 
             entity.ToTable("vehicle_segments");
 
