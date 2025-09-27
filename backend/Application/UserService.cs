@@ -10,6 +10,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
@@ -26,14 +27,16 @@ namespace Application
         private readonly EmailSettings _emailSettings;
         private readonly OTPSettings _otpSettings;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
         public UserService(IUserRepository repository, 
             IOptions<JwtSettings> jwtSettings,
             IRefreshTokenRepository refreshTokenRepository,
              IOptions<EmailSettings> emailSettings,
              IOTPRepository otpRepository,
              IHttpContextAccessor httpContextAccessor,
-             IOptions<OTPSettings> otpSetting
-             ,IMapper mapper
+             IOptions<OTPSettings> otpSetting,
+             IMapper mapper,
+             IMemoryCache cache
             )
         {
             _userRepository = repository;
@@ -44,6 +47,7 @@ namespace Application
             _contextAccessor = httpContextAccessor;
             _otpSettings = otpSetting.Value;
             _mapper = mapper;
+            _cache = cache;
         }
 
        
@@ -178,10 +182,13 @@ namespace Application
             {
                 id = Guid.NewGuid();
             } while (await _userRepository.GetByIdAsync(id) != null);
+            //lấy ra list role trong cache
+            var roles = _cache.Get<List<Role>>("AllRoles");
+
             user.Id = id;
             user.CreatedAt = user.UpdatedAt = DateTime.UtcNow;
             user.Email = email;
-            user.RoleId = (int)UserRoles.customer;
+            user.RoleId = roles.FirstOrDefault(r => r.Name == "Customer").Id;
             user.DeletedAt = null;
             Guid userId = await _userRepository.AddAsync(user);
             string accesstoken = GenerateAccessToken(userId);

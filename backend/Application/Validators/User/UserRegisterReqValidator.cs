@@ -36,7 +36,7 @@ namespace Application.Validators.User
                     return age >= 21;
                 }).WithMessage(Message.User.InvalidUserAge);
 
-            RuleFor(x => x.PhoneNumber)
+            RuleFor(x => x.Phone)
                 .NotEmpty().WithMessage(Message.User.PhoneIsRequired)
                 .Matches(@"^(?:\+84|0)(?:3\d|5[6-9]|7\d|8[1-9]|9\d)\d{7}$")
                 .WithMessage(Message.User.InvalidPhone);

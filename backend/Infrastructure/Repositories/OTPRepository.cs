@@ -2,7 +2,6 @@
 using Application.Repositories;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 
 
 namespace Infrastructure.Repositories
