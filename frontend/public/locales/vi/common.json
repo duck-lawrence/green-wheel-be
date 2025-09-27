@@ -26,5 +26,29 @@
         "update": "Cập nhật thất bại",
         "delete": "Xoá thất bại",
         "refresh": "Tải lại thất bại"
+    },
+
+    "email": {
+        "require": "Vui lòng nhập email",
+        "invalid": "Định dạng email không hợp lệ",
+        "label": "Email"
+    },
+
+    "password": {
+        "require": "Vui lòng nhập mật khẩu",
+        "min": "Mật khẩu phải có ít nhất 6 ký tự",
+        "label": "Mật khẩu"
+    },
+
+    "login": {
+        "welcome": "Chào mừng trở lại",
+        "loginContinue": "Đăng nhập vào tài khoản của bạn để tiếp tục",
+        "remember": "Ghi nhớ đăng nhập",
+        "forgot": "Quên mật khẩu?",
+        "login": "Đăng nhập",
+        "continueWithGoogle": "Tiếp tục với Google",
+        "or": "HOẶC",
+        "needToCreateAnAccount": "Bạn chưa có tài khoản?",
+        "regis": "Đăng ký"
     }
 }
