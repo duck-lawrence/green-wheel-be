@@ -3,6 +3,7 @@ using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
 using Application.Dtos.User.Request;
+using Application.Dtos.User.Respone;
 using Application.Helpers;
 using Application.Repositories;
 using AutoMapper;
@@ -432,6 +433,33 @@ namespace Application
             await _userRepository.AddAsync(user);
             await GenerateRefreshToken(id, null);
             return GenerateAccessToken(id);
+        }
+        public async Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims)
+        {
+            Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            User userFromDb = await _userRepository.GetByIdAsync(userID);
+            if (userFromDb == null)
+            {
+                throw new DirectoryNotFoundException(Message.User.UserNotFound);
+            }
+            return _mapper.Map<UserProfileViewRes>(userFromDb);
+        }
+
+        public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
+        {
+            Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            User userFromDb = await _userRepository.GetByIdAsync(userID);
+            if (userFromDb == null)
+            {
+                throw new DirectoryNotFoundException(Message.User.UserNotFound);
+            }
+            if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
+            if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
+            if (userUpdateReq.Phone != null) userFromDb.Phone = userUpdateReq.Phone;
+            if(userUpdateReq.DateOfBirth != null) userFromDb.DateOfBirth = userUpdateReq.DateOfBirth;
+            if(userUpdateReq.Sex != null) userFromDb.Sex = userUpdateReq.Sex;
+            await _userRepository.UpdateAsync(userFromDb);
+
         }
     }
 }
