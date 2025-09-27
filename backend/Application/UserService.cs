@@ -228,5 +228,39 @@ namespace Application
             await _userRepository.UpdateAsync(userFromDB);
 
         }
+
+        public async Task<int> Logout(string refreshToken)
+        {
+            JwtHelper.VerifyToken(refreshToken, _jwtSettings.RefreshTokenKey, TokenType.RefreshToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+            return await _refreshTokenRepository.RevokeRefreshToken(refreshToken);
+        }
+
+        public async Task<string> RefreshToken(string refreshToken, bool getRevoked)
+        {
+
+            ClaimsPrincipal claims = JwtHelper.VerifyToken(refreshToken,
+                                                            _jwtSettings.RefreshTokenKey,
+                                                            TokenType.RefreshToken.ToString(),
+                                                            _jwtSettings.Issuer,
+                                                            _jwtSettings.Audience);
+
+            if (claims != null)
+            {
+                RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
+                if (refreshTokenFromDB == null)
+                {
+                    throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                }
+                string newAccessToken = GenerateAccessToken(refreshTokenFromDB.UserId);
+                string newRefreshToken = await GenerateRefreshToken(refreshTokenFromDB.UserId, claims);
+                await _refreshTokenRepository.RevokeRefreshToken(refreshTokenFromDB.Token);
+
+                return newAccessToken;
+
+
+            }
+
+            throw new UnauthorizedAccessException(Message.User.InvalidToken);
+        }
     }
 }

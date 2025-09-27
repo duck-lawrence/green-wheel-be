@@ -7,7 +7,7 @@ namespace Application.Abstractions
     {
         Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq);
         Task<string?> Login(UserLoginReq user);
-        //Task<int> Logout(string refreshToken);
+        Task<int> Logout(string refreshToken);
         //Task<User> DeleteUserAsync(Guid id);
         //Task<IEnumerable<User>> GetAllUserAsync(Expression<Func<User, object>>? include = null);
         //Task<int> UpdateUserAsync(User user);
@@ -17,7 +17,7 @@ namespace Application.Abstractions
         string GenerateAccessToken(Guid userId);
         Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims);
 
-        //Task<string> RefreshToken(string refreshToken, bool getRevoked);
+        Task<string> RefreshToken(string refreshToken, bool getRevoked);
         Task<string> VerifyOTPAndEmail(VerifyOTPReq verifyOTPDto, TokenType type, string cookiesKey);
         Task SendOTP(string email);
 
