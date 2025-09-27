@@ -220,7 +220,23 @@ namespace API.Controllers
             }
             return BadRequest();
         }
+        [HttpGet("me")]
+        [Authorize]
+        public async Task<IActionResult> GetMe()
+        {
+            var userClaims = HttpContext.User;
+            var userProfileViewRes = await _userService.GetMe(userClaims);
+            return Ok(userProfileViewRes);
+        }
 
+        [HttpPatch("me")]
+        [Authorize]
+        public async Task<IActionResult> UpdateMe([FromBody]UserUpdateReq userUpdateReq)
+        {
+            var userClaims = HttpContext.User;
+            await _userService.UpdateMe(userClaims, userUpdateReq);
+            return Ok();
+        }
 
     }
 }
