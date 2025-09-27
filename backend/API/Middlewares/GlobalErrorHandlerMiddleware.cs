@@ -1,9 +1,12 @@
 ﻿
+using Application.AppExceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
-using System.Text.Json;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.RegularExpressions;
+using static System.Net.WebRequestMethods;
 
 namespace API.Middleware
 {
@@ -53,6 +56,12 @@ namespace API.Middleware
             catch (HttpRequestException httpEx)
             {
                 await WriteProblemDetailsAsync(context, 502, "External Request Failed", httpEx.Message);
+            }catch (RateLimitExceededException rEEx)
+            {
+                await WriteProblemDetailsAsync(context, 429, "Too Many Requests", rEEx.Message);
+            }catch(ConflictDuplicateException cDEx)
+            {
+                await WriteProblemDetailsAsync(context, 409, "Too Many Requests", cDEx.Message);
             }
             catch (Exception ex)
             {

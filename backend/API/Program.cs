@@ -11,12 +11,14 @@ using Application.Validators.User;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
+using Microsoft.Extensions.Caching.Memory;
+using System.Threading.Tasks;
 
 namespace API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +54,8 @@ namespace API
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-
+            builder.Services.AddScoped<IOTPRepository, OTPRepository>();
+            builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
 
@@ -61,7 +64,7 @@ namespace API
             builder.Services.AddFluentValidationAutoValidation();
 
             //Mapper
-            //builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
+            builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
 
             //configure <-> setting
@@ -69,9 +72,14 @@ namespace API
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var _jwtSetting = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
             builder.Services.AddJwtTokenValidation(_jwtSetting!);
+            //Email
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            //Otp
+            builder.Services.Configure<OTPSettings>(builder.Configuration.GetSection("OTPSettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
-
+            //sử dụng cahce
+            builder.Services.AddMemoryCache();
 
 
 
@@ -94,6 +102,21 @@ namespace API
             var app = builder.Build();
             //accept frontend
             app.UseCors("AllowFrontend");
+            //run cache and add list roll to cache
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleRepo = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
+                var roles = await roleRepo.GetAllAsync();
+
+                var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
+                //set cache và đảm bảo nó chạy xuyên suốt app
+                cache.Set("AllRoles", roles, new MemoryCacheEntryOptions
+                {
+                    //cache này sẽ tồn tại suốt vòng đời của cache
+                    Priority = CacheItemPriority.NeverRemove
+                });
+
+            }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

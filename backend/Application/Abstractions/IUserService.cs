@@ -1,11 +1,11 @@
 ﻿using Application.Dtos.User.Request;
 using System.Security.Claims;
-
+using Application.Constants;
 namespace Application.Abstractions
 {
     public interface IUserService
     {
-        //Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq);
+        Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq);
         Task<string?> Login(UserLoginReq user);
         //Task<int> Logout(string refreshToken);
         //Task<User> DeleteUserAsync(Guid id);
@@ -18,8 +18,8 @@ namespace Application.Abstractions
         Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims);
 
         //Task<string> RefreshToken(string refreshToken, bool getRevoked);
-        //Task<string> VerifyOTPAndEmail(string email, string otp, TokenType type, string cookiesKey);
-        //Task SendOTP(string email);
+        Task<string> VerifyOTPAndEmail(VerifyOTPReq verifyOTPDto, TokenType type, string cookiesKey);
+        Task SendOTP(string email);
 
         //Task ChangePassword(ClaimsPrincipal userClaims, string password, string oldPassword);
         //Task ResetPassword(string forgotPasswordToken, string password);
