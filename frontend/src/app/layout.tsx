@@ -3,9 +3,9 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { AppProviders } from "@/providers"
-import { LanguageSwitcher } from "@/components"
 import { Toaster } from "react-hot-toast"
 import { cookies } from "next/headers"
+import Navbar from "@/components/shared/Navbar"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -38,7 +38,7 @@ export default async function RootLayout({
             <body className="antialiased">
                 <AppProviders locale={locale}>
                     <div className="min-h-screen flex flex-col items-center p-6">
-                        <LanguageSwitcher />
+                        <Navbar />
                         {children}
                     </div>
                     {/* <Modals /> */}
