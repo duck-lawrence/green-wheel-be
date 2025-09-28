@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 
 namespace Application
@@ -29,6 +30,7 @@ namespace Application
         private readonly OTPSettings _otpSettings;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
+        private readonly IJwtBlackListRepository _jwtBackListRepository;
         public UserService(IUserRepository repository, 
             IOptions<JwtSettings> jwtSettings,
             IRefreshTokenRepository refreshTokenRepository,
@@ -37,7 +39,8 @@ namespace Application
              IHttpContextAccessor httpContextAccessor,
              IOptions<OTPSettings> otpSetting,
              IMapper mapper,
-             IMemoryCache cache
+             IMemoryCache cache,
+             IJwtBlackListRepository jwtBackListRepository
             )
         {
             _userRepository = repository;
@@ -49,6 +52,7 @@ namespace Application
             _otpSettings = otpSetting.Value;
             _mapper = mapper;
             _cache = cache;
+            _jwtBackListRepository = jwtBackListRepository;
         }
 
         
@@ -237,10 +241,19 @@ namespace Application
          */
         public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
         {
+            //----check in black list
+            if (await _jwtBackListRepository.CheckTokenInBlackList(token))
+            {
+                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+            }
+            //------------------------
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
             var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret, 
                 TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
-
+            //----save to black list
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            await _jwtBackListRepository.SaveTokenAsyns(token, expSeconds);
+            //------------------------
             var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
 
@@ -311,8 +324,19 @@ namespace Application
          */
         public async Task ResetPassword(string forgotPasswordToken, string password)
         {
+            //----check in black list
+            if (await _jwtBackListRepository.CheckTokenInBlackList(forgotPasswordToken))
+            {
+                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+            }
+            //------------------------
             var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenSecret,
                                                 TokenType.ForgotPasswordToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+
+            //---- save to black list
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            await _jwtBackListRepository.SaveTokenAsyns(forgotPasswordToken, expSeconds);
+            //------------------------
             string email = claims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
             if (userFromDB == null)
@@ -410,8 +434,18 @@ namespace Application
 
         public async Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName)
         {
+            //----check in black list
+            if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
+            {
+                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+            }
+            //------------------------
             var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
                 _jwtSettings.Issuer, _jwtSettings.Audience);
+            //----save to black list
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            await _jwtBackListRepository.SaveTokenAsyns(setPasswordToken, expSeconds);
+            //------------------------
             string email = claims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString();
             Guid id;
             do
