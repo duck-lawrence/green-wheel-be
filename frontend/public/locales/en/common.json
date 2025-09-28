@@ -26,5 +26,28 @@
         "update": "Failed to update",
         "delete": "Failed to delete",
         "refresh": "Failed to refresh"
+    },
+    "email": {
+        "require": "Email is required",
+        "invalid": "Invalid email format",
+        "label": "Email"
+    },
+
+    "password": {
+        "require": "Password is required",
+        "min": "Password must be at least 6 characters",
+        "label": "Password"
+    },
+
+    "login": {
+        "welcome": "Welcome Back",
+        "loginContinue": "Login to your account to continue",
+        "remember": "Remember Me",
+        "forgot": "Forgot Password?",
+        "login": "Login",
+        "continueWithGoogle": "Continue with Google",
+        "or": "OR",
+        "needToCreateAnAccount": "Need to create an account?",
+        "regis": "Regis"
     }
 }
