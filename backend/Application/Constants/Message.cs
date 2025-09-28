@@ -38,6 +38,7 @@ namespace Application.Constants
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
             public const string UserNotFound = "user.user_not_found";
+
         }
 
         //Common error
@@ -47,6 +48,13 @@ namespace Application.Constants
             public const string UnexpectedError = "An unexpected error occurred. Please try again later.";
         }
         //change password
-       
+
+        //Cloudinary
+        public static class Cloudinary
+        {
+            public const string NotFoundObjectInFile = "File is emty";
+            public const string InvalidFileType = "Unsupported image type";
+            public const string UploadFailed = "Upload failed";
+        }
     }
 }

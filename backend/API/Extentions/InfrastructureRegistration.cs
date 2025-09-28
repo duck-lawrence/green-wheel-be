@@ -1,4 +1,7 @@
-﻿using Infrastructure.ApplicationDbContext;
+﻿using Application;
+using Application.Abstractions;
+using Application.AppSettingConfigurations;
+using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -12,6 +15,13 @@ namespace API.Extentions
             {
                 options.UseSqlServer(mssqlConnectionString);
             });
+        }
+
+        public static IServiceCollection AddInfrastructureServices(this IServiceCollection serviceCollection, IConfiguration configuration)
+        {
+            serviceCollection.Configure<CloudinarySettings>(configuration.GetSection("CloudinarySettings"));
+            serviceCollection.AddScoped<IPhotoService,CloudinayService>();
+            return serviceCollection;
         }
     }
 }

@@ -8,6 +8,7 @@ using Application.AppSettingConfigurations;
 using Application.Mappers;
 using Application.Repositories;
 using Application.Validators.User;
+using CloudinaryDotNet;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
@@ -23,7 +24,8 @@ namespace API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -81,8 +83,8 @@ namespace API
             //sử dụng cahce
             builder.Services.AddMemoryCache();
 
-
-
+            //khai báo sử dụng DI cho cloudinary
+            builder.Services.AddInfrastructureServices(builder.Configuration);
 
 
 
@@ -96,8 +98,20 @@ namespace API
                 options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });
+            // đk cloudinary
+            var account = new Account(
+                cloudinarySettings.CloudName,
+                cloudinarySettings.ApiKey,
+                cloudinarySettings.ApiSecret
+            );
+            var cloudinary = new Cloudinary(account)
+            {
+                Api = { Secure = true }
+            };
+            builder.Services.AddSingleton(cloudinary);
 
-
+            // Đăng ký PhotoService
+            builder.Services.AddScoped<IPhotoService, CloudinayService>();
 
             var app = builder.Build();
             //accept frontend

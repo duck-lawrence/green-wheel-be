@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.User.Request;
+using Infrastructure.ApplicationDbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,6 +13,9 @@ namespace API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IPhotoService _photoService;
+        private readonly AppDbContext _db;
+        private readonly ILogger<UserController> _logger;
 
         //private readonly IGoogleCredentialService _googleService;
 
@@ -127,6 +131,16 @@ namespace API.Controllers
 
         }
 
+        [HttpPost("upload-avatar")]
+        [Authorize]
+        public async Task<IActionResult> UploadAvatar([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst("id")!.Value);
+
+            var avatarUrl = await _userService.UploadAvatarAsync(userId, file);
+
+            return Ok(new { AvatarUrl = avatarUrl });
+        }
 
     }
 }

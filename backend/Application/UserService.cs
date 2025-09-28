@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
@@ -28,6 +29,8 @@ namespace Application
         private readonly OTPSettings _otpSettings;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
+        private readonly IPhotoService _photoService;
+        private readonly ILogger<UserService > _logger;
         public UserService(IUserRepository repository, 
             IOptions<JwtSettings> jwtSettings,
             IRefreshTokenRepository refreshTokenRepository,
@@ -36,7 +39,9 @@ namespace Application
              IHttpContextAccessor httpContextAccessor,
              IOptions<OTPSettings> otpSetting,
              IMapper mapper,
-             IMemoryCache cache
+             IMemoryCache cache,
+             IPhotoService photoService,
+             ILogger<UserService> logger
             )
         {
             _userRepository = repository;
@@ -48,6 +53,8 @@ namespace Application
             _otpSettings = otpSetting.Value;
             _mapper = mapper;
             _cache = cache;
+            _photoService = photoService;
+            _logger = logger;
         }
 
        
@@ -261,6 +268,31 @@ namespace Application
             }
 
             throw new UnauthorizedAccessException(Message.User.InvalidToken);
+        }
+
+        public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
+        {
+            if (file == null || file.Length == 0) throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
+
+            var result = await _photoService.UploadPhotoAsync(file, $"users/userId");
+            if (string.IsNullOrEmpty(result.Url)) throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException(Message.User.UserNotFound);
+
+            // Nếu có avatar cũ thì xoá trước (optional)
+            if (!string.IsNullOrEmpty(user.AvatarPublicId))
+            {
+                await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+            }
+
+            user.AvatarUrl = result.Url;
+            user.AvatarPublicId = result.PublicID;
+            user.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _userRepository.UpdateAsync(user);
+
+            return user.AvatarUrl;
         }
     }
 }
