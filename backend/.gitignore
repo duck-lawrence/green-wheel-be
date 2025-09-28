@@ -69,6 +69,7 @@ nunit-*.xml
 Generated_Code/
 
 # Local configuration
+.env
 appsettings.*.json
 appsettings.json
 secrets.json

@@ -78,13 +78,13 @@ namespace Application
         /*
          Generate Access Token Func
         this func recieve userId
-        use jwtHelper and give userID, accesstoken secret key, type: accesstoken, access token expired time, isser and audience
+        use jwtHelper and give userID, accesstoken secret secret, type: accesstoken, access token expired time, isser and audience
         to generate access token
          */
         public string GenerateAccessToken(Guid userId)
         {
 
-            return JwtHelper.GenerateUserIDToken(userId, _jwtSettings.AccessTokenKey, TokenType.AccessToken.ToString(), _jwtSettings.AccessTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
+            return JwtHelper.GenerateUserIDToken(userId, _jwtSettings.AccessTokenSecret, TokenType.AccessToken.ToString(), _jwtSettings.AccessTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
         }
 
 
@@ -103,9 +103,9 @@ namespace Application
         public async Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims)
         {
             var _context = _contextAccessor.HttpContext;
-            string token = JwtHelper.GenerateUserIDToken(userId, _jwtSettings.RefreshTokenKey, TokenType.RefreshToken.ToString(),
+            string token = JwtHelper.GenerateUserIDToken(userId, _jwtSettings.RefreshTokenSecret, TokenType.RefreshToken.ToString(),
                 _jwtSettings.RefreshTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, oldClaims);
-            ClaimsPrincipal claims = JwtHelper.VerifyToken(token, _jwtSettings.RefreshTokenKey, TokenType.RefreshToken.ToString(),
+            ClaimsPrincipal claims = JwtHelper.VerifyToken(token, _jwtSettings.RefreshTokenSecret, TokenType.RefreshToken.ToString(),
                 _jwtSettings.Issuer, _jwtSettings.Audience);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Iat).Value, out long iatSeconds);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
@@ -198,19 +198,19 @@ namespace Application
             }
             var _context = _contextAccessor.HttpContext;
             await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
-            string secretKey = "";
+            string secret = "";
             int expiredTime;
             if (type == TokenType.RegisterToken)
             {
-                secretKey = _jwtSettings.RegisterTokenKey;
-                expiredTime = _jwtSettings.RefreshTokenExpiredTime;
+                secret = _jwtSettings.RegisterTokenSecret;
+                expiredTime = _jwtSettings.RegisterTokenExpiredTime;
             }
             else
             {
-                secretKey = _jwtSettings.ForgotPasswordTokenKey;
+                secret = _jwtSettings.ForgotPasswordTokenSecret;
                 expiredTime = _jwtSettings.ForgotPasswordTokenExpiredTime;
             }
-            string token = JwtHelper.GenerateEmailToken(verifyOTPDto.Email, secretKey, type.ToString(), expiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
+            string token = JwtHelper.GenerateEmailToken(verifyOTPDto.Email, secret, type.ToString(), expiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
             _context.Response.Cookies.Append(cookieKey, token, new CookieOptions
             {
                 HttpOnly = true,
@@ -238,7 +238,9 @@ namespace Application
         public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
         {
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
-            ClaimsPrincipal claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenKey, TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+            var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret, 
+                TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+
             var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
 
@@ -309,7 +311,7 @@ namespace Application
          */
         public async Task ResetPassword(string forgotPasswordToken, string password)
         {
-            var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenKey,
+            var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenSecret,
                                                 TokenType.ForgotPasswordToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
             string email = claims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
@@ -331,7 +333,7 @@ namespace Application
          */
         public async Task<int> Logout(string refreshToken)
         {
-            JwtHelper.VerifyToken(refreshToken, _jwtSettings.RefreshTokenKey, TokenType.RefreshToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
+            JwtHelper.VerifyToken(refreshToken, _jwtSettings.RefreshTokenSecret, TokenType.RefreshToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
             return await _refreshTokenRepository.RevokeRefreshToken(refreshToken);
         }
 
@@ -350,7 +352,7 @@ namespace Application
         {
 
             ClaimsPrincipal claims = JwtHelper.VerifyToken(refreshToken,
-                                                            _jwtSettings.RefreshTokenKey,
+                                                            _jwtSettings.RefreshTokenSecret,
                                                             TokenType.RefreshToken.ToString(),
                                                             _jwtSettings.Issuer,
                                                             _jwtSettings.Audience);
@@ -381,7 +383,7 @@ namespace Application
             User user = await _userRepository.GetByEmailAsync(email);
             if (user == null)
             {
-                string setPasswordToken = JwtHelper.GenerateEmailToken(email, _jwtSettings.SetPasswordTokenKey, TokenType.SetPasswordToken.ToString(),
+                string setPasswordToken = JwtHelper.GenerateEmailToken(email, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
                     _jwtSettings.SetPasswordTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
                 _context.Response.Cookies.Append(CookieKeys.SetPasswordToken, setPasswordToken, new CookieOptions
                 {
@@ -408,7 +410,7 @@ namespace Application
 
         public async Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName)
         {
-            var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenKey, TokenType.SetPasswordToken.ToString(),
+            var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
                 _jwtSettings.Issuer, _jwtSettings.Audience);
             string email = claims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString();
             Guid id;
