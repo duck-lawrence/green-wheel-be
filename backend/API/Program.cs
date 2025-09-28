@@ -9,6 +9,7 @@ using Application.AppSettingConfigurations;
 using Application.Mappers;
 using Application.Repositories;
 using Application.Validators.User;
+using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
@@ -24,8 +25,13 @@ namespace API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            Env.Load("../.env");
 
+            // Frontend Url
+            var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN") 
+                ?? "http://localhost:3000";
+
+            // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -36,18 +42,18 @@ namespace API
                 options.AddPolicy("AllowFrontend",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:3000") // FE origin
+                        policy.WithOrigins(frontendOrigin) // FE origin
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
                     });
             });
             //kết nối DB
-            builder.Services.AddInfrastructue(builder.Configuration.GetConnectionString("DefaultConnection")!);
+            builder.Services.AddInfrastructue(Environment.GetEnvironmentVariable("MSSQL_CONNECTION_STRING")!);
             //Cache
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = builder.Configuration["Redis:Configuration"];
+                options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONFIGURATION")!;
                 options.InstanceName = builder.Configuration["Redis:InstanceName"];
             });
             //thêm httpcontextAccessor để lấy context trong service
@@ -97,11 +103,6 @@ namespace API
                 options.SuppressModelStateInvalidFilter = true;
             });
 
-
-
-
-
-
             //Cấu hình request nhận request, nó tự chuyển trường của các đối tượng trong
             //DTO thành snakeCase để binding giá trị, và lúc trả ra 
             //thì các trường trong respone cũng sẽ bị chỉnh thành snake case
@@ -112,8 +113,6 @@ namespace API
                 options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });
-
-
 
             var app = builder.Build();
             //accept frontend
@@ -143,7 +142,6 @@ namespace API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

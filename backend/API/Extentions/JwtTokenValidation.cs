@@ -23,7 +23,7 @@ namespace API.Extentions
                         ClockSkew = TimeSpan.Zero,
                         ValidIssuer = _jwtSetting.Issuer,
                         ValidAudience = _jwtSetting.Audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSetting.AccessTokenKey))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSetting.AccessTokenSecret))
                     };
                 }
                 );
