@@ -1,16 +1,16 @@
 import React, { type PropsWithChildren } from "react"
 import { DisclosureContext } from "./DisclosureContext"
-import { useCreatePostDisclosureCore, useLoginDiscloresureCore } from "@/hooks/"
+import { useLoginDiscloresureCore, useRegisDiscloresureCore } from "@/hooks"
 
 export const DisclosureProvider = ({ children }: PropsWithChildren) => {
-    const useCreatePostDisclosure = useCreatePostDisclosureCore()
     const useLoginDiscloresure = useLoginDiscloresureCore()
+    const useRegisDiscloresure = useRegisDiscloresureCore()
 
     return (
         <DisclosureContext.Provider
             value={{
-                useCreatePostDisclosure,
-                useLoginDiscloresure
+                useLoginDiscloresure,
+                useRegisDiscloresure
             }}
         >
             {children}
