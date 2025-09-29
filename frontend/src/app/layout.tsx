@@ -6,6 +6,7 @@ import { AppProviders } from "@/providers"
 import { Toaster } from "react-hot-toast"
 import { cookies } from "next/headers"
 import Navbar from "@/components/shared/Navbar"
+import { Modals } from "@/components"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -41,7 +42,6 @@ export default async function RootLayout({
                         <Navbar />
                         {children}
                     </div>
-                    {/* <Modals /> */}
                     <Toaster position="bottom-right" reverseOrder={false} />
                 </AppProviders>
             </body>
