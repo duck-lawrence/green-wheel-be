@@ -1,10 +1,12 @@
 /* eslint-disable indent */
 "use client"
-import React, { useEffect, useState } from "react"
-import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
+import React, { useCallback, useEffect, useState } from "react"
+import { NavbarBrand, NavbarContent, NavbarItem, Link, Spinner } from "@heroui/react"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, NavbarStyled, UserIconStyled, LanguageSwitcher } from "@/components/"
-import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
+import { ButtonStyled, NavbarStyled, ProfileDropdown, LanguageSwitcher } from "@/components/"
+import { useLoginDiscloresureSingleton, useProfileStore, useToken } from "@/hooks"
+import { useLogout } from "@/hooks/queries/useAuth"
+import { useGetMe } from "@/hooks/queries/useProfile"
 
 export const AcmeLogo = () => {
     return (
@@ -21,19 +23,21 @@ export const AcmeLogo = () => {
 
 export function Navbar() {
     type NavbarState = "default" | "top" | "middle"
-
     const { t } = useTranslation()
-
     /*xử lí navbar */
     const [scrollState, setScroledState] = useState<NavbarState>("default")
     const [isHiddenNavbar, setIsHiddenNavbar] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
-
-    const [activeMenu, setActiveMenu] = useState("") // state lưu menu đang chọn
+    // state lưu menu đang chọn
+    const [activeMenu, setActiveMenu] = useState("")
     // xứ lí khi login thì hiện icon user
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
+    const user = useProfileStore((s) => s.user)
+    const { isLoading: isGetMeLoading } = useGetMe({ enabled: isLoggedIn })
+    const logoutMutation = useLogout({ onSuccess: undefined })
 
+    // handle navbar animation
     const baseClasses = `
         transition-all duration-400 ease-in-out
         mt-3 
@@ -48,7 +52,6 @@ export function Navbar() {
                 : "max-w-7xl scale-100"
         }
     `
-
     const itemClasses = [
         "flex",
         "relative",
@@ -63,13 +66,17 @@ export function Navbar() {
         "data-[active=true]:after:rounded-[2px]",
         "data-[active=true]:after:bg-primary"
     ]
-
     const menus = [
         { key: "home", label: t("navbar.home") },
         { key: "self-drive", label: t("navbar.self_drive") },
         { key: "about", label: t("navbar.about_us") },
         { key: "contact", label: t("navbar.contact") }
     ]
+
+    // func
+    const handleLogout = useCallback(async () => {
+        await logoutMutation.mutateAsync()
+    }, [logoutMutation])
 
     useEffect(() => {
         const handleScroll = () => {
@@ -150,10 +157,15 @@ export function Navbar() {
                 <LanguageSwitcher />
                 <NavbarItem>
                     {isLoggedIn ? (
-                        <UserIconStyled
-                            name="Gia Huy"
-                            img="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/433446266_758349243066734_884520383743627659_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=FsaTEptwBqwQ7kNvwGBnPfY&_nc_oc=Adl360kkqq9z98joIstrLI_QwmT7Rz78mugSWoMtIDaHnYtsi0LBcoxs5ZVdaHeo9oU&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=uf7J93HxXk7lntMDq36kgQ&oh=00_Afazntj845yvpldFU92bWJNTFamk4xwJTOVFZbYZ2GfZjQ&oe=68DC722B"
-                        />
+                        isGetMeLoading ? (
+                            <Spinner />
+                        ) : (
+                            <ProfileDropdown
+                                name={`${user?.lastName} ${user?.firstName}`}
+                                img={user?.avatarUrl}
+                                onLogout={handleLogout}
+                            />
+                        )
                     ) : (
                         <ButtonStyled
                             onPress={onOpenLogin}

@@ -1,6 +1,6 @@
 import { create } from "zustand"
 
-export type TokenStore = {
+type TokenStore = {
     accessToken: string | null
     isHydrated: boolean
     hydrate: () => void
@@ -44,6 +44,7 @@ export const useToken = create<TokenStore>()((set) => ({
         }
         set({ accessToken: token })
     },
+
     removeAccessToken: () => {
         if (typeof window === "undefined") return
         localStorage.removeItem("access_token")
@@ -51,11 +52,13 @@ export const useToken = create<TokenStore>()((set) => ({
         sessionStorage.removeItem("access_token")
         set({ accessToken: null })
     },
+
     setRememberMe: (rememberMe: boolean) => {
         if (typeof window === "undefined") return
         if (rememberMe) localStorage.setItem("remember_me", "true")
         else localStorage.removeItem("remember_me")
     },
+
     removeRememberMe: () => {
         if (typeof window === "undefined") return
         localStorage.removeItem("remember_me")
