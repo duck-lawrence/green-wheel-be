@@ -57,5 +57,44 @@
     "common": {
         "too_many_request": "Too many request",
         "unexpected_error": "An unexpected error occurred. Please try again later."
+    },
+    "email": {
+        "require": "Email is required",
+        "invalid": "Invalid email format",
+        "label": "Email"
+    },
+
+    "password": {
+        "require": "Password is required",
+        "min": "Password must be at least 6 characters",
+        "label": "Password"
+    },
+
+    "login": {
+        "welcome": "Welcome Back",
+        "loginContinue": "Login to your account to continue",
+        "remember": "Remember Me",
+        "forgot": "Forgot Password?",
+        "login": "Login",
+        "continueWithGoogle": "Continue with Google",
+        "or": "OR",
+        "needToCreateAnAccount": "Need to create an account?",
+        "regis": "Regis"
+    },
+
+    "home": {
+        "welcome": "Welcome to Green Wheel",
+        "slogan": "Green Rides. Brighter Future.",
+        "description": "Professional self-drive car rental service to meet all your personal travel needs",
+        "viewDetails": "View details"
+    },
+
+    "navbar": {
+        "home": "Home",
+        "selfDrive": "Self-drive",
+        "aboutUs": "About",
+        "contact": "Contact",
+        "login": "Login",
+        "register": "Register"
     }
 }
