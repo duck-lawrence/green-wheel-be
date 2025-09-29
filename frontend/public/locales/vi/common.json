@@ -36,19 +36,19 @@
 
     "password": {
         "require": "Vui lòng nhập mật khẩu",
-        "min": "Mật khẩu phải có ít nhất 6 ký tự",
+        "min": "Mật khẩu phải có ít nhất 8 ký tự",
         "label": "Mật khẩu"
     },
 
     "login": {
         "welcome": "Chào mừng trở lại",
-        "loginContinue": "Đăng nhập vào tài khoản của bạn để tiếp tục",
+        "login_continue": "Đăng nhập vào tài khoản của bạn để tiếp tục",
         "remember": "Ghi nhớ đăng nhập",
         "forgot": "Quên mật khẩu?",
         "login": "Đăng nhập",
-        "continueWithGoogle": "Tiếp tục với Google",
+        "continue_with_google": "Tiếp tục với Google",
         "or": "HOẶC",
-        "needToCreateAnAccount": "Bạn chưa có tài khoản?",
-        "regis": "Đăng ký"
+        "need_to_create_an_account": "Bạn chưa có tài khoản?",
+        "register": "Đăng ký"
     }
 }

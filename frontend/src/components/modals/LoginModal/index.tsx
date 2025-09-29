@@ -1,22 +1,18 @@
 "use client"
 import React from "react"
+import { ModalBody, ModalContent } from "@heroui/react"
 import { useLoginDiscloresureSingleton } from "@/hooks"
-import { ModalBody, ModalContent, ModalHeader } from "@heroui/react"
-import { ModalStyled } from "@/components/styled"
-
-import { useTranslation } from "react-i18next"
-import Login from "@/components/shared/LoginForm"
+import { ModalStyled, LoginForm } from "@/components/"
 
 export function LoginModal() {
-    const { t } = useTranslation()
-    const { isOpen, onOpenChange } = useLoginDiscloresureSingleton() //onclose
+    const { isOpen, onOpenChange, onClose } = useLoginDiscloresureSingleton()
 
     return (
         <ModalStyled isOpen={isOpen} onOpenChange={onOpenChange}>
-            <ModalContent>
-                <ModalHeader className="flex flex-col gap-1">Login</ModalHeader>
+            <ModalContent className="max-w-150 w-full p-14">
+                {/* <ModalHeader className="flex flex-col gap-1">{t("login.login")}</ModalHeader> */}
                 <ModalBody>
-                    <Login />
+                    <LoginForm onSuccess={onClose} />
                 </ModalBody>
             </ModalContent>
         </ModalStyled>

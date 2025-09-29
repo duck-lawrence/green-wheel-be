@@ -5,8 +5,7 @@ import "./globals.css"
 import { AppProviders } from "@/providers"
 import { Toaster } from "react-hot-toast"
 import { cookies } from "next/headers"
-import Navbar from "@/components/shared/Navbar"
-import { Modals } from "@/components"
+import { ClientHydration, Modals, Navbar } from "@/components/"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -38,11 +37,14 @@ export default async function RootLayout({
         <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
             <body className="antialiased">
                 <AppProviders locale={locale}>
-                    <div className="min-h-screen flex flex-col items-center p-6">
-                        <Navbar />
-                        {children}
-                    </div>
-                    <Toaster position="bottom-right" reverseOrder={false} />
+                    <ClientHydration>
+                        <div className="min-h-screen flex flex-col items-center p-6">
+                            <Navbar />
+                            {children}
+                        </div>
+                        <Modals />
+                        <Toaster position="bottom-right" reverseOrder={false} />
+                    </ClientHydration>
                 </AppProviders>
             </body>
         </html>

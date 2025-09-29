@@ -1,14 +1,11 @@
+/* eslint-disable indent */
 "use client"
 import React, { useEffect, useState } from "react"
 import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
-
-import { ButtonStyled } from "@/components/styled"
-import { useLoginDiscloresureSingleton } from "@/hooks"
-import NavbarStyled from "@/components/styled/NavbarStyled"
-import UserIconStyled from "@/components/styled/UserIconStyled"
-import { LanguageSwitcher } from "../LanguageSwitcher"
-import clsx from "clsx"
 import { useTranslation } from "react-i18next"
+import { ButtonStyled, NavbarStyled, UserIconStyled, LanguageSwitcher } from "@/components/"
+import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
+
 export const AcmeLogo = () => {
     return (
         <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
@@ -22,12 +19,58 @@ export const AcmeLogo = () => {
     )
 }
 
-export default function Navbar() {
-    const { t } = useTranslation()
+export function Navbar() {
     type NavbarState = "default" | "top" | "middle"
+
+    const { t } = useTranslation()
+
+    /*xử lí navbar */
     const [scrollState, setScroledState] = useState<NavbarState>("default")
     const [isHiddenNavbar, setIsHiddenNavbar] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
+
+    const [activeMenu, setActiveMenu] = useState("") // state lưu menu đang chọn
+    // xứ lí khi login thì hiện icon user
+    const isLoggedIn = useToken((s) => !!s.accessToken)
+    const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
+
+    const baseClasses = `
+        transition-all duration-400 ease-in-out
+        mt-3 
+        fixed left-0 w-full z-50
+        mx-auto max-w-7xl
+        data-[visible=false]:mt-0
+        rounded-3xl
+        ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
+        ${
+            scrollState === "top" || scrollState === "middle"
+                ? "rounded-3xl bg-[#4A9782] opacity-97 justify-between mx-auto max-w-3xl scale-95"
+                : "max-w-7xl scale-100"
+        }
+    `
+
+    const itemClasses = [
+        "flex",
+        "relative",
+        "h-full",
+        "items-center",
+        "data-[active=true]:after:content-['']",
+        "data-[active=true]:after:absolute",
+        "data-[active=true]:after:bottom-0",
+        "data-[active=true]:after:left-0",
+        "data-[active=true]:after:right-0",
+        "data-[active=true]:after:h-[2px]",
+        "data-[active=true]:after:rounded-[2px]",
+        "data-[active=true]:after:bg-primary"
+    ]
+
+    const menus = [
+        { key: "home", label: t("navbar.home") },
+        { key: "self-drive", label: t("navbar.self_drive") },
+        { key: "about", label: t("navbar.about_us") },
+        { key: "contact", label: t("navbar.contact") }
+    ]
+
     useEffect(() => {
         const handleScroll = () => {
             const y = window.scrollY
@@ -69,47 +112,6 @@ export default function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll)
     }, [lastScrollY])
 
-    const baseClasses = `
-        transition-all duration-400 ease-in-out
-        mt-3 
-        fixed left-0 w-full z-50
-        mx-auto max-w-7xl
-        data-[visible=false]:mt-0
-        rounded-3xl
-        ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
-        ${
-            scrollState === "top" || scrollState === "middle"
-                ? "rounded-3xl bg-[#4A9782] opacity-97 justify-between mx-auto max-w-3xl scale-95"
-                : "max-w-7xl scale-100"
-        }`
-
-    const itemClasses = [
-        "flex",
-        "relative",
-        "h-full",
-        "items-center",
-        "data-[active=true]:after:content-['']",
-        "data-[active=true]:after:absolute",
-        "data-[active=true]:after:bottom-0",
-        "data-[active=true]:after:left-0",
-        "data-[active=true]:after:right-0",
-        "data-[active=true]:after:h-[2px]",
-        "data-[active=true]:after:rounded-[2px]",
-        "data-[active=true]:after:bg-primary"
-    ]
-
-    /*xử lí navbar */
-    const [activeMenu, setActiveMenu] = useState("") // state lưu menu đang chọn
-    // xứ lí khi login thì hiện icon user
-    const [isLogin, setIsLogin] = useState(false)
-    const menus = [
-        { key: "home", label: t("navbar.home") },
-        { key: "self-drive", label: t("navbar.selfDrive") },
-        { key: "about", label: t("navbar.aboutUs") },
-        { key: "contact", label: t("navbar.contact") }
-    ]
-
-    const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
     return (
         <NavbarStyled
             data-visible={!isHiddenNavbar}
@@ -142,33 +144,24 @@ export default function Navbar() {
             </NavbarContent>
             {/* className="absolute right-30" */}
             <NavbarContent justify="end">
-                <div className={clsx("absolute", isLogin ? "right-[120px]" : "right-[88px]")}>
+                {/* <div className={clsx("absolute", isLogin ? "right-[120px]" : "right-[88px]")}>
                     <LanguageSwitcher />
-                </div>
+                </div> */}
+                <LanguageSwitcher />
                 <NavbarItem>
-                    {/* <ButtonStyled
-                        onPress={() => onOpenLogin()}
-                        // as={Link}
-                        // href="/login"
-                        variant="solid"
-                        className="rounded-3xl opacity-97 text-black"
-                    >
-                        Login
-                    </ButtonStyled> */}
-                    {isLogin ? (
+                    {isLoggedIn ? (
                         <UserIconStyled
                             name="Gia Huy"
                             img="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/433446266_758349243066734_884520383743627659_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=FsaTEptwBqwQ7kNvwGBnPfY&_nc_oc=Adl360kkqq9z98joIstrLI_QwmT7Rz78mugSWoMtIDaHnYtsi0LBcoxs5ZVdaHeo9oU&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=uf7J93HxXk7lntMDq36kgQ&oh=00_Afazntj845yvpldFU92bWJNTFamk4xwJTOVFZbYZ2GfZjQ&oe=68DC722B"
                         />
                     ) : (
                         <ButtonStyled
-                            onPress={() => onOpenLogin()}
-                            as={Link}
-                            href="/login"
+                            onPress={onOpenLogin}
+                            // as={Link}
                             variant="solid"
                             className="rounded-3xl opacity-97 text-black"
                         >
-                            Login
+                            {t("login.login")}
                         </ButtonStyled>
                     )}
                 </NavbarItem>

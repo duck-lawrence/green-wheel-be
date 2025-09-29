@@ -6,8 +6,9 @@ export function ModalStyled(props: ModalProps) {
     return (
         <Modal
             placement="center"
-            scrollBehavior="inside"
+            // scrollBehavior="inside"
             color="secondary"
+            isDismissable={false}
             {...props}
             className={cn(props.className)}
         />

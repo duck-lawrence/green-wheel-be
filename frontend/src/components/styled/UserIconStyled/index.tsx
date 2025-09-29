@@ -19,7 +19,7 @@ type UserProps = {
     img: string // string
 }
 
-export default function UserIconStyled({ name, img }: UserProps) {
+export function UserIconStyled({ name, img }: UserProps) {
     return (
         <div className="flex items-center gap-4">
             <Dropdown placement="bottom-start">
