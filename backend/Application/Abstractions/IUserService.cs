@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Application.Constants;
 using Application.Dtos.User.Respone;
+using Domain.Entities;
 namespace Application.Abstractions
 {
     public interface IUserService
@@ -13,7 +14,7 @@ namespace Application.Abstractions
         //Task<IEnumerable<User>> GetAllUserAsync(Expression<Func<User, object>>? include = null);
         //Task<int> UpdateUserAsync(User user);
 
-        //Task<User?> GetUserByIdAsync(Guid id);
+        Task<User?> GetUserByIdAsync(Guid id);
         //Task<User> GetUserByEmail(string email);
         string GenerateAccessToken(Guid userId);
         Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims);

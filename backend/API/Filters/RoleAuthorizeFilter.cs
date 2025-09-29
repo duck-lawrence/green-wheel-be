@@ -8,12 +8,12 @@ using System.Security.Claims;
 
 namespace API.Filters
 {
-    public class RoleAuthorizeFilter : Attribute, IAsyncAuthorizationFilter
+    public class RoleAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly string[] _roles;
         private readonly IMemoryCache _cache;
 
-        public RoleAuthorizeFilter(IMemoryCache cache, params string[] roles )
+        public RoleAuthorizeAttribute(IMemoryCache cache, params string[] roles )
         {
             _roles = roles;
             _cache = cache;
@@ -41,7 +41,14 @@ namespace API.Filters
                 return;
             }
             var roleList = _cache.Get<List<Role>>("AllRoles");
-            //var userInDB = userService.
+            var userInDB = await userService.GetUserByIdAsync(Guid.Parse(userId));
+            var userRole = roleList.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+
+            if (userRole == null || !_roles.Contains(userRole))
+            {
+                context.Result = new ForbidResult();
+            }
+
 
         }
     }

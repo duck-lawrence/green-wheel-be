@@ -497,5 +497,10 @@ namespace Application
             await _userRepository.UpdateAsync(userFromDb);
 
         }
+
+        public async Task<User?> GetUserByIdAsync(Guid id)
+        {
+            return await _userRepository.GetByIdAsync(id);
+        }
     }
 }
