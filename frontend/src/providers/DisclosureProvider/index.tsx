@@ -1,7 +1,6 @@
 import React, { type PropsWithChildren } from "react"
-import { useCreatePostDisclosureCore } from "@/hooks/singleton/disclosures/useCreatePostDisclosure"
 import { DisclosureContext } from "./DisclosureContext"
-import { useLoginDiscloresureCore } from "@/hooks"
+import { useCreatePostDisclosureCore, useLoginDiscloresureCore } from "@/hooks/"
 
 export const DisclosureProvider = ({ children }: PropsWithChildren) => {
     const useCreatePostDisclosure = useCreatePostDisclosureCore()

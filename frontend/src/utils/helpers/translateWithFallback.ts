@@ -1,6 +1,7 @@
-import { t } from "i18next"
+import { TFunction } from "i18next"
 
-export const getKeyWithFallback = (
+export const translateWithFallback = (
+    t: TFunction<"common", undefined>,
     key: string,
     fallbackKey: string = "common.unexpected_error"
 ) => {

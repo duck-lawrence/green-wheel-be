@@ -6,7 +6,7 @@ type CarouselProps = {
     slides: string[]
 }
 
-const Carousel: React.FC<CarouselProps> = ({ slides }) => {
+export const Carousel: React.FC<CarouselProps> = ({ slides }) => {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [slidesPerView, setSlidesPerView] = useState(1)
     const [isTransitioning, setIsTransitioning] = useState(true)
@@ -176,6 +176,3 @@ const Carousel: React.FC<CarouselProps> = ({ slides }) => {
         </div>
     )
 }
-
-export default Carousel
-

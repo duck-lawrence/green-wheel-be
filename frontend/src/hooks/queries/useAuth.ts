@@ -2,25 +2,29 @@ import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { authApi } from "@/services/authApi"
 import { useMutation } from "@tanstack/react-query"
-import useToken from "@/hooks/singleton/store/useToken"
-import { TokenRes } from "@/models/Auth/schema/response"
 import { BackendError } from "@/models/Common/response"
-import { getKeyWithFallback } from "@/utils/helpers/getKeyWithFallback"
+import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import { LoginUserReq } from "@/models/Auth/schema/request"
+import { useToken } from "@/hooks"
 
-export const useLogin = ({ rememberMe }: { rememberMe?: boolean } = {}) => {
+export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const setAccessToken = useToken((state) => state.setAccessToken)
 
     return useMutation({
-        mutationFn: authApi.login,
-        onSuccess: (data: TokenRes) => {
+        mutationFn: async ({ req, rememberMe }: { req: LoginUserReq; rememberMe?: boolean }) => {
+            const data = await authApi.login(req)
             setAccessToken(data.accessToken, rememberMe)
+            return data
+        },
+        onSuccess: () => {
+            onSuccess?.()
             toast.success(t("success.login"))
         },
         onError: (error: BackendError) => {
             console.log(`${error.title}: ${error.detail}`)
             if (error.detail !== undefined) {
-                toast.error(getKeyWithFallback(error.detail))
+                toast.error(translateWithFallback(t, error.detail))
             }
         }
     })

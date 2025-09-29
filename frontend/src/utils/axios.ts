@@ -1,6 +1,8 @@
 import { BACKEND_API_URL } from "@/constants/api"
-import useToken from "@/hooks/singleton/store/useToken"
+import { useToken } from "@/hooks"
+import i18n from "@/lib/i18n"
 import axios from "axios"
+import toast from "react-hot-toast"
 
 const axiosInstance = axios.create({
     baseURL: BACKEND_API_URL,
@@ -31,7 +33,7 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = true
             try {
                 const res = await axiosInstance.post(
-                    "/refresh-token",
+                    "/users/refresh-token",
                     {},
                     { withCredentials: true }
                 )
@@ -42,7 +44,7 @@ axiosInstance.interceptors.response.use(
 
                 return axiosInstance(originalRequest)
             } catch (refreshError) {
-                window.location.href = "/login"
+                toast(i18n.t("login.please_login"))
                 return Promise.reject(refreshError)
             }
         }

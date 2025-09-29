@@ -3,6 +3,7 @@ import { create } from "zustand"
 export type TokenStore = {
     accessToken: string | null
     isHydrated: boolean
+    hydrate: () => void
     setAccessToken: (token: string, rememberMe?: boolean) => void
     removeAccessToken: () => void
     setRememberMe: (remember: boolean) => void
@@ -21,10 +22,16 @@ const getStoredToken = () => {
         : sessionStorage.getItem("access_token")
 }
 
-const useToken = create<TokenStore>()((set) => ({
+export const useToken = create<TokenStore>()((set) => ({
     accessToken: getStoredToken(),
-    isHydrated: true,
-    setAccessToken: (token: string, rememberMe = false) => {
+    isHydrated: false,
+
+    hydrate: () => {
+        const token = getStoredToken()
+        set({ accessToken: token, isHydrated: true })
+    },
+
+    setAccessToken: (token: string, rememberMe = true) => {
         if (typeof window === "undefined") return
         if (rememberMe) {
             localStorage.setItem("access_token", token)
@@ -32,16 +39,16 @@ const useToken = create<TokenStore>()((set) => ({
             sessionStorage.removeItem("access_token")
         } else {
             sessionStorage.setItem("access_token", token)
-            sessionStorage.setItem("remember_me", "true")
             localStorage.removeItem("access_token")
+            localStorage.removeItem("remember_me")
         }
         set({ accessToken: token })
     },
     removeAccessToken: () => {
         if (typeof window === "undefined") return
-        localStorage.removeItem("accessToken")
-        localStorage.removeItem("rememberMe")
-        sessionStorage.removeItem("accessToken")
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("remember_me")
+        sessionStorage.removeItem("access_token")
         set({ accessToken: null })
     },
     setRememberMe: (rememberMe: boolean) => {
@@ -54,5 +61,3 @@ const useToken = create<TokenStore>()((set) => ({
         localStorage.removeItem("remember_me")
     }
 }))
-
-export default useToken
