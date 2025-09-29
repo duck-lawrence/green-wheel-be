@@ -2,9 +2,9 @@ import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { authApi } from "@/services/authApi"
 import { useMutation } from "@tanstack/react-query"
-import { BackendError } from "@/models/Common/response"
+import { BackendError } from "@/models/common/response"
+import { LoginUserReq } from "@/models/auth/schema/request"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
-import { LoginUserReq } from "@/models/Auth/schema/request"
 import { useToken } from "@/hooks"
 
 export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
@@ -20,6 +20,28 @@ export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
         onSuccess: () => {
             onSuccess?.()
             toast.success(t("success.login"))
+        },
+        onError: (error: BackendError) => {
+            console.log(`${error.title}: ${error.detail}`)
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
+
+export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+    const removeAccessToken = useToken((state) => state.removeAccessToken)
+
+    return useMutation({
+        mutationFn: async () => {
+            await authApi.logout()
+            removeAccessToken()
+        },
+        onSuccess: () => {
+            onSuccess?.()
+            toast.success(t("success.logout"))
         },
         onError: (error: BackendError) => {
             console.log(`${error.title}: ${error.detail}`)

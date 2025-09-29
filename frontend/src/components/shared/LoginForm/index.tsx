@@ -9,7 +9,7 @@ import { ButtonStyled, InputStyled, LogoStyle } from "@/components/styled"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import { useLogin } from "@/hooks/queries/useAuth"
-import { LoginUserReq } from "@/models/Auth/schema/request"
+import { LoginUserReq } from "@/models/auth/schema/request"
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()

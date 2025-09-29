@@ -16,6 +16,8 @@
         "body_is_required": "Body is required"
     },
     "user": {
+        "profile": "Profile",
+        "booking_history": "Booking history",
         "invalid_otp": "Invalid OTP",
         "otp_can_not_empty": "OTP is required",
         "otp_must_have_6_digits": "OTP must have 6 digits",
@@ -45,14 +47,16 @@
         "update": "Updated",
         "delete": "Deleted",
         "refresh": "Refreshed",
-        "login": "Login successful"
+        "login": "Login successful",
+        "logout": "Logout successful"
     },
     "failed": {
         "create": "Failed to create",
         "update": "Failed to update",
         "delete": "Failed to delete",
         "refresh": "Failed to refresh",
-        "login": "Login failed"
+        "login": "Login failed",
+        "logout": "Logout failed"
     },
     "common": {
         "too_many_request": "Too many request",
@@ -96,6 +100,7 @@
         "about_us": "About",
         "contact": "Contact",
         "login": "Login",
-        "register": "Register"
+        "register": "Register",
+        "logout": "Logout"
     }
 }
