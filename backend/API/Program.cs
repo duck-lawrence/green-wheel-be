@@ -1,5 +1,6 @@
 ﻿
 using API.Extentions;
+using API.Filters;
 using API.Middleware;
 using API.Policy;
 using Application;
@@ -8,10 +9,12 @@ using Application.AppSettingConfigurations;
 using Application.Mappers;
 using Application.Repositories;
 using Application.Validators.User;
+using DotNetEnv;
 using CloudinaryDotNet;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.Threading.Tasks;
 
@@ -23,6 +26,13 @@ namespace API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            Env.Load("../.env");
+
+            // Frontend Url
+            var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN") 
+                ?? "http://localhost:3000";
+
+            // Add services to the container.
             // Add services to the container.
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
@@ -36,18 +46,18 @@ namespace API
                 options.AddPolicy("AllowFrontend",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:3000") // FE origin
+                        policy.WithOrigins(frontendOrigin) // FE origin
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
                     });
             });
             //kết nối DB
-            builder.Services.AddInfrastructue(builder.Configuration.GetConnectionString("DefaultConnection")!);
+            builder.Services.AddInfrastructue(Environment.GetEnvironmentVariable("MSSQL_CONNECTION_STRING")!);
             //Cache
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = builder.Configuration["Redis:Configuration"];
+                options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONFIGURATION")!;
                 options.InstanceName = builder.Configuration["Redis:InstanceName"];
             });
             //thêm httpcontextAccessor để lấy context trong service
@@ -60,10 +70,8 @@ namespace API
             builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
-
-            //Fluentvalidator
-            builder.Services.AddValidatorsFromAssemblyContaining(typeof(UserLoginReqValidator));
-            builder.Services.AddFluentValidationAutoValidation();
+            builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
+            
 
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
@@ -78,10 +86,26 @@ namespace API
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
             //Otp
             builder.Services.Configure<OTPSettings>(builder.Configuration.GetSection("OTPSettings"));
+            //Google
+            builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("GoogleAuthSettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             //sử dụng cahce
             builder.Services.AddMemoryCache();
+
+            //thêm filter cho validation
+            builder.Services.AddControllers(options =>
+            {
+                // Thêm ValidationFilter vào pipeline
+                options.Filters.Add<ValidationFilter>();
+            });
+            //Fluentvalidator
+            builder.Services.AddValidatorsFromAssemblyContaining(typeof(UserLoginReqValidator));
+            //tắt validator tự ném lỗi
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             //khai báo sử dụng DI cho cloudinary
             builder.Services.AddInfrastructureServices(builder.Configuration);
@@ -98,6 +122,7 @@ namespace API
                 options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });
+
             // đk cloudinary
             var account = new Account(
                 cloudinarySettings.CloudName,
@@ -141,7 +166,6 @@ namespace API
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

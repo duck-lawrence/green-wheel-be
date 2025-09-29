@@ -66,46 +66,43 @@ namespace Application.Helpers
         }
 
 
-        public static ClaimsPrincipal VerifyToken(string token, string secretKey, string type, string issuer, string audience)
+        public static ClaimsPrincipal VerifyToken(string token, string secretStr, string type, string issuer, string audience)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(secretKey);
+            var secret = Encoding.UTF8.GetBytes(secretStr);
             
-                var validationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = issuer,
-                    ValidAudience = audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ClockSkew = TimeSpan.Zero
-                };
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = issuer,
+                ValidAudience = audience,
+                IssuerSigningKey = new SymmetricSecurityKey(secret),
+                ClockSkew = TimeSpan.Zero
+            };
 
-                try
+            try
+            {
+            // sẽ throw nếu token không hợp lệ hoặc hết hạn
+            SecurityToken validatedToken;
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
+            // có thể check thêm loại token (nếu bạn gắn claim type riêng)
+            if (!string.IsNullOrEmpty(type))
                 {
-                // sẽ throw nếu token không hợp lệ hoặc hết hạn
-                SecurityToken validatedToken;
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out validatedToken);
-                // có thể check thêm loại token (nếu bạn gắn claim type riêng)
-                if (!string.IsNullOrEmpty(type))
+                    var typeClaim = principal.FindFirst("type"); // hoặc "token_type" tùy bạn set khi tạo
+                    if (typeClaim == null || !typeClaim.Value.Equals(type, StringComparison.OrdinalIgnoreCase))
                     {
-                        var typeClaim = principal.FindFirst("type"); // hoặc "token_type" tùy bạn set khi tạo
-                        if (typeClaim == null || !typeClaim.Value.Equals(type, StringComparison.OrdinalIgnoreCase))
-                        {
-                            throw new UnauthorizedAccessException(Message.User.InvalidToken);
-                        }
+                        throw new UnauthorizedAccessException(Message.User.InvalidToken);
                     }
+                }
 
-                    return principal; // token hợp lệ và còn hạn
-                }
-                catch
-                {
-                    throw new UnauthorizedAccessException(Message.User.InvalidToken); // token không hợp lệ hoặc đã hết hạn
-                }
-            
+                return principal; // token hợp lệ và còn hạn
+            }
+            catch
+            {
+                throw new UnauthorizedAccessException(Message.User.InvalidToken); // token không hợp lệ hoặc đã hết hạn
+            }
         }
-        
-
     }
 }

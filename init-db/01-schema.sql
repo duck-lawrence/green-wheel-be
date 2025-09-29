@@ -39,7 +39,8 @@ CREATE TABLE [users] (
     [email] varchar(255),
     [password] nvarchar(255),
     [phone] varchar(15),
-    [sex] int NOT NULL DEFAULT 0, -- Male, Female
+	[is_google_linked] bit NOT NULL DEFAULT 0,
+    [sex] int, -- Male, Female
     [date_of_birth] datetimeoffset,
     [avatar_url] nvarchar(500),
     [avatar_public_id] nvarchar(255),

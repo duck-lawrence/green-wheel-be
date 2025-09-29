@@ -1,6 +1,7 @@
 ﻿using Domain.Commons;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.ApplicationDbContext;
 
@@ -70,6 +71,18 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
     public async Task<int> SaveChangesAsync()
     {
         return await base.SaveChangesAsync();
+    }
+    private static string ToSnakeCase(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return name;
+
+        var result = Regex.Replace(
+            name,
+            @"([a-z0-9])([A-Z])",
+            "$1_$2"
+        );
+
+        return result.ToLower();
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -1091,6 +1104,17 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
         });
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            // Đổi tên bảng
+            entity.SetTableName(ToSnakeCase(entity.GetTableName()));
+
+            // Đổi tên cột
+            foreach (var property in entity.GetProperties())
+            {
+                property.SetColumnName(ToSnakeCase(property.Name));
+            }
+        }
 
         OnModelCreatingPartial(modelBuilder);
     }
