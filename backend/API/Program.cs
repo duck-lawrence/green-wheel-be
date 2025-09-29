@@ -107,12 +107,12 @@ namespace API
             //DTO thành snakeCase để binding giá trị, và lúc trả ra 
             //thì các trường trong respone cũng sẽ bị chỉnh thành snake case
             //Ảnh hưởng khi map từ json sang object và object về json : json <-> object
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });
+            // builder.Services.AddControllers()
+            // .AddJsonOptions(options =>
+            // {
+            //     options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
+            //     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            // });
 
             var app = builder.Build();
             //accept frontend
