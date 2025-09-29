@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-export default function Logo() {
+export function LogoStyle() {
     return (
         <div>
             <img

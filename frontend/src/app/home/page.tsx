@@ -1,10 +1,5 @@
 "use client"
-import { ButtonStyled } from "@/components"
-import { LoginModal } from "@/components/modals/LoginModal"
-import Carousel from "@/components/shared/Carousel"
-import Navbar from "@/components/shared/Navbar"
-import UserIconStyled from "@/components/styled/UserIconStyled"
-import { useLoginDiscloresureSingleton } from "@/hooks"
+import { ButtonStyled, Navbar, Carousel } from "@/components"
 import Link from "next/link"
 import React from "react"
 import { slides } from "../../../public/cars"
@@ -28,7 +23,7 @@ export default function page() {
                                             hover:bg-primary hover:text-white hover:border-black"
                                 variant="bordered"
                             >
-                                {t("home.viewDetails")}
+                                {t("home.view_details")}
                             </ButtonStyled>
                         </div>
 
@@ -37,9 +32,6 @@ export default function page() {
                         <Carousel slides={slides} />
                     </div>
                 </div>
-            </div>
-            <div>
-                <LoginModal />
             </div>
         </>
     )
