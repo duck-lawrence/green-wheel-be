@@ -49,20 +49,29 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[]? includes = null)
         {
             var query = _dbSet.AsQueryable();
-            if(includes != null)
+
+            if (includes != null)
             {
-                foreach(var include in includes)
+                foreach (var include in includes)
                 {
                     query = query.Include(include);
                 }
             }
+
+            if (typeof(SorfDeletedEntity).IsAssignableFrom(typeof(T)))
+            {
+                query = query.Cast<SorfDeletedEntity>()
+                             .Where(x => x.DeletedAt == null)
+                             .Cast<T>();
+            }
+
             return await query.ToListAsync();
         }
 
         public async Task<T?> GetByIdAsync(Guid id)
         {
             //return  await _dbSet.FirstOrDefault(t => t.Id == id && t.);
-            var entityFromDb = await GetByIdAsync(id);
+            var entityFromDb = await _dbSet.FindAsync(id);
             if (entityFromDb is SorfDeletedEntity softEntity1 && softEntity1.DeletedAt == null)
             {
                 return entityFromDb;

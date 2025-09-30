@@ -28,7 +28,7 @@ namespace Infrastructure.Repositories
             if ((endDate - startDate).TotalHours < 24)
                 throw new ArgumentException(Message.VehicleModel.RentTimeIsNotAvailable);
 
-            var query = _dbContext.VehicleModels
+            var query = _dbContext.VehicleModels.Where(vm => vm.DeletedAt == null)
                 .Include(vm => vm.Vehicles)
                     .ThenInclude(v => v.RentalContracts)
                 .AsQueryable();
@@ -43,6 +43,7 @@ namespace Infrastructure.Repositories
             var result = await query
                 .Select(vm => new VehicleModelViewRes
                 {
+                    Id = vm.Id,
                     Name = vm.Name,
                     Description = vm.Description,
                     CostPerDay = vm.CostPerDay,
@@ -70,6 +71,7 @@ namespace Infrastructure.Repositories
                         )
                     )
                 })
+                
                 .ToListAsync();
             return result;
         }

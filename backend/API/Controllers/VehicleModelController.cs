@@ -52,7 +52,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetAllVehicleModel(VehicleFilterReq vehicleFilterReq)
         {
             var verhicelModelView = await _vehicleModelService.GetAllVehicleModels(vehicleFilterReq);
-            return Ok();
+            return Ok(verhicelModelView);
         }
         /*
          404: not found
