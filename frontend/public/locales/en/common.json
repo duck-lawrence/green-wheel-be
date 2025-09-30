@@ -15,17 +15,52 @@
         "body": "Body",
         "body_is_required": "Body is required"
     },
+    "user": {
+        "profile": "Profile",
+        "booking_history": "Booking history",
+        "invalid_otp": "Invalid OTP",
+        "otp_can_not_empty": "OTP is required",
+        "otp_must_have_6_digits": "OTP must have 6 digits",
+        "rate_limit_otp": "Resend OTP after 1 minute",
+        "attemp_otp": "Too many attemps, please resend to get new OTP",
+        "email_already_exists": "This email already exists",
+        "email_is_required": "Email is required",
+        "invalid_email": "Email is invalid",
+        "password_too_short": "Password must be at least 6 characters",
+        "password_can_not_empty": "Password is required",
+        "confirm_password_is_incorrect": "Confirm password must be the same as the password",
+        "invalid_user_age": "Age must be at least 21",
+        "invalid_phone": "Invalid phone",
+        "phone_is_required": "Phone is required",
+        "first_name_is_required": "First name is required",
+        "last_name_is_required": "Last name is required",
+        "date_of_birht_is_required": "Date of birth is required",
+        "old_password_is_incorrect": "Old password is incorrect",
+        "ole_password_is_required": "Old password is required",
+        "invalid_email_or_password": "Invalid email or password",
+        "unauthorized": "Unauthorized",
+        "invalid_token": "Invalid Token",
+        "user_not_found": "User not found"
+    },
     "success": {
         "create": "Created",
         "update": "Updated",
         "delete": "Deleted",
-        "refresh": "Refreshed"
+        "refresh": "Refreshed",
+        "login": "Login successful",
+        "logout": "Logout successful"
     },
     "failed": {
         "create": "Failed to create",
         "update": "Failed to update",
         "delete": "Failed to delete",
-        "refresh": "Failed to refresh"
+        "refresh": "Failed to refresh",
+        "login": "Login failed",
+        "logout": "Logout failed"
+    },
+    "common": {
+        "too_many_request": "Too many request",
+        "unexpected_error": "An unexpected error occurred. Please try again later."
     },
     "email": {
         "require": "Email is required",
@@ -35,35 +70,37 @@
 
     "password": {
         "require": "Password is required",
-        "min": "Password must be at least 6 characters",
+        "min": "Password must be at least 8 characters",
         "label": "Password"
     },
 
     "login": {
         "welcome": "Welcome Back",
-        "loginContinue": "Login to your account to continue",
+        "login_continue": "Login to your account to continue",
+        "please_login": "Please login",
         "remember": "Remember Me",
         "forgot": "Forgot Password?",
         "login": "Login",
-        "continueWithGoogle": "Continue with Google",
+        "continue_with_google": "Continue with Google",
         "or": "OR",
-        "needToCreateAnAccount": "Need to create an account?",
-        "regis": "Regis"
+        "need_to_create_an_account": "Need to create an account?",
+        "register": "Register"
     },
 
     "home": {
         "welcome": "Welcome to Green Wheel",
         "slogan": "Green Rides. Brighter Future.",
         "description": "Professional self-drive car rental service to meet all your personal travel needs",
-        "viewDetails": "View details"
+        "view_details": "View details"
     },
 
     "navbar": {
         "home": "Home",
-        "selfDrive": "Self-drive",
-        "aboutUs": "About",
+        "self_drive": "Self-drive",
+        "about_us": "About",
         "contact": "Contact",
         "login": "Login",
-        "register": "Register"
+        "register": "Register",
+        "logout": "Logout"
     }
 }

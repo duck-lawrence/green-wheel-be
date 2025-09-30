@@ -14,7 +14,7 @@ namespace Application.Constants
             //otp
             public const string InvalidOTP = "user.invalid_otp";
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
-            public const string OTPMustHave6Digits = "user.otp.must.have.6.digits";
+            public const string OTPMustHave6Digits = "user.otp_must_have_6_digits";
             public const string RateLimitOtp = "user.rate_limit_otp";
             public const string AttemptOtp = "user.attemp_otp";
             //register
@@ -25,7 +25,7 @@ namespace Application.Constants
             public const string PasswordCanNotEmpty = "user.password_can_not_empty";
             public const string ConfirmPasswordIsIncorrect = "user.confirm_password_is_incorrect";
             public const string InvalidUserAge = "user.invalid_user_age";
-            public const string InvalidPhone = "user.Invalid_phone";
+            public const string InvalidPhone = "user.invalid_phone";
             public const string PhoneIsRequired = "user.phone_is_required";
             public const string FirstNameIsRequired = "user.first_name_is_required";
             public const string LastNameIsRequired = "user.last_name_is_required";
@@ -38,13 +38,17 @@ namespace Application.Constants
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
             public const string UserNotFound = "user.user_not_found";
+            //change avatar
+            public const string NotFoundAvatar = "No avatar to delete";
+
+
         }
 
         //Common error
         public static class Common
         {
-            public const string TooManyRequest = "Common.too_many_request";
-            public const string UnexpectedError = "Common.unexpected_error";
+            public const string TooManyRequest = "common.too_many_request";
+            public const string UnexpectedError = "common.unexpected_error";
         }
 
         public static class VehicleModel
@@ -67,6 +71,16 @@ namespace Application.Constants
             public const string SportRangeKmCanNotNegative = "vehicle_model.sport_rang_km_can_not_negative";
             public const string BrandIdIsRequired = "vehicle_model.brand_id_is_required";
             public const string SegmentIdIsRequired = "vehicle_model.segment_id_is_required";
+        }
+        //change password
+
+        //Cloudinary
+        public static class Cloudinary
+        {
+            public const string NotFoundObjectInFile = "File is emty";
+            public const string InvalidFileType = "Unsupported image type";
+            public const string UploadFailed = "Upload failed";
+            public const string DeleteSuccess = "Delete successful";
         }
     }
 }

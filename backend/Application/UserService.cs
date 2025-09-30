@@ -2,6 +2,7 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
@@ -12,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Newtonsoft.Json.Linq;
@@ -24,35 +26,41 @@ namespace Application
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly IOTPRepository _otpRepository;
+        private readonly IJwtBlackListRepository _jwtBackListRepository;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly JwtSettings _jwtSettings;
         private readonly EmailSettings _emailSettings;
         private readonly OTPSettings _otpSettings;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
-        private readonly IJwtBlackListRepository _jwtBackListRepository;
+        private readonly IPhotoService _photoService;
+        private readonly ILogger<UserService > _logger;
         public UserService(IUserRepository repository, 
             IOptions<JwtSettings> jwtSettings,
             IRefreshTokenRepository refreshTokenRepository,
+             IJwtBlackListRepository jwtBackListRepository,
              IOptions<EmailSettings> emailSettings,
              IOTPRepository otpRepository,
              IHttpContextAccessor httpContextAccessor,
              IOptions<OTPSettings> otpSetting,
              IMapper mapper,
              IMemoryCache cache,
-             IJwtBlackListRepository jwtBackListRepository
+             IPhotoService photoService,
+             ILogger<UserService> logger
             )
         {
             _userRepository = repository;
             _refreshTokenRepository = refreshTokenRepository;
             _otpRepository = otpRepository;
+            _jwtBackListRepository = jwtBackListRepository;
             _jwtSettings = jwtSettings.Value;
             _emailSettings = emailSettings.Value;
             _contextAccessor = httpContextAccessor;
             _otpSettings = otpSetting.Value;
             _mapper = mapper;
             _cache = cache;
-            _jwtBackListRepository = jwtBackListRepository;
+            _photoService = photoService;
+            _logger = logger;
         }
 
         
@@ -501,6 +509,48 @@ namespace Application
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
             return await _userRepository.GetByIdAsync(id);
+        }
+        
+        public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
+        {
+            if (file == null || file.Length == 0) throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
+
+            var result = await _photoService.UploadPhotoAsync(file, $"users/{userId}");
+            if (string.IsNullOrEmpty(result.Url)) throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException(Message.User.UserNotFound);
+
+            // Nếu có avatar cũ thì xoá trước (optional)
+            if (!string.IsNullOrEmpty(user.AvatarPublicId))
+            {
+                try
+                {
+                    await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Can not delete old avata {PublicId}", user.AvatarPublicId);
+                }
+            }
+
+            user.AvatarUrl = result.Url;
+            user.AvatarPublicId = result.PublicID;
+            user.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _userRepository.UpdateAsync(user);
+
+            return user.AvatarUrl;
+        }
+
+        public async Task DeleteAvatarAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId) ?? throw new Exception(Message.User.UserNotFound);
+            if(string.IsNullOrEmpty(user.AvatarPublicId)) throw new Exception(Message.User.NotFoundAvatar);
+            await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+            user.AvatarUrl = null;
+            user.AvatarPublicId = null;
+            await _userRepository.UpdateAsync(user);
         }
     }
 }

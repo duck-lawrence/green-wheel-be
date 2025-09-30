@@ -2,10 +2,13 @@
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.User.Request;
+using Application.Dtos.Common.Request;
 using Application.Dtos.User.Respone;
+using Infrastructure.ApplicationDbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
@@ -14,6 +17,9 @@ namespace API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IPhotoService _photoService;
+        private readonly AppDbContext _db;
+        private readonly ILogger<UserController> _logger;
 
         private readonly IGoogleCredentialService _googleService;
 
@@ -107,7 +113,7 @@ namespace API.Controllers
         }
         /*
          status code:
-         400: pass is too short, empty password/oldpassword/confirmpassword, confirn password not match
+         400: pass is too short, empty password/oldpassword/confirmpassword, confirm password not match
          401: invalid old password
          200: change password successfully
          */
@@ -127,7 +133,7 @@ namespace API.Controllers
          Status code: 
          200: send email successfully
          400: incorrect form of email
-         429: send to much request per minutes
+         429: send to much request per minute
          */
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] SendEmailReq sendEmailRequestDto)
@@ -239,6 +245,23 @@ namespace API.Controllers
             await _userService.UpdateMe(userClaims, userUpdateReq);
             return Ok();
         }
+        [HttpPost("upload-avatar")]
+        [Authorize]
+        public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq req)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
 
+            var avatarUrl = await _userService.UploadAvatarAsync(userId, req.File);
+
+            return Ok(new { AvatarUrl = avatarUrl });
+        }
+        [HttpDelete("Delete-avatar")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAvatar()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userService.DeleteAvatarAsync(userId);
+            return Ok(new {Message = Message.Cloudinary.DeleteSuccess});
+        }
     }
 }

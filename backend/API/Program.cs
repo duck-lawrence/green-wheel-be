@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.OpenApi.Models;
 using API.Extentions;
 using API.Filters;
 using API.Middleware;
@@ -10,6 +10,7 @@ using Application.Mappers;
 using Application.Repositories;
 using Application.Validators.User;
 using DotNetEnv;
+using CloudinaryDotNet;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
@@ -32,10 +33,50 @@ namespace API
                 ?? "http://localhost:3000";
 
             // Add services to the container.
+            // Add services to the container.
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            var cloudinarySettings = builder.Configuration.GetSection("CloudinarySettings").Get<CloudinarySettings>();
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "API",
+                    Version = "v1"
+                });
+
+                // Thêm Security Definition để hiện nút Authorize
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Nhập JWT theo format: Bearer {your token}"
+                });
+
+                // Áp dụng cho tất cả request
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+                        });
+
             //Cors frontEnd
             builder.Services.AddCors(options =>
             {
@@ -107,16 +148,36 @@ namespace API
                 options.SuppressModelStateInvalidFilter = true;
             });
 
+            //khai báo sử dụng DI cho cloudinary
+            builder.Services.AddInfrastructureServices(builder.Configuration);
+
+
+
             //Cấu hình request nhận request, nó tự chuyển trường của các đối tượng trong
             //DTO thành snakeCase để binding giá trị, và lúc trả ra 
             //thì các trường trong respone cũng sẽ bị chỉnh thành snake case
             //Ảnh hưởng khi map từ json sang object và object về json : json <-> object
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
+            // builder.Services.AddControllers()
+            // .AddJsonOptions(options =>
+            // {
+            //     options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
+            //     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            // });
+
+            // đk cloudinary
+            var account = new Account(
+                cloudinarySettings.CloudName,
+                cloudinarySettings.ApiKey,
+                cloudinarySettings.ApiSecret
+            );
+            var cloudinary = new Cloudinary(account)
             {
-                options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });
+                Api = { Secure = true }
+            };
+            builder.Services.AddSingleton(cloudinary);
+
+            // Đăng ký PhotoService
+            builder.Services.AddScoped<IPhotoService, CloudinayService>();
 
             var app = builder.Build();
             //accept frontend
@@ -145,6 +206,7 @@ namespace API
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
