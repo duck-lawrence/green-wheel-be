@@ -11,7 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -50,6 +50,7 @@ namespace API.Controllers
          200: logout successfully
          401: Invalid refresh token
          */
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -106,7 +107,7 @@ namespace API.Controllers
             }
             else
             {
-                return BadRequest();
+                return Unauthorized(Message.User.InvalidToken);
             }
         }
         /*
@@ -167,7 +168,7 @@ namespace API.Controllers
                 await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
                 return Ok();
             }
-            return Unauthorized();
+            return Unauthorized(Message.User.InvalidToken);
 
         }
 

@@ -1,11 +1,11 @@
-// import { CreatePostModal } from "./posts/CreatePostModal"
+import { LoginModal } from "./LoginModal"
+import { RegisModal } from "./RegisModal"
 
-// export * from "./posts/"
-
-// export const Modals = () => {
-//     return (
-//         <>
-//             <CreatePostModal />
-//         </>
-//     )
-// }
+export const Modals = () => {
+    return (
+        <>
+            <LoginModal />
+            <RegisModal />
+        </>
+    )
+}

@@ -5,7 +5,7 @@ import { Button, ButtonProps, cn } from "@heroui/react"
 export function ButtonStyled(props: ButtonProps) {
     return (
         <Button
-            color="secondary"
+            color="primary"
             {...props}
             className={cn("font-medium text-base", props.className)}
         />

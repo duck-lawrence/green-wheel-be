@@ -99,12 +99,13 @@ namespace API
             });
             //thêm httpcontextAccessor để lấy context trong service
             builder.Services.AddHttpContextAccessor();
-            //Add scope repositories
+            //Add repositories
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IOTPRepository, OTPRepository>();
             builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            builder.Services.AddScoped<IJwtBlackListRepository, JwtBlackListRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
@@ -153,12 +154,12 @@ namespace API
             //DTO thành snakeCase để binding giá trị, và lúc trả ra 
             //thì các trường trong respone cũng sẽ bị chỉnh thành snake case
             //Ảnh hưởng khi map từ json sang object và object về json : json <-> object
-            builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });
+            // builder.Services.AddControllers()
+            // .AddJsonOptions(options =>
+            // {
+            //     options.JsonSerializerOptions.PropertyNamingPolicy = new SnakeCaseNamingPolicy();
+            //     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            // });
 
             // đk cloudinary
             var account = new Account(
