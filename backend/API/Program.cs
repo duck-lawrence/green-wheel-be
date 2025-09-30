@@ -65,9 +65,12 @@ namespace API
             builder.Services.AddScoped<IOTPRepository, OTPRepository>();
             builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             builder.Services.AddScoped<IJwtBlackListRepository, JwtBlackListRepository>();
+            builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+            builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
+            builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
             
 
             //Mapper

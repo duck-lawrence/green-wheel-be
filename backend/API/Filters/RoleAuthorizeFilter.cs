@@ -11,15 +11,15 @@ namespace API.Filters
     public class RoleAuthorizeAttribute : Attribute, IAsyncAuthorizationFilter
     {
         private readonly string[] _roles;
-        private readonly IMemoryCache _cache;
 
-        public RoleAuthorizeAttribute(IMemoryCache cache, params string[] roles )
+        public RoleAuthorizeAttribute(params string[] roles )
         {
             _roles = roles;
-            _cache = cache;
+            
         }
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
+            var _cache = context.HttpContext.RequestServices.GetService<IMemoryCache>();
             var user = context.HttpContext.User;
             //check user login or not?
             if(!user.Identity?.IsAuthenticated ?? true)
