@@ -13,7 +13,7 @@ namespace Application.Dtos.User.Respone
         public string LastName { get; set; }
         public int? Sex { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
-        public int? AvaterUrl { get; set; }
+        public string? AvatarUrl { get; set; }
         public string? Phone { get; set; }
         public string? LicenseUrl { get; set; }
         public string? CitizenUrl { get; set; }

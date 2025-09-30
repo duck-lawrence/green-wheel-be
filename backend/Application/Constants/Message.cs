@@ -38,6 +38,9 @@ namespace Application.Constants
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
             public const string UserNotFound = "user.user_not_found";
+            //change avatar
+            public const string NotFoundAvatar = "No avatar to delete";
+
 
         }
 
@@ -55,6 +58,7 @@ namespace Application.Constants
             public const string NotFoundObjectInFile = "File is emty";
             public const string InvalidFileType = "Unsupported image type";
             public const string UploadFailed = "Upload failed";
+            public const string DeleteSuccess = "Delete successful";
         }
     }
 }

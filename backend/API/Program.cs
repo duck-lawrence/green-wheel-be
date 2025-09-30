@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.OpenApi.Models;
 using API.Extentions;
 using API.Filters;
 using API.Middleware;
@@ -39,7 +39,44 @@ namespace API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            //builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "API",
+                    Version = "v1"
+                });
+
+                // Thêm Security Definition để hiện nút Authorize
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Nhập JWT theo format: Bearer {your token}"
+                });
+
+                // Áp dụng cho tất cả request
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
+                        });
+
             //Cors frontEnd
             builder.Services.AddCors(options =>
             {
@@ -165,6 +202,7 @@ namespace API
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

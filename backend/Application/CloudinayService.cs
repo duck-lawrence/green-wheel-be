@@ -44,7 +44,7 @@ namespace Application
             return ok;
         }
 
-        public async Task<PhotoUploadResult> UploadPhotoAsync(IFormFile file, string folder = null)
+        public async Task<PhotoUploadResult> UploadPhotoAsync(IFormFile file, string? folder = null)
         {
             if (file == null || file.Length == 0)
                 throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);

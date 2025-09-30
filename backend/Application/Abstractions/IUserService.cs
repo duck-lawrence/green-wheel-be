@@ -31,6 +31,12 @@ namespace Application.Abstractions
         //Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
 
+        
+        Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName);
+        Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
+        Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
+
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
+        Task DeleteAvatarAsync(Guid pulicId);
     }
 }

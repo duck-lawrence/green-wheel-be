@@ -2,6 +2,7 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
@@ -475,7 +476,7 @@ namespace Application
         {
             if (file == null || file.Length == 0) throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
 
-            var result = await _photoService.UploadPhotoAsync(file, $"users/userId");
+            var result = await _photoService.UploadPhotoAsync(file, $"users/{userId}");
             if (string.IsNullOrEmpty(result.Url)) throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
@@ -484,7 +485,14 @@ namespace Application
             // Nếu có avatar cũ thì xoá trước (optional)
             if (!string.IsNullOrEmpty(user.AvatarPublicId))
             {
-                await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+                try
+                {
+                    await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Can not delete old avata {PublicId}", user.AvatarPublicId);
+                }
             }
 
             user.AvatarUrl = result.Url;
@@ -494,6 +502,16 @@ namespace Application
             await _userRepository.UpdateAsync(user);
 
             return user.AvatarUrl;
+        }
+
+        public async Task DeleteAvatarAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId) ?? throw new Exception(Message.User.UserNotFound);
+            if(string.IsNullOrEmpty(user.AvatarPublicId)) throw new Exception(Message.User.NotFoundAvatar);
+            await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+            user.AvatarUrl = null;
+            user.AvatarPublicId = null;
+            await _userRepository.UpdateAsync(user);
         }
     }
 }
