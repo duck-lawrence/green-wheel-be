@@ -54,6 +54,7 @@ namespace Application.Constants
         public static class VehicleModel
         {
             public const string VehicleNotFound = "vehicle_model.vehicle_not_found";
+            public const string VehicleModelNotFound = "vehicle_model.vehicle_model_not_found";
             public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
             public const string VehicelModelNotFound = "vehicle_model.vehicle_model_not_found";
             public const string NameIsRequire = "vehicle_model.name_is_require";

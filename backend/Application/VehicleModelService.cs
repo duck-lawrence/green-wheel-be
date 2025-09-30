@@ -48,6 +48,16 @@ namespace Application
             return await _vehicleModelRepository.FilterVehicleModelsAsync(vehicleFilterReq.StationId, vehicleFilterReq.StartDate, vehicleFilterReq.EndDate, vehicleFilterReq.SegmentId);
         }
 
+        public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId ,DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate);
+            if(vehicleModelViewRes == null)
+            {
+                throw new NotFoundException(Message.VehicleModel.VehicleModelNotFound);
+            }
+            return vehicleModelViewRes;
+        }
+
         public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq updateVehicleModelReq)
         {
             var vehicleModelFromDB = await _vehicleModelRepository.GetByIdAsync(Id);
