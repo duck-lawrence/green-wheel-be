@@ -2,6 +2,7 @@
 using System.Security.Claims;
 using Application.Constants;
 using Application.Dtos.User.Respone;
+using Microsoft.AspNetCore.Http;
 namespace Application.Abstractions
 {
     public interface IUserService
@@ -26,8 +27,16 @@ namespace Application.Abstractions
         Task ResetPassword(string forgotPasswordToken, string password);
         Task<Dictionary<string, string>> LoginWithGoogle(string email);
 
-        Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
+        //Task<string> SetPassword(string setPasswordToken,string password, string firstName, string lastName);
+        //Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
+        //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
+
+        
+        Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName);
         Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
+
+        Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
+        Task DeleteAvatarAsync(Guid pulicId);
     }
 }
