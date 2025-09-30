@@ -38,7 +38,7 @@ export default async function RootLayout({
             <body className="antialiased">
                 <AppProviders locale={locale}>
                     <ClientHydration>
-                        <div className="min-h-screen flex flex-col items-center p-6">
+                        <div className="min-h-screen flex flex-col items-center p-6 pt-[77px]">
                             <Navbar />
                             {children}
                         </div>

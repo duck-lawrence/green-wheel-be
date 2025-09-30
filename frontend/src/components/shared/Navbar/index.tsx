@@ -11,6 +11,10 @@ import {
     useLogout,
     useGetMe
 } from "@/hooks"
+import { BackendError } from "@/models/common/response"
+import toast from "react-hot-toast"
+import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 
 export const AcmeLogo = () => {
     return (
@@ -26,26 +30,30 @@ export const AcmeLogo = () => {
 }
 
 export function Navbar() {
-    type NavbarState = "default" | "top" | "middle"
     const { t } = useTranslation()
-    /*xử lí navbar */
+    // handle navbar
+    type NavbarState = "default" | "top" | "middle"
     const [scrollState, setScroledState] = useState<NavbarState>("default")
     const [isHiddenNavbar, setIsHiddenNavbar] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
-    // state lưu menu đang chọn
-    const [activeMenu, setActiveMenu] = useState("")
-    // xứ lí khi login thì hiện icon user
+    const { activeMenuKey, setActiveMenuKey } = useNavbarItemStore()
+    // handle when login
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
-    const user = useProfileStore((s) => s.user)
-    const { isLoading: isGetMeLoading } = useGetMe({ enabled: isLoggedIn })
+    const { user, setUser } = useProfileStore()
+    const {
+        data: userRes,
+        isLoading: isGetMeLoading,
+        error: getMeError,
+        isError: isGetMeError
+    } = useGetMe({ enabled: isLoggedIn })
     const logoutMutation = useLogout({ onSuccess: undefined })
 
     // handle navbar animation
     const baseClasses = `
         transition-all duration-400 ease-in-out
         mt-3 
-        fixed left-0 w-full z-50
+        fixed left-0 w-full z-50 h-xl
         mx-auto max-w-7xl
         data-[visible=false]:mt-0
         rounded-3xl
@@ -66,13 +74,14 @@ export function Navbar() {
         "data-[active=true]:after:bottom-0",
         "data-[active=true]:after:left-0",
         "data-[active=true]:after:right-0",
-        "data-[active=true]:after:h-[2px]",
+        "data-[active=true]:after:h-[3px]",
+        "data-[active=true]:after:w-full",
         "data-[active=true]:after:rounded-[2px]",
         "data-[active=true]:after:bg-primary"
     ]
     const menus = [
         { key: "home", label: t("navbar.home") },
-        { key: "self-drive", label: t("navbar.self_drive") },
+        { key: "vehicle-rental", label: t("navbar.vehicle_rental") },
         { key: "about", label: t("navbar.about_us") },
         { key: "contact", label: t("navbar.contact") }
     ]
@@ -82,6 +91,8 @@ export function Navbar() {
         await logoutMutation.mutateAsync()
     }, [logoutMutation])
 
+    // useEffect
+    // handle navbar scroll
     useEffect(() => {
         const handleScroll = () => {
             const y = window.scrollY
@@ -123,41 +134,51 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll)
     }, [lastScrollY])
 
+    // handle get me success
+    useEffect(() => {
+        if (userRes) {
+            setUser(userRes)
+        }
+    }, [userRes, setUser])
+
+    // handle get me error
+    useEffect(() => {
+        if (isGetMeError && getMeError) {
+            const error = getMeError as BackendError
+            console.log(`${error.title}: ${error.detail}`)
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    }, [isGetMeError, getMeError, t])
+
     return (
         <NavbarStyled
             data-visible={!isHiddenNavbar}
             classNames={{
                 base: [baseClasses],
-                item: [
-                    // dấu gạch chân dưới mục được chọn
-                    itemClasses
-                    //
-                ]
+                item: [itemClasses]
             }}
         >
             <NavbarBrand>
                 <AcmeLogo />
                 <p className="font-bold text-inherit">ACME</p>
             </NavbarBrand>
-            <NavbarContent className="hidden sm:flex gap-4" justify="center">
+            <NavbarContent className="hidden sm:flex gap-4 justify-center">
                 {menus.map((menu) => (
                     <NavbarItem
                         key={menu.key}
-                        onClick={() => setActiveMenu(menu.key)}
-                        isActive={activeMenu == menu.key}
+                        onPress={() => setActiveMenuKey(menu.key)}
+                        isActive={activeMenuKey == menu.key}
                         as={Link}
-                        href={"/" + menu.key}
+                        href={menu.key === "home" ? "/" : "/" + menu.key}
                         className="text-black"
                     >
-                        {menu.label}
+                        <div className="text-center px-3 min-w-full">{menu.label}</div>
                     </NavbarItem>
                 ))}
             </NavbarContent>
-            {/* className="absolute right-30" */}
             <NavbarContent justify="end">
-                {/* <div className={clsx("absolute", isLoggedIn ? "right-[120px]" : "right-[88px]")}>
-                    <LanguageSwitcher />
-                </div> */}
                 <LanguageSwitcher />
                 <NavbarItem>
                     {isLoggedIn ? (
@@ -173,7 +194,6 @@ export function Navbar() {
                     ) : (
                         <ButtonStyled
                             onPress={onOpenLogin}
-                            // as={Link}
                             variant="solid"
                             className="rounded-3xl opacity-97 text-black"
                         >

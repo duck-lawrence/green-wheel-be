@@ -84,7 +84,7 @@
     },
     "navbar": {
         "home": "Home",
-        "self_drive": "Self-drive",
+        "vehicle_rental": "Vehicle Rental",
         "about_us": "About",
         "contact": "Contact",
         "login": "Login",
