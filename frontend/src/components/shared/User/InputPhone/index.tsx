@@ -1,3 +1,4 @@
+"use client"
 import { InputStyled } from "@/components/styled"
 import { useFormik } from "formik"
 import * as Yub from "yup"

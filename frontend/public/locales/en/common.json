@@ -102,5 +102,75 @@
         "login": "Login",
         "register": "Register",
         "logout": "Logout"
+    },
+
+    "enum": {
+        "male": "Male",
+        "female": "Female",
+
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "received": "Received",
+
+        "paid": "Paid",
+        "refunded": "Refunded",
+        "forfeited": "Forfeited",
+
+        "cancelled": "Cancelled",
+        "request_pending": "Request Pending",
+        "confirm_change_station_pending": "Confirm Change Station Pending",
+        "payment_pending": "Payment Pending",
+        "active": "Active",
+        "completed": "Completed",
+
+        "good": "Good",
+        "minor": "Minor",
+        "moderate": "Moderate",
+        "severe": "Severe",
+        "totaled": "Totaled",
+
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "rented": "Rented",
+        "maintenance": "Maintenance",
+
+        "base_rental": "Base Rental",
+        "damage": "Damage",
+        "late_return": "Late Return",
+        "cleaning": "Cleaning",
+        "penalty": "Penalty",
+        "other": "Other",
+
+        "cash": "Cash",
+        "momo_wallet": "Momo Wallet",
+
+        "in_progress": "In Progress",
+        "resolved": "Resolved",
+        "technical": "Technical",
+        "payment": "Payment",
+        "internal": "Internal",
+        "related_to_support": "Related to Support",
+
+        "b1": "B1",
+        "b": "B",
+        "c1": "C1",
+        "c": "C",
+        "d1": "D1",
+        "d2": "D2",
+        "d": "D",
+        "be": "BE",
+        "c1e": "C1E",
+        "ce": "CE",
+        "d1e": "D1E",
+        "d2e": "D2E",
+        "de": "DE",
+
+        "all": "All",
+        "awaiting_deposit": "Awaiting Deposit",
+        "confirmed": "Confirmed",
+        "in_use": "In Use",
+        "returned": "Returned",
+        "overdue": "Overdue"
     }
 }

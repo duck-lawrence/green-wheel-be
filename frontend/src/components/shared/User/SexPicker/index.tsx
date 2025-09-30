@@ -11,7 +11,7 @@ export const animals = [
 // Loại bỏ `children` vì mình render sẵn
 type SexPickerProps = Omit<SelectProps, "children">
 
-export default function SexPicker(props: SexPickerProps) {
+export function SexPicker(props: SexPickerProps) {
     return (
         <div className="flex items-center">
             <Select

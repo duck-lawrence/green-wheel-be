@@ -1,9 +1,9 @@
 "use client"
 // import BrandPicker from "@/components/modules/UserItem/BrandPicker"
-import TableStyled from "@/components/styled/TableStyled"
 import React, { useEffect, useState } from "react"
+import { FillterBarOrder } from "@/components/shared/User/FilterBarOrder"
+import TableStyled from "@/components/styled/TableStyled"
 import { orders } from "@/data/order"
-import FillterBarOrder from "@/components/modules/UserItem/FilterBarOrder"
 
 export default function Page() {
     const [order, setOrder] = useState(orders)

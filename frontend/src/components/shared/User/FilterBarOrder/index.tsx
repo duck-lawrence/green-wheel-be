@@ -2,13 +2,12 @@
 import { useFormik } from "formik"
 import React from "react"
 import * as Yup from "yup"
-
 import { OrderStatus } from "@/constants/enum"
-
-import { ButtonStyled } from "@/components/styled"
+import { ButtonStyled, DateRangePickerStyled } from "@/components/styled"
 import dayjs from "dayjs"
 import { VehicalModelPicker } from "../VehicalModelPicker"
-import { StatusOrderPicker } from "../StatusPicker"
+import { EnumPicker } from "@/components/modules/EnumPicker"
+import { OrderStatusLabels } from "@/constants/labels"
 
 export function FillterBarOrder({ onFilterChange }) {
     const formik = useFormik({
@@ -37,9 +36,11 @@ export function FillterBarOrder({ onFilterChange }) {
                 onChange={(val) => formik.setFieldValue("vehicalModel", val)}
             />
 
-            <StatusOrderPicker
+            <EnumPicker
                 value={formik.values.status}
                 onChange={(val) => formik.setFieldValue("status", val)}
+                labels={OrderStatusLabels}
+                label="Status"
             />
 
             <DateRangePickerStyled
