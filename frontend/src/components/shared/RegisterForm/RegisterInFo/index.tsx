@@ -5,11 +5,14 @@ import { ArrowLeftIcon } from "@phosphor-icons/react"
 import React from "react"
 import { ButtonStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
+import { useTranslation } from "react-i18next"
 
-interface RegisInfoProps {
+interface RegisterInfoProps {
     handleBack: () => void
 }
-export function RegisInFo({ handleBack }: RegisInfoProps) {
+export function RegisterInFo({ handleBack }: RegisterInfoProps) {
+    const { t } = useTranslation()
+
     // const [isShowPassword, setIsShowPassword] = useState(false)
     // const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
     const [isVisible, setIsVisible] = React.useState(false)
@@ -57,7 +60,7 @@ export function RegisInFo({ handleBack }: RegisInfoProps) {
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-12 mt-2 mb-2">
-                <h1 className="font-bold text-xl">Register Account (Step 3)</h1>
+                <div className="text-center">{t("auth.complete_register")}</div>
             </div>
 
             {/* Input InFo */}
@@ -175,7 +178,7 @@ export function RegisInFo({ handleBack }: RegisInfoProps) {
             </div>
 
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled onPress={handleBack} className="w-5 h-16 mx-auto mt-0">
+                <ButtonStyled onPress={handleBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
                 </ButtonStyled>
 
@@ -184,7 +187,7 @@ export function RegisInFo({ handleBack }: RegisInfoProps) {
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid}
-                    className="w-5 h-16 mx-auto mt-0"
+                    className="w-5 h-10 mx-auto mt-0"
                 >
                     Submit
                 </ButtonStyled>

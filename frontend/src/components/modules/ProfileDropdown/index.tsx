@@ -14,7 +14,7 @@ type ProfileDropdownProps = {
 
 export function ProfileDropdown({ name, img, onLogout }: ProfileDropdownProps) {
     const { t } = useTranslation()
-    const defaultAvatarUrl = "/commons/avtFallback.jpg"
+    const defaultAvatarUrl = "/images/avtFallback.jpg"
 
     return (
         <div className="flex items-center gap-4">

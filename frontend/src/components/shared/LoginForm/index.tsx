@@ -1,20 +1,20 @@
 "use client"
-import { Button, Checkbox, Divider, Link } from "@heroui/react"
+import { Checkbox, Divider, Link } from "@heroui/react"
 import React, { useCallback } from "react"
-
-// import ButtonGoogle from "../../styled/ButtonGoogle"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { ButtonStyled, InputStyled, LogoStyle } from "@/components/styled"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
-import { useLogin } from "@/hooks/queries/useAuth"
 import { LoginUserReq } from "@/models/auth/schema/request"
+import { ButtonStyled, InputStyled, LogoStyle } from "@/components"
+import { useLogin, useLoginDiscloresureSingleton, useRegisterDiscloresureSingleton } from "@/hooks"
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
     const loginMutation = useLogin({ onSuccess })
     const [isVisible, setIsVisible] = React.useState(false)
+    const { onClose: onCloseLogin } = useLoginDiscloresureSingleton()
+    const { onOpen: onOpenRegister } = useRegisterDiscloresureSingleton()
 
     // function
     const toggleVisibility = () => setIsVisible(!isVisible)
@@ -31,6 +31,11 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
         },
         [loginMutation]
     )
+
+    const handleOpenRegister = useCallback(() => {
+        onCloseLogin()
+        onOpenRegister()
+    }, [onCloseLogin, onOpenRegister])
 
     const formik = useFormik({
         initialValues: {
@@ -140,17 +145,17 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                     <Divider className="flex-1" />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <Button
+                    <ButtonStyled
                         startContent={<Icon icon="flat-color-icons:google" width={24} />}
                         variant="bordered"
                         onPress={() => (window.location.href = "/api/auth/google")} // Redirect ra Google OAuth
                     >
                         {t("login.continue_with_google")}
-                    </Button>
+                    </ButtonStyled>
                 </div>
                 <p className="text-small text-center">
                     {t("login.need_to_create_an_account")}&nbsp;
-                    <Link href="/signup" size="sm">
+                    <Link isBlock onPress={handleOpenRegister} className="cursor-pointer">
                         {t("login.register")}
                     </Link>
                 </p>

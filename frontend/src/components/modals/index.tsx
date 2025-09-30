@@ -1,11 +1,11 @@
 import { LoginModal } from "./LoginModal"
-import { RegisModal } from "./RegisModal"
+import { RegisterModal } from "./RegisterModal"
 
 export const Modals = () => {
     return (
         <>
             <LoginModal />
-            <RegisModal />
+            <RegisterModal />
         </>
     )
 }

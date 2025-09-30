@@ -1,5 +1,5 @@
 export * from "./LanguageSwitcher"
-export * from "./RegisForm"
+export * from "./RegisterForm"
 export * from "./Carousel"
 export * from "./LoginForm"
 export * from "./Navbar"

@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 "use client"
 
 import type { ComponentProps } from "react"
@@ -154,7 +155,7 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
             <nav aria-label="Progress" className="-my-4 max-w-fit overflow-x-auto py-4">
                 <ol className={cn("flex flex-row flex-nowrap gap-x-3", colors, className)}>
                     {steps?.map((step, stepIdx) => {
-                        let status =
+                        const status =
                             currentStep === stepIdx
                                 ? "active"
                                 : currentStep < stepIdx
@@ -236,7 +237,8 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
                                             aria-hidden="true"
                                             className="pointer-events-none absolute right-0 w-10 flex-none items-center"
                                             style={{
-                                                // @ts-ignore
+                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                                // @ts-expect-error
                                                 "--idx": stepIdx
                                             }}
                                         >

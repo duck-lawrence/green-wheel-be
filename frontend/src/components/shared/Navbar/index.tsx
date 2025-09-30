@@ -4,9 +4,13 @@ import React, { useCallback, useEffect, useState } from "react"
 import { NavbarBrand, NavbarContent, NavbarItem, Link, Spinner } from "@heroui/react"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, NavbarStyled, ProfileDropdown, LanguageSwitcher } from "@/components/"
-import { useLoginDiscloresureSingleton, useProfileStore, useToken } from "@/hooks"
-import { useLogout } from "@/hooks/queries/useAuth"
-import { useGetMe } from "@/hooks/queries/useProfile"
+import {
+    useLoginDiscloresureSingleton,
+    useProfileStore,
+    useToken,
+    useLogout,
+    useGetMe
+} from "@/hooks"
 
 export const AcmeLogo = () => {
     return (
@@ -151,7 +155,7 @@ export function Navbar() {
             </NavbarContent>
             {/* className="absolute right-30" */}
             <NavbarContent justify="end">
-                {/* <div className={clsx("absolute", isLogin ? "right-[120px]" : "right-[88px]")}>
+                {/* <div className={clsx("absolute", isLoggedIn ? "right-[120px]" : "right-[88px]")}>
                     <LanguageSwitcher />
                 </div> */}
                 <LanguageSwitcher />

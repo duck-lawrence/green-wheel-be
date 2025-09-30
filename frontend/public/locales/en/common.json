@@ -1,20 +1,32 @@
 {
-    "post": {
-        "go_to_list_page": "Go to Post list",
-        "list": "Post list",
-        "failed_to_load_posts": "Failed to load posts",
-        "no_posts_available": "No posts available",
-        "not_found": "Post not found",
-        "create": "Create",
-        "refresh": "Refresh",
-        "view_detail": "View detail",
-        "update": "Update",
-        "delete": "Delete",
-        "title": "Title",
-        "title_is_required": "Title is required",
-        "body": "Body",
-        "body_is_required": "Body is required"
+    "success": {
+        "create": "Created",
+        "update": "Updated",
+        "delete": "Deleted",
+        "refresh": "Refreshed",
+        "login": "Login successful",
+        "logout": "Logout successful"
     },
+    "failed": {
+        "create": "Failed to create",
+        "update": "Failed to update",
+        "delete": "Failed to delete",
+        "refresh": "Failed to refresh",
+        "login": "Login failed",
+        "logout": "Logout failed"
+    },
+    "common": {
+        "too_many_request": "Too many request",
+        "unexpected_error": "An unexpected error occurred. Please try again later."
+    },
+    "auth": {
+        "security_verification": "Security Verification",
+        "verify_identity": "Please enter the email verification code to verify your identity",
+        "complete_register": "Please enter the information below to complete your account registration",
+        "already_have_account": "Already have an account?"
+    },
+    "vehicle": {},
+    "vehicle_model": {},
     "user": {
         "profile": "Profile",
         "booking_history": "Booking history",
@@ -42,38 +54,16 @@
         "invalid_token": "Invalid Token",
         "user_not_found": "User not found"
     },
-    "success": {
-        "create": "Created",
-        "update": "Updated",
-        "delete": "Deleted",
-        "refresh": "Refreshed",
-        "login": "Login successful",
-        "logout": "Logout successful"
-    },
-    "failed": {
-        "create": "Failed to create",
-        "update": "Failed to update",
-        "delete": "Failed to delete",
-        "refresh": "Failed to refresh",
-        "login": "Login failed",
-        "logout": "Logout failed"
-    },
-    "common": {
-        "too_many_request": "Too many request",
-        "unexpected_error": "An unexpected error occurred. Please try again later."
-    },
     "email": {
         "require": "Email is required",
         "invalid": "Invalid email format",
         "label": "Email"
     },
-
     "password": {
         "require": "Password is required",
         "min": "Password must be at least 8 characters",
         "label": "Password"
     },
-
     "login": {
         "welcome": "Welcome Back",
         "login_continue": "Login to your account to continue",
@@ -86,14 +76,12 @@
         "need_to_create_an_account": "Need to create an account?",
         "register": "Register"
     },
-
     "home": {
         "welcome": "Welcome to Green Wheel",
         "slogan": "Green Rides. Brighter Future.",
         "description": "Professional self-drive car rental service to meet all your personal travel needs",
         "view_details": "View details"
     },
-
     "navbar": {
         "home": "Home",
         "self_drive": "Self-drive",
