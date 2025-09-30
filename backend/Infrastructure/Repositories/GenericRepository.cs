@@ -1,13 +1,10 @@
-﻿using Application.Repositories;
+﻿using Application.AppExceptions;
+using Application.Repositories;
 using Domain.Commons;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
@@ -33,7 +30,7 @@ namespace Infrastructure.Repositories
         public async Task<bool> DeleteAsync(Guid id)
         {
             var entityFromDb = await GetByIdAsync(id)
-        ?? throw new Exception($"{typeof(T).Name} is not found");
+        ?? throw new NotFoundException($"{typeof(T).Name} is not found");
 
             if (entityFromDb is SorfDeletedEntity softEntity && softEntity.DeletedAt == null)
             {
@@ -49,19 +46,31 @@ namespace Infrastructure.Repositories
             return entityFromDb != null;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(System.Linq.Expressions.Expression<Func<T, object>>? include = null)
+        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[]? includes = null)
         {
             var query = _dbSet.AsQueryable();
-            if(include != null)
+            if(includes != null)
             {
-                query = query.Include(include);
+                foreach(var include in includes)
+                {
+                    query = query.Include(include);
+                }
             }
             return await query.ToListAsync();
         }
 
         public async Task<T?> GetByIdAsync(Guid id)
         {
-            return await _dbSet.FindAsync(id);   
+            //return  await _dbSet.FirstOrDefault(t => t.Id == id && t.);
+            var entityFromDb = await GetByIdAsync(id);
+            if (entityFromDb is SorfDeletedEntity softEntity1 && softEntity1.DeletedAt == null)
+            {
+                return entityFromDb;
+            }else if(entityFromDb is SorfDeletedEntity softEntity2 && softEntity2.DeletedAt != null)
+            {
+                return null;
+            }
+            return entityFromDb;
         }
 
         public async Task<int> UpdateAsync(T entity)
@@ -69,7 +78,7 @@ namespace Infrastructure.Repositories
             var entityFromDb = await GetByIdAsync(entity.Id);
             if(entityFromDb == null)
             {
-                throw new Exception($"{typeof(T).Name} is not found");
+                throw new NotFoundException($"{typeof(T).Name} is not found");
             }
             _dbContext.Entry(entityFromDb).CurrentValues.SetValues(entity);
             return await _dbContext.SaveChangesAsync();

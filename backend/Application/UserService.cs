@@ -506,6 +506,11 @@ namespace Application
 
         }
 
+        public async Task<User?> GetUserByIdAsync(Guid id)
+        {
+            return await _userRepository.GetByIdAsync(id);
+        }
+        
         public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
         {
             if (file == null || file.Length == 0) throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);

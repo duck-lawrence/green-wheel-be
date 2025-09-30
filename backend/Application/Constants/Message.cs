@@ -50,6 +50,28 @@ namespace Application.Constants
             public const string TooManyRequest = "common.too_many_request";
             public const string UnexpectedError = "common.unexpected_error";
         }
+
+        public static class VehicleModel
+        {
+            public const string VehicleNotFound = "vehicle_model.vehicle_not_found";
+            public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
+            public const string VehicelModelNotFound = "vehicle_model.vehicle_model_not_found";
+            public const string NameIsRequire = "vehicle_model.name_is_require";
+            public const string SeatingCapacityIsRequired = "vehicle_model.seating_capacity_is_require";
+            public const string SeatingCapacityCanNotNegative = "vehicle_model.seating_capacity_can_not_negative";
+            public const string NumberOfAirbasIsRequire = "vehicle_model.airbass_is_require";
+            public const string NumberOfAirbasCanNotNegative = "vehicle_model.airbass_can_not_negative";
+            public const string MotorPowerIsRequired = "vehicle_model.mortor_power_is_required";
+            public const string MotorPowerCanNotNegative = "vehicle_model.mortor_power_can_not_negative";
+            public const string BatteryCapacityIsRequired = "vehicle_model.battery_capacity_is_required";
+            public const string BatteryCapacityCanNotNegative = "vehicle_model.battery_capacity_can_not_negative";
+            public const string EcoRangeKmIsRequired = "vehicle_model.eco_range_km_is_required";
+            public const string EcoRangeKmIsCanNotNegative = "vehicle_model.eco_range_km_can_not_negative";
+            public const string SportRangeKmIsRequired = "vehicle_model.sport_rang_km_is_required";
+            public const string SportRangeKmCanNotNegative = "vehicle_model.sport_rang_km_can_not_negative";
+            public const string BrandIdIsRequired = "vehicle_model.brand_id_is_required";
+            public const string SegmentIdIsRequired = "vehicle_model.segment_id_is_required";
+        }
         //change password
 
         //Cloudinary
