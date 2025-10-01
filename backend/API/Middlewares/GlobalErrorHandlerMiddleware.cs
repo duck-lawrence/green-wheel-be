@@ -23,6 +23,10 @@ namespace API.Middleware
             {
                 await next(context);
             }
+            catch(NotFoundException nFEx)
+            {
+                await WriteProblemDetailsAsync(context, 404, "Not Found", nFEx.Message);
+            }
             catch (ValidationException vEx) // System.ComponentModel.DataAnnotations
             {
                 await WriteProblemDetailsAsync(context, 400, "Validation Failed", vEx.Message);

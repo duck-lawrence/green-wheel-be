@@ -35,7 +35,7 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
-            <body className="antialiased">
+            <body className="antialiased bg-[#F4F4F4]">
                 <AppProviders locale={locale}>
                     <ClientHydration>
                         <div className="min-h-screen flex flex-col items-center p-6 pt-[77px]">

@@ -12,7 +12,7 @@ namespace Application.AppSettingConfigurations
         public int OtpRateLimit { get; set; }
         public int OtpRateLimitTtl { get; set; }
         public int OtpAttempts { get; set; }
-        public int OtpAttemtsTtl { get; set; }
+        public int OtpAttemptsTtl { get; set; }
 
     }
 }

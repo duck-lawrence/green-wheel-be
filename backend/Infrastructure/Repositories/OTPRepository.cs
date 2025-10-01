@@ -85,7 +85,7 @@ namespace Infrastructure.Repositories
                 // lần đầu tiên -> set TTL
                 var options = new DistributedCacheEntryOptions
                 {
-                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_otpSettings.OtpAttemtsTtl)
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(_otpSettings.OtpAttemptsTtl)
                 };
                 await _cache.SetStringAsync(key, count.ToString(), options);
             }
