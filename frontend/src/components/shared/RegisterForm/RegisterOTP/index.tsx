@@ -1,35 +1,41 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import React from "react"
+import React, { useCallback } from "react"
 import { ButtonStyled } from "@/components/styled"
 import { InputOtp } from "@heroui/react"
 import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react"
 import { useTranslation } from "react-i18next"
+import { useRegisterVerify } from "@/hooks"
 
 interface RegisterOTPProps {
-    handleBack: () => void
-    handleNext: () => void
+    email: string
+    onBack: () => void
+    onSuccess: () => void
 }
 
-export function RegisterOTP({ handleBack, handleNext }: RegisterOTPProps) {
+export function RegisterOTP({ email, onBack, onSuccess }: RegisterOTPProps) {
     const { t } = useTranslation()
+    const registerVerifyMutation = useRegisterVerify({ onSuccess })
+
+    const handleRegisterVerify = useCallback(
+        async (values: { otp: string; email: string }) => {
+            await registerVerifyMutation.mutateAsync({ ...values })
+        },
+        [registerVerifyMutation]
+    )
 
     const formik = useFormik({
         initialValues: {
-            opt: ""
+            email: email,
+            otp: ""
         },
         validationSchema: Yup.object({
-            opt: Yup.string()
+            otp: Yup.string()
                 .required("OTP is required")
                 .matches(/^[0-9]{6}$/, "Invalid OTP format")
         }),
-        onSubmit: async (values) => {
-            // await new Promise((resolve) => setTimeout(resolve, 4000))
-            // let values = JSON.stringify(values)
-            alert(JSON.stringify(values))
-            handleNext()
-        }
+        onSubmit: handleRegisterVerify
     })
 
     return (
@@ -43,22 +49,18 @@ export function RegisterOTP({ handleBack, handleNext }: RegisterOTPProps) {
                 <InputOtp
                     size="lg"
                     length={6}
-                    value={formik.values.opt}
-                    onValueChange={(value) => formik.setFieldValue("opt", value)}
-                    isInvalid={!!(formik.touched.opt && formik.errors.opt)}
-                    errorMessage={formik.errors.opt}
+                    value={formik.values.otp}
+                    onValueChange={(value) => formik.setFieldValue("otp", value)}
+                    isInvalid={!!(formik.touched.otp && formik.errors.otp)}
+                    errorMessage={formik.errors.otp}
                     onBlur={() => {
-                        formik.setFieldTouched("opt")
+                        formik.setFieldTouched("otp")
                     }}
                 />
             </div>
 
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled
-                    onPress={handleBack}
-                    color="primary"
-                    className="w-2 h-10 mx-auto mt-0"
-                >
+                <ButtonStyled onPress={onBack} color="primary" className="w-2 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
                 </ButtonStyled>
 

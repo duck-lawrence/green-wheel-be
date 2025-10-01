@@ -2,30 +2,45 @@
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { ArrowLeftIcon } from "@phosphor-icons/react"
-import React from "react"
+import React, { useCallback, useState } from "react"
 import { ButtonStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
+import { useRegisterComplete } from "@/hooks"
+import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
+import { Sex } from "@/constants/enum"
 
 interface RegisterInfoProps {
-    handleBack: () => void
+    onBack: () => void
+    onSuccess?: () => void
 }
-export function RegisterInFo({ handleBack }: RegisterInfoProps) {
+
+export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
     const { t } = useTranslation()
 
-    // const [isShowPassword, setIsShowPassword] = useState(false)
-    // const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
-    const [isVisible, setIsVisible] = React.useState(false)
+    const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
-    const [isConfirmVisible, setIsConfirmVisible] = React.useState(false)
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false)
+
+    const registerMutation = useRegisterComplete({ onSuccess })
+
     const toggleConFirmVisibility = () => setIsConfirmVisible(!isConfirmVisible)
+
+    const handleRegisterComplete = useCallback(
+        async (values: UserRegisterCompleteReq) => {
+            await registerMutation.mutateAsync(values)
+        },
+        [registerMutation]
+    )
+
     const formik = useFormik({
         initialValues: {
             lastName: "",
             firstName: "",
             password: "",
             confirmPassword: "",
-            phone: ""
+            phone: "",
+            sex: Sex.Male
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
@@ -49,11 +64,7 @@ export function RegisterInFo({ handleBack }: RegisterInfoProps) {
                 .length(10, "Phone must be exactly 10 digits")
                 .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0")
         }),
-        onSubmit: async (values) => {
-            await new Promise((resolve) => setTimeout(resolve, 4000))
-            alert(JSON.stringify(values))
-            // handleNext()
-        }
+        onSubmit: handleRegisterComplete
     })
 
     return (
@@ -178,7 +189,7 @@ export function RegisterInFo({ handleBack }: RegisterInfoProps) {
             </div>
 
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled onPress={handleBack} className="w-5 h-10 mx-auto mt-0">
+                <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
                 </ButtonStyled>
 

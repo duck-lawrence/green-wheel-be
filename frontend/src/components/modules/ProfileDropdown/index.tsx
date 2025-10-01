@@ -17,7 +17,7 @@ export function ProfileDropdown({ name, img, onLogout }: ProfileDropdownProps) {
     const defaultAvatarUrl = "/images/avtFallback.jpg"
 
     return (
-        <div className="flex items-center gap-4">
+        <div className="gap-4">
             <DropdownStyle>
                 <DropdownTrigger>
                     <User

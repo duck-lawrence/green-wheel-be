@@ -51,6 +51,7 @@ export function Navbar() {
 
     // handle navbar animation
     const baseClasses = `
+        bg-transparent
         transition-all duration-400 ease-in-out
         mt-3 
         fixed left-0 w-full z-50 h-xl
@@ -60,7 +61,7 @@ export function Navbar() {
         ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
         ${
             scrollState === "top" || scrollState === "middle"
-                ? "rounded-3xl bg-[#4A9782] opacity-97 justify-between mx-auto max-w-3xl scale-95"
+                ? "text-white rounded-3xl bg-[#4A9782]/80 justify-between mx-auto max-w-3xl scale-95"
                 : "max-w-7xl scale-100"
         }
     `
@@ -68,7 +69,6 @@ export function Navbar() {
         "flex",
         "relative",
         "h-full",
-        "items-center",
         "data-[active=true]:after:content-['']",
         "data-[active=true]:after:absolute",
         "data-[active=true]:after:bottom-0",
@@ -145,7 +145,6 @@ export function Navbar() {
     useEffect(() => {
         if (isGetMeError && getMeError) {
             const error = getMeError as BackendError
-            console.log(`${error.title}: ${error.detail}`)
             if (error.detail !== undefined) {
                 toast.error(translateWithFallback(t, error.detail))
             }
@@ -172,7 +171,11 @@ export function Navbar() {
                         isActive={activeMenuKey == menu.key}
                         as={Link}
                         href={menu.key === "home" ? "/" : "/" + menu.key}
-                        className="text-black"
+                        className={
+                            scrollState === "top" || scrollState === "middle"
+                                ? "text-white"
+                                : "text-black"
+                        }
                     >
                         <div className="text-center px-3 min-w-full">{menu.label}</div>
                     </NavbarItem>
@@ -180,7 +183,7 @@ export function Navbar() {
             </NavbarContent>
             <NavbarContent justify="end">
                 <LanguageSwitcher />
-                <NavbarItem>
+                <NavbarItem className="flex items-center">
                     {isLoggedIn ? (
                         isGetMeLoading ? (
                             <Spinner />

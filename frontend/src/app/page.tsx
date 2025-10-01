@@ -1,5 +1,5 @@
 "use client"
-import { ButtonStyled, Navbar, Carousel } from "@/components"
+import { ButtonStyled, Carousel } from "@/components"
 import Link from "next/link"
 import React, { useEffect } from "react"
 import { slides } from "../../public/cars"
@@ -16,7 +16,6 @@ export default function HomePage() {
 
     return (
         <>
-            <Navbar />
             <div>
                 <div className="mt-30">
                     <div className="relative">

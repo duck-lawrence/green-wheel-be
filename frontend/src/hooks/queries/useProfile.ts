@@ -8,6 +8,5 @@ export const useGetMe = ({ enabled }: { enabled?: boolean }) => {
         queryFn: profileApi.getMe,
         enabled
     })
-
     return query
 }

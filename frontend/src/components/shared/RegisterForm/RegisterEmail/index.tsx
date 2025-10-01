@@ -5,11 +5,20 @@ import React, { useCallback } from "react"
 import { ButtonStyled, InputStyled } from "@/components"
 import { useTranslation } from "react-i18next"
 import { Link } from "@heroui/react"
-import { useLoginDiscloresureSingleton, useRegisterDiscloresureSingleton } from "@/hooks"
+import {
+    useLoginDiscloresureSingleton,
+    useRegister,
+    useRegisterDiscloresureSingleton
+} from "@/hooks"
 
-export function RegisterEmail({ handleSubmit }: { handleSubmit: () => void }) {
+interface RegisterEmail {
+    setEmail: (email: string) => void
+    onSuccess?: () => void
+}
+
+export function RegisterEmail({ setEmail, onSuccess }: RegisterEmail) {
     const { t } = useTranslation()
-
+    const registerMutation = useRegister({ onSuccess })
     const { onClose: onCloseRegister } = useRegisterDiscloresureSingleton()
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
 
@@ -17,6 +26,14 @@ export function RegisterEmail({ handleSubmit }: { handleSubmit: () => void }) {
         onCloseRegister()
         onOpenLogin()
     }, [onCloseRegister, onOpenLogin])
+
+    const handleRegister = useCallback(
+        async (values: { email: string }) => {
+            await registerMutation.mutateAsync({ ...values })
+            setEmail(values.email)
+        },
+        [registerMutation]
+    )
 
     const formik = useFormik({
         initialValues: {
@@ -27,12 +44,7 @@ export function RegisterEmail({ handleSubmit }: { handleSubmit: () => void }) {
                 .required("Email is required")
                 .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, "Invalid email format")
         }),
-        onSubmit: async (values) => {
-            // await new Promise((resolve) => setTimeout(resolve, 4000))
-            handleSubmit()
-            // console.log()
-            alert(JSON.stringify(values))
-        }
+        onSubmit: handleRegister
     })
 
     return (
@@ -55,7 +67,7 @@ export function RegisterEmail({ handleSubmit }: { handleSubmit: () => void }) {
                     onBlur={() => {
                         formik.setFieldTouched("email")
                     }}
-                    onClear={() => console.log("input cleared")}
+                    onClear={() => {}}
                 />
             </div>
             {/* Button submit */}
@@ -65,7 +77,6 @@ export function RegisterEmail({ handleSubmit }: { handleSubmit: () => void }) {
                 isLoading={formik.isSubmitting}
                 color="primary"
                 isDisabled={!formik.isValid}
-                // onPress={() => formik.submitForm()}
             >
                 Send OTP
             </ButtonStyled>

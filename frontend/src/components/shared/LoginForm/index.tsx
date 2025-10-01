@@ -5,7 +5,6 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
-import { LoginUserReq } from "@/models/auth/schema/request"
 import { ButtonStyled, InputStyled, LogoStyle } from "@/components"
 import { useLogin, useLoginDiscloresureSingleton, useRegisterDiscloresureSingleton } from "@/hooks"
 
@@ -20,13 +19,9 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const toggleVisibility = () => setIsVisible(!isVisible)
 
     const handleLogin = useCallback(
-        async (values: LoginUserReq & { rememberMe: boolean }) => {
+        async (values: { email: string; password: string; rememberMe?: boolean }) => {
             await loginMutation.mutateAsync({
-                req: {
-                    email: values.email,
-                    password: values.password
-                },
-                rememberMe: values.rememberMe
+                ...values
             })
         },
         [loginMutation]

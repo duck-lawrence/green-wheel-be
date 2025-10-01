@@ -10,6 +10,7 @@ import { RegisterInFo } from "./RegisterInFo"
 export function RegisterForm() {
     const [step, setStep] = useState(0)
     const [direction, setDirection] = useState(1) // 1 = next, -1 = back
+    const [email, setEmail] = useState("")
 
     const variants = {
         enter: (direction: number) => ({
@@ -26,12 +27,12 @@ export function RegisterForm() {
         })
     }
 
-    const nextStep = () => {
+    const handleNextStep = () => {
         setDirection(1)
         setStep((prev) => prev + 1)
     }
 
-    const prevStep = () => {
+    const handlePrevStep = () => {
         setDirection(-1)
         setStep((prev) => prev - 1)
     }
@@ -63,7 +64,7 @@ export function RegisterForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterEmail handleSubmit={nextStep} />
+                                <RegisterEmail setEmail={setEmail} onSuccess={handleNextStep} />
                             </motion.div>
                         )}
                         {step === 1 && (
@@ -77,7 +78,11 @@ export function RegisterForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterOTP handleBack={prevStep} handleNext={nextStep} />
+                                <RegisterOTP
+                                    email={email}
+                                    onBack={handlePrevStep}
+                                    onSuccess={handleNextStep}
+                                />
                             </motion.div>
                         )}
                         {step === 2 && (
@@ -91,7 +96,7 @@ export function RegisterForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterInFo handleBack={prevStep} />
+                                <RegisterInFo onBack={handlePrevStep} />
                             </motion.div>
                         )}
                     </AnimatePresence>
