@@ -126,6 +126,20 @@
         "pickup_address": "Pickup Address",
         "status": "Status"
     },
+
+    "vehical": {
+        "pick_station": "Please select a pick-up location",
+        "pick_time_car": "Please select date and time to pick up the car",
+        "search_car": "Search car"
+    },
+
+    "validate": {
+        "date_received": "Vehicle pick-up date is invalid",
+        "date_return": "Please select return date and time",
+        "valid_date": "The return date must be after the pick-up date",
+        "time_return": "Car return date must be between 7am-5pm"
+    },
+
     "enum": {
         "male": "Male",
         "female": "Female",
