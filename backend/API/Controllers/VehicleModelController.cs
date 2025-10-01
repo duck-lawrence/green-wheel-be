@@ -1,4 +1,5 @@
-﻿using Application;
+﻿using API.Filters;
+using Application;
 using Application.Abstractions;
 using Application.Dtos.VehicleModel.Request;
 using Microsoft.AspNetCore.Http;
@@ -18,9 +19,12 @@ namespace API.Controllers
             _vehicleModelService = vehicleModelService;
         }
         /*
+         401: unauthorized
+         403: not have permission
          --400: invalid type
          200: success
          */
+        [RoleAuthorize("Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateVehicleModel(CreateVehicleModelReq createVehicleModelReq)
         {
@@ -31,10 +35,13 @@ namespace API.Controllers
             });
         }
         /*
+         401: unauthorized
+         403: not have permission
          200: success
          --400: invalid type
          404: not found
          */
+        [RoleAuthorize("Admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicleModel([FromRoute] Guid id, UpdateVehicleModelReq updateVehicleModelReq)
         {
@@ -63,14 +70,19 @@ namespace API.Controllers
             return Ok(verhicelModelView);
         }
         /*
-         404: not found
+         401: unauthorized
+         403: not have permission
+         404: vehicle model not found
          200: success
          */
+        [RoleAuthorize("Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicleModel([FromRoute] Guid id)
         {
             await _vehicleModelService.DeleteVehicleModleAsync(id);
             return Ok();
         }
+
+        
     }
 }

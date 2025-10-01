@@ -16,7 +16,8 @@ using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using System.Threading.Tasks;
+using Infrastructure.UnitOfWork;
+using Application.UnitOfWorks;
 
 namespace API
 {
@@ -108,12 +109,15 @@ namespace API
             builder.Services.AddScoped<IJwtBlackListRepository, JwtBlackListRepository>();
             builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
             builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
+            builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
             builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
-            
-
+            builder.Services.AddScoped<IVehicleService, VehicleService>();
+            builder.Services.AddScoped<IRentalContractService, RentalContractService>();
+            //UOW
+            builder.Services.AddScoped<IRentalContractUow, RentalContractUow>()
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi

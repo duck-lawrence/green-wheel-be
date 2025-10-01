@@ -9,6 +9,8 @@ namespace Application.Repositories
 {
     public interface IVehicleRepository : IGenericRepository<Vehicle>
     {
-
+        Task<Vehicle> GetByLicensePlateAsync(string licensePlate);
+        Task<Vehicle> GetVehicle(Guid stationId, Guid modelId,
+            DateTimeOffset startDate, DateTimeOffset endDate);
     }
 }

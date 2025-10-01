@@ -6,6 +6,6 @@ namespace API.Controllers
     [ApiController]
     public class InvoiceControllers : ControllerBase
     {
-
+        
     }
 }
