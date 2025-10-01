@@ -1,7 +1,7 @@
 "use client"
 import { cn, DatePicker, DatePickerProps } from "@heroui/react"
 import React from "react"
-export default function DatePickerStyled(props: DatePickerProps) {
+export function DatePickerStyled(props: DatePickerProps) {
     return (
         <DatePicker
             color="primary"

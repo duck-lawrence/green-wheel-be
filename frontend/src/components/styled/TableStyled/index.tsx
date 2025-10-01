@@ -1,20 +1,37 @@
 "use client"
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/react"
 import React from "react"
-// { data, loading }
+import { useTranslation } from "react-i18next"
 
-export default function TableStyled({ data, loading }) {
-    if (loading) return <div className="text-center">⏳ Loading order...</div>
+type TableStyledProps = {
+    data: {
+        order: string
+        model: string
+        pickupTime: string
+        returnTime: string
+        pickupAddress: string
+        status: string
+    }[]
+    loading: boolean
+}
+
+export default function TableStyled({ data, loading }: TableStyledProps) {
+    if (loading) return <div className="text-center">Loading order...</div>
     if (!data || data.length === 0) return <div className="text-center">No order</div>
+    const { t } = useTranslation()
     return (
         <Table aria-label="Example static collection table" className="w-full">
             <TableHeader>
-                <TableColumn className="text-xl text-center">Order</TableColumn>
-                <TableColumn className="text-xl text-center">Vehicle model</TableColumn>
-                <TableColumn className="text-xl text-center">Pickup time</TableColumn>
-                <TableColumn className="text-xl text-center">Return time</TableColumn>
-                <TableColumn className="text-xl text-center">Pickup address</TableColumn>
-                <TableColumn className="text-xl text-center">Status</TableColumn>
+                <TableColumn className="text-xl text-center">{t("table.order")}</TableColumn>
+                <TableColumn className="text-xl text-center">
+                    {t("table.vehicle_model")}
+                </TableColumn>
+                <TableColumn className="text-xl text-center">{t("table.pickup_time")}</TableColumn>
+                <TableColumn className="text-xl text-center">{t("table.return_time")}</TableColumn>
+                <TableColumn className="text-xl text-center">
+                    {t("table.pickup_address")}
+                </TableColumn>
+                <TableColumn className="text-xl text-center">{t("table.status")}</TableColumn>
             </TableHeader>
 
             <TableBody>
@@ -31,26 +48,4 @@ export default function TableStyled({ data, loading }) {
             </TableBody>
         </Table>
     )
-}
-{
-    /* <TableCell>
-                        <div className="flex justify-center items-center h-full w-full">
-                            Tony Reichert
-                        </div>
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex justify-center items-center h-full w-full">CEO</div>
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex justify-center items-center h-full w-full">Active</div>
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex justify-center items-center h-full w-full">Active</div>
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex justify-center items-center h-full w-full">Active</div>
-                    </TableCell>
-                    <TableCell>
-                        <div className="flex justify-center items-center h-full w-full">Active</div>
-                    </TableCell> */
 }

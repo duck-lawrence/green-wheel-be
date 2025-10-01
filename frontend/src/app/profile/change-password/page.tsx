@@ -4,8 +4,10 @@ import React, { useState } from "react"
 import * as Yup from "yup"
 import { useFormik } from "formik"
 import { Icon } from "@iconify/react"
+import { useTranslation } from "react-i18next"
 
 export default function page() {
+    const { t } = useTranslation()
     const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
     const [isNewVisible, setIsNewVisible] = useState(false)
@@ -21,22 +23,22 @@ export default function page() {
         },
         validationSchema: Yup.object({
             currentPassword: Yup.string()
-                .required("Current password is required")
-                .min(6, "Current password must be at least 6 characters")
+                .required(t("user.password_can_not_empty"))
+                .min(6, t("user.password_min"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    "Current password must contain 1 uppercase, 1 number, 1 special char"
+                    t("user.password_strength")
                 ),
             newPassword: Yup.string()
-                .required("New Password is required")
-                .min(6, "New Password must be at least 6 characters")
+                .required(t("user.new_password_can_not_empty"))
+                .min(6, t("user.password_min"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    "Password must contain 1 uppercase, 1 number, 1 special char"
+                    t("user.password_strength")
                 ),
             confirmPassword: Yup.string()
-                .oneOf([Yup.ref("newPassword")], "Passwords must match")
-                .required("Please confirm your password")
+                .oneOf([Yup.ref("newPassword")], t("user.confirm_password"))
+                .required(t("user.password_can_not_empty"))
         }),
         onSubmit: async (values) => {
             await new Promise((resolve) => setTimeout(resolve, 4000))
@@ -48,7 +50,7 @@ export default function page() {
         <form onSubmit={formik.handleSubmit} className="p-4">
             {/* Title */}
             <div className="text-3xl mb-4 p-4 font-bold">
-                <p>Thay đổi mật khẩu</p>
+                <p>{t("user.change_password")}</p>
             </div>
 
             {/* Form */}
@@ -167,7 +169,7 @@ export default function page() {
                     isDisabled={!formik.isValid || !formik.dirty}
                     className="flex w-30 mt-4 mb-4 mr-2"
                 >
-                    Submit
+                    {t("login.submit")}
                 </ButtonStyled>
             </div>
         </form>

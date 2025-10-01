@@ -1,13 +1,20 @@
 "use client"
-import { AvaterStyled, ButtonStyled, InputPhone, InputStyled } from "@/components"
-import { SexPicker } from "@/components/shared/User/SexPicker"
-import DatePickerStyled from "@/components/styled/DatePickerStyled"
+import {
+    AvaterStyled,
+    ButtonStyled,
+    DatePickerStyled,
+    InputPhone,
+    InputStyled,
+    SexPicker
+} from "@/components"
+
 import { Input } from "@heroui/react"
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
-
 import React, { useState } from "react"
+import { useTranslation } from "react-i18next"
 // import { useTranslation } from "react-i18next"
-export default function ProfilePage() {
+export default function Page() {
+    const { t } = useTranslation()
     const [showChange, setShowChange] = useState(true)
     const img =
         "https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/433446266_758349243066734_884520383743627659_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=FsaTEptwBqwQ7kNvwGBnPfY&_nc_oc=Adl360kkqq9z98joIstrLI_QwmT7Rz78mugSWoMtIDaHnYtsi0LBcoxs5ZVdaHeo9oU&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=uf7J93HxXk7lntMDq36kgQ&oh=00_Afazntj845yvpldFU92bWJNTFamk4xwJTOVFZbYZ2GfZjQ&oe=68DC722B"
@@ -29,7 +36,7 @@ export default function ProfilePage() {
                         <div>
                             <NotePencilIcon />
                         </div>
-                        Edit information
+                        {t("user.edit_information")}
                     </ButtonStyled>
                 ) : (
                     <ButtonStyled
@@ -37,15 +44,15 @@ export default function ProfilePage() {
                                  hover:bg-primary hover:text-black mt-9"
                         onPress={() => setShowChange(!showChange)}
                     >
-                        Save information
+                        {t("user.save_changes")}
                     </ButtonStyled>
                 )}
             </div>
             {showChange === false && (
                 <div className="flex justify-center item-center mt-6 ">
                     <InputStyled
-                        label="Account name"
-                        placeholder="Full name"
+                        label={t("user.account_name")}
+                        placeholder={t("user.full_name")}
                         variant="bordered"
                         className="w-164"
                     />
@@ -60,9 +67,9 @@ export default function ProfilePage() {
                 />
                 <SexPicker
                     {...(showChange === false ? { isDisabled: false } : { isDisabled: true })}
-                    label="Sex"
+                    label={t("user.sex")}
                     color="primary"
-                    placeholder="Choose sex"
+                    placeholder={t("user.choose_sex")}
                     variant="bordered"
                     className="w-75"
                 />
