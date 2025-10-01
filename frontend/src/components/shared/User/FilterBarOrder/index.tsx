@@ -19,7 +19,7 @@ export function FillterBarOrder({ onFilterChange }) {
         },
         validationSchema: Yup.object().shape({
             vehicalModel: Yup.string().required("Please pick vehicle model"),
-            status: Yup.string().required("Please choose status"),
+            status: Yup.number().required("Please choose status"),
             start: Yup.string().required("Choose start date"),
             end: Yup.string().required("Choose end date")
         }),
@@ -44,10 +44,11 @@ export function FillterBarOrder({ onFilterChange }) {
             />
 
             <DateRangePickerStyled
+                label="Pick start date and end date"
                 onChange={(val) => {
                     if (!val) {
-                        formik.setFieldValue("start", "")
-                        formik.setFieldValue("end", "")
+                        formik.setFieldValue("start", null)
+                        formik.setFieldValue("end", null)
                         return
                     }
 

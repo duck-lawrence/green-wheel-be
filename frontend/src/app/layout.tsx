@@ -6,6 +6,7 @@ import { AppProviders } from "@/providers"
 import { Toaster } from "react-hot-toast"
 import { cookies } from "next/headers"
 import { ClientHydration, Modals, Navbar } from "@/components/"
+import Script from "next/script"
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -35,10 +36,10 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
-            <body className="antialiased bg-[#F4F4F4]">
+            <body className="antialiased bg-[#f4f4f4]">
                 <AppProviders locale={locale}>
                     <ClientHydration>
-                        <div className="min-h-screen flex flex-col items-center p-6">
+                        <div className="min-h-screen flex flex-col items-center p-6 pt-[77px]">
                             <Navbar />
                             {children}
                         </div>
@@ -46,6 +47,7 @@ export default async function RootLayout({
                         <Toaster position="bottom-right" reverseOrder={false} />
                     </ClientHydration>
                 </AppProviders>
+                <Script src="https://accounts.google.com/gsi/client" async defer />
             </body>
         </html>
     )

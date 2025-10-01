@@ -1,70 +1,75 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import React from "react"
+import React, { useCallback } from "react"
 import { ButtonStyled } from "@/components/styled"
 import { InputOtp } from "@heroui/react"
 import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react"
+import { useTranslation } from "react-i18next"
+import { useRegisterVerify } from "@/hooks"
 
-interface RegisOTPProps {
-    handleBack: () => void
-    handleNext: () => void
+interface RegisterOTPProps {
+    email: string
+    onBack: () => void
+    onSuccess: () => void
 }
 
-export function RegisOTP({ handleBack, handleNext }: RegisOTPProps) {
+export function RegisterOTP({ email, onBack, onSuccess }: RegisterOTPProps) {
+    const { t } = useTranslation()
+    const registerVerifyMutation = useRegisterVerify({ onSuccess })
+
+    const handleRegisterVerify = useCallback(
+        async (values: { otp: string; email: string }) => {
+            await registerVerifyMutation.mutateAsync({ ...values })
+        },
+        [registerVerifyMutation]
+    )
+
     const formik = useFormik({
         initialValues: {
-            opt: ""
+            email: email,
+            otp: ""
         },
         validationSchema: Yup.object({
-            opt: Yup.string()
+            otp: Yup.string()
                 .required("OTP is required")
                 .matches(/^[0-9]{6}$/, "Invalid OTP format")
         }),
-        onSubmit: async (values) => {
-            // await new Promise((resolve) => setTimeout(resolve, 4000))
-            // let values = JSON.stringify(values)
-            alert(JSON.stringify(values))
-            handleNext()
-        }
+        onSubmit: handleRegisterVerify
     })
 
     return (
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-12 mt-2 mb-2">
-                <h1 className="font-bold text-xl">Register Account (Step 2)</h1>
+                <div className="text-center">{t("auth.verify_identity")}</div>
             </div>
             {/* Input OTP */}
             <div className=" mx-auto">
-                <p className="text-default-600 mb-2 ml-22 text-xl font-bold">6 digits OTP</p>
                 <InputOtp
                     size="lg"
                     length={6}
-                    value={formik.values.opt}
-                    onValueChange={(value) => formik.setFieldValue("opt", value)}
-                    isInvalid={!!(formik.touched.opt && formik.errors.opt)}
-                    errorMessage={formik.errors.opt}
+                    value={formik.values.otp}
+                    onValueChange={(value) => formik.setFieldValue("otp", value)}
+                    isInvalid={!!(formik.touched.otp && formik.errors.otp)}
+                    errorMessage={formik.errors.otp}
                     onBlur={() => {
-                        formik.setFieldTouched("opt")
+                        formik.setFieldTouched("otp")
                     }}
                 />
             </div>
 
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled
-                    onPress={handleBack}
-                    className="w-2 h-16 mx-auto mt-0 bg-primary opacity-80"
-                >
+                <ButtonStyled onPress={onBack} className="w-2 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
                 </ButtonStyled>
 
                 <ButtonStyled
                     type="submit"
-                    isLoading={formik.isSubmitting}
                     color="primary"
+                    isLoading={formik.isSubmitting}
                     isDisabled={!formik.isValid}
-                    className="w-4 h-16 mx-auto mt-0"
+                    className="w-4 h-10 mx-auto mt-0"
                 >
                     {formik.isSubmitting ? "" : <ArrowRightIcon />}
                 </ButtonStyled>

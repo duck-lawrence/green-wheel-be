@@ -4,9 +4,8 @@ import React from "react"
 export function DateRangePickerStyled(props: DateRangePickerProps) {
     return (
         <DateRangePicker
+            showMonthAndYearPickers
             variant="bordered"
-            color="primary"
-            label="Day start to end"
             {...props}
             className={cn("w-[240] font-medium text-base", props.className)}
         />

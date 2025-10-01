@@ -3,13 +3,14 @@ import { cn } from "@heroui/react"
 import React, { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { RowStep } from "./RowStep"
-import { RegisEmail } from "./RegisEmail"
-import { RegisOTP } from "./RegisOTP"
-import { RegisInFo } from "./RegisInFo"
+import { RegisterEmail } from "./RegisterEmail"
+import { RegisterOTP } from "./RegisterOTP"
+import { RegisterInFo } from "./RegisterInFo"
 
-export function RegisForm() {
+export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     const [step, setStep] = useState(0)
     const [direction, setDirection] = useState(1) // 1 = next, -1 = back
+    const [email, setEmail] = useState("")
 
     const variants = {
         enter: (direction: number) => ({
@@ -26,12 +27,12 @@ export function RegisForm() {
         })
     }
 
-    const nextStep = () => {
+    const handleNextStep = () => {
         setDirection(1)
         setStep((prev) => prev + 1)
     }
 
-    const prevStep = () => {
+    const handlePrevStep = () => {
         setDirection(-1)
         setStep((prev) => prev - 1)
     }
@@ -63,7 +64,11 @@ export function RegisForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisEmail handleSubmit={nextStep} />
+                                <RegisterEmail
+                                    email={email}
+                                    setEmail={setEmail}
+                                    onSuccess={handleNextStep}
+                                />
                             </motion.div>
                         )}
                         {step === 1 && (
@@ -77,7 +82,11 @@ export function RegisForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisOTP handleBack={prevStep} handleNext={nextStep} />
+                                <RegisterOTP
+                                    email={email}
+                                    onBack={handlePrevStep}
+                                    onSuccess={handleNextStep}
+                                />
                             </motion.div>
                         )}
                         {step === 2 && (
@@ -91,7 +100,7 @@ export function RegisForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisInFo handleBack={prevStep} />
+                                <RegisterInFo onSuccess={onSuccess} />
                             </motion.div>
                         )}
                     </AnimatePresence>

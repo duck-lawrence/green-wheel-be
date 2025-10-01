@@ -1,12 +1,13 @@
 /* eslint-disable indent */
 "use client"
-import React, { useCallback, useEffect, useState } from "react"
-import { NavbarBrand, NavbarContent, NavbarItem, Link, Spinner } from "@heroui/react"
+import React, { useEffect, useState } from "react"
+import "./navbar.css"
+import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, NavbarStyled, ProfileDropdown, LanguageSwitcher } from "@/components/"
-import { useLoginDiscloresureSingleton, useProfileStore, useToken } from "@/hooks"
-import { useLogout } from "@/hooks/queries/useAuth"
-import { useGetMe } from "@/hooks/queries/useProfile"
+import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
+import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
+import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
+import { ProfileDropdown } from "./ProfileDropdown"
 
 export const AcmeLogo = () => {
     return (
@@ -22,62 +23,57 @@ export const AcmeLogo = () => {
 }
 
 export function Navbar() {
-    type NavbarState = "default" | "top" | "middle"
     const { t } = useTranslation()
-    /*xử lí navbar */
+    // handle navbar
+    type NavbarState = "default" | "top" | "middle"
     const [scrollState, setScroledState] = useState<NavbarState>("default")
     const [isHiddenNavbar, setIsHiddenNavbar] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
-    // state lưu menu đang chọn
-    const [activeMenu, setActiveMenu] = useState("")
-    // xứ lí khi login thì hiện icon user
+    const { activeMenuKey, setActiveMenuKey } = useNavbarItemStore()
+    // handle when login
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
-    const user = useProfileStore((s) => s.user)
-    const { isLoading: isGetMeLoading } = useGetMe({ enabled: isLoggedIn })
-    const logoutMutation = useLogout({ onSuccess: undefined })
 
     // handle navbar animation
     const baseClasses = `
+        bg-transparent
         transition-all duration-400 ease-in-out
         mt-3 
-        fixed left-0 w-full z-50
+        fixed left-0 w-full z-50 h-xl
         mx-auto max-w-7xl
         data-[visible=false]:mt-0
         rounded-3xl
+        justify-between
         ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
         ${
             scrollState === "top" || scrollState === "middle"
-                ? "rounded-3xl bg-[#4A9782] opacity-97 justify-between mx-auto max-w-3xl scale-95"
-                : "max-w-7xl scale-100"
+                ? "text-white rounded-3xl bg-[#080808]/50 mx-auto max-w-3xl scale-95"
+                : ""
         }
     `
     const itemClasses = [
         "flex",
         "relative",
         "h-full",
-        "items-center",
         "data-[active=true]:after:content-['']",
         "data-[active=true]:after:absolute",
         "data-[active=true]:after:bottom-0",
         "data-[active=true]:after:left-0",
         "data-[active=true]:after:right-0",
-        "data-[active=true]:after:h-[2px]",
+        "data-[active=true]:after:h-[3px]",
+        "data-[active=true]:after:w-full",
         "data-[active=true]:after:rounded-[2px]",
         "data-[active=true]:after:bg-primary"
     ]
     const menus = [
         { key: "home", label: t("navbar.home") },
-        { key: "self-drive", label: t("navbar.self_drive") },
+        { key: "vehicle-rental", label: t("navbar.vehicle_rental") },
         { key: "about", label: t("navbar.about_us") },
         { key: "contact", label: t("navbar.contact") }
     ]
 
-    // func
-    const handleLogout = useCallback(async () => {
-        await logoutMutation.mutateAsync()
-    }, [logoutMutation])
-
+    // useEffect
+    // handle navbar scroll
     useEffect(() => {
         const handleScroll = () => {
             const y = window.scrollY
@@ -124,54 +120,47 @@ export function Navbar() {
             data-visible={!isHiddenNavbar}
             classNames={{
                 base: [baseClasses],
-                item: [
-                    // dấu gạch chân dưới mục được chọn
-                    itemClasses
-                    //
-                ]
+                item: [itemClasses]
             }}
         >
+            {/* start content */}
             <NavbarBrand>
                 <AcmeLogo />
                 <p className="font-bold text-inherit">ACME</p>
             </NavbarBrand>
-            <NavbarContent className="hidden sm:flex gap-4" justify="center">
+            {/* middle content */}
+            <NavbarContent className="hidden sm:flex gap-4 justify-center">
                 {menus.map((menu) => (
                     <NavbarItem
                         key={menu.key}
-                        onClick={() => setActiveMenu(menu.key)}
-                        isActive={activeMenu == menu.key}
+                        onPress={() => setActiveMenuKey(menu.key)}
+                        isActive={activeMenuKey == menu.key}
                         as={Link}
-                        href={"/" + menu.key}
-                        className="text-black"
+                        href={menu.key === "home" ? "/" : "/" + menu.key}
+                        className={
+                            scrollState === "top" || scrollState === "middle"
+                                ? "text-white"
+                                : "text-inherit"
+                        }
                     >
-                        {menu.label}
+                        <div className="text-center px-3 min-w-full">{menu.label}</div>
                     </NavbarItem>
                 ))}
             </NavbarContent>
-            {/* className="absolute right-30" */}
+            {/* end content */}
             <NavbarContent justify="end">
-                {/* <div className={clsx("absolute", isLogin ? "right-[120px]" : "right-[88px]")}>
-                    <LanguageSwitcher />
-                </div> */}
-                <LanguageSwitcher />
-                <NavbarItem>
+                <LanguageSwitcher
+                    isChangeTextColor={scrollState === "top" || scrollState === "middle"}
+                />
+                <NavbarItem className="flex items-center">
                     {isLoggedIn ? (
-                        isGetMeLoading ? (
-                            <Spinner />
-                        ) : (
-                            <ProfileDropdown
-                                name={`${user?.lastName} ${user?.firstName}`}
-                                img={user?.avatarUrl}
-                                onLogout={handleLogout}
-                            />
-                        )
+                        <ProfileDropdown />
                     ) : (
                         <ButtonStyled
                             onPress={onOpenLogin}
-                            // as={Link}
+                            color="primary"
                             variant="solid"
-                            className="rounded-3xl opacity-97 text-black"
+                            className="rounded-3xl opacity-97"
                         >
                             {t("login.login")}
                         </ButtonStyled>

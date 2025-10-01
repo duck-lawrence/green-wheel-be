@@ -1,28 +1,49 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { ArrowLeftIcon } from "@phosphor-icons/react"
-import React from "react"
-import { ButtonStyled, InputStyled } from "@/components/styled"
+import React, { useCallback, useState } from "react"
+import { ButtonStyled, DatePickerStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
+import { useTranslation } from "react-i18next"
+import { useRegisterComplete } from "@/hooks"
+import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
+import { Sex } from "@/constants/enum"
+import { EnumPicker } from "@/components/modules/EnumPicker"
+import { SexLabels } from "@/constants/labels"
+import dayjs from "dayjs"
 
-interface RegisInfoProps {
-    handleBack: () => void
+interface RegisterInfoProps {
+    // onBack: () => void
+    onSuccess?: () => void
 }
-export function RegisInFo({ handleBack }: RegisInfoProps) {
-    // const [isShowPassword, setIsShowPassword] = useState(false)
-    // const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
-    const [isVisible, setIsVisible] = React.useState(false)
+
+export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
+    const { t } = useTranslation()
+
+    const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
-    const [isConfirmVisible, setIsConfirmVisible] = React.useState(false)
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false)
+
+    const registerMutation = useRegisterComplete({ onSuccess })
+
     const toggleConFirmVisibility = () => setIsConfirmVisible(!isConfirmVisible)
+
+    const handleRegisterComplete = useCallback(
+        async (values: UserRegisterCompleteReq) => {
+            await registerMutation.mutateAsync(values)
+        },
+        [registerMutation]
+    )
+
     const formik = useFormik({
         initialValues: {
             lastName: "",
             firstName: "",
             password: "",
             confirmPassword: "",
-            phone: ""
+            dateOfBirth: "",
+            phone: "",
+            sex: Sex.Male
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
@@ -41,30 +62,28 @@ export function RegisInFo({ handleBack }: RegisInfoProps) {
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], "Passwords must match")
                 .required("Please confirm your password"),
+            dateOfBirth: Yup.string(),
             phone: Yup.string()
                 .required("Phone is required")
                 .length(10, "Phone must be exactly 10 digits")
-                .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0")
+                .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0"),
+            sex: Yup.number().required("Sex is required")
         }),
-        onSubmit: async (values) => {
-            await new Promise((resolve) => setTimeout(resolve, 4000))
-            alert(JSON.stringify(values))
-            // handleNext()
-        }
+        onSubmit: handleRegisterComplete
     })
 
     return (
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-12 mt-2 mb-2">
-                <h1 className="font-bold text-xl">Register Account (Step 3)</h1>
+                <div className="text-center">{t("auth.complete_register")}</div>
             </div>
 
             {/* Input InFo */}
             <div className="flex mx-auto w-110 gap-5">
                 <InputStyled
-                    variant="bordered"
                     label="Last name"
+                    variant="bordered"
                     value={formik.values.lastName}
                     onValueChange={(value) => formik.setFieldValue("lastName", value)}
                     isInvalid={!!(formik.touched.lastName && formik.errors.lastName)}
@@ -75,8 +94,8 @@ export function RegisInFo({ handleBack }: RegisInfoProps) {
                 />
 
                 <InputStyled
-                    variant="bordered"
                     label="First name"
+                    variant="bordered"
                     value={formik.values.firstName}
                     onValueChange={(value) => formik.setFieldValue("firstName", value)}
                     isInvalid={!!(formik.touched.firstName && formik.errors.firstName)}
@@ -174,19 +193,44 @@ export function RegisInFo({ handleBack }: RegisInfoProps) {
                 />
             </div>
 
+            <div className="flex mx-auto w-110 gap-5">
+                <EnumPicker
+                    label="Sex"
+                    value={formik.values.sex}
+                    onChange={(val) => formik.setFieldValue("sex", val)}
+                    labels={SexLabels}
+                />
+
+                <DatePickerStyled
+                    label="Date of birth"
+                    onChange={(val) => {
+                        if (!val) {
+                            formik.setFieldValue("dateOfBirth", null)
+                            return
+                        }
+
+                        const dob = val
+                            ? dayjs(val.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
+                            : ""
+
+                        formik.setFieldValue("dateOfBirth", dob)
+                    }}
+                />
+            </div>
+
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled onPress={handleBack} className="w-5 h-16 mx-auto mt-0">
+                {/* <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
-                </ButtonStyled>
+                </ButtonStyled> */}
 
                 <ButtonStyled
                     type="submit"
+                    className="w-110 h-10 mx-auto mt-4"
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid}
-                    className="w-5 h-16 mx-auto mt-0"
                 >
-                    Submit
+                    {t("login.register")}
                 </ButtonStyled>
             </div>
         </form>
