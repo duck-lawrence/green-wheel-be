@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum TokenType
+    public enum DamageStatus
     {
-        AccessToken = 0,
-        RefreshToken = 1,
-        RegisterToken = 2,
-        ForgotPasswordToken = 3,
-        SetPasswordToken = 4
+        Good = 0,
+        Minor = 1,
+        Moderate = 2,
+        Severe = 3,
+        Totaled = 4
     }
 }

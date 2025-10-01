@@ -110,6 +110,10 @@ namespace API
             builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
             builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
             builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
+            builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+            builder.Services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
+            builder.Services.AddScoped<IDepositRepository, DepositRepository>();
+
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
@@ -117,7 +121,7 @@ namespace API
             builder.Services.AddScoped<IVehicleService, VehicleService>();
             builder.Services.AddScoped<IRentalContractService, RentalContractService>();
             //UOW
-            builder.Services.AddScoped<IRentalContractUow, RentalContractUow>()
+            builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi

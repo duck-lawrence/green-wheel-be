@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum TokenType
+    public enum PaymentMethod
     {
-        AccessToken = 0,
-        RefreshToken = 1,
-        RegisterToken = 2,
-        ForgotPasswordToken = 3,
-        SetPasswordToken = 4
+        Cash = 0,
+        MomoWallet = 1
     }
 }

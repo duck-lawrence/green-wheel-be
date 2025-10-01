@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum TokenType
+    public enum DepositStatus
     {
-        AccessToken = 0,
-        RefreshToken = 1,
-        RegisterToken = 2,
-        ForgotPasswordToken = 3,
-        SetPasswordToken = 4
+        Pending = 0,
+        Paid = 1,
+        Refunded = 2, 
+        Forfeited = 3
     }
 }

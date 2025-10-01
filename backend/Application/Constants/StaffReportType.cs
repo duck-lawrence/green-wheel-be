@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum TokenType
+    public enum StaffReportType
     {
-        AccessToken = 0,
-        RefreshToken = 1,
-        RegisterToken = 2,
-        ForgotPasswordToken = 3,
-        SetPasswordToken = 4
+        Internal = 0,
+        RelatredToSupport = 1,
+        Other = 2
     }
 }

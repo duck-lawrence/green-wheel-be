@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum TokenType
+    public enum InvoiceItemType
     {
-        AccessToken = 0,
-        RefreshToken = 1,
-        RegisterToken = 2,
-        ForgotPasswordToken = 3,
-        SetPasswordToken = 4
+        BaseRental = 0,
+        Damage = 1,
+        LateReturn = 2,
+        Cleaning = 3,
+        Penalty = 4,
+        Other = 5
     }
 }
