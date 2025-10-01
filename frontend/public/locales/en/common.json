@@ -28,7 +28,10 @@
         "invalid_email": "Email is invalid",
         "password_too_short": "Password must be at least 6 characters",
         "password_can_not_empty": "Password is required",
-        "confirm_password_is_incorrect": "Confirm password must be the same as the password",
+        "new_password_can_not_empty": "New password is required",
+        "password_min": "Current password must be at least 6 characters",
+        "confirm_password": "Confirm password must be the same as the new password",
+        "password_strength": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
         "invalid_user_age": "Age must be at least 21",
         "invalid_phone": "Invalid phone",
         "phone_is_required": "Phone is required",
@@ -40,7 +43,17 @@
         "invalid_email_or_password": "Invalid email or password",
         "unauthorized": "Unauthorized",
         "invalid_token": "Invalid Token",
-        "user_not_found": "User not found"
+        "user_not_found": "User not found",
+        "my_profile": "My Profile",
+        "change_password": "Change Password",
+        "edit_information": "Edit Information",
+        "save_changes": "Save Changes",
+        "account_name": "Account Name",
+        "full_name": "Full Name",
+        "sex": "Sex",
+        "choose_sex": "Choose Sex",
+        "date_of_birth": "Date of Birth",
+        "phone": "Phone"
     },
     "success": {
         "create": "Created",
@@ -71,7 +84,8 @@
     "password": {
         "require": "Password is required",
         "min": "Password must be at least 8 characters",
-        "label": "Password"
+        "label": "Password",
+        "change": "Change Password?"
     },
 
     "login": {
@@ -84,7 +98,8 @@
         "continue_with_google": "Continue with Google",
         "or": "OR",
         "need_to_create_an_account": "Need to create an account?",
-        "register": "Register"
+        "register": "Register",
+        "submit": "Submit"
     },
 
     "home": {
@@ -102,5 +117,82 @@
         "login": "Login",
         "register": "Register",
         "logout": "Logout"
+    },
+    "table": {
+        "order": "Order",
+        "vehicle_model": "Vehicle Model",
+        "pickup_time": "Pickup Time",
+        "return_time": "Return Time",
+        "pickup_address": "Pickup Address",
+        "status": "Status"
+    },
+    "enum": {
+        "male": "Male",
+        "female": "Female",
+
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "received": "Received",
+
+        "paid": "Paid",
+        "refunded": "Refunded",
+        "forfeited": "Forfeited",
+
+        "cancelled": "Cancelled",
+        "request_pending": "Request Pending",
+        "confirm_change_station_pending": "Confirm Change Station Pending",
+        "payment_pending": "Payment Pending",
+        "active": "Active",
+        "completed": "Completed",
+
+        "good": "Good",
+        "minor": "Minor",
+        "moderate": "Moderate",
+        "severe": "Severe",
+        "totaled": "Totaled",
+
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "rented": "Rented",
+        "maintenance": "Maintenance",
+
+        "base_rental": "Base Rental",
+        "damage": "Damage",
+        "late_return": "Late Return",
+        "cleaning": "Cleaning",
+        "penalty": "Penalty",
+        "other": "Other",
+
+        "cash": "Cash",
+        "momo_wallet": "Momo Wallet",
+
+        "in_progress": "In Progress",
+        "resolved": "Resolved",
+        "technical": "Technical",
+        "payment": "Payment",
+        "internal": "Internal",
+        "related_to_support": "Related to Support",
+
+        "b1": "B1",
+        "b": "B",
+        "c1": "C1",
+        "c": "C",
+        "d1": "D1",
+        "d2": "D2",
+        "d": "D",
+        "be": "BE",
+        "c1e": "C1E",
+        "ce": "CE",
+        "d1e": "D1E",
+        "d2e": "D2E",
+        "de": "DE",
+
+        "all": "All",
+        "awaiting_deposit": "Awaiting Deposit",
+        "confirmed": "Confirmed",
+        "in_use": "In Use",
+        "returned": "Returned",
+        "overdue": "Overdue"
     }
 }
