@@ -3,7 +3,7 @@ import { ButtonStyled } from "@/components/styled"
 import React from "react"
 import { useTranslation } from "react-i18next"
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({ isChangeTextColor }: { isChangeTextColor: boolean }) {
     const { i18n } = useTranslation()
 
     const switchLang = (lang: string) => {
@@ -16,7 +16,9 @@ export function LanguageSwitcher() {
         <div className="flex justify-end">
             {i18n.language !== "en" && (
                 <ButtonStyled
-                    className="bg-transparent p-0 max-w-fit min-w-fit"
+                    className={`bg-transparent p-0 max-w-fit min-w-fit ${
+                        isChangeTextColor ? "text-white" : "text-inherit"
+                    }`}
                     onPress={() => switchLang("en")}
                 >
                     VI
@@ -24,7 +26,9 @@ export function LanguageSwitcher() {
             )}
             {i18n.language !== "vi" && (
                 <ButtonStyled
-                    className="bg-transparent p-0 max-w-fit min-w-fit"
+                    className={`bg-transparent p-0 max-w-fit min-w-fit ${
+                        isChangeTextColor ? "text-white" : "text-inherit"
+                    }`}
                     onPress={() => switchLang("vi")}
                 >
                     EN

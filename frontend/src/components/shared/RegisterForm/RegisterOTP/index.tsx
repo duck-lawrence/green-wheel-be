@@ -60,14 +60,14 @@ export function RegisterOTP({ email, onBack, onSuccess }: RegisterOTPProps) {
             </div>
 
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled onPress={onBack} color="primary" className="w-2 h-10 mx-auto mt-0">
+                <ButtonStyled onPress={onBack} className="w-2 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
                 </ButtonStyled>
 
                 <ButtonStyled
                     type="submit"
-                    isLoading={formik.isSubmitting}
                     color="primary"
+                    isLoading={formik.isSubmitting}
                     isDisabled={!formik.isValid}
                     className="w-4 h-10 mx-auto mt-0"
                 >

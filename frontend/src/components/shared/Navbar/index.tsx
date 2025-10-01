@@ -1,20 +1,13 @@
 /* eslint-disable indent */
 "use client"
-import React, { useCallback, useEffect, useState } from "react"
-import { NavbarBrand, NavbarContent, NavbarItem, Link, Spinner } from "@heroui/react"
+import React, { useEffect, useState } from "react"
+import "./navbar.css"
+import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, NavbarStyled, ProfileDropdown, LanguageSwitcher } from "@/components/"
-import {
-    useLoginDiscloresureSingleton,
-    useProfileStore,
-    useToken,
-    useLogout,
-    useGetMe
-} from "@/hooks"
-import { BackendError } from "@/models/common/response"
-import toast from "react-hot-toast"
-import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
+import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
+import { ProfileDropdown } from "./ProfileDropdown"
 
 export const AcmeLogo = () => {
     return (
@@ -40,14 +33,6 @@ export function Navbar() {
     // handle when login
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
-    const { user, setUser } = useProfileStore()
-    const {
-        data: userRes,
-        isLoading: isGetMeLoading,
-        error: getMeError,
-        isError: isGetMeError
-    } = useGetMe({ enabled: isLoggedIn })
-    const logoutMutation = useLogout({ onSuccess: undefined })
 
     // handle navbar animation
     const baseClasses = `
@@ -58,11 +43,12 @@ export function Navbar() {
         mx-auto max-w-7xl
         data-[visible=false]:mt-0
         rounded-3xl
+        justify-between
         ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
         ${
             scrollState === "top" || scrollState === "middle"
-                ? "text-white rounded-3xl bg-[#4A9782]/80 justify-between mx-auto max-w-3xl scale-95"
-                : "max-w-7xl scale-100"
+                ? "text-white rounded-3xl bg-[#080808]/50 mx-auto max-w-3xl scale-95"
+                : ""
         }
     `
     const itemClasses = [
@@ -85,11 +71,6 @@ export function Navbar() {
         { key: "about", label: t("navbar.about_us") },
         { key: "contact", label: t("navbar.contact") }
     ]
-
-    // func
-    const handleLogout = useCallback(async () => {
-        await logoutMutation.mutateAsync()
-    }, [logoutMutation])
 
     // useEffect
     // handle navbar scroll
@@ -134,23 +115,6 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll)
     }, [lastScrollY])
 
-    // handle get me success
-    useEffect(() => {
-        if (userRes) {
-            setUser(userRes)
-        }
-    }, [userRes, setUser])
-
-    // handle get me error
-    useEffect(() => {
-        if (isGetMeError && getMeError) {
-            const error = getMeError as BackendError
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
-        }
-    }, [isGetMeError, getMeError, t])
-
     return (
         <NavbarStyled
             data-visible={!isHiddenNavbar}
@@ -159,10 +123,12 @@ export function Navbar() {
                 item: [itemClasses]
             }}
         >
+            {/* start content */}
             <NavbarBrand>
                 <AcmeLogo />
                 <p className="font-bold text-inherit">ACME</p>
             </NavbarBrand>
+            {/* middle content */}
             <NavbarContent className="hidden sm:flex gap-4 justify-center">
                 {menus.map((menu) => (
                     <NavbarItem
@@ -181,24 +147,20 @@ export function Navbar() {
                     </NavbarItem>
                 ))}
             </NavbarContent>
+            {/* end content */}
             <NavbarContent justify="end">
-                <LanguageSwitcher />
+                <LanguageSwitcher
+                    isChangeTextColor={scrollState === "top" || scrollState === "middle"}
+                />
                 <NavbarItem className="flex items-center">
                     {isLoggedIn ? (
-                        isGetMeLoading ? (
-                            <Spinner />
-                        ) : (
-                            <ProfileDropdown
-                                name={`${user?.lastName} ${user?.firstName}`}
-                                img={user?.avatarUrl}
-                                onLogout={handleLogout}
-                            />
-                        )
+                        <ProfileDropdown />
                     ) : (
                         <ButtonStyled
                             onPress={onOpenLogin}
+                            color="primary"
                             variant="solid"
-                            className="rounded-3xl opacity-97 text-black"
+                            className="rounded-3xl opacity-97"
                         >
                             {t("login.login")}
                         </ButtonStyled>

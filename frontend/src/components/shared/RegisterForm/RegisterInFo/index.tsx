@@ -1,7 +1,6 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { ArrowLeftIcon } from "@phosphor-icons/react"
 import React, { useCallback, useState } from "react"
 import { ButtonStyled, DatePickerStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
@@ -14,11 +13,11 @@ import { SexLabels } from "@/constants/labels"
 import dayjs from "dayjs"
 
 interface RegisterInfoProps {
-    onBack: () => void
+    // onBack: () => void
     onSuccess?: () => void
 }
 
-export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
+export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
     const { t } = useTranslation()
 
     const [isVisible, setIsVisible] = useState(false)
@@ -220,16 +219,16 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
             </div>
 
             <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
+                {/* <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
-                </ButtonStyled>
+                </ButtonStyled> */}
 
                 <ButtonStyled
                     type="submit"
+                    className="w-110 h-10 mx-auto mt-4"
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid}
-                    className="w-5 h-10 mx-auto mt-0"
                 >
                     {t("login.register")}
                 </ButtonStyled>

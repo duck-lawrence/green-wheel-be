@@ -79,7 +79,7 @@ export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmail) {
                 color="primary"
                 isDisabled={!formik.isValid}
             >
-                Send OTP
+                {t("auth.send_otp")}
             </ButtonStyled>
 
             <p className="text-small text-center">

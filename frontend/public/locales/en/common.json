@@ -5,7 +5,8 @@
         "delete": "Deleted",
         "refresh": "Refreshed",
         "login": "Login successful",
-        "logout": "Logout successful"
+        "logout": "Logout successful",
+        "register": "Register successful"
     },
     "failed": {
         "create": "Failed to create",
@@ -16,14 +17,15 @@
         "logout": "Logout failed"
     },
     "common": {
-        "too_many_request": "Too many request",
+        "too_many_request": "Too many request. Try again later",
         "unexpected_error": "An unexpected error occurred. Please try again later."
     },
     "auth": {
         "security_verification": "Security Verification",
         "verify_identity": "Please enter the email verification code to verify your identity",
         "complete_register": "Please enter the information below to complete your account registration",
-        "already_have_account": "Already have an account?"
+        "already_have_account": "Already have an account?",
+        "send_otp": "Send OTP"
     },
     "vehicle": {},
     "vehicle_model": {},

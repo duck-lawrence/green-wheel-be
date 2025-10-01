@@ -25,5 +25,10 @@ export const authApi = {
         requestWrapper<TokenRes>(async () => {
             const res = await axiosInstance.post("/users/register/complete", req)
             return res.data
+        }),
+    loginGoogle: (credential: string) =>
+        requestWrapper<TokenRes>(async () => {
+            const res = await axiosInstance.post("/users/login-google", { credential })
+            return res.data
         })
 }

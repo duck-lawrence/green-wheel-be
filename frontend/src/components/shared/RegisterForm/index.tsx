@@ -100,7 +100,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterInFo onSuccess={onSuccess} onBack={handlePrevStep} />
+                                <RegisterInFo onSuccess={onSuccess} />
                             </motion.div>
                         )}
                     </AnimatePresence>

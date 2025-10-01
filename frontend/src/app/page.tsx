@@ -36,6 +36,8 @@ export default function HomePage() {
                         {/* Carousel */}
                         <Carousel slides={slides} />
                         <Carousel slides={slides} />
+                        <Carousel slides={slides} />
+                        <Carousel slides={slides} />
                     </div>
                 </div>
             </div>

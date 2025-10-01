@@ -23,8 +23,8 @@ export default {
                             foreground: "#ffffff"
                         },
                         secondary: {
-                            DEFAULT: "#14b8a6",
-                            foreground: "#ffffff"
+                            DEFAULT: "#f4f4f4",
+                            foreground: "#000000"
                         }
                     }
                 }

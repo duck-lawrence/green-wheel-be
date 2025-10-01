@@ -7,6 +7,7 @@ import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, InputStyled, LogoStyle } from "@/components"
 import { useLogin, useLoginDiscloresureSingleton, useRegisterDiscloresureSingleton } from "@/hooks"
+import { GoogleLoginButton } from "./GoogleLoginButton"
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
@@ -140,13 +141,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                     <Divider className="flex-1" />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <ButtonStyled
-                        startContent={<Icon icon="flat-color-icons:google" width={24} />}
-                        variant="bordered"
-                        onPress={() => (window.location.href = "/api/auth/google")} // Redirect ra Google OAuth
-                    >
-                        {t("login.continue_with_google")}
-                    </ButtonStyled>
+                    <GoogleLoginButton onSuccess={onSuccess} />
                 </div>
                 <p className="text-small text-center">
                     {t("login.need_to_create_an_account")}&nbsp;
