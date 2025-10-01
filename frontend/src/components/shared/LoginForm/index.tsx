@@ -1,6 +1,6 @@
 "use client"
 import { Checkbox, Divider, Link } from "@heroui/react"
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Icon } from "@iconify/react"
@@ -11,7 +11,7 @@ import { useLogin, useLoginDiscloresureSingleton, useRegisterDiscloresureSinglet
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
     const loginMutation = useLogin({ onSuccess })
-    const [isVisible, setIsVisible] = React.useState(false)
+    const [isVisible, setIsVisible] = useState(false)
     const { onClose: onCloseLogin } = useLoginDiscloresureSingleton()
     const { onOpen: onOpenRegister } = useRegisterDiscloresureSingleton()
 

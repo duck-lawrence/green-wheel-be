@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query"
 import { BackendError } from "@/models/common/response"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { useToken } from "@/hooks"
+import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
 
 export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
@@ -22,7 +23,6 @@ export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
         }) => {
             const data = await authApi.login({ email, password })
             setAccessToken(data.accessToken, rememberMe)
-            return data
         },
         onSuccess: () => {
             onSuccess?.()
@@ -87,9 +87,13 @@ export const useRegisterVerify = ({ onSuccess }: { onSuccess?: () => void }) => 
 
 export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
+    const setAccessToken = useToken((state) => state.setAccessToken)
 
     return useMutation({
-        mutationFn: authApi.regsiterComplete,
+        mutationFn: async (req: UserRegisterCompleteReq) => {
+            const data = await authApi.regsiterComplete(req)
+            setAccessToken(data.accessToken)
+        },
         onSuccess: onSuccess,
         onError: (error: BackendError) => {
             if (error.detail !== undefined) {

@@ -3,12 +3,15 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { ArrowLeftIcon } from "@phosphor-icons/react"
 import React, { useCallback, useState } from "react"
-import { ButtonStyled, InputStyled } from "@/components/styled"
+import { ButtonStyled, DatePickerStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import { useRegisterComplete } from "@/hooks"
 import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
 import { Sex } from "@/constants/enum"
+import { EnumPicker } from "@/components/modules/EnumPicker"
+import { SexLabels } from "@/constants/labels"
+import dayjs from "dayjs"
 
 interface RegisterInfoProps {
     onBack: () => void
@@ -39,6 +42,7 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
             firstName: "",
             password: "",
             confirmPassword: "",
+            dateOfBirth: "",
             phone: "",
             sex: Sex.Male
         },
@@ -59,10 +63,12 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], "Passwords must match")
                 .required("Please confirm your password"),
+            dateOfBirth: Yup.string(),
             phone: Yup.string()
                 .required("Phone is required")
                 .length(10, "Phone must be exactly 10 digits")
-                .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0")
+                .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0"),
+            sex: Yup.number().required("Sex is required")
         }),
         onSubmit: handleRegisterComplete
     })
@@ -77,8 +83,8 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
             {/* Input InFo */}
             <div className="flex mx-auto w-110 gap-5">
                 <InputStyled
-                    variant="bordered"
                     label="Last name"
+                    variant="bordered"
                     value={formik.values.lastName}
                     onValueChange={(value) => formik.setFieldValue("lastName", value)}
                     isInvalid={!!(formik.touched.lastName && formik.errors.lastName)}
@@ -89,8 +95,8 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
                 />
 
                 <InputStyled
-                    variant="bordered"
                     label="First name"
+                    variant="bordered"
                     value={formik.values.firstName}
                     onValueChange={(value) => formik.setFieldValue("firstName", value)}
                     isInvalid={!!(formik.touched.firstName && formik.errors.firstName)}
@@ -188,6 +194,31 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
                 />
             </div>
 
+            <div className="flex mx-auto w-110 gap-5">
+                <EnumPicker
+                    label="Sex"
+                    value={formik.values.sex}
+                    onChange={(val) => formik.setFieldValue("sex", val)}
+                    labels={SexLabels}
+                />
+
+                <DatePickerStyled
+                    label="Date of birth"
+                    onChange={(val) => {
+                        if (!val) {
+                            formik.setFieldValue("dateOfBirth", null)
+                            return
+                        }
+
+                        const dob = val
+                            ? dayjs(val.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
+                            : ""
+
+                        formik.setFieldValue("dateOfBirth", dob)
+                    }}
+                />
+            </div>
+
             <div className="flex mx-auto gap-4 mt-4">
                 <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
@@ -200,7 +231,7 @@ export function RegisterInFo({ onSuccess, onBack }: RegisterInfoProps) {
                     isDisabled={!formik.isValid}
                     className="w-5 h-10 mx-auto mt-0"
                 >
-                    Submit
+                    {t("login.register")}
                 </ButtonStyled>
             </div>
         </form>

@@ -12,11 +12,12 @@ import {
 } from "@/hooks"
 
 interface RegisterEmail {
+    email: string
     setEmail: (email: string) => void
     onSuccess?: () => void
 }
 
-export function RegisterEmail({ setEmail, onSuccess }: RegisterEmail) {
+export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmail) {
     const { t } = useTranslation()
     const registerMutation = useRegister({ onSuccess })
     const { onClose: onCloseRegister } = useRegisterDiscloresureSingleton()
@@ -37,7 +38,7 @@ export function RegisterEmail({ setEmail, onSuccess }: RegisterEmail) {
 
     const formik = useFormik({
         initialValues: {
-            email: ""
+            email: email
         },
         validationSchema: Yup.object({
             email: Yup.string()

@@ -7,7 +7,7 @@ import { RegisterEmail } from "./RegisterEmail"
 import { RegisterOTP } from "./RegisterOTP"
 import { RegisterInFo } from "./RegisterInFo"
 
-export function RegisterForm() {
+export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
     const [step, setStep] = useState(0)
     const [direction, setDirection] = useState(1) // 1 = next, -1 = back
     const [email, setEmail] = useState("")
@@ -64,7 +64,11 @@ export function RegisterForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterEmail setEmail={setEmail} onSuccess={handleNextStep} />
+                                <RegisterEmail
+                                    email={email}
+                                    setEmail={setEmail}
+                                    onSuccess={handleNextStep}
+                                />
                             </motion.div>
                         )}
                         {step === 1 && (
@@ -96,7 +100,7 @@ export function RegisterForm() {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterInFo onBack={handlePrevStep} />
+                                <RegisterInFo onSuccess={onSuccess} onBack={handlePrevStep} />
                             </motion.div>
                         )}
                     </AnimatePresence>

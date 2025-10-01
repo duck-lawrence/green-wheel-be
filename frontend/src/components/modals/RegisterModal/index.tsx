@@ -7,7 +7,7 @@ import { useRegisterDiscloresureSingleton } from "@/hooks"
 
 export function RegisterModal() {
     const { t } = useTranslation()
-    const { isOpen, onOpenChange } = useRegisterDiscloresureSingleton() //onclose
+    const { isOpen, onOpenChange, onClose } = useRegisterDiscloresureSingleton() //onclose
 
     return (
         <ModalStyled isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -16,7 +16,7 @@ export function RegisterModal() {
                     {t("login.register")}
                 </ModalHeader>
                 <ModalBody>
-                    <RegisterForm />
+                    <RegisterForm onSuccess={onClose} />
                 </ModalBody>
             </ModalContent>
         </ModalStyled>

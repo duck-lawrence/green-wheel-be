@@ -174,7 +174,7 @@ export function Navbar() {
                         className={
                             scrollState === "top" || scrollState === "middle"
                                 ? "text-white"
-                                : "text-black"
+                                : "text-inherit"
                         }
                     >
                         <div className="text-center px-3 min-w-full">{menu.label}</div>

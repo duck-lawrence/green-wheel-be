@@ -15,7 +15,7 @@ export const authApi = {
         }),
     regsiter: ({ email }: { email: string }) =>
         requestWrapper<void>(async () => {
-            await axiosInstance.post("/users/regsiter", { email })
+            await axiosInstance.post("/users/register", { email })
         }),
     registerVerify: ({ otp, email }: { otp: string; email: string }) =>
         requestWrapper<void>(async () => {
