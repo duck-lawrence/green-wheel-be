@@ -2,8 +2,9 @@
 import React from "react"
 import { ModalBody, ModalContent, ModalHeader } from "@heroui/react"
 import { useTranslation } from "react-i18next"
-import { ModalStyled, RegisterForm } from "@/components"
+import { ModalStyled } from "@/components"
 import { useRegisterDiscloresureSingleton } from "@/hooks"
+import { RegisterForm } from "./RegisterForm"
 
 export function RegisterModal() {
     const { t } = useTranslation()

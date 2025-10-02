@@ -9,3 +9,9 @@ export type UserRegisterCompleteReq = {
     phone: string
     sex: Sex
 }
+
+export type UserChangePasswordReq = {
+    oldPassword: string
+    password: string
+    confirmPassword: string
+}

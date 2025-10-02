@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
                 protocol: "https",
                 hostname: "vinfastvinhphuc.vn",
                 pathname: "/**"
+            },
+            {
+                protocol: "https",
+                hostname: "marketplace.canva.com",
+                pathname: "/**"
             }
         ]
     }
