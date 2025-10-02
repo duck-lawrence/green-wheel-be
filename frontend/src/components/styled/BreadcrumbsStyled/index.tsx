@@ -3,20 +3,23 @@ import { BreadcrumbItem, Breadcrumbs } from "@heroui/react"
 import Link from "next/link"
 import React from "react"
 
-export function BreadCrumbsStyled() {
+type Crumb = {
+    label: string
+    href: string
+}
+
+type BreadCrumbsStyledProps = {
+    items: Crumb[]
+}
+
+export function BreadCrumbsStyled({ items }: BreadCrumbsStyledProps) {
     return (
         <Breadcrumbs>
-            {/* <BreadcrumbItem startContent={<HomeIcon />}>Home</BreadcrumbItem> */}
-
-            <BreadcrumbItem>
-                <Link href={"/home"}>Home</Link>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-                <Link href={"/vehical"}>vehicle</Link>
-            </BreadcrumbItem>
-            <BreadcrumbItem>
-                <Link href={"/detail"}>Detail</Link>
-            </BreadcrumbItem>
+            {items.map((item, idx) => (
+                <BreadcrumbItem key={idx}>
+                    <Link href={item.href}>{item.label}</Link>
+                </BreadcrumbItem>
+            ))}
         </Breadcrumbs>
     )
 }

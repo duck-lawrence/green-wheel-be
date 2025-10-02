@@ -5,6 +5,9 @@ import { BreadCrumbsStyled, ButtonStyled } from "@/components/styled"
 import { Field } from "@/components/styled/FieldStyled"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 import Link from "next/link"
+import { currency } from "@/utils/helpers/currentcy"
+import { useToken } from "@/hooks"
+
 // Data
 const vehicle = {
     id: "1",
@@ -31,11 +34,11 @@ const vehicle = {
 
 function mapSpecs(vehicle: any) {
     return [
-        { key: "Số chỗ", value: vehicle.seating_capacity },
-        { key: "Công suất", value: vehicle.motor_power + " kW" },
-        { key: "Dung lượng pin", value: vehicle.battery_capacity + " kWh" },
-        { key: "Eco Range", value: vehicle.eco_range_km + " km" },
-        { key: "Sport Range", value: vehicle.sport_range_km + " km" },
+        { key: "Số chỗ", value: vehicle.seatingCapacity },
+        { key: "Công suất", value: vehicle.motorPower + " kW" },
+        { key: "Dung lượng pin", value: vehicle.batteryCapacity + " kWh" },
+        { key: "Eco Range", value: vehicle.ecoRangeKm + " km" },
+        { key: "Sport Range", value: vehicle.sportRangeKm + " km" },
         { key: "Hộp số", value: vehicle.transmission }
     ]
 }
@@ -53,12 +56,57 @@ const basePolocies = (deposite: number) => [
     }
 ]
 
+// Danh sách xe giả lập
+const allVehicles = [
+    {
+        id: "1",
+        name: "VinFast VF 3",
+        costPerDay: 690000,
+        seatingCapacity: 4,
+        fuel: "Điện",
+        transmission: "Tự động",
+        img: "https://vinfasttimescity.vn/wp-content/uploads/2024/08/vinfast-vf7-mau-trang-scaled.jpg"
+    },
+    {
+        id: "2",
+        name: "VinFast VF 5",
+        costPerDay: 790000,
+        seatingCapacity: 5,
+        fuel: "Điện",
+        transmission: "Tự động",
+        img: "https://vinfast-cars.vn/wp-content/uploads/2024/10/vinfast-vf6-trang.png"
+    },
+    {
+        id: "3",
+        name: "VinFast VF 6",
+        costPerDay: 890000,
+        seatingCapacity: 5,
+        fuel: "Điện",
+        transmission: "Tự động",
+        img: "https://vinfast-khanhhoa.com/wp-content/uploads/2021/02/vinfast-president-color-9.png"
+    },
+    {
+        id: "4",
+        name: "VinFast VF 7",
+        costPerDay: 990000,
+        seatingCapacity: 7,
+        fuel: "Điện",
+        transmission: "Tự động",
+        img: "https://vinfastnewway.com.vn/wp-content/uploads/2019/09/lux-white_2-169.jpg"
+    }
+]
+
 //  Helpers
-const currency = (n: number) => new Intl.NumberFormat("vi-VN").format(n)
+// xử lý container xe tương tự
+const similarVehicles = allVehicles
+    .filter((v) => v.id !== vehicle.id)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3)
 
 export function Detail() {
+    const isLoggedIn = useToken((s) => !!s.accessToken)
     const [active, setActive] = useState(0)
-    const [dates, setDates] = useState({ pick: "", drop: "" })
+    const [dates, setDates] = useState({ pick: "2025-10-04", drop: "2025-10-06" })
 
     const totalDays = useMemo(() => {
         const { pick, drop } = dates
@@ -69,13 +117,19 @@ export function Detail() {
         return Math.max(0, diff)
     }, [dates])
 
-    const total = totalDays * vehicle.costPerDay
+    const total = totalDays * vehicle.costPerDay + vehicle.depositFee
 
     return (
         <div className="min-h-dvh bg-neutral-50 text-neutral-900 ">
             {/* Breadcrumb */}
             <div className="p-4">
-                <BreadCrumbsStyled />
+                <BreadCrumbsStyled
+                    items={[
+                        { label: "Home", href: "/home" },
+                        { label: "Vehicle", href: "/vehicle" },
+                        { label: "Detail", href: "/detail" }
+                    ]}
+                />
             </div>
 
             {/* Header */}
@@ -97,10 +151,14 @@ export function Detail() {
                             </span>
                         </p>
                     </div>
+                    {/*  font-extrabold*/}
                     <div className="text-right">
-                        <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">
-                            {currency(vehicle.costPerDay)}{" "}
-                            <span className="text-base font-normal text-neutral-500">đ/ngày</span>
+                        <p className="text-2xl sm:text-3xl font-semibold text-emerald-600">
+                            {currency(vehicle.costPerDay)}
+                            <span className="text-base font-normal text-neutral-500">
+                                {" "}
+                                VND/Ngày
+                            </span>
                         </p>
                     </div>
                 </div>
@@ -110,8 +168,9 @@ export function Detail() {
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Gallery */}
                 <section className="lg:col-span-8">
-                    <div className="grid grid-cols-4 gap-3">
-                        <div className="col-span-4 md:col-span-3 aspect-[16/10] overflow-hidden rounded-2xl bg-neutral-200">
+                    {/* Picture */}
+                    <div className="grid grid-rows-4 gap-3">
+                        <div className="row-span-3 aspect-[16/10] overflow-hidden rounded-2xl bg-neutral-200">
                             <motion.img
                                 key={active}
                                 initial={{ opacity: 0, scale: 1.02 }}
@@ -122,7 +181,8 @@ export function Detail() {
                                 className="h-full w-full object-cover"
                             />
                         </div>
-                        <div className="col-span-4 md:col-span-1 grid grid-rows-3 gap-3">
+
+                        <div className="row-span-1 grid grid-cols-4 gap-3">
                             {vehicle.images.map((src, idx) => (
                                 <button
                                     key={src}
@@ -156,9 +216,9 @@ export function Detail() {
                         </div>
                     </div>
 
-                    {/* Policies */}
-                    <section className="mt-8">
-                        <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    {/*================ Policies =======================*/}
+                    <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
+                        <div className="grid gap-4 md:grid-cols-2">
                             {basePolocies(vehicle.depositFee).map((p) => (
                                 <div key={p.title} className="rounded-2xl bg-white p-5 shadow-sm">
                                     <h3 className="font-semibold">{p.title}</h3>
@@ -168,9 +228,9 @@ export function Detail() {
                         </div>
                     </section>
                 </section>
-
+                {/* ========================================================= */}
                 {/* Booking Card (sticky on desktop) */}
-                <aside className="lg:col-span-4 lg:sticky lg:top-10 space-y-6">
+                <aside className="lg:col-span-4 lg:sticky lg:top-10 space-y-6 ">
                     <div className="rounded-2xl bg-white p-5 shadow-sm border border-neutral-100">
                         <h2 className="text-lg font-semibold">Thông tin xe</h2>
                         <div className="mt-4 grid gap-4">
@@ -197,11 +257,12 @@ export function Detail() {
                                 />
                             </div>
 
+                            {/* Đơn tạm tính */}
                             <div className="rounded-xl bg-neutral-50 p-4">
                                 <div className="flex items-center justify-between text-sm">
                                     <span>Đơn giá</span>
                                     <span className="font-medium">
-                                        {currency(vehicle.costPerDay)} đ/ngày
+                                        {currency(vehicle.costPerDay)}
                                     </span>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between text-sm">
@@ -222,51 +283,59 @@ export function Detail() {
                                 </div>
                             </div>
 
-                            <ButtonStyled className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            <ButtonStyled
+                                isDisabled={isLoggedIn}
+                                className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            >
                                 <Link href={"/"}>Yêu cầu đặt xe</Link>
                             </ButtonStyled>
                         </div>
                     </div>
                 </aside>
+            </main>
 
-                <section className="mt-10">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold">Xe tương tự</h2>
-                        <a href="#" className="text-sm text-emerald-700 hover:underline">
-                            Xem tất cả
-                        </a>
-                    </div>
-                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {[1, 2, 3].map((i) => (
-                            <a
-                                key={i}
-                                href="#"
-                                className="group rounded-2xl bg-white p-3 shadow-sm hover:shadow-md transition"
-                            >
-                                <div className="aspect-[16/10] overflow-hidden rounded-xl bg-neutral-200">
-                                    <img
-                                        className="h-full w-full object-cover group-hover:scale-105 transition"
-                                        src="https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcar%2Fvf301.jpg&w=1080&q=75"
-                                        alt="car"
-                                    />
-                                </div>
-                                <div className="mt-3 flex items-center justify-between">
-                                    <div>
-                                        <p className="font-medium">VinFast VF 5</p>
-                                        <p className="text-sm text-neutral-500">
-                                            Điện • 5 chỗ • Tự động
-                                        </p>
-                                    </div>
-                                    <p className="text-emerald-600 font-semibold">
-                                        {currency(790000)}{" "}
-                                        <span className="text-xs text-neutral-500">đ/ngày</span>
+            <section className="w-300 ml-10 flex flex-col pb-10">
+                <div className="flex items-end gap-250">
+                    <h2 className="text-2xl font-semibold">Xe tương tự</h2>
+                    <Link
+                        href="/vehicles"
+                        className="text-sm text-emerald-700 hover:underline font-semibold"
+                    >
+                        Xem tất cả
+                    </Link>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {similarVehicles.map((i) => (
+                        <Link
+                            key={i.id}
+                            href={`/vehicles/${i.id}`}
+                            className="group block rounded-2xl bg-white p-5 shadow-md hover:shadow-lg transition transform hover:scale-[1.02]"
+                        >
+                            <div className="aspect-[16/10] w-full overflow-hidden rounded-xl bg-neutral-200">
+                                <img
+                                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    src={i.img}
+                                    alt={i.name}
+                                />
+                            </div>
+
+                            <div className="mt-4 flex items-center justify-between">
+                                <div className="min-w-0">
+                                    <p className="font-semibold text-lg truncate">{i.name}</p>
+                                    <p className="text-sm text-neutral-500">
+                                        Điện • {i.seatingCapacity} chỗ • Tự động
                                     </p>
                                 </div>
-                            </a>
-                        ))}
-                    </div>
-                </section>
-            </main>
+                                <p className="text-emerald-600 font-semibold text-base whitespace-nowrap">
+                                    {currency(i.costPerDay)}{" "}
+                                    <span className="text-sm text-neutral-500">VND/Ngày</span>
+                                </p>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            </section>
         </div>
     )
 }
