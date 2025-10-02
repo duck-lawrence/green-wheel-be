@@ -61,7 +61,7 @@ export const useRegister = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
 
     return useMutation({
-        mutationFn: authApi.regsiter,
+        mutationFn: authApi.register,
         onSuccess: onSuccess,
         onError: (error: BackendError) => {
             if (error.detail !== undefined) {
