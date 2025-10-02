@@ -5,6 +5,7 @@ import React from "react"
 import { ButtonStyled } from "@/components/styled"
 import { InputOtp } from "@heroui/react"
 import { ArrowLeftIcon, ArrowRightIcon } from "@phosphor-icons/react"
+import { useTranslation } from "react-i18next"
 
 interface RegisOTPProps {
     handleBack: () => void
@@ -12,14 +13,15 @@ interface RegisOTPProps {
 }
 
 export function ForgotOTP({ handleBack, handleNext }: RegisOTPProps) {
+    const { t } = useTranslation()
     const formik = useFormik({
         initialValues: {
             opt: ""
         },
         validationSchema: Yup.object({
             opt: Yup.string()
-                .required("OTP is required")
-                .matches(/^[0-9]{6}$/, "Invalid OTP format")
+                .required(t("user.otp_can_not_empty"))
+                .matches(/^[0-9]{6}$/, t("user.invalid_otp"))
         }),
         onSubmit: async (values) => {
             // await new Promise((resolve) => setTimeout(resolve, 4000))
@@ -33,11 +35,13 @@ export function ForgotOTP({ handleBack, handleNext }: RegisOTPProps) {
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-12 mt-2 mb-2">
-                <h1 className="font-bold text-xl">Forgot Account (Step 2)</h1>
+                <h1 className="font-bold text-xl">{t("auth.forgot_step2")}</h1>
             </div>
             {/* Input OTP */}
             <div className=" mx-auto">
-                <p className="text-default-600 mb-2 ml-22 text-xl font-bold">6 digits OTP</p>
+                <p className="text-default-600 mb-2 ml-22 text-xl font-bold">
+                    {t("user.otp_must_have_6_digits")}
+                </p>
                 <InputOtp
                     size="lg"
                     length={6}

@@ -26,7 +26,11 @@
         "complete_register": "Please enter the information below to complete your account registration",
         "already_have_account": "Already have an account?",
         "matches": "Send OTP",
-        "forgot_step1": "Forgot Account (Step 1)"
+        "forgot_step1": "Forgot Account (Step 1)",
+        "forgot_step2": "Forgot Account (Step 2)",
+        "forgot_step3": "Forgot Account (Step 3)",
+        "new_password": "New password",
+        "confirm_new_password": "Confirm new password"
     },
     "vehicle": {},
     "vehicle_model": {},

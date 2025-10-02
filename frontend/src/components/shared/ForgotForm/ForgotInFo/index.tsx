@@ -57,7 +57,7 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-12 mt-2 mb-2">
-                <h1 className="font-bold text-xl">Forgot Account (Step 3)</h1>
+                <h1 className="font-bold text-xl">{t("auth.forgot_step3")}</h1>
             </div>
 
             {/* Input InFo */}
@@ -75,7 +75,7 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="New password"
+                    label={t("auth.new_password")}
                     type={isVisible ? "text" : "password"}
                     value={formik.values.password}
                     onValueChange={(value) => formik.setFieldValue("password", value)}
@@ -109,7 +109,7 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="Confirm new password"
+                    label={t("auth.confirm_new_password")}
                     type={isConfirmVisible ? "text" : "password"}
                     value={formik.values.confirmPassword}
                     onValueChange={(value) => formik.setFieldValue("confirmPassword", value)}
@@ -153,7 +153,7 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
                     isDisabled={!formik.isValid}
                     className="w-5 h-16 mx-auto mt-0"
                 >
-                    Submit
+                    {t("login.submit")}
                 </ButtonStyled>
             </div>
         </form>
