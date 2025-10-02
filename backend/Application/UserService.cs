@@ -249,6 +249,10 @@ namespace Application
          */
         public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
         {
+            if(await _userRepository.GetByPhoneAsync(userRegisterReq.Phone) != null)
+            {
+                throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+            }
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(token))
             {
@@ -259,7 +263,7 @@ namespace Application
             var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret, 
                 TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
 
-            //------------------------
+            
             var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
 
@@ -494,6 +498,13 @@ namespace Application
 
         public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
+            if (userUpdateReq.Phone != null)
+            {
+                if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
+                {
+                    throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+                }
+            }
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             User userFromDb = await _userRepository.GetByIdAsync(userID);
             if (userFromDb == null)
@@ -554,6 +565,14 @@ namespace Application
             user.AvatarUrl = null;
             user.AvatarPublicId = null;
             await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task CheckDupEmail(string email)
+        {
+            if(await _userRepository.GetByEmailAsync(email) != null)
+            {
+                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists);
+            }
         }
     }
 }
