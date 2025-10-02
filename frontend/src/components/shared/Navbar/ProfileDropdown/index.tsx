@@ -1,13 +1,14 @@
 "use client"
-import { DropdownStyle } from "@/components"
-import { useGetMe, useLogout, useProfileStore, useToken } from "@/hooks"
-import { BackendError } from "@/models/common/response"
+
+import React, { useCallback, useEffect } from "react"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@heroui/react"
 import Link from "next/link"
-import React, { useCallback, useEffect } from "react"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
+import { DropdownStyle } from "@/components"
+import { useGetMe, useLogout, useProfileStore, useToken } from "@/hooks"
+import { BackendError } from "@/models/common/response"
 
 export function ProfileDropdown() {
     const defaultAvatarUrl = "/images/avtFallback.jpg"

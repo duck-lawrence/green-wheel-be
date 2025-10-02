@@ -1,4 +1,3 @@
-/* eslint-disable indent */
 "use client"
 import React, { useEffect, useState } from "react"
 import "./index.css"
@@ -40,14 +39,14 @@ export function Navbar() {
         transition-all duration-400 ease-in-out
         mt-3 
         fixed left-0 w-full z-50 h-xl
-        mx-auto max-w-7xl
+        mx-auto max-w-6xl
         data-[visible=false]:mt-0
         rounded-3xl
         justify-between
         ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
         ${
             scrollState === "top" || scrollState === "middle"
-                ? "text-white rounded-3xl bg-[#080808]/50 mx-auto max-w-3xl scale-95"
+                ? "text-white rounded-3xl bg-[#080808]/60 mx-auto max-w-3xl scale-95"
                 : ""
         }
     `

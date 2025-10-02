@@ -1,10 +1,8 @@
-/* eslint-disable indent */
 "use client"
 
+import React from "react"
 import type { ComponentProps } from "react"
 import type { ButtonProps } from "@heroui/react"
-
-import React from "react"
 import { useControlledState } from "@react-stately/utils"
 import { m, LazyMotion, domAnimation } from "framer-motion"
 import { cn } from "@heroui/react"

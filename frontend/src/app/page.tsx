@@ -16,29 +16,29 @@ export default function HomePage() {
 
     return (
         <div>
-            <div className="mt-30">
-                <div className="relative">
-                    <div className="absolute top-0 left-164 flex flex-col items-center justify-center gap-4">
-                        <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
-                        <div className="text-gray-500">{t("home.description")}</div>
-                        <ButtonStyled
-                            as={Link}
-                            href="/self-drive"
-                            className="text-black h-13 transition-all duration-500
+            <div className="mt-30 min-h-[80vh]">
+                <div className="flex flex-col items-center justify-center gap-4">
+                    <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
+                    <div className="text-gray-500">{t("home.description")}</div>
+                    <ButtonStyled
+                        as={Link}
+                        href="/self-drive"
+                        className="text-black h-13 transition-all duration-500
                                             hover:bg-primary hover:text-white hover:border-black"
-                            variant="bordered"
-                        >
-                            {t("home.view_details")}
-                        </ButtonStyled>
-                    </div>
-
-                    {/* Carousel */}
-                    <Carousel slides={slides} />
-                    <Carousel slides={slides} />
-                    <Carousel slides={slides} />
-                    <Carousel slides={slides} />
+                        variant="bordered"
+                    >
+                        {t("home.view_details")}
+                    </ButtonStyled>
                 </div>
+
+                {/* Carousel */}
+                <Carousel slides={slides} />
             </div>
+            <Carousel slides={slides} />
+            <Carousel slides={slides} />
+            <Carousel slides={slides} />
+            <Carousel slides={slides} />
+            <Carousel slides={slides} />
         </div>
     )
 }
