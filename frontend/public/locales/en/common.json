@@ -25,7 +25,8 @@
         "verify_identity": "Please enter the email verification code to verify your identity",
         "complete_register": "Please enter the information below to complete your account registration",
         "already_have_account": "Already have an account?",
-        "send_otp": "Send OTP"
+        "matches": "Send OTP",
+        "forgot_step1": "Forgot Account (Step 1)"
     },
     "vehicle": {},
     "vehicle_model": {},
