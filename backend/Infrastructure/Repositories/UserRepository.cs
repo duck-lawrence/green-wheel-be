@@ -22,6 +22,9 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
-        
+        public async Task<User?> GetByPhoneAsync(string phone)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(user => user.Phone == phone);
+        }
     }
 }

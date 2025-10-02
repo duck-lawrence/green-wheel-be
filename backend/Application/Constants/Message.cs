@@ -30,6 +30,7 @@ namespace Application.Constants
             public const string FirstNameIsRequired = "user.first_name_is_required";
             public const string LastNameIsRequired = "user.last_name_is_required";
             public const string DateOfBirthIsRequired = "user.date_of_birht_is_required";
+            public const string PhoneAlreadyExist = "user.phone_already_exist";
             //change password
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
             public const string OldPasswordIsRequired = "user.ole_password_is_required";
