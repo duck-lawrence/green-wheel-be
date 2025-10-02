@@ -280,11 +280,20 @@ export const RegisterReceiveForm = () => {
               <div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center space-x-4">
-                    <div className="w-32 h-24 relative">
+                    <div
+                      className="
+                        relative overflow-hidden rounded-md
+                        w-40 h-28              /* base size */
+                        sm:w-48 sm:h-32        /* ↑ trên màn rộng hơn */
+                        md:w-56 md:h-36
+                      "
+                    >
                       <img
                         src="https://vinfastninhbinh.com.vn/wp-content/uploads/2024/06/vinfast-vf3-5.png"
                         alt={t("car_rental.vehicle")}
-                        className="rounded-md w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-contain" 
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
                     <div>
