@@ -9,7 +9,7 @@ import { VehicalModelPicker } from "../VehicalModelPicker"
 import { EnumPicker } from "@/components/modules/EnumPicker"
 import { OrderStatusLabels } from "@/constants/labels"
 
-export function FillterBarOrder({ onFilterChange }) {
+export function FillterBarOrder({ onFilterChange }: { onFilterChange: () => void }) {
     const formik = useFormik({
         initialValues: {
             vehicalModel: "",
@@ -25,7 +25,7 @@ export function FillterBarOrder({ onFilterChange }) {
         }),
         onSubmit: (values) => {
             console.log("Payload gửi API:", values)
-            onFilterChange(values)
+            onFilterChange()
         }
     })
 
