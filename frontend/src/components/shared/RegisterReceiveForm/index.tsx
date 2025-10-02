@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
 
-const RegisterReceiveCar = () => {
+export const RegisterReceiveForm = () => {
   const { t} = useTranslation("common")
 
   const [mounted, setMounted] = useState(false)
@@ -293,4 +293,3 @@ const RegisterReceiveCar = () => {
   )
 }
 
-export default RegisterReceiveCar

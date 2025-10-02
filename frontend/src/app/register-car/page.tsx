@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 
 const RegisterReceiveCar = dynamic(
-  () => import('@/components/register_recieve_car'),
+  () => import('@/components/shared/RegisterReceiveForm'),
   { ssr: false }
 )
 
