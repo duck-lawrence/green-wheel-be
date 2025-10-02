@@ -9,5 +9,7 @@ namespace Application.Repositories
                                                             DateTimeOffset startDate,
                                                             DateTimeOffset endDate,
                                                             Guid? segmentId = null);
+        Task<VehicleModelViewRes> GetByIdAsync(Guid vehicleId, Guid stationId, DateTimeOffset startDate,
+        DateTimeOffset endDate);
     }
 }

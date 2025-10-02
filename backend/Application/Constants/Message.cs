@@ -31,6 +31,7 @@ namespace Application.Constants
             public const string LastNameIsRequired = "user.last_name_is_required";
             public const string DateOfBirthIsRequired = "user.date_of_birht_is_required";
             //change password
+            public const string DoNotHavePermission = "user.do_not_have_permission";
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
             public const string OldPasswordIsRequired = "user.ole_password_is_required";
             //login
@@ -51,9 +52,14 @@ namespace Application.Constants
             public const string UnexpectedError = "common.unexpected_error";
         }
 
+        public static class Vehicle
+        {
+            public const string VehicleNotFound = "vehicle.vehicle_not_found";
+            public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
+        }
         public static class VehicleModel
         {
-            public const string VehicleNotFound = "vehicle_model.vehicle_not_found";
+            public const string VehicleModelNotFound = "vehicle_model.vehicle_model_not_found";
             public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
             public const string VehicelModelNotFound = "vehicle_model.vehicle_model_not_found";
             public const string NameIsRequire = "vehicle_model.name_is_require";
@@ -81,6 +87,18 @@ namespace Application.Constants
             public const string InvalidFileType = "Unsupported image type";
             public const string UploadFailed = "Upload failed";
             public const string DeleteSuccess = "Delete successful";
+        }
+
+        //Rental Contract
+        public static class RentalContract
+        {
+            public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
+        }
+
+        //Station
+        public static class Station
+        {
+            public const string StationNotFound = "station.station_not_found";
         }
     }
 }
