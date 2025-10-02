@@ -1,34 +1,35 @@
 "use client"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { ArrowLeftIcon } from "@phosphor-icons/react"
-import React from "react"
+import React, { useCallback, useState } from "react"
 import { ButtonStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
-import { useEmailStore } from "@/store/useEmailStore"
 import { useTranslation } from "react-i18next"
+import { useResetPassword } from "@/hooks"
 
-interface RegisInfoProps {
-    handleBack: () => void
+interface ForgotInfoProps {
+    onSuccess?: () => void
 }
 
-function maskEmail(email: string) {
-    const [username, domain] = email.split("@")
-    if (username.length <= 2) {
-        return username[0] + "***@" + domain
-    }
-    return username.slice(0, 2) + "***@" + domain
-}
-
-export function ForgotInFo({ handleBack }: RegisInfoProps) {
+export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
     const { t } = useTranslation()
-    // const [isShowPassword, setIsShowPassword] = useState(false)
-    // const [isShowConfirmPassword, setIsShowConfirmPassword] = useState(false)
-    const [isVisible, setIsVisible] = React.useState(false)
+    const resetMutation = useResetPassword({ onSuccess })
+
+    const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
-    const [isConfirmVisible, setIsConfirmVisible] = React.useState(false)
+    const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const toggleConFirmVisibility = () => setIsConfirmVisible(!isConfirmVisible)
-    const email = useEmailStore((state) => state.email)
+
+    const handleResetPassword = useCallback(
+        async ({ password, confirmPassword }: { password: string; confirmPassword: string }) => {
+            await resetMutation.mutateAsync({
+                newPassword: password,
+                confirmNewPassword: confirmPassword
+            })
+        },
+        [resetMutation]
+    )
+
     const formik = useFormik({
         initialValues: {
             password: "",
@@ -37,7 +38,7 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
         validationSchema: Yup.object({
             password: Yup.string()
                 .required(t("password.require"))
-                .min(6, t("password.min"))
+                .min(8, t("password.min"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
                     t("user.password_strength")
@@ -46,31 +47,27 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
                 .oneOf([Yup.ref("password")], t("user.confirm_password"))
                 .required(t("password.require"))
         }),
-        onSubmit: async (values) => {
-            await new Promise((resolve) => setTimeout(resolve, 4000))
-            alert(JSON.stringify(values))
-            // handleNext()
-        }
+        onSubmit: handleResetPassword
     })
 
     return (
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
-            <div className="mx-12 mt-2 mb-2">
-                <h1 className="font-bold text-xl">{t("auth.forgot_step3")}</h1>
+            <div className="mx-auto mt-2 mb-2">
+                <div className="text-center">{t("auth.please_reset_password")}</div>
             </div>
 
             {/* Input InFo */}
             <div className="w-110 mx-auto">
-                <div className="w-110 mx-auto">
+                {/* <div className="w-110 mx-auto">
                     <InputStyled
                         isDisabled
                         // className="my-3"
                         variant="bordered"
                         label="Email"
-                        value={maskEmail(email)}
+                        value={maskEmail("tduc01234@gmail.com")}
                     />
-                </div>
+                </div> */}
 
                 <InputStyled
                     className="my-3"
@@ -141,19 +138,19 @@ export function ForgotInFo({ handleBack }: RegisInfoProps) {
                 />
             </div>
 
-            <div className="flex mx-auto gap-4 mt-4">
-                <ButtonStyled onPress={handleBack} className="w-5 h-16 mx-auto mt-0">
+            <div className="mx-auto">
+                {/* <ButtonStyled onPress={handleBack} className="w-5 h-16 mx-auto mt-0">
                     <ArrowLeftIcon />
-                </ButtonStyled>
+                </ButtonStyled> */}
 
                 <ButtonStyled
                     type="submit"
+                    className="w-110 h-10 mx-auto mt-4"
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid}
-                    className="w-5 h-16 mx-auto mt-0"
                 >
-                    {t("login.submit")}
+                    {t("auth.reset_password")}
                 </ButtonStyled>
             </div>
         </form>

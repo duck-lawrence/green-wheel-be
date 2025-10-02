@@ -1,6 +1,6 @@
 "use client"
-import React from "react"
 import RowSteps from "@/components/modules/RowSteps"
+import React from "react"
 import { useTranslation } from "react-i18next"
 
 interface RowStepProps {
@@ -12,7 +12,7 @@ export function RowStep({ n }: RowStepProps) {
     const steps = [
         { title: t("email.label") },
         { title: t("auth.otp") },
-        { title: t("login.register") }
+        { title: t("password.label") }
     ]
 
     return (
