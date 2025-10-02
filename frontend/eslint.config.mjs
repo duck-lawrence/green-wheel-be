@@ -7,7 +7,6 @@ import globals from "globals"
 
 export default [
     js.configs.recommended,
-
     {
         files: ["**/*.{js,jsx,ts,tsx}"],
         languageOptions: {
@@ -28,6 +27,7 @@ export default [
         },
         rules: {
             ...pluginNext.configs.recommended.rules,
+            ...pluginNext.configs["core-web-vitals"].rules,
             "no-unused-vars": "off",
             "@typescript-eslint/no-unused-vars": "error",
             "react/display-name": "off",
