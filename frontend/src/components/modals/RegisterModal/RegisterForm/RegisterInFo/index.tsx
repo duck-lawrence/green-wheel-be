@@ -110,7 +110,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="New password"
+                    label="Password"
                     type={isVisible ? "text" : "password"}
                     value={formik.values.password}
                     onValueChange={(value) => formik.setFieldValue("password", value)}
@@ -144,7 +144,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="Confirm new password"
+                    label="Confirm password"
                     type={isConfirmVisible ? "text" : "password"}
                     value={formik.values.confirmPassword}
                     onValueChange={(value) => formik.setFieldValue("confirmPassword", value)}

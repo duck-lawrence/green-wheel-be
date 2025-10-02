@@ -2,7 +2,8 @@
 import React from "react"
 import { ModalBody, ModalContent } from "@heroui/react"
 import { useLoginDiscloresureSingleton } from "@/hooks"
-import { ModalStyled, LoginForm } from "@/components/"
+import { ModalStyled } from "@/components/"
+import { LoginForm } from "./LoginForm"
 
 export function LoginModal() {
     const { isOpen, onOpenChange, onClose } = useLoginDiscloresureSingleton()
