@@ -33,7 +33,7 @@ export function GoogleLoginButton({ onSuccess }: { onSuccess?: () => void }) {
     return (
         <div
             id="google-signin-button"
-            className="overflow-hidden border-primary border-2 rounded-[12px] 
+            className="overflow-hidden border-primary border-2 rounded-[12px] hover-scale
                     transform transition-transform duration-150 active:scale-95 ease-in-out"
         ></div>
     )
