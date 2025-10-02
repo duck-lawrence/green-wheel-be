@@ -9,3 +9,7 @@
 button {
     cursor: pointer;
 }
+
+.hover-scale {
+    @apply transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95;
+}

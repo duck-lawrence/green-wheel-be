@@ -1,7 +1,7 @@
 /* eslint-disable indent */
 "use client"
 import React, { useEffect, useState } from "react"
-import "./navbar.css"
+import "./index.css"
 import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
