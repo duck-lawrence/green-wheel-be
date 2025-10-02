@@ -71,11 +71,52 @@ namespace Infrastructure.Repositories
                         )
                     )
                 })
-                
                 .ToListAsync();
             return result;
         }
 
-       
+        public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate,
+        DateTimeOffset endDate)
+        {
+            var query = _dbContext.VehicleModels.Where(vm => vm.Id == id)
+                .Include(vm => vm.Segment)
+                .Include(vm => vm.Vehicles)
+                    .ThenInclude(v => v.RentalContracts)
+                .AsQueryable();
+            var result = await query
+                .Select(vm => new VehicleModelViewRes
+                {
+                    Id = vm.Id,
+                    Name = vm.Name,
+                    Description = vm.Description,
+                    CostPerDay = vm.CostPerDay,
+                    DepositFee = vm.DepositFee,
+                    SeatingCapacity = vm.SeatingCapacity,
+                    NumberOfAirbags = vm.NumberOfAirbags,
+                    MotorPower = vm.MotorPower,
+                    BatteryCapacity = vm.BatteryCapacity,
+                    EcoRangeKm = vm.EcoRangeKm,
+                    SportRangeKm = vm.SportRangeKm,
+                    Brand = vm.Brand,
+                    Segment = vm.Segment,
+                    AvailableVehicleCount = vm.Vehicles.Count(v =>
+                        v.StationId == stationId &&
+                        (
+                            v.Status == (int)VehicleStatus.Available // Available
+                            ||
+                            (v.Status == (int)VehicleStatus.Unavaible && endDate < v.RentalContracts.Min(rc => rc.StartDate).AddDays(-10)) // Unavailable
+                                                                                                                                           //nếu có người thuê rồi thì 
+                                                                                                                                           //ngày kết thúc phải sớm hơn 10 ngày
+                            ||
+                            (v.Status == (int)VehicleStatus.Rented && startDate > v.RentalContracts.Max(rc => rc.EndDate).AddDays(10)) // Rented
+                                                                                                                                       //nếu có người đang thuê thì 
+                                                                                                                                       //ngày bắt đầu phải muộn hơn ngày kết thúc của người trước 10 ngày
+                        )
+                    )
+                })
+                .FirstOrDefaultAsync();
+            return result;
+
+        }
     }
 }

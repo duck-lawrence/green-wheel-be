@@ -7,7 +7,7 @@ export default function VehicleRental() {
 
     useEffect(() => {
         setActiveMenuKey("vehicle-rental")
-    }, [])
+    }, [setActiveMenuKey])
 
     return <div>page</div>
 }

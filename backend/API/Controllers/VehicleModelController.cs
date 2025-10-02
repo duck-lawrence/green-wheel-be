@@ -1,4 +1,5 @@
-﻿using Application;
+﻿using API.Filters;
+using Application;
 using Application.Abstractions;
 using Application.Dtos.VehicleModel.Request;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Route("api/vihicle-models")]
+    [Route("api/vehicle-models")]
     [ApiController]
     public class VehicleModelController : ControllerBase
     {
@@ -18,11 +19,13 @@ namespace API.Controllers
             _vehicleModelService = vehicleModelService;
         }
         /*
+         401: unauthorized
+         403: not have permission
          --400: invalid type
          200: success
-         500: faild to save to DB
          */
-        [HttpPost("create-vehicle-model")]
+        [RoleAuthorize("Admin")]
+        [HttpPost]
         public async Task<IActionResult> CreateVehicleModel(CreateVehicleModelReq createVehicleModelReq)
         {
             var id = await _vehicleModelService.CreateVehicleModelAsync(createVehicleModelReq);
@@ -32,12 +35,14 @@ namespace API.Controllers
             });
         }
         /*
+         401: unauthorized
+         403: not have permission
          200: success
-         500: faild to save to Db
          --400: invalid type
          404: not found
          */
-        [HttpPatch("update-vehicle-model/{id}")]
+        [RoleAuthorize("Admin")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicleModel([FromRoute] Guid id, UpdateVehicleModelReq updateVehicleModelReq)
         {
             await _vehicleModelService.UpdateVehicleModelAsync(id, updateVehicleModelReq);
@@ -46,24 +51,38 @@ namespace API.Controllers
 
         /*
          200: success
-         500: faild in Db maybe
          */
-        [HttpGet("get-all-vehicle-models")]
-        public async Task<IActionResult> GetAllVehicleModel(VehicleFilterReq vehicleFilterReq)
+        [HttpGet]
+        public async Task<IActionResult> GetAllVehicleModel([FromQuery]VehicleFilterReq vehicleFilterReq)
         {
             var verhicelModelView = await _vehicleModelService.GetAllVehicleModels(vehicleFilterReq);
             return Ok(verhicelModelView);
         }
         /*
+         200: success
          404: not found
-         500: faild in db
+         */
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetVehicelModelById([FromRoute] Guid id, Guid stationId,
+                                                 DateTimeOffset startDate, DateTimeOffset endDate)
+        {
+            var verhicelModelView = await _vehicleModelService.GetByIdAsync(id, stationId, startDate, endDate);
+            return Ok(verhicelModelView);
+        }
+        /*
+         401: unauthorized
+         403: not have permission
+         404: vehicle model not found
          200: success
          */
-        [HttpDelete("delete-vehicle-model/{id}")]
+        [RoleAuthorize("Admin")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicleModel([FromRoute] Guid id)
         {
             await _vehicleModelService.DeleteVehicleModleAsync(id);
             return Ok();
         }
+
+        
     }
 }

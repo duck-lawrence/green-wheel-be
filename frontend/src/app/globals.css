@@ -13,3 +13,13 @@ button {
 .hover-scale {
     @apply transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95;
 }
+
+@layer utilities {
+    .asfaltBackground {
+        @apply bg-[url('/textures/asfalt-dark.png')];
+    }
+
+    .diamondBackground {
+        @apply bg-[url('/textures/diagmonds-light.png')];
+    }
+}

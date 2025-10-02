@@ -1,10 +1,8 @@
-/* eslint-disable indent */
 "use client"
 
+import React from "react"
 import type { ComponentProps } from "react"
 import type { ButtonProps } from "@heroui/react"
-
-import React from "react"
 import { useControlledState } from "@react-stately/utils"
 import { m, LazyMotion, domAnimation } from "framer-motion"
 import { cn } from "@heroui/react"
@@ -237,7 +235,6 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
                                             aria-hidden="true"
                                             className="pointer-events-none absolute right-0 w-10 flex-none items-center"
                                             style={{
-                                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                                                 // @ts-expect-error
                                                 "--idx": stepIdx
                                             }}

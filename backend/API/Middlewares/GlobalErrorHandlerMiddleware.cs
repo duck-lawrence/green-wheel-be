@@ -1,5 +1,6 @@
 ﻿
 using Application.AppExceptions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
@@ -23,7 +24,15 @@ namespace API.Middleware
             {
                 await next(context);
             }
-            catch(NotFoundException nFEx)
+            catch(BusinessException bEx)
+            {
+                await WriteProblemDetailsAsync(context, 422, "Business Exception", bEx.Message);
+            }
+            catch (ForbidenException fEx)
+            {
+                await WriteProblemDetailsAsync(context, 403, "Not Have Permission", fEx.Message);
+            }
+            catch (NotFoundException nFEx)
             {
                 await WriteProblemDetailsAsync(context, 404, "Not Found", nFEx.Message);
             }

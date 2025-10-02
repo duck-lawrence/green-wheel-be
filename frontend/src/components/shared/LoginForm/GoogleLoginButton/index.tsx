@@ -28,7 +28,7 @@ export function GoogleLoginButton({ onSuccess }: { onSuccess?: () => void }) {
                 }
             )
         }
-    }, [])
+    }, [loginGoogleMutation])
 
     return (
         <div

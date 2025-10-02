@@ -1,10 +1,12 @@
 ﻿using Application.Abstractions;
+using Application.Constants;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Application.AppExceptions;
 
 namespace API.Filters
 {
@@ -24,21 +26,19 @@ namespace API.Filters
             //check user login or not?
             if(!user.Identity?.IsAuthenticated ?? true)
             {
-                context.Result = new UnauthorizedResult();
-                return;
+                throw new UnauthorizedAccessException(Message.User.Unauthorized);
+                
             }
             //take userId
             var userId = user.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             if (userId == null)
             {
-                context.Result = new UnauthorizedResult();
-                return;
+                throw new UnauthorizedAccessException(Message.User.Unauthorized);
             }
             var userService = context.HttpContext.RequestServices.GetService<IUserService>();
             if (userService == null)
             {
-                context.Result = new StatusCodeResult(500);
-                return;
+                throw new Exception();
             }
             var roleList = _cache.Get<List<Role>>("AllRoles");
             var userInDB = await userService.GetUserByIdAsync(Guid.Parse(userId));
@@ -46,10 +46,8 @@ namespace API.Filters
 
             if (userRole == null || !_roles.Contains(userRole))
             {
-                context.Result = new ForbidResult();
+                throw new ForbidenException(Message.User.DoNotHavePermission);
             }
-
-
         }
     }
 }

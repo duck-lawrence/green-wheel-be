@@ -8,8 +8,8 @@ import { useTranslation } from "react-i18next"
 
 export default function Page() {
     const { t } = useTranslation()
-    const [order, setOrder] = useState(orders) // thôn tin đơn hàng
-    const [loading, setLoading] = useState(false)
+    const [order] = useState(orders) // thôn tin đơn hàng
+    const [loading] = useState(false)
     const [filters, setFilter] = useState({})
 
     useEffect(() => {

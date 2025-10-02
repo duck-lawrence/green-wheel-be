@@ -7,7 +7,7 @@ export default function AboutPage() {
 
     useEffect(() => {
         setActiveMenuKey("about")
-    }, [])
+    }, [setActiveMenuKey])
 
     return <div>page</div>
 }
