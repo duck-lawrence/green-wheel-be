@@ -1,37 +1,36 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
-import { Formik, Form, Field, ErrorMessage } from 'formik'
-import * as Yup from 'yup'
-import { Icon } from '@iconify/react'
-import { useTranslation } from 'react-i18next'
-import Link from 'next/link'
-import { useProfileStore, useToken } from '@/hooks'
+import React, { useState, useEffect } from "react"
+import { Formik, Form, Field, ErrorMessage } from "formik"
+import * as Yup from "yup"
+import { Icon } from "@iconify/react"
+import { useTranslation } from "react-i18next"
+import Link from "next/link"
+import { useProfileStore, useToken } from "@/hooks"
 
 const RegisterReceiveCar = () => {
-  const { t, i18n, ready } = useTranslation("common")
+  const { t} = useTranslation("common")
 
   const [mounted, setMounted] = useState(false)
-    const msg = (k: string) => () => t(k)
 
   const { user } = useProfileStore()
   const isLoggedIn = useToken((s) => !!s.accessToken)
 
 
   const RegisterCarSchema = Yup.object().shape({
-    fullName: Yup.string().required(t('fullName.required')),
+    fullName: Yup.string().required(t("fullName.required")),
     phone: Yup.string()
-      .matches(/^[0-9]{9,11}$/, t('phone.invalid'))
-      .required(t('phone.required')),
-    email: Yup.string().email(t('email.invalid')).required(t('email.required')),
+      .matches(/^[0-9]{9,11}$/, t("phone.invalid"))
+      .required(t("phone.required")),
+    email: Yup.string().email(t("email.invalid")).required(t("email.required")),
     isVingroup: Yup.boolean(),
-    pickupLocation: Yup.string().required(t('pickupLocation.required')),
+    pickupLocation: Yup.string().required(t("pickupLocation.required")),
     referralCode: Yup.string(),
     note: Yup.string(),
-    paymentMethod: Yup.string().required(t('paymentMethod.required')),
+    paymentMethod: Yup.string().required(t("paymentMethod.required")),
     promotionCode: Yup.string(),
-    agreeTerms: Yup.boolean().oneOf([true], t('agreeTerms.required')),
-    agreeDataPolicy: Yup.boolean().oneOf([true], t('agreeDataPolicy.required'))
+    agreeTerms: Yup.boolean().oneOf([true], t("agreeTerms.required")),
+    agreeDataPolicy: Yup.boolean().oneOf([true], t("agreeDataPolicy.required"))
   })
 
   useEffect(() => {
@@ -39,21 +38,21 @@ const RegisterReceiveCar = () => {
   }, [])
 
   const initialValues = {
-    fullName: isLoggedIn && user ? `${user.firstName} ${user.lastName}` : '',
-    phone: isLoggedIn && user && user.phone ? user.phone : '',
-    email: isLoggedIn && user ? user.email : '',
+    fullName: isLoggedIn && user ? `${user.firstName} ${user.lastName}` : "",
+    phone: isLoggedIn && user && user.phone ? user.phone : "",
+    email: isLoggedIn && user ? user.email : "",
     isVingroup: false,
-    pickupLocation: '',
-    referralCode: '',
-    note: '',
-    paymentMethod: '',
-    promotionCode: '',
+    pickupLocation: "",
+    referralCode: "",
+    note: "",
+    paymentMethod: "",
+    promotionCode: "",
     agreeTerms: false,
     agreeDataPolicy: false
   }
 
   const handleSubmit = (values: any) => {
-    console.log('Form values:', values)
+    console.log("Form values:", values)
     // Xử lý gửi form
   }
 
@@ -64,14 +63,14 @@ const RegisterReceiveCar = () => {
   const totalPayment = listedFee + deposit
 
   const formatCurrency = (amount: number) => {
-    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + 'đ'
+    return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ"
   }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6">
-          <h2 className="text-3xl font-bold">{t('car_rental.register_title')}</h2>
+          <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
           <button type="button" className="text-gray-500 hover:text-gray-700">
             <Icon icon="ph:x" width={24} height={24} />
           </button>
@@ -90,64 +89,64 @@ const RegisterReceiveCar = () => {
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="fullName" className="block text-sm font-medium mb-1">
-                        {t('car_rental.renter_name')}<span className="text-red-500">*</span>
+                        {t("car_rental.renter_name")}<span className="text-red-500">*</span>
                       </label>
                       <Field
                         type="text"
                         id="fullName"
                         name="fullName"
-                        placeholder={t('car_rental.renter_name_placeholder')}
-                        className={`w-full border rounded-md p-2 ${errors.fullName && touched.fullName ? 'border-red-500' : 'border-gray-300'}`}
+                        placeholder={t("car_rental.renter_name_placeholder")}
+                        className={`w-full border rounded-md p-2 ${errors.fullName && touched.fullName ? "border-red-500" : "border-gray-300"}`}
                       />
                       <ErrorMessage name="fullName" component="div" className="text-red-500 text-sm mt-1" />
                     </div>
 
                     <div>
                       <label htmlFor="phone" className="block text-sm font-medium mb-1">
-                        {t('car_rental.phone')}<span className="text-red-500">*</span>
+                        {t("car_rental.phone")}<span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <Field
                           type="text"
                           id="phone"
                           name="phone"
-                          placeholder={t('car_rental.phone_placeholder')}
-                          className={`w-full border rounded-md p-2 ${errors.phone && touched.phone ? 'border-red-500' : 'border-gray-300'}`}
+                          placeholder={t("car_rental.phone_placeholder")}
+                          className={`w-full border rounded-md p-2 ${errors.phone && touched.phone ? "border-red-500" : "border-gray-300"}`}
                         />
                       </div>
                       <ErrorMessage name="phone" component="div" className="text-red-500 text-sm mt-1" />
-                      <p className="text-xs text-red-500 mt-1">{t('car_rental.phone_min_length')}</p>
-                      <p className="text-xs text-red-500">{t('car_rental.phone_verification')}</p>
+                      <p className="text-xs text-red-500 mt-1">{t("car_rental.phone_min_length")}</p>
+                      <p className="text-xs text-red-500">{t("car_rental.phone_verification")}</p>
                     </div>
                     
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium mb-1">
-                        {t('car_rental.email')}<span className="text-red-500">*</span>
+                        {t("car_rental.email")}<span className="text-red-500">*</span>
                       </label>
                       <Field
                         type="email"
                         id="email"
                         name="email"
                         placeholder="wheel@fpt.edu.vn"
-                        className={`w-full border rounded-md p-2 ${errors.email && touched.email ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`w-full border rounded-md p-2 ${errors.email && touched.email ? "border-red-500" : "border-gray-300"}`}
                       />
                       <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
                     </div>
 
                     <div>
                       <label htmlFor="pickupLocation" className="block text-sm font-medium mb-1">
-                        {t('car_rental.pickup_location')}<span className="text-red-500">*</span>
+                        {t("car_rental.pickup_location")}<span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <Field
                           as="select"
                           id="pickupLocation"
                           name="pickupLocation"
-                          className={`w-full border rounded-md p-2 appearance-none ${errors.pickupLocation && touched.pickupLocation ? 'border-red-500' : 'border-gray-300'}`}
+                          className={`w-full border rounded-md p-2 appearance-none ${errors.pickupLocation && touched.pickupLocation ? "border-red-500" : "border-gray-300"}`}
                         >
-                          <option value="">{t('car_rental.select_pickup_location')}</option>
-                          <option value="place1">{t('car_rental.place1')}</option>
-                          <option value="place2">{t('car_rental.place2')}</option>
+                          <option value="">{t("car_rental.select_pickup_location")}</option>
+                          <option value="place1">{t("car_rental.place1")}</option>
+                          <option value="place2">{t("car_rental.place2")}</option>
                         </Field>
                         <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
                           <Icon icon="ph:caret-down" />
@@ -158,7 +157,7 @@ const RegisterReceiveCar = () => {
 
                     <div>
                       <label htmlFor="note" className="block text-sm font-medium mb-1">
-                        {t('car_rental.note')}
+                        {t("car_rental.note")}
                       </label>
                       <Field
                         as="textarea"
@@ -171,16 +170,16 @@ const RegisterReceiveCar = () => {
 
                   {/* Phương thức thanh toán */}
                   <div className="mt-6">
-                    <h3 className="font-medium mb-3">{t('car_rental.payment_method')}</h3>
+                    <h3 className="font-medium mb-3">{t("car_rental.payment_method")}</h3>
                     <Field
                       as="select"
                       id="paymentMethod"
                       name="paymentMethod"
-                      className={`w-full border rounded-md p-2 appearance-none ${errors.paymentMethod && touched.paymentMethod ? 'border-red-500' : 'border-gray-300'}`}
+                      className={`w-full border rounded-md p-2 appearance-none ${errors.paymentMethod && touched.paymentMethod ? "border-red-500" : "border-gray-300"}`}
                     >
-                      <option value="">{t('car_rental.select_payment_method')}</option>
-                      <option value="banking">{t('car_rental.bank_transfer')}</option>
-                      <option value="momo">{t('car_rental.momo_wallet')}</option>
+                      <option value="">{t("car_rental.select_payment_method")}</option>
+                      <option value="banking">{t("car_rental.bank_transfer")}</option>
+                      <option value="momo">{t("car_rental.momo_wallet")}</option>
                     </Field>
                     <ErrorMessage name="paymentMethod" component="div" className="text-red-500 text-sm mt-1" />
                   </div>
@@ -195,7 +194,7 @@ const RegisterReceiveCar = () => {
                         className="mt-1"
                       />
                       <label htmlFor="agreeTerms" className="ml-2 text-sm">
-                        {t('car_rental.agree_terms')} <Link href="#" className="text-blue-600 hover:underline">{t('car_rental.payment_terms')}</Link> {t('car_rental.of_green_wheel')}
+                        {t("car_rental.agree_terms")} <Link href="#" className="text-blue-600 hover:underline">{t("car_rental.payment_terms")}</Link> {t("car_rental.of_green_wheel")}
                       </label>
                     </div>
                     <ErrorMessage name="agreeTerms" component="div" className="text-red-500 text-sm" />
@@ -208,7 +207,7 @@ const RegisterReceiveCar = () => {
                         className="mt-1"
                       />
                       <label htmlFor="agreeDataPolicy" className="ml-2 text-sm">
-                        {t('car_rental.agree_data_policy')} <Link href="#" className="text-blue-600 hover:underline">{t('car_rental.data_sharing_terms')}</Link> {t('car_rental.of_green_wheel')}
+                        {t("car_rental.agree_data_policy")} <Link href="#" className="text-blue-600 hover:underline">{t("car_rental.data_sharing_terms")}</Link> {t("car_rental.of_green_wheel")}
                       </label>
                     </div>
                     <ErrorMessage name="agreeDataPolicy" component="div" className="text-red-500 text-sm" />
@@ -222,15 +221,13 @@ const RegisterReceiveCar = () => {
                       <div className="w-32 h-24 relative">
                         <img 
                           src="https://vinfastninhbinh.com.vn/wp-content/uploads/2024/06/vinfast-vf3-5.png" 
-                          alt={t('car_rental.vehicle')}
+                          alt={t("car_rental.vehicle")}
                           className="rounded-md w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "/images/avtFallback.jpg";
-                          }}
+                          
                         />
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium">{t('car_rental.vehicle')}</h3>
+                        <h3 className="text-lg font-medium">{t("car_rental.vehicle")}</h3>
                       </div>
                     </div>
 
@@ -238,7 +235,7 @@ const RegisterReceiveCar = () => {
                       <div className="flex justify-between items-center">
                         <h4 className="font-medium">Hà Nội</h4>
                         <button type="button" className="text-blue-600">
-                          <Icon icon="ph:pencil" className="inline mr-1" />
+                       
                         </button>
                       </div>
                       <div className="mt-2 flex items-center">
@@ -250,18 +247,18 @@ const RegisterReceiveCar = () => {
                     </div>
 
                     <div className="mt-4">
-                      <h4 className="font-medium">{t('car_rental.detail_table')}</h4>
+                      <h4 className="font-medium">{t("car_rental.detail_table")}</h4>
                       <div className="mt-2 space-y-2">
                         <div className="flex justify-between">
-                          <span>{t('car_rental.listed_fee')}</span>
+                          <span>{t("car_rental.listed_fee")}</span>
                           <span>{formatCurrency(listedFee)}</span>
                         </div>
                         <div className="border-t pt-2 flex justify-between font-medium">
-                          <span>{t('car_rental.total')}</span>
+                          <span>{t("car_rental.total")}</span>
                           <span>{formatCurrency(listedFee)}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>{t('car_rental.deposit')}</span>
+                          <span>{t("car_rental.deposit")}</span>
                           <span>{formatCurrency(deposit)}</span>
                         </div>
                       </div>
@@ -270,8 +267,8 @@ const RegisterReceiveCar = () => {
                     <div className="mt-6 border-t pt-4">
                       <div className="flex justify-between items-center">
                         <div>
-                          <span className="font-medium">{t('car_rental.payment')}</span>
-                          <span className="text-xs text-gray-500 block">{t('car_rental.price_includes_vat')}</span>
+                          <span className="font-medium">{t("car_rental.payment")}</span>
+                          <span className="text-xs text-gray-500 block">{t("car_rental.price_includes_vat")}</span>
                         </div>
                         <span className="text-2xl font-bold text-green-500">{formatCurrency(totalPayment)}</span>
                       </div>
@@ -285,7 +282,7 @@ const RegisterReceiveCar = () => {
                   type="submit" 
                   className="bg-green-600 hover:bg-green-700 text-white px-8 py-2 rounded-md"
                 >
-                  {t('car_rental.pay')} {formatCurrency(totalPayment)}
+                  {t("car_rental.pay")} {formatCurrency(totalPayment)}
                 </button>
               </div>
             </Form>

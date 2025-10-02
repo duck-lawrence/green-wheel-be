@@ -239,6 +239,7 @@
     "pay": "Pay",
     "place1": "Place 1",
     "place2": "Place 2",
-    "detail_table": "Detail table"
+    "detail_table": "Detail table",
+    "total" : "Total"
   }
 }
