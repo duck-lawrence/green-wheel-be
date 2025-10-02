@@ -1,33 +1,30 @@
 "use client"
 import React, { useMemo, useState } from "react"
 import { motion } from "framer-motion"
-
-// --------- Mock Data (replace with your CMS/API) ---------
+import { BreadCrumbsStyled, ButtonStyled } from "@/components/styled"
+import { Field } from "@/components/styled/FieldStyled"
+import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
+import Link from "next/link"
+// Data
 const vehicle = {
     name: "VinFast VF 3",
     slug: "vinfast-vf3",
-    rating: 4.8,
-    reviews: 126,
     pricePerDay: 690000,
-    priceUnit: "đ/ngày",
-    oldPricePerDay: 790000,
+    priceUnit: "VND/ngày",
     fuel: "Điện",
+    deposite: 3000000,
     seats: 4,
     transmission: "Tự động",
     rangeKm: 210,
     powerKw: 32,
     torqueNm: 110,
+    // start: 9/05/2025,
+    // end: 09-05-2025,
     images: [
-        "https://images.unsplash.com/photo-1493236272126-8c562028cd64?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=1600&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=1600&auto=format&fit=crop"
-    ],
-    highlights: [
-        "Miễn phí 200km/ngày",
-        "Giao xe tận nơi trong 30 phút",
-        "Hỗ trợ 24/7",
-        "Bảo hiểm thân vỏ"
+        "https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcar%2Fvf301.jpg&w=1080&q=75",
+        "https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcar%2Fvf303.jpg&w=1080&q=75",
+        "https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcar%2Fvf304.jpg&w=1080&q=75",
+        "https://greenfuture.tech/_next/image?url=https%3A%2F%2Fupload-static.fgf.vn%2Fcar%2Fvf305.jpg&w=1080&q=75"
     ],
     policies: [
         { title: "Giấy tờ", text: "CCCD gắn chip/Passport + GPLX B2 trở lên." },
@@ -50,7 +47,7 @@ const vehicle = {
 const currency = (n: number) => new Intl.NumberFormat("vi-VN").format(n)
 
 // --------- UI ---------
-export default function VF3RentalPage() {
+export function Detail() {
     const [active, setActive] = useState(0)
     const [dates, setDates] = useState({ pick: "", drop: "" })
     const totalDays = useMemo(() => {
@@ -65,25 +62,11 @@ export default function VF3RentalPage() {
     const total = totalDays * vehicle.pricePerDay
 
     return (
-        <div className="min-h-dvh bg-neutral-50 text-neutral-900">
+        <div className="min-h-dvh bg-neutral-50 text-neutral-900 ">
             {/* Breadcrumb */}
-            <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 text-sm text-neutral-500">
-                <ol className="flex flex-wrap items-center gap-2">
-                    <li>
-                        <a href="/" className="hover:text-neutral-800">
-                            Trang chủ
-                        </a>
-                    </li>
-                    <li>/</li>
-                    <li>
-                        <a href="/thue-xe-tu-lai" className="hover:text-neutral-800">
-                            Thuê xe tự lái
-                        </a>
-                    </li>
-                    <li>/</li>
-                    <li className="text-neutral-800 font-medium">{vehicle.name}</li>
-                </ol>
-            </nav>
+            <div className="p-4">
+                <BreadCrumbsStyled />
+            </div>
 
             {/* Header */}
             <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-4">
@@ -93,7 +76,7 @@ export default function VF3RentalPage() {
                             {vehicle.name}
                         </h1>
                         <div className="mt-2 flex items-center gap-3 text-sm">
-                            <div className="flex items-center">
+                            {/* <div className="flex items-center">
                                 {Array.from({ length: 5 }).map((_, i) => (
                                     <svg
                                         key={i}
@@ -107,16 +90,16 @@ export default function VF3RentalPage() {
                                         <path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                                     </svg>
                                 ))}
-                            </div>
-                            <span className="text-neutral-600">
+                            </div> */}
+                            {/* <span className="text-neutral-600">
                                 {vehicle.rating} ({vehicle.reviews} đánh giá)
-                            </span>
+                            </span> */}
                         </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-sm line-through text-neutral-400">
+                        {/* <p className="text-sm line-through text-neutral-400">
                             {currency(vehicle.oldPricePerDay)} {vehicle.priceUnit}
-                        </p>
+                        </p> */}
                         <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">
                             {currency(vehicle.pricePerDay)}{" "}
                             <span className="text-base font-normal text-neutral-500">
@@ -162,21 +145,6 @@ export default function VF3RentalPage() {
                         </div>
                     </div>
 
-                    {/* Highlights */}
-                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {vehicle.highlights.map((h) => (
-                            <div
-                                key={h}
-                                className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm"
-                            >
-                                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-50">
-                                    ✅
-                                </span>
-                                <p className="text-sm text-neutral-700">{h}</p>
-                            </div>
-                        ))}
-                    </div>
-
                     {/* Specs */}
                     <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
                         <h2 className="text-xl font-semibold mb-4">Thông số</h2>
@@ -194,12 +162,12 @@ export default function VF3RentalPage() {
 
                     {/* Tabs */}
                     <section className="mt-8">
-                        <div className="flex flex-wrap gap-2">
+                        {/* <div className="flex flex-wrap gap-2">
                             <TabButton>Chi tiết</TabButton>
                             <TabButton>Chính sách</TabButton>
                             <TabButton>FAQ</TabButton>
                             <TabButton>Đánh giá ({vehicle.reviews})</TabButton>
-                        </div>
+                        </div> */}
                         <div className="mt-4 grid gap-4 md:grid-cols-2">
                             {vehicle.policies.map((p) => (
                                 <div key={p.title} className="rounded-2xl bg-white p-5 shadow-sm">
@@ -251,37 +219,27 @@ export default function VF3RentalPage() {
                 </section>
 
                 {/* Booking Card (sticky on desktop) */}
-                <aside className="lg:col-span-4">
-                    <div className="lg:sticky lg:top-6 rounded-2xl bg-white p-5 shadow-sm border border-neutral-100">
-                        <h2 className="text-lg font-semibold">Đặt xe nhanh</h2>
+                <aside className="lg:col-span-4 lg:sticky lg:top-10 space-y-6">
+                    <div className="rounded-2xl bg-white p-5 shadow-sm border border-neutral-100">
+                        <h2 className="text-lg font-semibold">Thông tin xe</h2>
                         <div className="mt-4 grid gap-4">
-                            <div>
-                                <label className="text-sm text-neutral-600">Ngày nhận</label>
-                                <input
-                                    type="date"
-                                    className="mt-1 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
-                                    value={dates.pick}
-                                    onChange={(e) =>
-                                        setDates((p) => ({ ...p, pick: e.target.value }))
-                                    }
-                                />
-                            </div>
-                            <div>
-                                <label className="text-sm text-neutral-600">Ngày trả</label>
-                                <input
-                                    type="date"
-                                    className="mt-1 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 outline-none focus:ring-2 focus:ring-emerald-500"
-                                    value={dates.drop}
-                                    onChange={(e) =>
-                                        setDates((p) => ({ ...p, drop: e.target.value }))
-                                    }
-                                />
-                            </div>
                             <div className="grid grid-cols-2 gap-3">
-                                <Field label="Nhiên liệu" value={vehicle.fuel} />
-                                <Field label="Số chỗ" value={String(vehicle.seats)} />
-                                <Field label="Hộp số" value={vehicle.transmission} />
-                                <Field label="Quãng đường" value={`~${vehicle.rangeKm} km`} />
+                                <Field
+                                    label="Nhiên liệu"
+                                    value="Điện"
+                                    icon={<GasPump size={18} weight="duotone" />}
+                                />
+                                <Field label="Số chỗ" value="4" icon={<UsersFour size={18} />} />
+                                <Field
+                                    label="Hộp số"
+                                    value="Tự động"
+                                    icon={<SteeringWheel size={18} />}
+                                />
+                                <Field
+                                    label="Quãng đường"
+                                    value="~210 km"
+                                    icon={<RoadHorizon size={18} />}
+                                />
                             </div>
 
                             <div className="rounded-xl bg-neutral-50 p-4">
@@ -293,8 +251,15 @@ export default function VF3RentalPage() {
                                 </div>
                                 <div className="mt-2 flex items-center justify-between text-sm">
                                     <span>Số ngày</span>
-                                    <span className="font-medium">{totalDays}</span>
+                                    <span className="font-medium">
+                                        {currency(vehicle.pricePerDay)}{" "}
+                                    </span>
                                 </div>
+                                <div className="mt-2 flex items-center justify-between text-sm">
+                                    <span>Tiền cọc</span>
+                                    <span className="font-medium">{vehicle.deposite}</span>
+                                </div>
+
                                 <div className="mt-3 h-px bg-neutral-200" />
                                 <div className="mt-3 flex items-center justify-between text-base font-semibold">
                                     <span>Tạm tính</span>
@@ -302,20 +267,15 @@ export default function VF3RentalPage() {
                                 </div>
                             </div>
 
-                            <button
-                                className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                                onClick={() => alert("Gửi yêu cầu đặt xe! (hook API tại đây)")}
-                            >
-                                Yêu cầu đặt xe
-                            </button>
-                            <p className="text-center text-xs text-neutral-500">
-                                Không cần thanh toán trước
-                            </p>
+                            <ButtonStyled className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                <Link href={"/"}>Yêu cầu đặt xe</Link>
+                            </ButtonStyled>
                         </div>
                     </div>
 
                     {/* Policy quicklist */}
-                    <div className="mt-6 rounded-2xl bg-white p-5 shadow-sm">
+                    {/* className="lg:sticky lg:top-140 mt-6 rounded-2xl bg-white p-5 shadow-sm" */}
+                    <div className="rounded-2xl bg-white p-5 shadow-sm">
                         <h3 className="font-semibold mb-3">Chính sách nhanh</h3>
                         <ul className="space-y-2 text-sm text-neutral-700">
                             {vehicle.policies.map((p) => (
@@ -362,14 +322,19 @@ export default function VF3RentalPage() {
     )
 }
 
-function Field({ label, value }: { label: string; value: string }) {
-    return (
-        <div className="rounded-xl border border-neutral-200 p-3">
-            <p className="text-xs uppercase tracking-wide text-neutral-500">{label}</p>
-            <p className="mt-1 font-medium">{value}</p>
-        </div>
-    )
-}
+// function Field({ label, value, icon }: { label: string; value: string; Icon?: React.ElementType }) {
+//     return (
+//         <div className="rounded-xl border border-neutral-200 p-3">
+//             {icon && (
+//                 <div className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+//                     <Icon size={18} />
+//                 </div>
+//             )}
+//             <p className="text-xs uppercase tracking-wide text-neutral-500">{label}</p>
+//             <p className="mt-1 font-medium">{value}</p>
+//         </div>
+//     )
+// }
 
 function TabButton({ children }: { children: React.ReactNode }) {
     const [active, setActive] = useState(false)

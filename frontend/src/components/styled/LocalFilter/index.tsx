@@ -1,3 +1,4 @@
+"use client"
 import { Autocomplete, AutocompleteItem } from "@heroui/react"
 import React from "react"
 import { MapPinAreaIcon } from "@phosphor-icons/react"
