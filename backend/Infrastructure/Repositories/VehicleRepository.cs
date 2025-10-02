@@ -1,4 +1,5 @@
-﻿using Application.Constants;
+﻿using Application.AppExceptions;
+using Application.Constants;
 using Application.Dtos.VehicleModel.Respone;
 using Application.Repositories;
 using Domain.Entities;
@@ -38,6 +39,17 @@ namespace Infrastructure.Repositories
                     && startDate > v.RentalContracts.Max(rc => rc.EndDate).AddDays(10))
             );
             return result;
+        }
+
+        public async Task UpdateStatusAsync(Guid id, int status)
+        {
+            var vehicle = await _dbContext.Vehicles.FirstOrDefaultAsync(t => t.Id == id);
+            if(vehicle == null)
+            {
+                throw new NotFoundException(Message.Vehicle.VehicleNotFound);
+            }
+            vehicle.Status = status;
+            await UpdateAsync(vehicle);
         }
     }
 }

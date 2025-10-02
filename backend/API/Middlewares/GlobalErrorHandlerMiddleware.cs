@@ -24,6 +24,10 @@ namespace API.Middleware
             {
                 await next(context);
             }
+            catch(BusinessException bEx)
+            {
+                await WriteProblemDetailsAsync(context, 422, "Business Exception", bEx.Message);
+            }
             catch (ForbidenException fEx)
             {
                 await WriteProblemDetailsAsync(context, 403, "Not Have Permission", fEx.Message);

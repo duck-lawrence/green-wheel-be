@@ -10,6 +10,6 @@ namespace Application.Repositories
     public interface IInvoiceRepository : IGenericRepository<Invoice>
     {
         Task<IEnumerable<Invoice>> GetByContractAsync(Guid ContractId);
-
+        Task<Invoice?> GetByIdOptionAsync(Guid id, bool includeItems = false, bool includeDeposit = false);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,14 +16,17 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public Task AddRangeAsync(IEnumerable<InvoiceItem> items)
+        public async Task AddRangeAsync(IEnumerable<InvoiceItem> items)
         {
-            throw new NotImplementedException();
+            foreach(var item in items)
+            {
+                await _dbContext.InvoiceItems.AddAsync(item);
+            }
         }
 
-        public Task<IEnumerable<InvoiceItem>> GetByInvoiceIdAsync(Guid invoiceId)
+        public async Task<IEnumerable<InvoiceItem>> GetByInvoiceIdAsync(Guid invoiceId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.InvoiceItems.Where(i => i.InvoiceId == invoiceId).ToListAsync();
         }
     }
 }

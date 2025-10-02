@@ -113,7 +113,7 @@ namespace API
             builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             builder.Services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
             builder.Services.AddScoped<IDepositRepository, DepositRepository>();
-
+            builder.Services.AddScoped<IStationRepository, StationRepository>();
             //Add scope service
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();

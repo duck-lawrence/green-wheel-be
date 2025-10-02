@@ -88,5 +88,17 @@ namespace Application.Constants
             public const string UploadFailed = "Upload failed";
             public const string DeleteSuccess = "Delete successful";
         }
+
+        //Rental Contract
+        public static class RentalContract
+        {
+            public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
+        }
+
+        //Station
+        public static class Station
+        {
+            public const string StationNotFound = "station.station_not_found";
+        }
     }
 }

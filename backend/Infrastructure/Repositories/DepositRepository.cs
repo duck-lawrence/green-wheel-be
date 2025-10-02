@@ -1,6 +1,7 @@
 ﻿using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,9 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public Task<Deposit?> GetByInvoiceIdAsync(Guid invoiceId)
+        public async Task<Deposit?> GetByInvoiceIdAsync(Guid invoiceId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Deposits.FirstOrDefaultAsync(x => x.InvoiceId == invoiceId);
         }
     }
 }

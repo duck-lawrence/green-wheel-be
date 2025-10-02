@@ -2,6 +2,7 @@
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
 
 namespace Infrastructure.Repositories
@@ -12,9 +13,23 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public Task<IEnumerable<Invoice>> GetByContractAsync(Guid ContractId)
+        public async Task<IEnumerable<Invoice>> GetByContractAsync(Guid ContractId)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Invoices.Where(i => i.ContractId == ContractId).ToListAsync();
+        }
+
+        public async Task<Invoice?> GetByIdOptionAsync(Guid id, bool includeItems = false, bool includeDeposit = false)
+        {
+            IQueryable<Invoice> query = _dbContext.Invoices.AsQueryable();
+            if (includeItems)
+            {
+                query = query.Include(i => i.InvoiceItems);
+            }
+            if (includeDeposit)
+            {
+                query = query.Include(i => i.Deposit);
+            }
+            return await query.FirstOrDefaultAsync(i => i.Id == id);
         }
     }
 }

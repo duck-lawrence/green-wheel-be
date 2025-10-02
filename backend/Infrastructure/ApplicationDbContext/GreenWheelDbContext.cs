@@ -68,9 +68,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
     public virtual DbSet<VehicleSegment> VehicleSegments { get; set; }
     public DbSet<T> Set<T>() where T : class, IEntity => base.Set<T>();
-    public async Task<int> SaveChangesAsync()
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return await base.SaveChangesAsync();
+        return await base.SaveChangesAsync(cancellationToken);
     }
     private static string ToSnakeCase(string name)
     {
