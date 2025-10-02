@@ -16,9 +16,10 @@ type TableStyledProps = {
 }
 
 export default function TableStyled({ data, loading }: TableStyledProps) {
+    const { t } = useTranslation()
+
     if (loading) return <div className="text-center">Loading order...</div>
     if (!data || data.length === 0) return <div className="text-center">No order</div>
-    const { t } = useTranslation()
     return (
         <Table aria-label="Example static collection table" className="w-full">
             <TableHeader>

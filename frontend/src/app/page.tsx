@@ -12,7 +12,7 @@ export default function HomePage() {
 
     useEffect(() => {
         setActiveMenuKey("home")
-    }, [])
+    }, [setActiveMenuKey])
 
     return (
         <div>

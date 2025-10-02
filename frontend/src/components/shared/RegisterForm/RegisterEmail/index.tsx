@@ -11,13 +11,13 @@ import {
     useRegisterDiscloresureSingleton
 } from "@/hooks"
 
-interface RegisterEmail {
+interface RegisterEmailProps {
     email: string
     setEmail: (email: string) => void
     onSuccess?: () => void
 }
 
-export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmail) {
+export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmailProps) {
     const { t } = useTranslation()
     const registerMutation = useRegister({ onSuccess })
     const { onClose: onCloseRegister } = useRegisterDiscloresureSingleton()
@@ -33,7 +33,7 @@ export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmail) {
             await registerMutation.mutateAsync({ ...values })
             setEmail(values.email)
         },
-        [registerMutation]
+        [registerMutation, setEmail]
     )
 
     const formik = useFormik({

@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import React, { useEffect, useState, useRef, useMemo } from "react"
 
 type CarouselProps = {
@@ -139,7 +140,7 @@ export const Carousel: React.FC<CarouselProps> = ({ slides }) => {
                                     style={{ flex: `0 0 ${100 / slidesPerView}%` }}
                                 >
                                     <div className="bg-gray-200 rounded-xl shadow-lg w-full h-full flex items-center justify-center">
-                                        <img
+                                        <Image
                                             src={src}
                                             alt=""
                                             className="w-full h-full object-cover rounded-xl"

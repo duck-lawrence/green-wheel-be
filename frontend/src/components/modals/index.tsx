@@ -3,9 +3,9 @@ import { RegisterModal } from "./RegisterModal"
 
 export const Modals = () => {
     return (
-        <>
+        <div>
             <LoginModal />
             <RegisterModal />
-        </>
+        </div>
     )
 }

@@ -7,7 +7,7 @@ export default function Contact() {
 
     useEffect(() => {
         setActiveMenuKey("contact")
-    }, [])
+    }, [setActiveMenuKey])
 
     return <div>page</div>
 }
