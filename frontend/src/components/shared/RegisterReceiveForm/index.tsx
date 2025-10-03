@@ -7,7 +7,8 @@ import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
-import { ButtonStyled, InputStyled, LogoStyle } from "@/components"
+import { ButtonStyled, InputStyled,SelectStyled } from "@/components"
+
 
 type FormValues = {
   fullName: string
@@ -155,7 +156,7 @@ export const RegisterReceiveForm = () => {
                   />
 
                   {/* Pickup location (input) */}
-                  <div>
+                  {/* <div>
                                    <label htmlFor="pickupLocation" className="block text-sm font-medium mb-1">
                                      {t("car_rental.pickup_location")}
                                      <span className="text-red-500">*</span>
@@ -186,8 +187,29 @@ export const RegisterReceiveForm = () => {
                                        {formik.errors.pickupLocation}
                                      </div>
                                    )}
-                                 </div>
-
+                                 </div> */}
+                                 <SelectStyled
+                                    label={
+                                      <>
+                                        {t("car_rental.pickup_location")}
+                                        <span className="text-danger-500 ml-1">*</span>
+                                      </>
+                                    }
+                                    isRequired
+                                    placeholder={t("car_rental.select_pickup_location")}
+                                    options={[
+                                      { value: "place1", label: t("car_rental.place1") },
+                                      { value: "place2", label: t("car_rental.place2") },
+                                    ]}
+                                    value={formik.values.pickupLocation}
+                                    onSimpleChange={(v) => formik.setFieldValue("pickupLocation", v)}
+                                    onBlur={() => formik.setFieldTouched("pickupLocation", true)}
+                                    errorMessage={
+                                      formik.touched.pickupLocation && formik.errors.pickupLocation
+                                        ? formik.errors.pickupLocation
+                                        : undefined
+                                    }
+                                  />
                   {/* Note (input) */}
                   <InputStyled
                     variant="bordered"
