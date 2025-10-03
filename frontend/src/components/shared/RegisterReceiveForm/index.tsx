@@ -6,7 +6,7 @@ import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
-import { ButtonStyled, InputStyled, LocalFilter , EnumPicker,ImageStyled } from "@/components"
+import { ButtonStyled, InputStyled, LocalFilter , EnumPicker,ImageStyled, TextareaStyled } from "@/components"
 import { PaymentMethod } from "@/constants/enum"
 import { PaymentMethodLabels } from "@/constants/labels"
 
@@ -15,10 +15,8 @@ type FormValues = {
   phone: string
   email: string
   pickupLocation: string
-  referralCode: string
   note: string
   paymentMethod: PaymentMethod | null 
-  promotionCode: string
   agreeTerms: boolean
   agreeDataPolicy: boolean
 }
@@ -45,10 +43,8 @@ export const RegisterReceiveForm = () => {
     phone: isLoggedIn && user && user.phone ? user.phone : "",
     email: isLoggedIn && user ? user.email : "",
     pickupLocation: "",
-    referralCode: "",
     note: "",
     paymentMethod: null,
-    promotionCode: "",
     agreeTerms: false,
     agreeDataPolicy: false,
   }
@@ -161,72 +157,19 @@ export const RegisterReceiveForm = () => {
                   {formik.touched.pickupLocation && formik.errors.pickupLocation && (
                     <p className="text-red-500 text-sm mt-1">{formik.errors.pickupLocation}</p>
                   )}
-                  {/* <LocalFilter
-                    label={
-                      <>
-                        {t("car_rental.pickup_location")}
-                        <span className="text-danger-500 ml-1">*</span>
-                      </>
-                    }
-                    isRequired
-                    placeholder={t("car_rental.select_pickup_location")}
-                    options={[
-                      { value: "place1", label: t("car_rental.place1") },
-                      { value: "place2", label: t("car_rental.place2") },
-                    ]}
-                    value={ // tìm object trong options có value trùng với formik.values.pickupLocation nhưng mà đang là string
-                      [
-                        { value: "place1", label: t("car_rental.place1") },
-                        { value: "place2", label: t("car_rental.place2") },
-                      ].find(o => o.value === formik.values.pickupLocation) ?? null
-                    }
-                    onValueChange={(opt: { value: string; label: string } | null) =>
-                      formik.setFieldValue("pickupLocation", opt?.value ?? "")
-                    }
-                    onBlur={() => formik.setFieldTouched("pickupLocation", true)}
-                    isInvalid={Boolean(formik.touched.pickupLocation && formik.errors.pickupLocation)}
-                    errorMessage={
-                      formik.touched.pickupLocation && formik.errors.pickupLocation
-                        ? formik.errors.pickupLocation
-                        : undefined
-                    }
-                /> */}
+                  
                   {/* Note (input) */}
-                  <InputStyled
-                    variant="bordered"
+                  <TextareaStyled
+                    
                     label={t("car_rental.note")}
                     placeholder=""
                     value={formik.values.note}
                     onValueChange={(v) => formik.setFieldValue("note", v)}
+                    onBlur={() => formik.setFieldTouched("note", true)}
                     isInvalid={!!(formik.touched.note && formik.errors.note)}
                     errorMessage={formik.touched.note ? formik.errors.note : undefined}
-                    onBlur={() => formik.setFieldTouched("note", true)}
-                    onClear={() => formik.setFieldValue("note", "")}
+                    minRows={4}
                   />
-
-                  {/* Payment method (input) */}
-                  {/* <div className="mt-6">
-                <h3 className="font-medium mb-3">{t("car_rental.payment_method")}</h3>
-                <select
-                  id="paymentMethod"
-                  name="paymentMethod"
-                  value={formik.values.paymentMethod}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={`w-full border rounded-md p-2 appearance-none ${
-                    formik.errors.paymentMethod && formik.touched.paymentMethod
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <option value="">{t("car_rental.select_payment_method")}</option>
-                  <option value="banking">{t("car_rental.bank_transfer")}</option>
-                  <option value="momo">{t("car_rental.momo_wallet")}</option>
-                </select>
-                {formik.touched.paymentMethod && formik.errors.paymentMethod && (
-                  <div className="text-red-500 text-sm mt-1">{formik.errors.paymentMethod}</div>
-                )}
-              </div>    */}     
                 
                <EnumPicker<PaymentMethod>
                   value={formik.values.paymentMethod}
