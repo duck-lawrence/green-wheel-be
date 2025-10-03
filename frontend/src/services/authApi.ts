@@ -13,14 +13,19 @@ export const authApi = {
             const res = await axiosInstance.post("/users/login", { email, password })
             return res.data
         }),
+    logout: () =>
+        requestWrapper<void>(async () => {
+            await axiosInstance.post("/users/logout")
+        }),
     loginGoogle: (credential: string) =>
         requestWrapper<LoginGoogleRes>(async () => {
             const res = await axiosInstance.post("/users/login-google", { credential })
             return res.data
         }),
-    logout: () =>
-        requestWrapper<void>(async () => {
-            await axiosInstance.post("/users/logout")
+    setPassword: (req: UserSetPasswordReq) =>
+        requestWrapper<TokenRes>(async () => {
+            const res = await axiosInstance.post("/users/login-google/set-password", req)
+            return res.data
         }),
 
     // Register
@@ -39,11 +44,6 @@ export const authApi = {
         }),
 
     // Password
-    setPassword: (req: UserSetPasswordReq) =>
-        requestWrapper<TokenRes>(async () => {
-            const res = await axiosInstance.post("/users/login-google/set-password", req)
-            return res.data
-        }),
     changePassword: (req: UserChangePasswordReq) =>
         requestWrapper<void>(async () => {
             await axiosInstance.post("/users/change-password", req)

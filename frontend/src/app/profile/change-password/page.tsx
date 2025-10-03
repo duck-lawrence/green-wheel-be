@@ -1,13 +1,27 @@
 "use client"
 import { ButtonStyled, InputStyled } from "@/components"
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import * as Yup from "yup"
 import { useFormik } from "formik"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
+import { useChangePassword } from "@/hooks"
+import { UserChangePasswordReq } from "@/models/auth/schema/request"
 
 export default function ChangePasswordPage() {
     const { t } = useTranslation()
+
+    const chagnePasswordMutation = useChangePassword({
+        onSuccess: () => window.location.replace("/")
+    })
+
+    const handleChangePassword = useCallback(
+        async (values: UserChangePasswordReq) => {
+            await chagnePasswordMutation.mutateAsync(values)
+        },
+        [chagnePasswordMutation]
+    )
+
     const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
     const [isNewVisible, setIsNewVisible] = useState(false)
@@ -17,40 +31,37 @@ export default function ChangePasswordPage() {
 
     const formik = useFormik({
         initialValues: {
-            currentPassword: "",
-            newPassword: "",
+            oldPassword: "",
+            password: "",
             confirmPassword: ""
         },
         validationSchema: Yup.object({
             currentPassword: Yup.string()
-                .required(t("user.password_can_not_empty"))
-                .min(6, t("user.password_too_short"))
+                .required(t("user.old_password_is_required"))
+                .min(8, t("user.password_too_short"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
                     t("user.password_strength")
                 ),
-            newPassword: Yup.string()
+            password: Yup.string()
                 .required(t("user.new_password_can_not_empty"))
-                .min(6, t("user.password_too_short"))
+                .min(8, t("user.password_too_short"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
                     t("user.password_strength")
                 ),
             confirmPassword: Yup.string()
-                .oneOf([Yup.ref("newPassword")], t("user.confirm_password"))
+                .oneOf([Yup.ref("password")], t("user.confirm_password_equal"))
                 .required(t("user.password_can_not_empty"))
         }),
-        onSubmit: async (values) => {
-            await new Promise((resolve) => setTimeout(resolve, 4000))
-            alert(JSON.stringify(values))
-        }
+        onSubmit: handleChangePassword
     })
 
     return (
         <form onSubmit={formik.handleSubmit} className="p-4">
             {/* Title */}
             <div className="text-3xl mb-4 p-4 font-bold">
-                <p>{t("user.change_password")}</p>
+                <p>{t("auth.change_password")}</p>
             </div>
 
             {/* Form */}
@@ -59,14 +70,14 @@ export default function ChangePasswordPage() {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="Current password"
+                    label={t("auth.old_password")}
                     type={isVisible ? "text" : "password"}
-                    value={formik.values.currentPassword}
-                    onValueChange={(value) => formik.setFieldValue("currentPassword", value)}
-                    isInvalid={!!(formik.touched.currentPassword && formik.errors.currentPassword)}
-                    errorMessage={formik.errors.currentPassword}
+                    value={formik.values.oldPassword}
+                    onValueChange={(value) => formik.setFieldValue("oldPassword", value)}
+                    isInvalid={!!(formik.touched.oldPassword && formik.errors.oldPassword)}
+                    errorMessage={formik.errors.oldPassword}
                     onBlur={() => {
-                        formik.setFieldTouched("currentPassword")
+                        formik.setFieldTouched("oldPassword")
                     }}
                     endContent={
                         <button
@@ -94,14 +105,14 @@ export default function ChangePasswordPage() {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="New password"
+                    label={t("auth.new_password")}
                     type={isNewVisible ? "text" : "password"}
-                    value={formik.values.newPassword}
-                    onValueChange={(value) => formik.setFieldValue("newPassword", value)}
-                    isInvalid={!!(formik.touched.newPassword && formik.errors.newPassword)}
-                    errorMessage={formik.errors.newPassword}
+                    value={formik.values.password}
+                    onValueChange={(value) => formik.setFieldValue("password", value)}
+                    isInvalid={!!(formik.touched.password && formik.errors.password)}
+                    errorMessage={formik.errors.password}
                     onBlur={() => {
-                        formik.setFieldTouched("newPassword")
+                        formik.setFieldTouched("password")
                     }}
                     endContent={
                         <button
@@ -129,7 +140,7 @@ export default function ChangePasswordPage() {
                 <InputStyled
                     className="my-3"
                     variant="bordered"
-                    label="Confirm new password"
+                    label={t("auth.confirm_new_password")}
                     type={isConfirmVisible ? "text" : "password"}
                     value={formik.values.confirmPassword}
                     onValueChange={(value) => formik.setFieldValue("confirmPassword", value)}
@@ -167,9 +178,9 @@ export default function ChangePasswordPage() {
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid || !formik.dirty}
-                    className="flex w-30 mt-4 mb-4 mr-2"
+                    className="flex min-w-30 mt-4 mb-4 mr-2"
                 >
-                    {t("login.submit")}
+                    {t("auth.change_password")}
                 </ButtonStyled>
             </div>
         </form>

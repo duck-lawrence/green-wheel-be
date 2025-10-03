@@ -44,7 +44,7 @@ export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
                     t("user.password_strength")
                 ),
             confirmPassword: Yup.string()
-                .oneOf([Yup.ref("password")], t("user.confirm_password"))
+                .oneOf([Yup.ref("password")], t("user.confirm_password_equal"))
                 .required(t("user.password_can_not_empty"))
         }),
         onSubmit: handleResetPassword
