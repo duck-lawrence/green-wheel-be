@@ -8,9 +8,10 @@ import { locals } from "@/data/local"
 type LocalFilterProps = {
     value: string | null
     onChange: (value: string | null) => void
+    className?: string
 }
 // cần truyền fetch data vào đang hard code
-export function LocalFilter({ value, onChange }: LocalFilterProps) {
+export function LocalFilter({ value, onChange, className }: LocalFilterProps) {
     return (
         <Autocomplete
             // defaultItems={locals}
@@ -19,7 +20,8 @@ export function LocalFilter({ value, onChange }: LocalFilterProps) {
             placeholder="Search"
             startContent={<MapPinAreaIcon className="text-xl" />}
             variant="bordered"
-            className="max-w-55 h-14 mr-0"
+            // className="max-w-55 h-14 mr-0"
+            className={className}
             selectedKey={value ?? undefined}
             onSelectionChange={(key) => {
                 onChange(key as string)
