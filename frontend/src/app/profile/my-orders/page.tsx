@@ -8,9 +8,9 @@ import { useTranslation } from "react-i18next"
 
 export default function Page() {
     const { t } = useTranslation()
-    const [order, setOrder] = useState(orders) // thôn tin đơn hàng
-    const [loading, setLoading] = useState(false)
-    const [filters, setFilter] = useState()
+    const [order] = useState(orders) // thôn tin đơn hàng
+    const [loading] = useState(false)
+    const [filters, setFilter] = useState({})
 
     useEffect(() => {
         if (filters) {
@@ -25,7 +25,7 @@ export default function Page() {
             </div>
 
             <div className="p-4">
-                <FillterBarOrder onFilterChange={(filters) => setFilter(filters)} />
+                <FillterBarOrder onFilterChange={() => setFilter(filters)} />
             </div>
 
             <div className="p-4">

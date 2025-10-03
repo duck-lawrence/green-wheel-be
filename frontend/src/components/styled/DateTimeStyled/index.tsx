@@ -1,4 +1,5 @@
 "use client"
+
 import { cn, DatePicker, DatePickerProps } from "@heroui/react"
 import { CalendarDateTime } from "@internationalized/date"
 import React from "react"
@@ -19,7 +20,7 @@ export default function DateTimeStyled({ value, onChange, ...props }: DateTimeSt
                 value={value}
                 onChange={(calendarDateTime) => {
                     if (calendarDateTime && onChange) {
-                        onChange(calendarDateTime) //  giữ CalendarDateTime trong state
+                        onChange(calendarDateTime as CalendarDateTime) //  giữ CalendarDateTime trong state
                     }
                 }}
                 {...props}

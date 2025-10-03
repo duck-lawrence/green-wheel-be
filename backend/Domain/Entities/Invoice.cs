@@ -28,8 +28,6 @@ public partial class Invoice : SorfDeletedEntity, IEntity
 
     public DateTimeOffset? ExpiresAt { get; set; }
 
-    
-
     public Guid ContractId { get; set; }
 
     public Guid? ChecklistId { get; set; }

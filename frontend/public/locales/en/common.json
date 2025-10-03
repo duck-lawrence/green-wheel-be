@@ -1,20 +1,61 @@
 {
-    "post": {
-        "go_to_list_page": "Go to Post list",
-        "list": "Post list",
-        "failed_to_load_posts": "Failed to load posts",
-        "no_posts_available": "No posts available",
-        "not_found": "Post not found",
-        "create": "Create",
-        "refresh": "Refresh",
-        "view_detail": "View detail",
-        "update": "Update",
-        "delete": "Delete",
-        "title": "Title",
-        "title_is_required": "Title is required",
-        "body": "Body",
-        "body_is_required": "Body is required"
+  "success": {
+    "create": "Created",
+    "update": "Updated",
+    "delete": "Deleted",
+    "refresh": "Refreshed",
+    "login": "Login successful",
+    "logout": "Logout successful",
+    "register": "Register successful"
+  },
+  "failed": {
+    "create": "Failed to create",
+    "update": "Failed to update",
+    "delete": "Failed to delete",
+    "refresh": "Failed to refresh",
+    "login": "Login failed",
+    "logout": "Logout failed"
+  },
+  "common": {
+    "too_many_request": "Too many request. Try again later",
+    "unexpected_error": "An unexpected error occurred. Please try again later."
+  },
+    "success": {
+        "create": "Created",
+        "update": "Updated",
+        "delete": "Deleted",
+        "refresh": "Refreshed",
+        "login": "Login successful",
+        "logout": "Logout successful",
+        "register": "Register successful",
+        "reset_password": "Reset password successful"
     },
+    "failed": {
+        "create": "Failed to create",
+        "update": "Failed to update",
+        "delete": "Failed to delete",
+        "refresh": "Failed to refresh",
+        "login": "Login failed",
+        "logout": "Logout failed"
+    },
+    "common": {
+        "too_many_request": "Too many request. Try again later",
+        "unexpected_error": "An unexpected error occurred. Please try again later."
+    },
+    "auth": {
+        "otp": "OTP",
+        "security_verification": "Security Verification",
+        "verify_identity": "Please enter the email verification code to verify your identity",
+        "complete_register": "Please enter the information below to complete your account registration",
+        "already_have_account": "Already have an account?",
+        "send_otp": "Send OTP",
+        "new_password": "New password",
+        "confirm_new_password": "Confirm new password",
+        "reset_password": "Reset password",
+        "please_reset_password": "Please set your new password"
+    },
+    "vehicle": {},
+    "vehicle_model": {},
     "user": {
         "profile": "Profile",
         "booking_history": "Booking history",
@@ -26,17 +67,19 @@
         "email_already_exists": "This email already exists",
         "email_is_required": "Email is required",
         "invalid_email": "Email is invalid",
-        "password_too_short": "Password must be at least 6 characters",
+        "password_too_short": "Password must be at least 8 characters",
         "password_can_not_empty": "Password is required",
         "new_password_can_not_empty": "New password is required",
-        "password_min": "Current password must be at least 6 characters",
+        "password_min": "Current password must be at least 8 characters",
         "confirm_password": "Confirm password must be the same as the new password",
         "password_strength": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
         "invalid_user_age": "Age must be at least 21",
-        "invalid_phone": "Invalid phone",
+        "invalid_phone": "Phone must be 10 digits and start with 0",
         "phone_is_required": "Phone is required",
         "first_name_is_required": "First name is required",
+        "invalid_first_name": "First name only contains letters",
         "last_name_is_required": "Last name is required",
+        "invalid_last_name": "Last name only contains letters",
         "date_of_birht_is_required": "Date of birth is required",
         "old_password_is_incorrect": "Old password is incorrect",
         "ole_password_is_required": "Old password is required",
@@ -51,43 +94,22 @@
         "account_name": "Account Name",
         "full_name": "Full Name",
         "sex": "Sex",
+        "sex_is_required": "Sex is required",
         "choose_sex": "Choose Sex",
         "date_of_birth": "Date of Birth",
         "phone": "Phone"
-    },
-    "success": {
-        "create": "Created",
-        "update": "Updated",
-        "delete": "Deleted",
-        "refresh": "Refreshed",
-        "login": "Login successful",
-        "logout": "Logout successful"
-    },
-    "failed": {
-        "create": "Failed to create",
-        "update": "Failed to update",
-        "delete": "Failed to delete",
-        "refresh": "Failed to refresh",
-        "login": "Login failed",
-        "logout": "Logout failed"
-    },
-    "common": {
-        "too_many_request": "Too many request",
-        "unexpected_error": "An unexpected error occurred. Please try again later."
     },
     "email": {
         "require": "Email is required",
         "invalid": "Invalid email format",
         "label": "Email"
     },
-
     "password": {
         "require": "Password is required",
         "min": "Password must be at least 8 characters",
         "label": "Password",
         "change": "Change Password?"
     },
-
     "login": {
         "welcome": "Welcome Back",
         "login_continue": "Login to your account to continue",
@@ -101,17 +123,15 @@
         "register": "Register",
         "submit": "Submit"
     },
-
     "home": {
         "welcome": "Welcome to Green Wheel",
         "slogan": "Green Rides. Brighter Future.",
         "description": "Professional self-drive car rental service to meet all your personal travel needs",
         "view_details": "View details"
     },
-
     "navbar": {
         "home": "Home",
-        "self_drive": "Self-drive",
+        "vehicle_rental": "Vehicle Rental",
         "about_us": "About",
         "contact": "Contact",
         "login": "Login",
@@ -127,86 +147,225 @@
         "status": "Status"
     },
 
-    "vehical": {
-        "pick_station": "Please select a pick-up location",
-        "pick_time_car": "Please select date and time to pick up the car",
-        "search_car": "Search car"
-    },
+  "fullName": { "required": "Please enter your full name" },
+  "phone": {
+    "required": "Please enter your phone number",
+    "invalid": "Phone number is not valid"
+  },
+  "email": {
+    "required": "Please enter your email",
+    "invalid": "Email format is invalid"
+  },
+  "paymentMethod": { "required": "Please select a payment method" },
+  "pickupLocation": { "required": "Please select pickup location" },
+  "agreeTerms": { "required": "You must agree to the payment terms" },
+  "agreeDataPolicy": { "required": "You must agree to the data sharing terms" },
 
-    "validate": {
-        "date_received": "Vehicle pick-up date is invalid",
-        "date_return": "Please select return date and time",
-        "valid_date": "The return date must be after the pick-up date",
-        "time_return": "Car return date must be between 7am-5pm"
-    },
+  "auth": {
+    "security_verification": "Security Verification",
+    "verify_identity": "Please enter the email verification code to verify your identity",
+    "complete_register": "Please enter the information below to complete your account registration",
+    "already_have_account": "Already have an account?",
+    "send_otp": "Send OTP"
+  },
 
-    "enum": {
-        "male": "Male",
-        "female": "Female",
+  "vehicle": {},
+  "vehicle_model": {},
 
-        "pending": "Pending",
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "received": "Received",
+  "user": {
+    "profile": "Profile",
+    "booking_history": "Booking history",
+    "invalid_otp": "Invalid OTP",
+    "otp_can_not_empty": "OTP is required",
+    "otp_must_have_6_digits": "OTP must have 6 digits",
+    "rate_limit_otp": "Resend OTP after 1 minute",
+    "attemp_otp": "Too many attemps, please resend to get new OTP",
+    "email_already_exists": "This email already exists",
+    "email_is_required": "Email is required",
+    "invalid_email": "Email is invalid",
+    "password_too_short": "Password must be at least 6 characters",
+    "password_can_not_empty": "Password is required",
+    "new_password_can_not_empty": "New password is required",
+    "password_min": "Current password must be at least 6 characters",
+    "confirm_password": "Confirm password must be the same as the new password",
+    "password_strength": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
+    "invalid_user_age": "Age must be at least 21",
+    "invalid_phone": "Invalid phone",
+    "phone_is_required": "Phone is required",
+    "first_name_is_required": "First name is required",
+    "last_name_is_required": "Last name is required",
+    "date_of_birht_is_required": "Date of birth is required",
+    "old_password_is_incorrect": "Old password is incorrect",
+    "ole_password_is_required": "Old password is required",
+    "invalid_email_or_password": "Invalid email or password",
+    "unauthorized": "Unauthorized",
+    "invalid_token": "Invalid Token",
+    "user_not_found": "User not found",
+    "my_profile": "My Profile",
+    "change_password": "Change Password",
+    "edit_information": "Edit Information",
+    "save_changes": "Save Changes",
+    "account_name": "Account Name",
+    "full_name": "Full Name",
+    "sex": "Sex",
+    "choose_sex": "Choose Sex",
+    "date_of_birth": "Date of Birth",
+    "phone": "Phone"
+  },
 
-        "paid": "Paid",
-        "refunded": "Refunded",
-        "forfeited": "Forfeited",
+  "password": {
+    "require": "Password is required",
+    "min": "Password must be at least 8 characters",
+    "label": "Password",
+    "change": "Change Password?"
+  },
 
-        "cancelled": "Cancelled",
-        "request_pending": "Request Pending",
-        "confirm_change_station_pending": "Confirm Change Station Pending",
-        "payment_pending": "Payment Pending",
-        "active": "Active",
-        "completed": "Completed",
+  "login": {
+    "welcome": "Welcome Back",
+    "login_continue": "Login to your account to continue",
+    "please_login": "Please login",
+    "remember": "Remember Me",
+    "forgot": "Forgot Password?",
+    "login": "Login",
+    "continue_with_google": "Continue with Google",
+    "or": "OR",
+    "need_to_create_an_account": "Need to create an account?",
+    "register": "Register",
+    "submit": "Submit"
+  },
 
-        "good": "Good",
-        "minor": "Minor",
-        "moderate": "Moderate",
-        "severe": "Severe",
-        "totaled": "Totaled",
+  "home": {
+    "welcome": "Welcome to Green Wheel",
+    "slogan": "Green Rides. Brighter Future.",
+    "description": "Professional self-drive car rental service to meet all your personal travel needs",
+    "view_details": "View details"
+  },
 
-        "available": "Available",
-        "unavailable": "Unavailable",
-        "rented": "Rented",
-        "maintenance": "Maintenance",
+  "navbar": {
+    "home": "Home",
+    "vehicle_rental": "Vehicle Rental",
+    "about_us": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
 
-        "base_rental": "Base Rental",
-        "damage": "Damage",
-        "late_return": "Late Return",
-        "cleaning": "Cleaning",
-        "penalty": "Penalty",
-        "other": "Other",
+  "table": {
+    "order": "Order",
+    "vehicle_model": "Vehicle Model",
+    "pickup_time": "Pickup Time",
+    "return_time": "Return Time",
+    "pickup_address": "Pickup Address",
+    "status": "Status"
+  },
 
-        "cash": "Cash",
-        "momo_wallet": "Momo Wallet",
+  "vehical": {
+    "pick_station": "Please select a pick-up location",
+    "pick_time_car": "Please select date and time to pick up the car",
+    "search_car": "Search car"
+  },
 
-        "in_progress": "In Progress",
-        "resolved": "Resolved",
-        "technical": "Technical",
-        "payment": "Payment",
-        "internal": "Internal",
-        "related_to_support": "Related to Support",
+  "validate": {
+    "date_received": "Vehicle pick-up date is invalid",
+    "date_return": "Please select return date and time",
+    "valid_date": "The return date must be after the pick-up date",
+    "time_return": "Car return date must be between 7am-5pm"
+  },
 
-        "b1": "B1",
-        "b": "B",
-        "c1": "C1",
-        "c": "C",
-        "d1": "D1",
-        "d2": "D2",
-        "d": "D",
-        "be": "BE",
-        "c1e": "C1E",
-        "ce": "CE",
-        "d1e": "D1E",
-        "d2e": "D2E",
-        "de": "DE",
+  "enum": {
+    "male": "Male",
+    "female": "Female",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "received": "Received",
+    "paid": "Paid",
+    "refunded": "Refunded",
+    "forfeited": "Forfeited",
+    "cancelled": "Cancelled",
+    "request_pending": "Request Pending",
+    "confirm_change_station_pending": "Confirm Change Station Pending",
+    "payment_pending": "Payment Pending",
+    "active": "Active",
+    "completed": "Completed",
+    "good": "Good",
+    "minor": "Minor",
+    "moderate": "Moderate",
+    "severe": "Severe",
+    "totaled": "Totaled",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "rented": "Rented",
+    "maintenance": "Maintenance",
+    "base_rental": "Base Rental",
+    "damage": "Damage",
+    "late_return": "Late Return",
+    "cleaning": "Cleaning",
+    "penalty": "Penalty",
+    "other": "Other",
+    "cash": "Cash",
+    "momo_wallet": "Momo Wallet",
+    "in_progress": "In Progress",
+    "resolved": "Resolved",
+    "technical": "Technical",
+    "payment": "Payment",
+    "internal": "Internal",
+    "related_to_support": "Related to Support",
+    "b1": "B1",
+    "b": "B",
+    "c1": "C1",
+    "c": "C",
+    "d1": "D1",
+    "d2": "D2",
+    "d": "D",
+    "be": "BE",
+    "c1e": "C1E",
+    "ce": "CE",
+    "d1e": "D1E",
+    "d2e": "D2E",
+    "de": "DE",
+    "all": "All",
+    "awaiting_deposit": "Awaiting Deposit",
+    "confirmed": "Confirmed",
+    "in_use": "In Use",
+    "returned": "Returned",
+    "overdue": "Overdue"
+  },
 
-        "all": "All",
-        "awaiting_deposit": "Awaiting Deposit",
-        "confirmed": "Confirmed",
-        "in_use": "In Use",
-        "returned": "Returned",
-        "overdue": "Overdue"
-    }
+  "car_rental": {
+    "vehicle": "Vehicle",
+    "register_title": "CAR RENTAL REGISTRATION",
+    "renter_name": "Renter Name",
+    "renter_name_placeholder": "Nguyen Van A",
+    "phone": "Phone Number",
+    "phone_placeholder": "09xxxxx",
+    "phone_min_length": "Phone number must have at least 9 characters",
+    "phone_verification": "Please verify your phone number to use Green Wheel services",
+    "email": "Email",
+    "email_placeholder": "wheel@fpt.edu.vn",
+    "pickup_location": "Pickup Location",
+    "select_pickup_location": "Please select a pickup location",
+    "note": "Note",
+    "payment_method": "Payment Method",
+    "select_payment_method": "Select payment method",
+    "bank_transfer": "Bank Transfer",
+    "momo_wallet": "MoMo Wallet",
+    "agree_terms": "I have read and agree to the",
+    "payment_terms": "Payment Terms",
+    "data_sharing_terms": "Personal Data Sharing Terms",
+    "of_green_wheel": "of Green Wheel",
+    "agree_data_policy": "I agree to share my personal information according to the",
+    "detailed_statement": "Detailed Statement",
+    "listed_fee": "Listed Fee",
+    "total_amount": "Total Amount",
+    "deposit": "Deposit",
+    "payment": "Payment",
+    "price_includes_vat": "*Car rental price includes VAT.",
+    "pay": "Pay",
+    "place1": "Place 1",
+    "place2": "Place 2",
+    "detail_table": "Detail table",
+    "total" : "Total"
+  }
 }

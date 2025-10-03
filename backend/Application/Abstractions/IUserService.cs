@@ -39,5 +39,6 @@ namespace Application.Abstractions
 
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
         Task DeleteAvatarAsync(Guid pulicId);
+        Task CheckDupEmail(string email);
     }
 }

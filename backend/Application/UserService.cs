@@ -249,6 +249,10 @@ namespace Application
          */
         public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
         {
+            if(await _userRepository.GetByPhoneAsync(userRegisterReq.Phone) != null)
+            {
+                throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+            }
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(token))
             {
@@ -258,10 +262,8 @@ namespace Application
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
             var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret, 
                 TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
-            //----save to black list
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-            await _jwtBackListRepository.SaveTokenAsyns(token, expSeconds);
-            //------------------------
+
+            
             var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
 
@@ -285,6 +287,10 @@ namespace Application
             Guid userId = await _userRepository.AddAsync(user);
             string accesstoken = GenerateAccessToken(userId);
             string refreshToken = await GenerateRefreshToken(userId, null);
+
+            //----save to black list
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            await _jwtBackListRepository.SaveTokenAsyns(token, expSeconds);
 
             return accesstoken;
         }
@@ -341,9 +347,6 @@ namespace Application
             var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenSecret,
                                                 TokenType.ForgotPasswordToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
 
-            //---- save to black list
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-            await _jwtBackListRepository.SaveTokenAsyns(forgotPasswordToken, expSeconds);
             //------------------------
             string email = claims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
@@ -354,7 +357,9 @@ namespace Application
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userFromDB.Id.ToString());
             userFromDB.Password = PasswordHelper.HashPassword(password);
             await _userRepository.UpdateAsync(userFromDB);
-
+            //---- save to black list
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            await _jwtBackListRepository.SaveTokenAsyns(forgotPasswordToken, expSeconds);
         }
 
 
@@ -450,9 +455,6 @@ namespace Application
             //------------------------
             var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
                 _jwtSettings.Issuer, _jwtSettings.Audience);
-            //----save to black list
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-            await _jwtBackListRepository.SaveTokenAsyns(setPasswordToken, expSeconds);
             //------------------------
             string email = claims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString();
             Guid id;
@@ -476,6 +478,11 @@ namespace Application
             };
             await _userRepository.AddAsync(user);
             await GenerateRefreshToken(id, null);
+
+            //----save to black list
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            await _jwtBackListRepository.SaveTokenAsyns(setPasswordToken, expSeconds);
+            
             return GenerateAccessToken(id);
         }
         public async Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims)
@@ -491,6 +498,13 @@ namespace Application
 
         public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
+            if (userUpdateReq.Phone != null)
+            {
+                if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
+                {
+                    throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+                }
+            }
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             User userFromDb = await _userRepository.GetByIdAsync(userID);
             if (userFromDb == null)
@@ -551,6 +565,14 @@ namespace Application
             user.AvatarUrl = null;
             user.AvatarPublicId = null;
             await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task CheckDupEmail(string email)
+        {
+            if(await _userRepository.GetByEmailAsync(email) != null)
+            {
+                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists);
+            }
         }
     }
 }

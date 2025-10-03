@@ -8,7 +8,7 @@ export const requestWrapper = async <T>(fn: () => Promise<T>): Promise<T> => {
         if (axios.isAxiosError(error)) {
             const data = error.response?.data
             const backendError: BackendError = {
-                title: data?.title ?? "Error",
+                title: data?.title ?? "Internal Server Error",
                 status: data?.status ?? error.response?.status,
                 detail: data?.detail ?? error.message
             }

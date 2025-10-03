@@ -15,5 +15,6 @@ namespace Application.Abstractions
         Task<IEnumerable<VehicleModelViewRes>> GetAllVehicleModels(VehicleFilterReq vehicleFilterReq);
         Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq updateVehicleModelReq);
         Task<bool> DeleteVehicleModleAsync(Guid id);
+        Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate, DateTimeOffset endDate);
     }
 }

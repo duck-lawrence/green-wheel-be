@@ -1,3 +1,4 @@
-export * from "./useCreatePostDisclosure"
 export * from "./useLoginDiscloresure"
-export * from "./useRegisDiscloresure"
+export * from "./useRegisterDiscloresure"
+export * from "./useChangePasswordDiscloresure"
+export * from "./useForgotPasswordDiscloresure"

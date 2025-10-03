@@ -6,7 +6,7 @@ import { useFormik } from "formik"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 
-export default function page() {
+export default function ChangePasswordPage() {
     const { t } = useTranslation()
     const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)

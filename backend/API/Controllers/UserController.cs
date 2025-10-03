@@ -71,6 +71,7 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
         {
+            await _userService.CheckDupEmail(email.Email);
             await _userService.SendOTP(email.Email);
             return Ok();
         }
