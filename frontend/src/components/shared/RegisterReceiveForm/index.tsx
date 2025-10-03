@@ -3,23 +3,20 @@
 import React, { useState, useEffect } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
-import { ButtonStyled, InputStyled,SelectStyled } from "@/components"
-
+import { ButtonStyled, InputStyled, LocalFilter , EnumPicker,ImageStyled, TextareaStyled } from "@/components"
+import { PaymentMethod } from "@/constants/enum"
+import { PaymentMethodLabels } from "@/constants/labels"
 
 type FormValues = {
   fullName: string
   phone: string
   email: string
-  isVingroup: boolean
   pickupLocation: string
-  referralCode: string
   note: string
-  paymentMethod: string
-  promotionCode: string
+  paymentMethod: PaymentMethod | null 
   agreeTerms: boolean
   agreeDataPolicy: boolean
 }
@@ -35,7 +32,7 @@ export const RegisterReceiveForm = () => {
   useEffect(() => {
     setMounted(true)
   }, [])
-
+// Chỉnh lấy api 
   const listedFee = 590000
   const deposit = 5000000
   const totalPayment = listedFee + deposit
@@ -45,12 +42,9 @@ export const RegisterReceiveForm = () => {
     fullName: isLoggedIn && user ? `${user.firstName} ${user.lastName}` : "",
     phone: isLoggedIn && user && user.phone ? user.phone : "",
     email: isLoggedIn && user ? user.email : "",
-    isVingroup: false,
     pickupLocation: "",
-    referralCode: "",
     note: "",
-    paymentMethod: "",
-    promotionCode: "",
+    paymentMethod: null,
     agreeTerms: false,
     agreeDataPolicy: false,
   }
@@ -83,17 +77,14 @@ export const RegisterReceiveForm = () => {
   const renterFilled = !!formik.values.fullName?.trim()
   const emailFilled  = !!formik.values.email?.trim()
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 mt-30">
       {mounted ? (
-        <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center p-6">
+        <div className="mx-auto max-w-5xl bg-white rounded-lg ">
+          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-6">
             <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
-            <button type="button" className="text-gray-500 hover:text-gray-700">
-              <Icon icon="ph:x" width={24} height={24} />
-            </button>
           </div>
 
-          <form onSubmit={formik.handleSubmit} className="p-6" noValidate>
+          <form onSubmit={formik.handleSubmit} className="px-6 pb-8 pt-6" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Cột trái: tất cả input */}
               <div>
@@ -156,98 +147,46 @@ export const RegisterReceiveForm = () => {
                   />
 
                   {/* Pickup location (input) */}
-                  {/* <div>
-                                   <label htmlFor="pickupLocation" className="block text-sm font-medium mb-1">
-                                     {t("car_rental.pickup_location")}
-                                     <span className="text-red-500">*</span>
-                                   </label>
-                                   <div className="relative">
-                                     <select
-                                       id="pickupLocation"
-                                       name="pickupLocation"
-                                       value={formik.values.pickupLocation}
-                                       onChange={formik.handleChange}
-                                       onBlur={formik.handleBlur}
-                                       className={`w-full border rounded-md p-2 appearance-none ${
-                                         formik.errors.pickupLocation && formik.touched.pickupLocation
-                                           ? "border-red-500"
-                                           : "border-gray-300"
-                                       }`}
-                                     >
-                                       <option value="">{t("car_rental.select_pickup_location")}</option>
-                                       <option value="place1">{t("car_rental.place1")}</option>
-                                       <option value="place2">{t("car_rental.place2")}</option>
-                                     </select>
-                                     <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                                       <Icon icon="ph:caret-down" />
-                                     </div>
-                                   </div>
-                                   {formik.touched.pickupLocation && formik.errors.pickupLocation && (
-                                     <div className="text-red-500 text-sm mt-1">
-                                       {formik.errors.pickupLocation}
-                                     </div>
-                                   )}
-                                 </div> */}
-                                 <SelectStyled
-                                    label={
-                                      <>
-                                        {t("car_rental.pickup_location")}
-                                        <span className="text-danger-500 ml-1">*</span>
-                                      </>
-                                    }
-                                    isRequired
-                                    placeholder={t("car_rental.select_pickup_location")}
-                                    options={[
-                                      { value: "place1", label: t("car_rental.place1") },
-                                      { value: "place2", label: t("car_rental.place2") },
-                                    ]}
-                                    value={formik.values.pickupLocation}
-                                    onSimpleChange={(v) => formik.setFieldValue("pickupLocation", v)}
-                                    onBlur={() => formik.setFieldTouched("pickupLocation", true)}
-                                    errorMessage={
-                                      formik.touched.pickupLocation && formik.errors.pickupLocation
-                                        ? formik.errors.pickupLocation
-                                        : undefined
-                                    }
-                                  />
+                  <LocalFilter
+                    value={formik.values.pickupLocation || null}
+                    onChange={(val) => {
+                      formik.setFieldValue("pickupLocation", val ?? "")
+                      formik.setFieldTouched("pickupLocation", true)
+                    }}
+                  />
+                  {formik.touched.pickupLocation && formik.errors.pickupLocation && (
+                    <p className="text-red-500 text-sm mt-1">{formik.errors.pickupLocation}</p>
+                  )}
+                  
                   {/* Note (input) */}
-                  <InputStyled
-                    variant="bordered"
+                  <TextareaStyled
+                    
                     label={t("car_rental.note")}
                     placeholder=""
                     value={formik.values.note}
                     onValueChange={(v) => formik.setFieldValue("note", v)}
+                    onBlur={() => formik.setFieldTouched("note", true)}
                     isInvalid={!!(formik.touched.note && formik.errors.note)}
                     errorMessage={formik.touched.note ? formik.errors.note : undefined}
-                    onBlur={() => formik.setFieldTouched("note", true)}
-                    onClear={() => formik.setFieldValue("note", "")}
+                    minRows={4}
                   />
-
-                  {/* Payment method (input) */}
-                  <div className="mt-6">
-                <h3 className="font-medium mb-3">{t("car_rental.payment_method")}</h3>
-                <select
-                  id="paymentMethod"
-                  name="paymentMethod"
+                
+               <EnumPicker<PaymentMethod>
                   value={formik.values.paymentMethod}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  className={`w-full border rounded-md p-2 appearance-none ${
-                    formik.errors.paymentMethod && formik.touched.paymentMethod
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  }`}
-                >
-                  <option value="">{t("car_rental.select_payment_method")}</option>
-                  <option value="banking">{t("car_rental.bank_transfer")}</option>
-                  <option value="momo">{t("car_rental.momo_wallet")}</option>
-                </select>
+                  onChange={(v) => {
+                    formik.setFieldValue("paymentMethod", v)
+                    formik.setFieldTouched("paymentMethod", true)
+                  }}
+                  labels={PaymentMethodLabels}
+                  label={t("car_rental.select_payment_method")}
+                />
                 {formik.touched.paymentMethod && formik.errors.paymentMethod && (
-                  <div className="text-red-500 text-sm mt-1">{formik.errors.paymentMethod}</div>
+                  <p className="text-red-500 text-sm mt-1">
+                    {formik.errors.paymentMethod as string}
+                  </p>
                 )}
-              </div>         
-                </div>
 
+              </div> 
                 {/* Điều khoản */}
                 <div className="mt-6 space-y-3">
                   <div className="flex items-start">
@@ -302,20 +241,18 @@ export const RegisterReceiveForm = () => {
               <div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center space-x-4">
-                    <div
-                      className="
-                        relative overflow-hidden rounded-md
-                        w-40 h-28              /* base size */
-                        sm:w-48 sm:h-32        /* ↑ trên màn rộng hơn */
-                        md:w-56 md:h-36
-                      "
-                    >
-                      <img
+                    <div className="
+                      relative overflow-hidden rounded-md
+                      w-40 h-28
+                      sm:w-48 sm:h-32
+                      md:w-56 md:h-36
+                    ">
+                      <ImageStyled
                         src="https://vinfastninhbinh.com.vn/wp-content/uploads/2024/06/vinfast-vf3-5.png"
                         alt={t("car_rental.vehicle")}
-                        className="absolute inset-0 w-full h-full object-contain" 
-                        loading="lazy"
-                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-contain"
+                        width={800}      
+                        height={520}       
                       />
                     </div>
                     <div>
@@ -373,22 +310,23 @@ export const RegisterReceiveForm = () => {
 
             {/* Submit */}
             <div className="mt-8 text-center">
-              <button
-                type="submit"
-                disabled={!formik.isValid || formik.isSubmitting}
-                className={`px-8 py-2 rounded-md text-white ${
-                  !formik.isValid || formik.isSubmitting
-                    ? "bg-green-300 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
-              >
-                {t("car_rental.pay")} {formatCurrency(totalPayment)}
-              </button>
-            </div>
+            <ButtonStyled
+              type="submit"
+              isDisabled={!formik.isValid || formik.isSubmitting}
+              isLoading={formik.isSubmitting}
+              // tuỳ chọn: đổi màu/variant theo trạng thái cho giống bg-green-600
+              color={!formik.isValid || formik.isSubmitting ? "default" : "success"}
+              variant={!formik.isValid || formik.isSubmitting ? "flat" : "solid"}
+              className="px-8 py-2 rounded-md"
+            >
+              {/* {t("car_rental.pay")} {formatCurrency(totalPayment)} */}
+              {t("car_rental.pay")}
+            </ButtonStyled>
+          </div>
           </form>
         </div>
       ) : (
-        <div className="text-white">Loading…</div>
+        <div className="text-center text-gray-600">Loading...</div>
       )}
     </div>
   )
