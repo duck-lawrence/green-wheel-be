@@ -191,14 +191,17 @@ namespace Application
         Best regards,  
         The HYCAT Team
          */
-        public async Task VerifyRentalContract(Guid id, int status)
+        public async Task VerifyRentalContract(Guid id)
         {
             var rentalContract = await _uow.RentalContracts.GetByIdAsync(id);
             if (rentalContract == null)
             {
                 throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
             }
-            await UpdateStatus(rentalContract, status);
+            if(rentalContract.Status == (int)RentalContractStatus.RequestPeding)
+            {
+                await UpdateStatus(rentalContract, (int)RentalContractStatus.PaymentPending);
+            }
             //Lấy customer
             var customer = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
             {
@@ -213,8 +216,8 @@ namespace Application
             })).Where(rc => rc.Id == id)
             .Select(rc => rc.Invoices).FirstOrDefault();
 
-            string subject = "Hello đây là mail đến từ nhà vệ sinh";
-            string templatePath = Path.Combine("../Application", "Templates", "PaymentEmailTemplate.txt");
+            string subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
+            string templatePath = Path.Combine("../Application", "Templates", "PaymentEmailTemplate.html");
             string body = System.IO.File.ReadAllText(templatePath);
 
             body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)

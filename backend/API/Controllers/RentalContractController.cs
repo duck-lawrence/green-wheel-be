@@ -55,7 +55,7 @@ namespace API.Controllers
         [RoleAuthorize("Staff")]
         public async Task<IActionResult> VerifyRentalContract(Guid id)
         {
-            await _rentalContractService.VerifyRentalContract(id, (int)RentalContractStatus.PaymentPending);
+            await _rentalContractService.VerifyRentalContract(id);
             return Ok();
         }
     }
