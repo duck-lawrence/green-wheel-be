@@ -356,18 +356,19 @@ export const RegisterReceiveForm = () => {
 
             {/* Submit */}
             <div className="mt-8 text-center">
-              <button
-                type="submit"
-                disabled={!formik.isValid || formik.isSubmitting}
-                className={`px-8 py-2 rounded-md text-white ${
-                  !formik.isValid || formik.isSubmitting
-                    ? "bg-green-300 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                }`}
-              >
-                {t("car_rental.pay")} {formatCurrency(totalPayment)}
-              </button>
-            </div>
+            <ButtonStyled
+              type="submit"
+              isDisabled={!formik.isValid || formik.isSubmitting}
+              isLoading={formik.isSubmitting}
+              // tuỳ chọn: đổi màu/variant theo trạng thái cho giống bg-green-600
+              color={!formik.isValid || formik.isSubmitting ? "default" : "success"}
+              variant={!formik.isValid || formik.isSubmitting ? "flat" : "solid"}
+              className="px-8 py-2 rounded-md"
+            >
+              {/* {t("car_rental.pay")} {formatCurrency(totalPayment)} */}
+              {t("car_rental.pay")}
+            </ButtonStyled>
+          </div>
           </form>
         </div>
       ) : (
