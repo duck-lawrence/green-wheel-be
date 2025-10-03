@@ -36,6 +36,7 @@
     "vehicle": {},
     "vehicle_model": {},
     "user": {
+        "account_information": "Account information",
         "profile": "Profile",
         "booking_history": "Booking history",
         "invalid_otp": "Invalid OTP",
