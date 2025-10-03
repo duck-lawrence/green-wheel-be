@@ -1,6 +1,7 @@
 ﻿
 using Application.Abstractions;
 using Application.AppExceptions;
+using Application.AppSettingConfigurations;
 using Application.Constants;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
@@ -8,13 +9,16 @@ using Application.Helpers;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace Application
 {
@@ -22,10 +26,12 @@ namespace Application
     {
         private readonly IRentalContractUow _uow;
         private readonly IMapper _mapper;
-        public RentalContractService(IRentalContractUow uow, IMapper mapper)
+        private readonly EmailSettings _emailSettings;
+        public RentalContractService(IRentalContractUow uow, IMapper mapper, IOptions<EmailSettings> emailSettings)
         {
             _uow = uow;
             _mapper = mapper;
+            _emailSettings = emailSettings.Value;
         }
         public async Task<RentalContractViewRes> CreateRentalContractAsync(ClaimsPrincipal userClaims, CreateRentalContractReq createReq)
         {
@@ -151,6 +157,77 @@ namespace Application
             await _uow.SaveChangesAsync();
             var rentalContractViewRespone = _mapper.Map<RentalContractViewRes>(contract);
             return rentalContractViewRespone;
+        }
+
+        public async Task<IEnumerable<RentalContractForStaffViewRes>> GetByStatus(int status)
+        {
+            var RcList = await _uow.RentalContracts.GetByStatus(status);
+            var RcForStaffViewRes = _mapper.Map<IEnumerable<RentalContractForStaffViewRes>>(RcList);
+            return RcForStaffViewRes;
+        }
+
+        public async Task UpdateStatus(RentalContract rentalContract, int status)
+        {
+            
+            rentalContract.Status = status;
+            await _uow.RentalContracts.UpdateAsync(rentalContract);
+        }
+
+        /*
+         Dear [CustomerName],
+
+        Thank you for booking a vehicle with GreenWheel.  
+        To complete your reservation, please proceed with the payment:
+
+        - Booking ID: {rentalContract.Id}  
+        - Rental period: [rentalContract.StartDate] – [rentalContract.EndDate]  
+        - Amount due: [TotalAmount]
+
+        You can pay directly in the GreenWheel app or click the link below:  
+        [LinkSet]
+
+        Note: Your reservation will be automatically cancelled if payment is not completed before [HUHU].
+
+        Best regards,  
+        The HYCAT Team
+         */
+        public async Task VerifyRentalContract(Guid id, int status)
+        {
+            var rentalContract = await _uow.RentalContracts.GetByIdAsync(id);
+            if (rentalContract == null)
+            {
+                throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
+            }
+            await UpdateStatus(rentalContract, status);
+            //Lấy customer
+            var customer = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
+            {
+                rc => rc.Customer
+            })).Where(rc => rc.Id == id)
+            .Select(rc => rc.Customer).FirstOrDefault();
+            
+            //Lấy invoice
+            var invoice = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
+            {
+                rc => rc.Invoices
+            })).Where(rc => rc.Id == id)
+            .Select(rc => rc.Invoices).FirstOrDefault();
+
+            string subject = "Hello đây là mail đến từ nhà vệ sinh";
+            string templatePath = Path.Combine("../Application", "Templates", "PaymentEmailTemplate.txt");
+            string body = System.IO.File.ReadAllText(templatePath);
+
+            body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
+                       .Replace("{BookingId}", rentalContract.Id.ToString())
+                       .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
+                       .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"))
+                       .Replace("{AmountDue}", (invoice.First().Tax * invoice.First().Subtotal).ToString("C"))
+                       .Replace("{PaymentLink}", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1")
+                       .Replace("{Deadline}", "NGU");
+
+
+            await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
+
         }
     }
 }

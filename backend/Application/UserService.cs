@@ -166,7 +166,7 @@ namespace Application
                 throw new RateLimitExceededException(Message.User.RateLimitOtp);
             }
             await _otpRepository.RemoveOTPAsync(email); //xoá cũ trước khi lưu cái ms
-            string otp = new Random().Next(100000, 900000).ToString();
+            string otp = GenerateOtpHelper.GenerateOtp();
             await _otpRepository.SaveOTPAsyns(email, otp);
             string subject = "Your OTP code";
             string body = $"OTP: {otp} có quá oke khum người đẹp";

@@ -1,5 +1,7 @@
-﻿using Application;
+﻿using API.Filters;
+using Application;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +12,12 @@ namespace API.Controllers
     [ApiController]
     public class RentalContractController : ControllerBase
     {
+        /*
+         status code
+         404: vehicle, model not found
+         422: business error (citizen id)
+         200: success
+         */
         private readonly IRentalContractService _rentalContractService;
         public RentalContractController(IRentalContractService rentalContractService)
         {
@@ -25,6 +33,30 @@ namespace API.Controllers
             return Ok(
                 rentalContractViewRes
             );
-        }   
+        }
+        /*
+         status code
+         200 success
+         */
+        [HttpGet]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> GetByStatus([FromQuery] int status)
+        {
+            var rcList = await _rentalContractService.GetByStatus(status);
+            return Ok(rcList);
+        }
+
+        /*
+         status code
+         404 rental contract not found
+         200 succes
+         */
+        [HttpPut("{id}/verify")]
+        [RoleAuthorize("Staff")]
+        public async Task<IActionResult> VerifyRentalContract(Guid id)
+        {
+            await _rentalContractService.VerifyRentalContract(id, (int)RentalContractStatus.PaymentPending);
+            return Ok();
+        }
     }
 }

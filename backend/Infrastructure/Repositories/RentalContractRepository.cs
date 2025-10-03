@@ -22,11 +22,18 @@ namespace Infrastructure.Repositories
             return await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId).ToListAsync();
         }
 
+        public async Task<IEnumerable<RentalContract>> GetByStatus(int status)
+        {
+            return await _dbContext.RentalContracts.Where(rc => rc.Status == status).ToArrayAsync();
+        }
+
         public async Task<bool> HasActiveContractAsync(Guid customerId)
         {
             return await (_dbContext.RentalContracts.Where(r => r.CustomerId == customerId 
             && r.Status != (int)RentalContractStatus.Completed
             && r.Status != (int)RentalContractStatus.Cancelled).FirstOrDefaultAsync()) != null;
         }
+
+        
     }
 }
