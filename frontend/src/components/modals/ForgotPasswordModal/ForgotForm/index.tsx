@@ -3,11 +3,11 @@ import { cn } from "@heroui/react"
 import React, { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { RowStep } from "./RowStep"
-import { RegisterEmail } from "./RegisterEmail"
-import { RegisterOTP } from "./RegisterOTP"
-import { RegisterInFo } from "./RegisterInFo"
+import { FortgotEmail } from "./ForgotEmail"
+import { ForgotOTP } from "./ForgotOTP"
+import { ForgotInFo } from "./ForgotInFo"
 
-export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
+export function ForgotForm({ onSuccess }: { onSuccess?: () => void }) {
     const [step, setStep] = useState(0)
     const [direction, setDirection] = useState(1) // 1 = next, -1 = back
     const [email, setEmail] = useState("")
@@ -64,7 +64,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterEmail
+                                <FortgotEmail
                                     email={email}
                                     setEmail={setEmail}
                                     onSuccess={handleNextStep}
@@ -82,7 +82,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterOTP
+                                <ForgotOTP
                                     email={email}
                                     onBack={handlePrevStep}
                                     onSuccess={handleNextStep}
@@ -100,7 +100,7 @@ export function RegisterForm({ onSuccess }: { onSuccess?: () => void }) {
                                 transition={{ duration: 0.4 }}
                                 className="absolute w-full"
                             >
-                                <RegisterInFo onSuccess={onSuccess} />
+                                <ForgotInFo onSuccess={onSuccess} />
                             </motion.div>
                         )}
                     </AnimatePresence>

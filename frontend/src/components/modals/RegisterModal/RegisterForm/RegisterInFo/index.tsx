@@ -19,13 +19,11 @@ interface RegisterInfoProps {
 
 export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
     const { t } = useTranslation()
+    const registerMutation = useRegisterComplete({ onSuccess })
 
     const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
-
-    const registerMutation = useRegisterComplete({ onSuccess })
-
     const toggleConFirmVisibility = () => setIsConfirmVisible(!isConfirmVisible)
 
     const handleRegisterComplete = useCallback(
@@ -47,27 +45,26 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
-                .required("Last name is required")
-                .matches(/^[A-Za-z\s]+$/, "Last name only contains letters"),
+                .required(t("user.last_name_is_required"))
+                .matches(/^[A-Za-z\s]+$/, t("user.invalid_last_name")),
             firstName: Yup.string()
-                .required("First name is required")
-                .matches(/^[A-Za-z\s]+$/, "First name only contains letters"),
+                .required(t("user.first_name_is_required"))
+                .matches(/^[A-Za-z\s]+$/, t("user.invalid_first_name")),
             password: Yup.string()
-                .required("Password is required")
-                .min(6, "Password must be at least 6 characters")
+                .required(t("password.require"))
+                .min(8, t("password.min"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    "Password must contain 1 uppercase, 1 number, 1 special char"
+                    t("user.password_strength")
                 ),
             confirmPassword: Yup.string()
-                .oneOf([Yup.ref("password")], "Passwords must match")
-                .required("Please confirm your password"),
+                .oneOf([Yup.ref("password")], t("user.confirm_password"))
+                .required(t("password.require")),
             dateOfBirth: Yup.string(),
             phone: Yup.string()
-                .required("Phone is required")
-                .length(10, "Phone must be exactly 10 digits")
-                .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0"),
-            sex: Yup.number().required("Sex is required")
+                .required(t("user.phone_is_required"))
+                .matches(/^(0[0-9]{9})$/, t("user.invalid_phone")),
+            sex: Yup.number().required(t("user.sex_is_required"))
         }),
         onSubmit: handleRegisterComplete
     })
@@ -75,7 +72,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
     return (
         <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
-            <div className="mx-12 mt-2 mb-2">
+            <div className="mx-auto mt-2 mb-2">
                 <div className="text-center">{t("auth.complete_register")}</div>
             </div>
 
@@ -218,7 +215,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                 />
             </div>
 
-            <div className="flex mx-auto gap-4 mt-4">
+            <div className="mx-auto">
                 {/* <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />
                 </ButtonStyled> */}

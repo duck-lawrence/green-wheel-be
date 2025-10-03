@@ -27,7 +27,8 @@
         "refresh": "Refreshed",
         "login": "Login successful",
         "logout": "Logout successful",
-        "register": "Register successful"
+        "register": "Register successful",
+        "reset_password": "Reset password successful"
     },
     "failed": {
         "create": "Failed to create",
@@ -42,16 +43,16 @@
         "unexpected_error": "An unexpected error occurred. Please try again later."
     },
     "auth": {
+        "otp": "OTP",
         "security_verification": "Security Verification",
         "verify_identity": "Please enter the email verification code to verify your identity",
         "complete_register": "Please enter the information below to complete your account registration",
         "already_have_account": "Already have an account?",
-        "matches": "Send OTP",
-        "forgot_step1": "Forgot Account (Step 1)",
-        "forgot_step2": "Forgot Account (Step 2)",
-        "forgot_step3": "Forgot Account (Step 3)",
+        "send_otp": "Send OTP",
         "new_password": "New password",
-        "confirm_new_password": "Confirm new password"
+        "confirm_new_password": "Confirm new password",
+        "reset_password": "Reset password",
+        "please_reset_password": "Please set your new password"
     },
     "vehicle": {},
     "vehicle_model": {},
@@ -66,17 +67,19 @@
         "email_already_exists": "This email already exists",
         "email_is_required": "Email is required",
         "invalid_email": "Email is invalid",
-        "password_too_short": "Password must be at least 6 characters",
+        "password_too_short": "Password must be at least 8 characters",
         "password_can_not_empty": "Password is required",
         "new_password_can_not_empty": "New password is required",
-        "password_min": "Current password must be at least 6 characters",
+        "password_min": "Current password must be at least 8 characters",
         "confirm_password": "Confirm password must be the same as the new password",
         "password_strength": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
         "invalid_user_age": "Age must be at least 21",
-        "invalid_phone": "Invalid phone",
+        "invalid_phone": "Phone must be 10 digits and start with 0",
         "phone_is_required": "Phone is required",
         "first_name_is_required": "First name is required",
+        "invalid_first_name": "First name only contains letters",
         "last_name_is_required": "Last name is required",
+        "invalid_last_name": "Last name only contains letters",
         "date_of_birht_is_required": "Date of birth is required",
         "old_password_is_incorrect": "Old password is incorrect",
         "ole_password_is_required": "Old password is required",
@@ -91,6 +94,7 @@
         "account_name": "Account Name",
         "full_name": "Full Name",
         "sex": "Sex",
+        "sex_is_required": "Sex is required",
         "choose_sex": "Choose Sex",
         "date_of_birth": "Date of Birth",
         "phone": "Phone"
