@@ -1,4 +1,5 @@
 ﻿using Application.AppSettingConfigurations;
+using Application.Constants;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Runtime.CompilerServices;
@@ -25,8 +26,17 @@ namespace API.Extentions
                         ValidAudience = _jwtSetting.Audience,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSetting.AccessTokenSecret))
                     };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnChallenge = context =>
+                        {
+                            throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                        },
+                        
+                    };
                 }
-                );
+
+              );
         }
     }
 }

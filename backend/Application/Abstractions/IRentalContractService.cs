@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,9 @@ namespace Application.Abstractions
     public interface IRentalContractService
     {
         Task<RentalContractViewRes> CreateRentalContractAsync(ClaimsPrincipal userClaim, CreateRentalContractReq createRentalContractReq);
+        Task<IEnumerable<RentalContractForStaffViewRes>> GetByStatus(int status);
+         Task VerifyRentalContract(Guid id, int status);
+        Task UpdateStatus(RentalContract rentalContract, int status);
+
     }
 }

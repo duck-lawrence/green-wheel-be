@@ -11,6 +11,8 @@ namespace Application.Constants
         //Register
         public static class User
         {
+            //auth
+            public const string MissingToken = "user.missing_token";
             //otp
             public const string InvalidOTP = "user.invalid_otp";
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
@@ -94,6 +96,7 @@ namespace Application.Constants
         public static class RentalContract
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
+            public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
         }
 
         //Station
