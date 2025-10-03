@@ -202,3 +202,24 @@ export const useResetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
         }
     })
 }
+
+export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+    const removeAccessToken = useToken((s) => s.removeAccessToken)
+    const removeUser = useProfileStore((s) => s.removeUser)
+
+    return useMutation({
+        mutationFn: authApi.changePassword,
+        onSuccess: () => {
+            removeAccessToken()
+            removeUser()
+            onSuccess?.()
+            toast.success(t("success.change_password"))
+        },
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}

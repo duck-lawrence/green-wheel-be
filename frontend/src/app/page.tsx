@@ -5,14 +5,24 @@ import React, { useEffect } from "react"
 import { slides } from "../../public/cars"
 import { useTranslation } from "react-i18next"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
+import { useSearchParams } from "next/navigation"
+import toast from "react-hot-toast"
 
 export default function HomePage() {
     const { t } = useTranslation()
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
+    const params = useSearchParams()
 
     useEffect(() => {
         setActiveMenuKey("home")
     }, [setActiveMenuKey])
+
+    useEffect(() => {
+        const reason = params.get("reason")
+        if (reason === "expired" || reason === "no_token") {
+            toast.error(t("login.please_login"))
+        }
+    }, [params, t])
 
     return (
         <div>
