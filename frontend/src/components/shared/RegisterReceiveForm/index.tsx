@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
-import { ButtonStyled, InputStyled,SelectStyled } from "@/components"
+import { ButtonStyled, InputStyled,SelectStyled, LocalFilter } from "@/components"
 
 
 type FormValues = {
@@ -35,7 +34,7 @@ export const RegisterReceiveForm = () => {
   useEffect(() => {
     setMounted(true)
   }, [])
-
+// Chỉnh lấy api 
   const listedFee = 590000
   const deposit = 5000000
   const totalPayment = listedFee + deposit
@@ -83,17 +82,14 @@ export const RegisterReceiveForm = () => {
   const renterFilled = !!formik.values.fullName?.trim()
   const emailFilled  = !!formik.values.email?.trim()
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 mt-30">
       {mounted ? (
-        <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-          <div className="flex justify-between items-center p-6">
+        <div className="mx-auto max-w-5xl bg-white rounded-lg ">
+          <div className="flex items-center justify-between border-b border-gray-100 px-6 py-6">
             <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
-            <button type="button" className="text-gray-500 hover:text-gray-700">
-              <Icon icon="ph:x" width={24} height={24} />
-            </button>
           </div>
 
-          <form onSubmit={formik.handleSubmit} className="p-6" noValidate>
+          <form onSubmit={formik.handleSubmit} className="px-6 pb-8 pt-6" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Cột trái: tất cả input */}
               <div>
@@ -188,28 +184,29 @@ export const RegisterReceiveForm = () => {
                                      </div>
                                    )}
                                  </div> */}
-                                 <SelectStyled
-                                    label={
-                                      <>
-                                        {t("car_rental.pickup_location")}
-                                        <span className="text-danger-500 ml-1">*</span>
-                                      </>
-                                    }
-                                    isRequired
-                                    placeholder={t("car_rental.select_pickup_location")}
-                                    options={[
-                                      { value: "place1", label: t("car_rental.place1") },
-                                      { value: "place2", label: t("car_rental.place2") },
-                                    ]}
-                                    value={formik.values.pickupLocation}
-                                    onSimpleChange={(v) => formik.setFieldValue("pickupLocation", v)}
-                                    onBlur={() => formik.setFieldTouched("pickupLocation", true)}
-                                    errorMessage={
-                                      formik.touched.pickupLocation && formik.errors.pickupLocation
-                                        ? formik.errors.pickupLocation
-                                        : undefined
-                                    }
-                                  />
+                                <LocalFilter
+                                  label={
+                                    <>
+                                      {t("car_rental.pickup_location")}
+                                      <span className="text-danger-500 ml-1">*</span>
+                                    </>
+                                  }
+                                  required
+                                  placeholder={t("car_rental.select_pickup_location")}
+                                  options={[
+                                    { value: "place1", label: t("car_rental.place1") },
+                                    { value: "place2", label: t("car_rental.place2") },
+                                  ]}
+                                  value={formik.values.pickupLocation}
+                                  onChange={(v) => formik.setFieldValue("pickupLocation", v)}
+                                  onBlur={() => formik.setFieldTouched("pickupLocation", true)}
+                                  error={Boolean(formik.touched.pickupLocation && formik.errors.pickupLocation)}
+                                  helperText={
+                                    formik.touched.pickupLocation && formik.errors.pickupLocation
+                                      ? formik.errors.pickupLocation
+                                      : undefined
+                                  }
+                                />
                   {/* Note (input) */}
                   <InputStyled
                     variant="bordered"
@@ -388,7 +385,7 @@ export const RegisterReceiveForm = () => {
           </form>
         </div>
       ) : (
-        <div className="text-white">Loading…</div>
+        <div className="text-center text-gray-600">Loading...</div>
       )}
     </div>
   )
