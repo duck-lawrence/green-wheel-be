@@ -6,18 +6,18 @@ import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
-import { ButtonStyled, InputStyled,SelectStyled, LocalFilter } from "@/components"
-
+import { ButtonStyled, InputStyled,SelectStyled, LocalFilter , EnumPicker} from "@/components"
+import { PaymentMethod } from "@/constants/enum"
+import { PaymentMethodLabels } from "@/constants/labels"
 
 type FormValues = {
   fullName: string
   phone: string
   email: string
-  isVingroup: boolean
   pickupLocation: string
   referralCode: string
   note: string
-  paymentMethod: string
+  paymentMethod: PaymentMethod | null 
   promotionCode: string
   agreeTerms: boolean
   agreeDataPolicy: boolean
@@ -44,11 +44,10 @@ export const RegisterReceiveForm = () => {
     fullName: isLoggedIn && user ? `${user.firstName} ${user.lastName}` : "",
     phone: isLoggedIn && user && user.phone ? user.phone : "",
     email: isLoggedIn && user ? user.email : "",
-    isVingroup: false,
     pickupLocation: "",
     referralCode: "",
     note: "",
-    paymentMethod: "",
+    paymentMethod: null,
     promotionCode: "",
     agreeTerms: false,
     agreeDataPolicy: false,
@@ -196,7 +195,7 @@ export const RegisterReceiveForm = () => {
                   />
 
                   {/* Payment method (input) */}
-                  <div className="mt-6">
+                  {/* <div className="mt-6">
                 <h3 className="font-medium mb-3">{t("car_rental.payment_method")}</h3>
                 <select
                   id="paymentMethod"
@@ -217,9 +216,21 @@ export const RegisterReceiveForm = () => {
                 {formik.touched.paymentMethod && formik.errors.paymentMethod && (
                   <div className="text-red-500 text-sm mt-1">{formik.errors.paymentMethod}</div>
                 )}
-              </div>         
-                </div>
-
+              </div>    */}     
+                
+                <EnumPicker<PaymentMethod>
+                  value={formik.values.paymentMethod}
+                  onChange={(v) => {
+                    formik.setFieldValue("paymentMethod", v)
+                    formik.setFieldTouched("paymentMethod", true)  // đánh dấu touched tại đây
+                  }}
+                  labels={PaymentMethodLabels}
+                  label={t("car_rental.select_payment_method")}
+                  error={Boolean(formik.touched.paymentMethod && formik.errors.paymentMethod)}
+                  helperText={formik.touched.paymentMethod ? (formik.errors.paymentMethod as string) : undefined}
+                  className="w-full"
+              />
+              </div> 
                 {/* Điều khoản */}
                 <div className="mt-6 space-y-3">
                   <div className="flex items-start">
