@@ -1,11 +1,22 @@
 "use client"
 import React, { useEffect } from "react"
-import { useLoginGoogle } from "@/hooks"
+import { useLoginGoogle, useSetPasswordDiscloresureSingleton } from "@/hooks"
 import { GOOGLE_CLIENT_ID } from "@/constants/api"
 import { GoogleCredentialResponse } from "@/types/google"
 
-export function GoogleLoginButton({ onSuccess }: { onSuccess?: () => void }) {
-    const loginGoogleMutation = useLoginGoogle({ onSuccess })
+export function GoogleLoginButton({
+    rememberMe,
+    onSuccess
+}: {
+    rememberMe?: boolean
+    onSuccess?: () => void
+}) {
+    const { onOpen: onOpenSetPassword } = useSetPasswordDiscloresureSingleton()
+    const loginGoogleMutation = useLoginGoogle({
+        rememberMe,
+        onSuccess,
+        onNeedSetPassword: onOpenSetPassword
+    })
 
     useEffect(() => {
         if (window.google) {

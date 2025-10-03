@@ -33,7 +33,7 @@ namespace Application.Abstractions
         //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
 
         
-        Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName);
+        Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req);
         Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
 

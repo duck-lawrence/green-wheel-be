@@ -2,11 +2,11 @@ import { DisclosureContext } from "@/providers/DisclosureProvider/DisclosureCont
 import { useDisclosure } from "@heroui/react"
 import { useContext } from "react"
 
-export const useChangePasswordDiscloresureCore = () => {
+export const useSetPasswordDiscloresureCore = () => {
     return useDisclosure()
 }
 
-export const useChangePasswordDiscloresureSingleton = () => {
-    const { useChangePasswordDiscloresure } = useContext(DisclosureContext)!
-    return useChangePasswordDiscloresure
+export const useSetPasswordDiscloresureSingleton = () => {
+    const { useSetPasswordDiscloresure } = useContext(DisclosureContext)!
+    return useSetPasswordDiscloresure
 }

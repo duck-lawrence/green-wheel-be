@@ -16,8 +16,9 @@ import { GoogleLoginButton } from "./GoogleLoginButton"
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
-    const loginMutation = useLogin({ onSuccess })
     const [isVisible, setIsVisible] = useState(false)
+    const [rememberMe, setRememberMe] = useState(true)
+    const loginMutation = useLogin({ rememberMe, onSuccess })
     const { onClose: onCloseLogin } = useLoginDiscloresureSingleton()
     const { onOpen: onOpenRegister } = useRegisterDiscloresureSingleton()
     const { onOpen: onOpenForgot } = useForgotPasswordDiscloresureSingleton()
@@ -26,10 +27,8 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const toggleVisibility = () => setIsVisible(!isVisible)
 
     const handleLogin = useCallback(
-        async (values: { email: string; password: string; rememberMe?: boolean }) => {
-            await loginMutation.mutateAsync({
-                ...values
-            })
+        async (values: { email: string; password: string }) => {
+            await loginMutation.mutateAsync(values)
         },
         [loginMutation]
     )
@@ -47,14 +46,16 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const formik = useFormik({
         initialValues: {
             email: "",
-            password: "",
-            rememberMe: false
+            password: ""
+            // rememberMe: false
         },
         validationSchema: Yup.object().shape({
             email: Yup.string()
-                .required(t("email.require"))
-                .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("email.invalid")),
-            password: Yup.string().required(t("password.require")).min(8, t("password.min"))
+                .required(t("user.email_is_required"))
+                .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("user.invalid_email")),
+            password: Yup.string()
+                .required(t("user.password_can_not_empty"))
+                .min(8, t("user.password_too_short"))
         }),
         onSubmit: handleLogin
     })
@@ -73,7 +74,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                     <InputStyled
                         // className="my-3"
                         variant="bordered"
-                        label={t("email.label")}
+                        label={t("auth.email")}
                         value={formik.values.email}
                         onValueChange={(value) => formik.setFieldValue("email", value)}
                         isInvalid={!!(formik.touched.email && formik.errors.email)}
@@ -85,7 +86,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                     />
                     <InputStyled
                         variant="bordered"
-                        label={t("password.label")}
+                        label={t("auth.password")}
                         type={isVisible ? "text" : "password"}
                         value={formik.values.password}
                         onValueChange={(value) => formik.setFieldValue("password", value)}
@@ -119,11 +120,15 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
 
                 <div className="flex w-full items-center justify-between px-1 py-2">
                     <div className="flex flex-col gap-2">
-                        <Checkbox
+                        {/* <Checkbox
                             isSelected={formik.values.rememberMe}
                             onValueChange={(isSelected) =>
                                 formik.setFieldValue("rememberMe", isSelected)
                             }
+                        > */}
+                        <Checkbox
+                            isSelected={rememberMe}
+                            onValueChange={(isSelected) => setRememberMe(isSelected)}
                         >
                             {t("login.remember")}
                         </Checkbox>
@@ -156,7 +161,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                     <Divider className="flex-1" />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <GoogleLoginButton onSuccess={onSuccess} />
+                    <GoogleLoginButton rememberMe={rememberMe} onSuccess={onSuccess} />
                 </div>
                 <p className="text-small text-center">
                     {t("login.need_to_create_an_account")}&nbsp;

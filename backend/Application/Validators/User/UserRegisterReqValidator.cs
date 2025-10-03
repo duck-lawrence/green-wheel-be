@@ -27,9 +27,9 @@ namespace Application.Validators.User
                 .Must(dob =>
                 {
                     var today = DateTime.Now;
-                    var age = today.Year - dob.Value.Year;
-                    if (today.Month < dob.Value.Month ||
-                    (today.Month == dob.Value.Month && today.Day < dob.Value.Day))
+                    var age = today.Year - dob.Year;
+                    if (today.Month < dob.Month ||
+                    (today.Month == dob.Month && today.Day < dob.Day))
                     {
                         age--;
                     }

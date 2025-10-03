@@ -29,7 +29,10 @@ export function Navbar() {
     const [scrollState, setScroledState] = useState<NavbarState>("default")
     const [isHiddenNavbar, setIsHiddenNavbar] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
-    const { activeMenuKey, setActiveMenuKey } = useNavbarItemStore()
+    const { activeMenuKey, setActiveMenuKey } = useNavbarItemStore((s) => ({
+        activeMenuKey: s.activeMenuKey,
+        setActiveMenuKey: s.setActiveMenuKey
+    }))
     // handle when login
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()

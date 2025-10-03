@@ -17,6 +17,8 @@ const getRemeberMe = () => {
 
 const getStoredToken = () => {
     if (typeof window === "undefined") return null
+    console.log(localStorage.getItem("access_token"))
+
     return getRemeberMe()
         ? localStorage.getItem("access_token")
         : sessionStorage.getItem("access_token")

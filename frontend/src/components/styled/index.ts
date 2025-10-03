@@ -15,4 +15,4 @@ export * from "./AvatarStyled"
 export * from "./DateTimeStyled"
 export * from "./LocalFilter"
 export * from "./ImageStyled"
-
+export * from "./SelectStyle"

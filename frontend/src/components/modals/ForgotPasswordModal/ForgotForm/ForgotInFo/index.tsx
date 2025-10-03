@@ -37,15 +37,15 @@ export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
         },
         validationSchema: Yup.object({
             password: Yup.string()
-                .required(t("password.require"))
-                .min(8, t("password.min"))
+                .required(t("user.password_can_not_empty"))
+                .min(8, t("user.password_too_short"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
                     t("user.password_strength")
                 ),
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], t("user.confirm_password"))
-                .required(t("password.require"))
+                .required(t("user.password_can_not_empty"))
         }),
         onSubmit: handleResetPassword
     })

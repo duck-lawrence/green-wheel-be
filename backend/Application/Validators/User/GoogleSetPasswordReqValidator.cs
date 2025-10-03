@@ -19,6 +19,20 @@ namespace Application.Validators.User
 
             RuleFor(x => x.ConfirmPassword)
                 .Equal(x => x.Password).WithMessage(Message.User.ConfirmPasswordIsIncorrect);
+
+            RuleFor(x => x.DateOfBirth)
+                .NotEmpty().WithMessage(Message.User.DateOfBirthIsRequired)
+                .Must(dob =>
+                {
+                    var today = DateTime.Now;
+                    var age = today.Year - dob.Year;
+                    if (today.Month < dob.Month ||
+                    (today.Month == dob.Month && today.Day < dob.Day))
+                    {
+                        age--;
+                    }
+                    return age >= 21;
+                }).WithMessage(Message.User.InvalidUserAge);
         }
     }
 }
