@@ -12,5 +12,6 @@ namespace Application.Dtos.User.Request
         public string FirstName { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
+        public DateTimeOffset DateOfBirth { get; set; }
     }
 }

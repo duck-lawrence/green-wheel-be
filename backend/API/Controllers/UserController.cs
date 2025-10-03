@@ -220,8 +220,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.SetPasswordToken, out var setPasswordToken))
             {
-                string accesstoken = await _userService.SetPassword(setPasswordToken, googleSetPasswordReqDto.Password,
-                    googleSetPasswordReqDto.FirstName, googleSetPasswordReqDto.LastName);
+                string accesstoken = await _userService.SetPassword(setPasswordToken, googleSetPasswordReqDto);
                 return Ok(new
                 {
                     AccessToken = accesstoken
