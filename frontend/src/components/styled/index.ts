@@ -14,4 +14,5 @@ export * from "./TableStyled"
 export * from "./AvatarStyled"
 export * from "./DateTimeStyled"
 export * from "./LocalFilter"
-export * from "./SelectStyle"
+export * from "./ImageStyled"
+
