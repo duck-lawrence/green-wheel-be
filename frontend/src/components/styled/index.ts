@@ -1,4 +1,5 @@
 export * from "./ButtonStyled"
+export * from "./BreadcrumbsStyled"
 export * from "./CardStyled"
 export * from "./DropdownStyle"
 export * from "./FormStyled"

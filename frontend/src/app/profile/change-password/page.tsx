@@ -36,7 +36,7 @@ export default function ChangePasswordPage() {
             confirmPassword: ""
         },
         validationSchema: Yup.object({
-            currentPassword: Yup.string()
+            oldPassword: Yup.string()
                 .required(t("user.old_password_is_required"))
                 .min(8, t("user.password_too_short"))
                 .matches(
@@ -177,7 +177,7 @@ export default function ChangePasswordPage() {
                     type="submit"
                     isLoading={formik.isSubmitting}
                     color="primary"
-                    isDisabled={!formik.isValid || !formik.dirty}
+                    isDisabled={!formik.isValid}
                     className="flex min-w-30 mt-4 mb-4 mr-2"
                 >
                     {t("auth.change_password")}

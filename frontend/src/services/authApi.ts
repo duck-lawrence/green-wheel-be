@@ -46,7 +46,7 @@ export const authApi = {
     // Password
     changePassword: (req: UserChangePasswordReq) =>
         requestWrapper<void>(async () => {
-            await axiosInstance.post("/users/change-password", req)
+            await axiosInstance.put("/users/change-password", req)
         }),
     forgotPassword: ({ email }: { email: string }) =>
         requestWrapper<void>(async () => {

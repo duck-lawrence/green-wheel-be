@@ -8,6 +8,11 @@ const axiosInstance = axios.create({
     headers: { "Content-Type": "application/json" }
 })
 
+const refreshInstance = axios.create({
+    baseURL: BACKEND_API_URL,
+    withCredentials: true
+})
+
 // request interceptors
 axiosInstance.interceptors.request.use(
     (config) => {
@@ -28,15 +33,15 @@ axiosInstance.interceptors.response.use(
         const originalRequest = error.config
         const hasToken = !!useToken.getState().accessToken
 
-        if (error.response?.status === 401 && hasToken && !originalRequest._retry) {
-            originalRequest._retry = true
+        if (
+            error.response?.status === 401 &&
+            // (error.response?.data.detail === "user.invalid_token" || hasToken) &&
+            !originalRequest.sent
+        ) {
+            originalRequest.sent = true
             try {
                 useToken.getState().removeAccessToken()
-                const res = await axiosInstance.post(
-                    "/users/refresh-token",
-                    {},
-                    { withCredentials: true }
-                )
+                const res = await refreshInstance.post("/users/refresh-token")
                 useToken.getState().setAccessToken(res.data.accessToken)
 
                 originalRequest.headers = originalRequest.headers || {}
@@ -48,7 +53,6 @@ axiosInstance.interceptors.response.use(
                 return Promise.reject(refreshError)
             }
         }
-
         return Promise.reject(error)
     }
 )

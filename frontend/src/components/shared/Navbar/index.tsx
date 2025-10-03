@@ -5,7 +5,7 @@ import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
 import NextLink from "next/link"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
-import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
+import { useGetMe, useLoginDiscloresureSingleton, useToken } from "@/hooks"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import { ProfileDropdown } from "./ProfileDropdown"
 
@@ -35,6 +35,7 @@ export function Navbar() {
     // handle when login
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
+    useGetMe()
 
     // handle navbar animation
     const baseClasses = `
