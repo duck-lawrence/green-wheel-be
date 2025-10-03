@@ -7,7 +7,7 @@ import Link from "next/link"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { DropdownStyle } from "@/components"
-import { useGetMe, useLogout, useProfileStore } from "@/hooks"
+import { useGetMe, useLogout, useProfileStore, useToken } from "@/hooks"
 import { BackendError } from "@/models/common/response"
 
 export function ProfileDropdown() {
@@ -16,14 +16,14 @@ export function ProfileDropdown() {
     const logoutMutation = useLogout({ onSuccess: undefined })
     const user = useProfileStore((s) => s.user)
     const setUser = useProfileStore((s) => s.setUser)
-    // const isLoggedIn = useToken((s) => !!s.accessToken)
+    const isLoggedIn = useToken((s) => !!s.accessToken)
 
     const {
         data: userRes,
         isLoading: isGetMeLoading,
         error: getMeError,
         isError: isGetMeError
-    } = useGetMe()
+    } = useGetMe({ enabled: isLoggedIn })
 
     const handleLogout = useCallback(async () => {
         await logoutMutation.mutateAsync()

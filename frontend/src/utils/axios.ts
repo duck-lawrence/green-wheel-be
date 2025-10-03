@@ -31,11 +31,14 @@ axiosInstance.interceptors.response.use(
     (res) => res,
     async (error) => {
         const originalRequest = error.config
-        const hasToken = !!useToken.getState().accessToken
+        // const hasToken = !!useToken.getState().accessToken
 
         if (
             error.response?.status === 401 &&
-            // (error.response?.data.detail === "user.invalid_token" || hasToken) &&
+            error.response?.data.detail === "user.invalid_token" &&
+            // (error.response?.data.detail === "user.invalid_token" ||
+            //     error.response?.data.detail === "user.missing_token" ||
+            //     hasToken) &&
             !originalRequest.sent
         ) {
             originalRequest.sent = true
