@@ -41,6 +41,7 @@ export function FillterBarOrder({ onFilterChange }: { onFilterChange: () => void
                 onChange={(val) => formik.setFieldValue("status", val)}
                 labels={OrderStatusLabels}
                 label="Status"
+                className="max-w-55 h-14"
             />
 
             <DateRangePickerStyled
