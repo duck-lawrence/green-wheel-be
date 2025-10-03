@@ -22,10 +22,9 @@ namespace API.Controllers
         {
             var userClaims = HttpContext.User;
             var rentalContractViewRes = await _rentalContractService.CreateRentalContractAsync(userClaims, createReq);
-            return Ok(new
-            {
+            return Ok(
                 rentalContractViewRes
-            });
+            );
         }   
     }
 }

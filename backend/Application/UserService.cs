@@ -445,7 +445,7 @@ namespace Application
 
         }
 
-        public async Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName)
+        public async Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req)
         {
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
@@ -466,12 +466,13 @@ namespace Application
             var user = new User
             {
                 Id = id,
-                FirstName = firstName,
-                LastName = lastName,
+                FirstName = req.FirstName,
+                LastName = req.LastName,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 Email = email,
-                Password = PasswordHelper.HashPassword(password),
+                Password = PasswordHelper.HashPassword(req.Password),
+                DateOfBirth = req.DateOfBirth,
                 RoleId = roles.FirstOrDefault(r => r.Name == "Customer")!.Id,
                 IsGoogleLinked = true,
                 DeletedAt = null,

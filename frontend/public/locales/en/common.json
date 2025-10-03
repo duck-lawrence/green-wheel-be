@@ -49,6 +49,9 @@
         "complete_register": "Please enter the information below to complete your account registration",
         "already_have_account": "Already have an account?",
         "send_otp": "Send OTP",
+        "email": "Email",
+        "password": "Password",
+        "confirm_password": "Confirm password",
         "new_password": "New password",
         "confirm_new_password": "Confirm new password",
         "reset_password": "Reset password",
@@ -57,6 +60,7 @@
     "vehicle": {},
     "vehicle_model": {},
     "user": {
+        "account_information": "Account information",
         "profile": "Profile",
         "booking_history": "Booking history",
         "invalid_otp": "Invalid OTP",
@@ -70,14 +74,15 @@
         "password_too_short": "Password must be at least 8 characters",
         "password_can_not_empty": "Password is required",
         "new_password_can_not_empty": "New password is required",
-        "password_min": "Current password must be at least 8 characters",
         "confirm_password": "Confirm password must be the same as the new password",
         "password_strength": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
         "invalid_user_age": "Age must be at least 21",
         "invalid_phone": "Phone must be 10 digits and start with 0",
         "phone_is_required": "Phone is required",
+        "first_name": "First name",
         "first_name_is_required": "First name is required",
         "invalid_first_name": "First name only contains letters",
+        "last_name": "Last name",
         "last_name_is_required": "Last name is required",
         "invalid_last_name": "Last name only contains letters",
         "date_of_birht_is_required": "Date of birth is required",
@@ -97,18 +102,8 @@
         "sex_is_required": "Sex is required",
         "choose_sex": "Choose Sex",
         "date_of_birth": "Date of Birth",
+        "date_of_birth_require": "Date of Birth is required",
         "phone": "Phone"
-    },
-    "email": {
-        "require": "Email is required",
-        "invalid": "Invalid email format",
-        "label": "Email"
-    },
-    "password": {
-        "require": "Password is required",
-        "min": "Password must be at least 8 characters",
-        "label": "Password",
-        "change": "Change Password?"
     },
     "login": {
         "welcome": "Welcome Back",

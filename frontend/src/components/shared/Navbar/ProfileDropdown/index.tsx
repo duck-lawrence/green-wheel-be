@@ -14,7 +14,10 @@ export function ProfileDropdown() {
     const defaultAvatarUrl = "/images/avtFallback.jpg"
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: undefined })
-    const { user, setUser } = useProfileStore()
+    const { user, setUser } = useProfileStore((s) => ({
+        user: s.user,
+        setUser: s.setUser
+    }))
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const {
         data: userRes,
@@ -65,7 +68,7 @@ export function ProfileDropdown() {
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User Actions" variant="flat">
                     <DropdownItem key="profile" textValue={t("user.profile")}>
-                        <Link href="/#">{t("user.profile")}</Link>
+                        <Link href="/profile">{t("user.profile")}</Link>
                     </DropdownItem>
                     <DropdownItem key="team_settings" textValue={t("user.booking_history")}>
                         <Link href="/#">{t("user.booking_history")}</Link>

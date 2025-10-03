@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { Tabs, Tab, TabsProps, cn } from "@heroui/react"
+import { Tabs, Tab } from "@heroui/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import i18n from "@/lib/i18n"
@@ -16,7 +16,7 @@ const tabs = [
     }
 ]
 
-export default function AccountSidebar(props: TabsProps) {
+export default function AccountSidebar() {
     const pathname = usePathname()
 
     return (
@@ -28,17 +28,22 @@ export default function AccountSidebar(props: TabsProps) {
                     aria-label="Options"
                     placement="start"
                     selectedKey={pathname}
-                    {...props}
-                    className={cn("font-medium text-base", props.className)}
+                    className={
+                        "font-medium text-base h-40 w-50 shadow-2xs bg-white rounded-2xl overflow-hidden"
+                    }
+                    classNames={{
+                        tabList: "p-0 w-full"
+                    }}
                 >
                     {tabs.map((tab) => (
                         <Tab
                             key={tab.href}
-                            title={<Link href={tab.href}>{tab.label}</Link>}
-                            className={cn(
-                                "text-xl gap-6 flex w-49"
-                                // tab.key === "changePassword" ? "w-49" : "w-49"
-                            )}
+                            title={
+                                <Link className={"rounded-none"} href={tab.href}>
+                                    {tab.label}
+                                </Link>
+                            }
+                            className={"text-xl gap-6 flex rounded-none w-full"}
                         />
                     ))}
                 </Tabs>

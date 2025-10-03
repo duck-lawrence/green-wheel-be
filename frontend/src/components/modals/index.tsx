@@ -1,13 +1,13 @@
 import React from "react"
 import { LoginModal } from "./LoginModal"
 import { RegisterModal } from "./RegisterModal"
-import { ChangePasswordModal } from "./ChangePasswordModal"
+import { SetPasswordModal } from "./SetPasswordModal"
 import { ForgotPasswordModal } from "./ForgotPasswordModal"
 
 export const Modals = () => {
     return (
         <div>
-            <ChangePasswordModal />
+            <SetPasswordModal />
             <ForgotPasswordModal />
             <LoginModal />
             <RegisterModal />

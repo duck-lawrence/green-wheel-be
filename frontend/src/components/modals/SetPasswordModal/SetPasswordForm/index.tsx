@@ -1,47 +1,42 @@
-"use client"
+import React from "react"
+import { useProfileStore, useSetPassword } from "@/hooks"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import React, { useCallback, useState } from "react"
+import { useCallback, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { ButtonStyled, DatePickerStyled, InputStyled } from "@/components/styled"
 import { Icon } from "@iconify/react"
-import { useTranslation } from "react-i18next"
-import { useRegisterComplete } from "@/hooks"
-import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
-import { Sex } from "@/constants/enum"
-import { EnumPicker } from "@/components/modules/EnumPicker"
-import { SexLabels } from "@/constants/labels"
 import dayjs from "dayjs"
 
-interface RegisterInfoProps {
-    // onBack: () => void
-    onSuccess?: () => void
-}
-
-export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
+export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
-    const registerMutation = useRegisterComplete({ onSuccess })
+    const setPasswordMutation = useSetPassword({ onSuccess })
+    const user = useProfileStore((s) => s.user)
 
     const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const toggleConFirmVisibility = () => setIsConfirmVisible(!isConfirmVisible)
 
-    const handleRegisterComplete = useCallback(
-        async (values: UserRegisterCompleteReq) => {
-            await registerMutation.mutateAsync(values)
+    const handleSetPassword = useCallback(
+        async (values: {
+            lastName: string
+            firstName: string
+            password: string
+            confirmPassword: string
+        }) => {
+            await setPasswordMutation.mutateAsync(values)
         },
-        [registerMutation]
+        [setPasswordMutation]
     )
 
     const formik = useFormik({
         initialValues: {
-            lastName: "",
-            firstName: "",
+            lastName: user?.lastName || "",
+            firstName: user?.firstName || "",
             password: "",
             confirmPassword: "",
-            dateOfBirth: "",
-            phone: "",
-            sex: Sex.Male
+            dateOfBirth: ""
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
@@ -60,13 +55,9 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], t("user.confirm_password"))
                 .required(t("user.password_can_not_empty")),
-            dateOfBirth: Yup.string().required(t("user.date_of_birht_is_required")),
-            phone: Yup.string()
-                .required(t("user.phone_is_required"))
-                .matches(/^(0[0-9]{9})$/, t("user.invalid_phone")),
-            sex: Yup.number().required(t("user.sex_is_required"))
+            dateOfBirth: Yup.string().required(t("user.date_of_birht_is_required"))
         }),
-        onSubmit: handleRegisterComplete
+        onSubmit: handleSetPassword
     })
 
     return (
@@ -171,33 +162,9 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                         </button>
                     }
                 />
-                <InputStyled
-                    className="my-3"
-                    variant="bordered"
-                    label={t("user.phone")}
-                    maxLength={10}
-                    pattern="[0-9]*"
-                    onInput={(e) => {
-                        e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, "")
-                    }}
-                    value={formik.values.phone}
-                    onValueChange={(value) => formik.setFieldValue("phone", value)}
-                    isInvalid={!!(formik.touched.phone && formik.errors.phone)}
-                    errorMessage={formik.errors.phone}
-                    onBlur={() => {
-                        formik.setFieldTouched("phone")
-                    }}
-                />
             </div>
 
-            <div className="flex mx-auto w-110 gap-5">
-                <EnumPicker
-                    label={t("user.sex")}
-                    value={formik.values.sex}
-                    onChange={(val) => formik.setFieldValue("sex", val)}
-                    labels={SexLabels}
-                />
-
+            <div className="mx-autow-110">
                 <DatePickerStyled
                     label={t("user.date_of_birth")}
                     onChange={(val) => {
@@ -214,7 +181,6 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                     }}
                 />
             </div>
-
             <div className="mx-auto">
                 {/* <ButtonStyled onPress={onBack} className="w-5 h-10 mx-auto mt-0">
                     <ArrowLeftIcon />

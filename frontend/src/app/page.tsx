@@ -8,7 +8,7 @@ import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 
 export default function HomePage() {
     const { t } = useTranslation()
-    const { setActiveMenuKey } = useNavbarItemStore()
+    const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
 
     useEffect(() => {
         setActiveMenuKey("home")

@@ -24,14 +24,14 @@ export default function ChangePasswordPage() {
         validationSchema: Yup.object({
             currentPassword: Yup.string()
                 .required(t("user.password_can_not_empty"))
-                .min(6, t("user.password_min"))
+                .min(6, t("user.password_too_short"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
                     t("user.password_strength")
                 ),
             newPassword: Yup.string()
                 .required(t("user.new_password_can_not_empty"))
-                .min(6, t("user.password_min"))
+                .min(6, t("user.password_too_short"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
                     t("user.password_strength")

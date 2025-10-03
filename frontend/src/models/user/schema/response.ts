@@ -9,10 +9,3 @@ export type UserProfileViewRes = {
     licenseUrl?: string
     citizenUrl?: string
 }
-
-export type LoginGoogleRes = {
-    needSetPassword: boolean
-    accessToken?: string
-    firstName: string
-    lastName: string
-}

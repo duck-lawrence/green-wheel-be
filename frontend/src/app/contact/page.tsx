@@ -3,7 +3,7 @@ import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import React, { useEffect } from "react"
 
 export default function Contact() {
-    const { setActiveMenuKey } = useNavbarItemStore()
+    const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
 
     useEffect(() => {
         setActiveMenuKey("contact")

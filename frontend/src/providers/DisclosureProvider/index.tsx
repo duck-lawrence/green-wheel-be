@@ -1,7 +1,7 @@
 import React, { type PropsWithChildren } from "react"
 import { DisclosureContext } from "./DisclosureContext"
 import {
-    useChangePasswordDiscloresureCore,
+    useSetPasswordDiscloresureCore,
     useForgotPasswordDiscloresureCore,
     useLoginDiscloresureCore,
     useRegisterDiscloresureCore
@@ -10,7 +10,7 @@ import {
 export const DisclosureProvider = ({ children }: PropsWithChildren) => {
     const useLoginDiscloresure = useLoginDiscloresureCore()
     const useRegisterDiscloresure = useRegisterDiscloresureCore()
-    const useChangePasswordDiscloresure = useChangePasswordDiscloresureCore()
+    const useSetPasswordDiscloresure = useSetPasswordDiscloresureCore()
     const useForgotPasswordDiscloresure = useForgotPasswordDiscloresureCore()
 
     return (
@@ -18,7 +18,7 @@ export const DisclosureProvider = ({ children }: PropsWithChildren) => {
             value={{
                 useLoginDiscloresure,
                 useRegisterDiscloresure,
-                useChangePasswordDiscloresure,
+                useSetPasswordDiscloresure,
                 useForgotPasswordDiscloresure
             }}
         >
