@@ -42,7 +42,7 @@ export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmailProps
         },
         validationSchema: Yup.object({
             email: Yup.string()
-                .required(t("user.email_is_required"))
+                .required(t("user.email_require"))
                 .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("user.invalid_email"))
         }),
         onSubmit: handleRegister

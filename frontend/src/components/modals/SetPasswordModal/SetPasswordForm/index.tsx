@@ -55,7 +55,7 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], t("user.confirm_password"))
                 .required(t("user.password_can_not_empty")),
-            dateOfBirth: Yup.string().required(t("user.date_of_birht_is_required"))
+            dateOfBirth: Yup.string().required(t("user.date_of_birth_require"))
         }),
         onSubmit: handleSetPassword
     })
