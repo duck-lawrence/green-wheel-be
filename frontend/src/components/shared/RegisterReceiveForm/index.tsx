@@ -52,7 +52,7 @@ export const RegisterReceiveForm = () => {
     email: isLoggedIn && user ? user.email : "",
     pickupLocation: "",
     note: "",
-    paymentMethod: null,
+    paymentMethod: PaymentMethod.Cash,
     agreeTerms: false,
     agreeDataPolicy: false,
   }
