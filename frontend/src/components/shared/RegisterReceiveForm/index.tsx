@@ -152,61 +152,36 @@ export const RegisterReceiveForm = () => {
                   />
 
                   {/* Pickup location (input) */}
-                  {/* <div>
-                                   <label htmlFor="pickupLocation" className="block text-sm font-medium mb-1">
-                                     {t("car_rental.pickup_location")}
-                                     <span className="text-red-500">*</span>
-                                   </label>
-                                   <div className="relative">
-                                     <select
-                                       id="pickupLocation"
-                                       name="pickupLocation"
-                                       value={formik.values.pickupLocation}
-                                       onChange={formik.handleChange}
-                                       onBlur={formik.handleBlur}
-                                       className={`w-full border rounded-md p-2 appearance-none ${
-                                         formik.errors.pickupLocation && formik.touched.pickupLocation
-                                           ? "border-red-500"
-                                           : "border-gray-300"
-                                       }`}
-                                     >
-                                       <option value="">{t("car_rental.select_pickup_location")}</option>
-                                       <option value="place1">{t("car_rental.place1")}</option>
-                                       <option value="place2">{t("car_rental.place2")}</option>
-                                     </select>
-                                     <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
-                                       <Icon icon="ph:caret-down" />
-                                     </div>
-                                   </div>
-                                   {formik.touched.pickupLocation && formik.errors.pickupLocation && (
-                                     <div className="text-red-500 text-sm mt-1">
-                                       {formik.errors.pickupLocation}
-                                     </div>
-                                   )}
-                                 </div> */}
-                                <LocalFilter
-                                  label={
-                                    <>
-                                      {t("car_rental.pickup_location")}
-                                      <span className="text-danger-500 ml-1">*</span>
-                                    </>
-                                  }
-                                  required
-                                  placeholder={t("car_rental.select_pickup_location")}
-                                  options={[
-                                    { value: "place1", label: t("car_rental.place1") },
-                                    { value: "place2", label: t("car_rental.place2") },
-                                  ]}
-                                  value={formik.values.pickupLocation}
-                                  onChange={(v) => formik.setFieldValue("pickupLocation", v)}
-                                  onBlur={() => formik.setFieldTouched("pickupLocation", true)}
-                                  error={Boolean(formik.touched.pickupLocation && formik.errors.pickupLocation)}
-                                  helperText={
-                                    formik.touched.pickupLocation && formik.errors.pickupLocation
-                                      ? formik.errors.pickupLocation
-                                      : undefined
-                                  }
-                                />
+                  <LocalFilter
+                    label={
+                      <>
+                        {t("car_rental.pickup_location")}
+                        <span className="text-danger-500 ml-1">*</span>
+                      </>
+                    }
+                    isRequired
+                    placeholder={t("car_rental.select_pickup_location")}
+                    options={[
+                      { value: "place1", label: t("car_rental.place1") },
+                      { value: "place2", label: t("car_rental.place2") },
+                    ]}
+                    value={ // tìm object trong options có value trùng với formik.values.pickupLocation nhưng mà đang là string
+                      [
+                        { value: "place1", label: t("car_rental.place1") },
+                        { value: "place2", label: t("car_rental.place2") },
+                      ].find(o => o.value === formik.values.pickupLocation) ?? null
+                    }
+                    onValueChange={(opt: { value: string; label: string } | null) =>
+                      formik.setFieldValue("pickupLocation", opt?.value ?? "")
+                    }
+                    onBlur={() => formik.setFieldTouched("pickupLocation", true)}
+                    isInvalid={Boolean(formik.touched.pickupLocation && formik.errors.pickupLocation)}
+                    errorMessage={
+                      formik.touched.pickupLocation && formik.errors.pickupLocation
+                        ? formik.errors.pickupLocation
+                        : undefined
+                    }
+                />
                   {/* Note (input) */}
                   <InputStyled
                     variant="bordered"
