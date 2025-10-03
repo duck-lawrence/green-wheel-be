@@ -7,6 +7,7 @@ import {
     InputStyled,
     SexPicker
 } from "@/components"
+import { useProfileStore } from "@/hooks"
 
 import { Input } from "@heroui/react"
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
@@ -14,17 +15,20 @@ import React, { useState } from "react"
 import { useTranslation } from "react-i18next"
 // import { useTranslation } from "react-i18next"
 export default function Page() {
+    const defaultAvatarUrl = "/images/avtFallback.jpg"
     const { t } = useTranslation()
     const [showChange, setShowChange] = useState(true)
-    const img =
-        "https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/433446266_758349243066734_884520383743627659_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=FsaTEptwBqwQ7kNvwGBnPfY&_nc_oc=Adl360kkqq9z98joIstrLI_QwmT7Rz78mugSWoMtIDaHnYtsi0LBcoxs5ZVdaHeo9oU&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=uf7J93HxXk7lntMDq36kgQ&oh=00_Afazntj845yvpldFU92bWJNTFamk4xwJTOVFZbYZ2GfZjQ&oe=68DC722B"
+    const { user } = useProfileStore()
 
     return (
         <div className="w-[984]">
-            <div className="text-3xl mb-4 p-4 font-bold">Account information</div>
+            <div className="text-3xl mb-4 p-4 font-bold">{t("user.account_information")}</div>
             <div className="flex gap-60">
                 <div className="ml-6">
-                    <AvaterStyled name="Ngo Gia Huy" img={img} />
+                    <AvaterStyled
+                        name={`${user?.lastName.trim() || ""} ${user?.firstName.trim() || ""}`}
+                        img={user?.avatarUrl || defaultAvatarUrl}
+                    />
                 </div>
 
                 {showChange ? (
