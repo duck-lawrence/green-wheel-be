@@ -4,3 +4,5 @@ export * from "./Navbar"
 export * from "./ClientHydration"
 export * from "./User"
 export * from "./FilterForm"
+export * from "./RegisterReceiveForm"
+
