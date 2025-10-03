@@ -6,7 +6,12 @@ import * as Yup from "yup"
 import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, InputStyled, LogoStyle } from "@/components"
-import { useLogin, useLoginDiscloresureSingleton, useRegisterDiscloresureSingleton } from "@/hooks"
+import {
+    useForgotPasswordDiscloresureSingleton,
+    useLogin,
+    useLoginDiscloresureSingleton,
+    useRegisterDiscloresureSingleton
+} from "@/hooks"
 import { GoogleLoginButton } from "./GoogleLoginButton"
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
@@ -15,6 +20,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const [isVisible, setIsVisible] = useState(false)
     const { onClose: onCloseLogin } = useLoginDiscloresureSingleton()
     const { onOpen: onOpenRegister } = useRegisterDiscloresureSingleton()
+    const { onOpen: onOpenForgot } = useForgotPasswordDiscloresureSingleton()
 
     // function
     const toggleVisibility = () => setIsVisible(!isVisible)
@@ -32,6 +38,11 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
         onCloseLogin()
         onOpenRegister()
     }, [onCloseLogin, onOpenRegister])
+
+    const handleOpenForgot = useCallback(() => {
+        onCloseLogin()
+        onOpenForgot()
+    }, [onCloseLogin, onOpenForgot])
 
     const formik = useFormik({
         initialValues: {
@@ -118,7 +129,11 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                         </Checkbox>
                     </div>
                     <div>
-                        <Link className="text-default-500" href="/forgot" size="sm">
+                        <Link
+                            className="text-default-500 cursor-pointer"
+                            size="sm"
+                            onPress={handleOpenForgot}
+                        >
                             {t("login.forgot")}
                         </Link>
                     </div>

@@ -4,7 +4,7 @@ import { ModalBody, ModalContent } from "@heroui/react"
 import { useChangePasswordDiscloresureSingleton } from "@/hooks"
 import { ModalStyled } from "@/components/"
 
-export function LoginModal() {
+export function ChangePasswordModal() {
     const { isOpen, onOpenChange, onClose } = useChangePasswordDiscloresureSingleton()
 
     return (

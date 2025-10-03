@@ -57,6 +57,33 @@ export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     })
 }
 
+export const useLoginGoogle = ({
+    onNeedSetPassword,
+    onSuccess
+}: {
+    onNeedSetPassword: () => void
+    onSuccess?: () => void
+}) => {
+    const { t } = useTranslation()
+    const setAccessToken = useToken((state) => state.setAccessToken)
+
+    return useMutation({
+        mutationFn: async (credential: string) => {
+            const data = await authApi.loginGoogle(credential)
+            setAccessToken(data.accessToken)
+        },
+        onSuccess: () => {
+            onSuccess?.()
+            toast.success(t("success.login"))
+        },
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
+
 export const useRegister = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
 
@@ -106,18 +133,42 @@ export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) =
     })
 }
 
-export const useLoginGoogle = ({ onSuccess }: { onSuccess?: () => void }) => {
+export const useForgotPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((state) => state.setAccessToken)
 
     return useMutation({
-        mutationFn: async (credential: string) => {
-            const data = await authApi.loginGoogle(credential)
-            setAccessToken(data.accessToken)
-        },
+        mutationFn: authApi.forgotPassword,
+        onSuccess: onSuccess,
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
+
+export const useForgotPasswordVerify = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+
+    return useMutation({
+        mutationFn: authApi.forgotPasswordVerify,
+        onSuccess: onSuccess,
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
+
+export const useResetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+
+    return useMutation({
+        mutationFn: authApi.resetPassword,
         onSuccess: () => {
             onSuccess?.()
-            toast.success(t("success.login"))
+            toast.success(t("success.reset_password"))
         },
         onError: (error: BackendError) => {
             if (error.detail !== undefined) {

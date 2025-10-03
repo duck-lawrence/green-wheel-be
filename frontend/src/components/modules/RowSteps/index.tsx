@@ -161,7 +161,12 @@ const RowSteps = React.forwardRef<HTMLButtonElement, RowStepsProps>(
                                 : "complete"
 
                         return (
-                            <li key={stepIdx} className="relative flex w-full items-center pr-12">
+                            <li
+                                key={stepIdx}
+                                className={`relative flex w-full items-center ${
+                                    stepIdx != steps.length - 1 ? "pr-12" : ""
+                                }`}
+                            >
                                 <button
                                     key={stepIdx}
                                     ref={ref}
