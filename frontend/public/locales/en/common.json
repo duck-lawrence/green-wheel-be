@@ -39,6 +39,7 @@
     "vehicle": {},
     "vehicle_model": {},
     "user": {
+        "account_information": "Account information",
         "profile": "Profile",
         "booking_history": "Booking history",
 
@@ -131,10 +132,10 @@
         "status": "Status"
     },
     "contral_form": {
-        "payment_method": "Please select a payment method",
-        "pickup_location": "Please select pickup location",
-        "agree_terms": "You must agree to the payment terms",
-        "agree_data_policy": "You must agree to the data sharing terms"
+        "payment_method_require": "Please select a payment method",
+        "pickup_location_require": "Please select pickup location",
+        "agree_terms_require": "You must agree to the payment terms",
+        "agree_data_policy_require": "You must agree to the data sharing terms"
     },
     "vehical": {
         "pick_station": "Please select a pick-up location",
