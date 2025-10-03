@@ -32,7 +32,10 @@ namespace API.Extentions
                         {
                             throw new UnauthorizedAccessException(Message.User.MissingToken);
                         }
-                        
+                        OnAuthenticationFailed = context =>
+                        {
+                            throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                        }
                     };
                 }
 
