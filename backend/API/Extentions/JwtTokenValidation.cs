@@ -30,13 +30,13 @@ namespace API.Extentions
                     {
                         OnChallenge = context =>
                         {
-                            throw new UnauthorizedAccessException(Message.User.InvalidToken);
-                        },
+                            throw new UnauthorizedAccessException(Message.User.MissingToken);
+                        }
                         
                     };
                 }
 
-              );
+                );
         }
     }
 }
