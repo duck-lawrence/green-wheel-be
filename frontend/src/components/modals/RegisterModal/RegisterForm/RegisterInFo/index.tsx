@@ -58,9 +58,9 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                     t("user.password_strength")
                 ),
             confirmPassword: Yup.string()
-                .oneOf([Yup.ref("password")], t("user.confirm_password"))
+                .oneOf([Yup.ref("password")], t("user.confirm_password_equal"))
                 .required(t("user.password_can_not_empty")),
-            dateOfBirth: Yup.string().required(t("user.date_of_birht_is_required")),
+            dateOfBirth: Yup.string().required(t("user.date_of_birth_require")),
             phone: Yup.string()
                 .required(t("user.phone_is_required"))
                 .matches(/^(0[0-9]{9})$/, t("user.invalid_phone")),

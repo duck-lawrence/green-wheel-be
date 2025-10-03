@@ -11,7 +11,7 @@ const tabs = [
     // { key: "legal", label: t("user.legal"), href: "/user/legal" },
     {
         key: "changePassword",
-        label: i18n.t("user.change_password"),
+        label: i18n.t("auth.change_password"),
         href: "/profile/change-password"
     }
 ]

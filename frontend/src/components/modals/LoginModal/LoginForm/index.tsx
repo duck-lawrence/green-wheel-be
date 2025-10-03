@@ -51,7 +51,7 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
         },
         validationSchema: Yup.object().shape({
             email: Yup.string()
-                .required(t("user.email_is_required"))
+                .required(t("user.email_require"))
                 .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("user.invalid_email")),
             password: Yup.string()
                 .required(t("user.password_can_not_empty"))

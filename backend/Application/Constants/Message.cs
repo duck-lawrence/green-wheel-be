@@ -19,22 +19,22 @@ namespace Application.Constants
             public const string AttemptOtp = "user.attemp_otp";
             //register
             public const string EmailAlreadyExists = "user.email_already_exists";
-            public const string EmailIsRequired = "user.email_is_required";
+            public const string EmailIsRequired = "user.email_require";
             public const string InvalidEmail = "user.invalid_email";
             public const string PasswordTooShort = "user.password_too_short";
             public const string PasswordCanNotEmpty = "user.password_can_not_empty";
             public const string ConfirmPasswordIsIncorrect = "user.confirm_password_is_incorrect";
             public const string InvalidUserAge = "user.invalid_user_age";
             public const string InvalidPhone = "user.invalid_phone";
-            public const string PhoneIsRequired = "user.phone_is_required";
+            public const string PhoneIsRequired = "user.phone_require";
             public const string FirstNameIsRequired = "user.first_name_is_required";
             public const string LastNameIsRequired = "user.last_name_is_required";
-            public const string DateOfBirthIsRequired = "user.date_of_birht_is_required";
+            public const string DateOfBirthIsRequired = "user.date_of_birth_require";
             public const string PhoneAlreadyExist = "user.phone_already_exist";
             //change password
             public const string DoNotHavePermission = "user.do_not_have_permission";
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
-            public const string OldPasswordIsRequired = "user.ole_password_is_required";
+            public const string OldPasswordIsRequired = "user.old_password_is_required";
             //login
             public const string InvalidEmailOrPassword = "user.invalid_email_or_password";
             public const string Unauthorized = "user.unauthorized";

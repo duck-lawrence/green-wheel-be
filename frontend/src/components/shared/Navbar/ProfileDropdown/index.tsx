@@ -14,11 +14,10 @@ export function ProfileDropdown() {
     const defaultAvatarUrl = "/images/avtFallback.jpg"
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: undefined })
-    const { user, setUser } = useProfileStore((s) => ({
-        user: s.user,
-        setUser: s.setUser
-    }))
+    const user = useProfileStore((s) => s.user)
+    const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useToken((s) => !!s.accessToken)
+
     const {
         data: userRes,
         isLoading: isGetMeLoading,
