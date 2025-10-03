@@ -4,27 +4,23 @@ import { authApi } from "@/services/authApi"
 import { useMutation } from "@tanstack/react-query"
 import { BackendError } from "@/models/common/response"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
-import { useToken } from "@/hooks"
-import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
+import { useProfileStore, useToken } from "@/hooks"
 
-export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
+// ===== Login and logout =====
+export const useLogin = ({
+    rememberMe,
+    onSuccess
+}: {
+    rememberMe?: boolean
+    onSuccess?: () => void
+}) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((state) => state.setAccessToken)
+    const setAccessToken = useToken((s) => s.setAccessToken)
 
     return useMutation({
-        mutationFn: async ({
-            email,
-            password,
-            rememberMe
-        }: {
-            email: string
-            password: string
-            rememberMe?: boolean
-        }) => {
-            const data = await authApi.login({ email, password })
+        mutationFn: authApi.login,
+        onSuccess: (data) => {
             setAccessToken(data.accessToken, rememberMe)
-        },
-        onSuccess: () => {
             onSuccess?.()
             toast.success(t("success.login"))
         },
@@ -38,14 +34,14 @@ export const useLogin = ({ onSuccess }: { onSuccess?: () => void }) => {
 
 export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const removeAccessToken = useToken((state) => state.removeAccessToken)
+    const removeAccessToken = useToken((s) => s.removeAccessToken)
+    const removeUser = useProfileStore((s) => s.removeUser)
 
     return useMutation({
-        mutationFn: async () => {
-            await authApi.logout()
-            removeAccessToken()
-        },
+        mutationFn: authApi.logout,
         onSuccess: () => {
+            removeAccessToken()
+            removeUser()
             onSuccess?.()
             toast.success(t("success.logout"))
         },
@@ -58,21 +54,50 @@ export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
 }
 
 export const useLoginGoogle = ({
+    rememberMe,
     onNeedSetPassword,
     onSuccess
 }: {
+    rememberMe?: boolean
     onNeedSetPassword: () => void
     onSuccess?: () => void
 }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((state) => state.setAccessToken)
+    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setUser = useProfileStore((s) => s.setUser)
 
     return useMutation({
-        mutationFn: async (credential: string) => {
-            const data = await authApi.loginGoogle(credential)
-            setAccessToken(data.accessToken)
+        mutationFn: authApi.loginGoogle,
+        onSuccess: (data) => {
+            if (!data.needSetPassword) {
+                setAccessToken(data.accessToken!, rememberMe)
+                toast.success(t("success.login"))
+            } else {
+                setUser({
+                    email: "",
+                    firstName: data.firstName || "",
+                    lastName: data.lastName || ""
+                })
+                onNeedSetPassword()
+            }
+            onSuccess?.()
         },
-        onSuccess: () => {
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
+
+export const useSetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+    const setAccessToken = useToken((s) => s.setAccessToken)
+
+    return useMutation({
+        mutationFn: authApi.setPassword,
+        onSuccess: (data) => {
+            setAccessToken(data.accessToken)
             onSuccess?.()
             toast.success(t("success.login"))
         },
@@ -84,6 +109,7 @@ export const useLoginGoogle = ({
     })
 }
 
+// ===== Register =====
 export const useRegister = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
 
@@ -114,14 +140,12 @@ export const useRegisterVerify = ({ onSuccess }: { onSuccess?: () => void }) => 
 
 export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((state) => state.setAccessToken)
+    const setAccessToken = useToken((s) => s.setAccessToken)
 
     return useMutation({
-        mutationFn: async (req: UserRegisterCompleteReq) => {
-            const data = await authApi.regsiterComplete(req)
+        mutationFn: authApi.regsiterComplete,
+        onSuccess: (data) => {
             setAccessToken(data.accessToken)
-        },
-        onSuccess: () => {
             onSuccess?.()
             toast.success(t("success.register"))
         },
@@ -133,6 +157,7 @@ export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) =
     })
 }
 
+// ===== Password =====
 export const useForgotPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
 

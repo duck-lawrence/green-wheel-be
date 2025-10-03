@@ -31,6 +31,7 @@ axiosInstance.interceptors.response.use(
         if (error.response?.status === 401 && hasToken && !originalRequest._retry) {
             originalRequest._retry = true
             try {
+                useToken.getState().removeAccessToken()
                 const res = await axiosInstance.post(
                     "/users/refresh-token",
                     {},

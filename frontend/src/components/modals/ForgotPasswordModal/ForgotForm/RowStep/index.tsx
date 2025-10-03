@@ -10,9 +10,9 @@ export function RowStep({ n }: RowStepProps) {
     const { t } = useTranslation()
 
     const steps = [
-        { title: t("email.label") },
+        { title: t("auth.email") },
         { title: t("auth.otp") },
-        { title: t("password.label") }
+        { title: t("auth.password") }
     ]
 
     return (
