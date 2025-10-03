@@ -6,7 +6,7 @@ import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 import { useProfileStore, useToken } from "@/hooks"
-import { ButtonStyled, InputStyled,SelectStyled, LocalFilter , EnumPicker} from "@/components"
+import { ButtonStyled, InputStyled, LocalFilter , EnumPicker,ImageStyled } from "@/components"
 import { PaymentMethod } from "@/constants/enum"
 import { PaymentMethodLabels } from "@/constants/labels"
 
@@ -152,6 +152,16 @@ export const RegisterReceiveForm = () => {
 
                   {/* Pickup location (input) */}
                   <LocalFilter
+                    value={formik.values.pickupLocation || null}
+                    onChange={(val) => {
+                      formik.setFieldValue("pickupLocation", val ?? "")
+                      formik.setFieldTouched("pickupLocation", true)
+                    }}
+                  />
+                  {formik.touched.pickupLocation && formik.errors.pickupLocation && (
+                    <p className="text-red-500 text-sm mt-1">{formik.errors.pickupLocation}</p>
+                  )}
+                  {/* <LocalFilter
                     label={
                       <>
                         {t("car_rental.pickup_location")}
@@ -180,7 +190,7 @@ export const RegisterReceiveForm = () => {
                         ? formik.errors.pickupLocation
                         : undefined
                     }
-                />
+                /> */}
                   {/* Note (input) */}
                   <InputStyled
                     variant="bordered"
@@ -218,18 +228,21 @@ export const RegisterReceiveForm = () => {
                 )}
               </div>    */}     
                 
-                <EnumPicker<PaymentMethod>
+               <EnumPicker<PaymentMethod>
                   value={formik.values.paymentMethod}
                   onChange={(v) => {
                     formik.setFieldValue("paymentMethod", v)
-                    formik.setFieldTouched("paymentMethod", true)  // đánh dấu touched tại đây
+                    formik.setFieldTouched("paymentMethod", true)
                   }}
                   labels={PaymentMethodLabels}
                   label={t("car_rental.select_payment_method")}
-                  error={Boolean(formik.touched.paymentMethod && formik.errors.paymentMethod)}
-                  helperText={formik.touched.paymentMethod ? (formik.errors.paymentMethod as string) : undefined}
-                  className="w-full"
-              />
+                />
+                {formik.touched.paymentMethod && formik.errors.paymentMethod && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formik.errors.paymentMethod as string}
+                  </p>
+                )}
+
               </div> 
                 {/* Điều khoản */}
                 <div className="mt-6 space-y-3">
@@ -285,20 +298,18 @@ export const RegisterReceiveForm = () => {
               <div>
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <div className="flex items-center space-x-4">
-                    <div
-                      className="
-                        relative overflow-hidden rounded-md
-                        w-40 h-28              /* base size */
-                        sm:w-48 sm:h-32        /* ↑ trên màn rộng hơn */
-                        md:w-56 md:h-36
-                      "
-                    >
-                      <img
+                    <div className="
+                      relative overflow-hidden rounded-md
+                      w-40 h-28
+                      sm:w-48 sm:h-32
+                      md:w-56 md:h-36
+                    ">
+                      <ImageStyled
                         src="https://vinfastninhbinh.com.vn/wp-content/uploads/2024/06/vinfast-vf3-5.png"
                         alt={t("car_rental.vehicle")}
-                        className="absolute inset-0 w-full h-full object-contain" 
-                        loading="lazy"
-                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-contain"
+                        width={800}      
+                        height={520}       
                       />
                     </div>
                     <div>
