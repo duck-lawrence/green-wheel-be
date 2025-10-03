@@ -91,7 +91,8 @@
         "choose_sex": "Choose Sex",
 
         "unauthorized": "Unauthorized",
-        "invalid_token": "Invalid Token",
+        "invalid_token": "Invalid token",
+        "missing_token": "Missing token in header",
         "user_not_found": "User not found",
         "my_profile": "My Profile",
         "edit_information": "Edit Information",

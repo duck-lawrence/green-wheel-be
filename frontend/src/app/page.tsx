@@ -1,28 +1,42 @@
 "use client"
 import { ButtonStyled, Carousel } from "@/components"
 import Link from "next/link"
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { slides } from "../../public/cars"
 import { useTranslation } from "react-i18next"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
 
 export default function HomePage() {
     const { t } = useTranslation()
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
+    const router = useRouter()
     const params = useSearchParams()
+    const hasShownToast = useRef(false)
 
     useEffect(() => {
         setActiveMenuKey("home")
     }, [setActiveMenuKey])
 
     useEffect(() => {
+        if (hasShownToast.current) return
+
         const reason = params.get("reason")
         if (reason === "expired" || reason === "no_token") {
             toast.error(t("login.please_login"))
+            hasShownToast.current = true
         }
-    }, [params, t])
+
+        // tạo URL mới không có param
+        const newParams = new URLSearchParams(params.toString())
+        newParams.delete("reason")
+
+        router.replace(
+            `${window.location.pathname}${newParams.toString() ? "?" + newParams.toString() : ""}`,
+            { scroll: false }
+        )
+    }, [params, t, router])
 
     return (
         <div>

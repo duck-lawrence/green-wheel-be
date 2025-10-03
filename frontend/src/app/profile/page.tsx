@@ -21,7 +21,7 @@ export default function Page() {
     const { user } = useProfileStore()
 
     return (
-        <div className="w-[984]">
+        <div>
             <div className="text-3xl mb-4 p-4 font-bold">{t("user.account_information")}</div>
             <div className="flex gap-60">
                 <div className="ml-6">
