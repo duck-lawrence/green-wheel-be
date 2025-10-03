@@ -65,7 +65,7 @@ export function ProfileDropdown() {
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User Actions" variant="flat">
                     <DropdownItem key="profile" textValue={t("user.profile")}>
-                        <Link href="/#">{t("user.profile")}</Link>
+                        <Link href="/profile">{t("user.profile")}</Link>
                     </DropdownItem>
                     <DropdownItem key="team_settings" textValue={t("user.booking_history")}>
                         <Link href="/#">{t("user.booking_history")}</Link>

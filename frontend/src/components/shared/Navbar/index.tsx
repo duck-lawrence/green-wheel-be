@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react"
 import "./index.css"
 import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
+import NextLink from "next/link"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
 import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
@@ -46,8 +47,8 @@ export function Navbar() {
         ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
         ${
             scrollState === "top" || scrollState === "middle"
-                ? "text-white rounded-3xl bg-[#080808]/60 mx-auto max-w-3xl scale-95"
-                : ""
+                ? "text-white rounded-3xl bg-[#080808]/60 backdrop-blur-md mx-auto max-w-3xl scale-95"
+                : "backdrop-blur-none"
         }
     `
     const itemClasses = [
@@ -124,8 +125,10 @@ export function Navbar() {
         >
             {/* start content */}
             <NavbarBrand>
-                <AcmeLogo />
-                <p className="font-bold text-inherit">ACME</p>
+                <NextLink href={"/"} className="flex items-center">
+                    <AcmeLogo />
+                    <p className="font-bold text-inherit">ACME</p>
+                </NextLink>
             </NavbarBrand>
             {/* middle content */}
             <NavbarContent className="hidden sm:flex gap-4 justify-center">
