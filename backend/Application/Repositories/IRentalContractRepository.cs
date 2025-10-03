@@ -11,5 +11,7 @@ namespace Application.Repositories
     {
         Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId);
         Task<bool> HasActiveContractAsync(Guid customerId);
+        Task<IEnumerable<RentalContract>> GetByStatus(int status);
+        
     }
 }

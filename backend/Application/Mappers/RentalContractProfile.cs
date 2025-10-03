@@ -14,6 +14,7 @@ namespace Application.Mappers
         public RentalContractProfile()
         {
             CreateMap<RentalContract, RentalContractViewRes>();
+            CreateMap<RentalContract, RentalContractForStaffViewRes>();
         }
     }
 }
