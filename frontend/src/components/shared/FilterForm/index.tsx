@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next"
 const MIN_HOUR = 7
 const MAX_HOUR = 17
 
-export function Filter() {
+export function FilterForm() {
     const { t } = useTranslation()
     // Tính thời gian mặc định
     const zonedNow = fromDate(new Date(), getLocalTimeZone())
@@ -84,6 +84,7 @@ export function Filter() {
                     <LocalFilter
                         value={formik.values.local}
                         onChange={(val) => formik.setFieldValue("local", val)}
+                        className="max-w-55 h-14 mr-0"
                     />
                     {formik.touched.local && typeof formik.errors.local === "string" && (
                         <div className="text-red-500 text-sm mt-1">{formik.errors.local}</div>
