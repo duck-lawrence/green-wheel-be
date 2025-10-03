@@ -1,12 +1,14 @@
 "use client"
 import React, { useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { BreadCrumbsStyled, ButtonStyled } from "@/components/styled"
+import { ButtonStyled } from "@/components/styled"
 import { Field } from "@/components/styled/FieldStyled"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 import Link from "next/link"
 import { currency } from "@/utils/helpers/currentcy"
 import { useToken } from "@/hooks"
+import { MathDate } from "@/utils/helpers/mathDate"
+import { BreadCrumbsStyled } from "../../styled"
 
 // Data
 const vehicle = {
@@ -106,15 +108,10 @@ const similarVehicles = allVehicles
 export function Detail() {
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const [active, setActive] = useState(0)
-    const [dates, setDates] = useState({ pick: "2025-10-04", drop: "2025-10-06" })
+    const [dates, setDates] = useState({ start: "2025-10-04", end: "2025-10-06" })
 
     const totalDays = useMemo(() => {
-        const { pick, drop } = dates
-        if (!pick || !drop) return 0
-        const a = new Date(pick)
-        const b = new Date(drop)
-        const diff = Math.ceil((+b - +a) / (1000 * 60 * 60 * 24))
-        return Math.max(0, diff)
+        return MathDate(dates)
     }, [dates])
 
     const total = totalDays * vehicle.costPerDay + vehicle.depositFee
