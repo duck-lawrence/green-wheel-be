@@ -27,6 +27,11 @@ export function LocalFilter({ value, onChange, className }: LocalFilterProps) {
                 onChange(key as string)
                 console.log("Selected:", key)
             }}
+            // classNames={{
+            //     base: "h-25", // toàn bộ khung
+            //     selectorButton: "min-h-20 h-20 py-3", // ✅ phần hiển thị input
+            //     listbox: "text-xl" // menu list
+            // }}
         >
             {(item: (typeof locals)[0]) => (
                 <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>
