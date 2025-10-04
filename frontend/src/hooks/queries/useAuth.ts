@@ -40,9 +40,9 @@ export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     return useMutation({
         mutationFn: authApi.logout,
         onSuccess: () => {
+            onSuccess?.()
             removeAccessToken()
             removeUser()
-            onSuccess?.()
             toast.success(t("success.logout"))
         },
         onError: (error: BackendError) => {

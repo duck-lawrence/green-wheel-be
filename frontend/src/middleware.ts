@@ -15,7 +15,6 @@ export function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/?reason=expired", req.url))
     }
 
-    console.log("hehe")
     return NextResponse.next()
 }
 

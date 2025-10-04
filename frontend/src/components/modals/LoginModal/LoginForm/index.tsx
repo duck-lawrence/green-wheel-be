@@ -3,9 +3,8 @@ import { Checkbox, Divider, Link } from "@heroui/react"
 import React, { useCallback, useState } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, InputStyled, LogoStyle } from "@/components"
+import { ButtonStyled, ButtonToggleVisibility, InputStyled, LogoStyle } from "@/components"
 import {
     useForgotPasswordDiscloresureSingleton,
     useLogin,
@@ -96,24 +95,10 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                             formik.setFieldTouched("password")
                         }}
                         endContent={
-                            <button
-                                aria-label="toggle password visibility"
-                                className="focus:outline-solid outline-transparent"
-                                type="button"
-                                onClick={toggleVisibility}
-                            >
-                                {isVisible ? (
-                                    <Icon
-                                        className="text-default-400 pointer-events-none text-2xl"
-                                        icon="solar:eye-closed-linear"
-                                    />
-                                ) : (
-                                    <Icon
-                                        className="text-default-400 pointer-events-none text-2xl"
-                                        icon="solar:eye-bold"
-                                    />
-                                )}
-                            </button>
+                            <ButtonToggleVisibility
+                                isVisible={isVisible}
+                                toggleVisibility={toggleVisibility}
+                            />
                         }
                     />
                 </div>

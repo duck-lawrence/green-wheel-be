@@ -499,7 +499,7 @@ namespace Application
 
         public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
-            if (userUpdateReq.Phone != null)
+            if (!string.IsNullOrEmpty(userUpdateReq.Phone))
             {
                 if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
                 {
@@ -514,7 +514,7 @@ namespace Application
             }
             if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
             if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
-            if (userUpdateReq.Phone != null) userFromDb.Phone = userUpdateReq.Phone;
+            if (!string.IsNullOrEmpty(userUpdateReq.Phone)) userFromDb.Phone = userUpdateReq.Phone;
             if(userUpdateReq.DateOfBirth != null) userFromDb.DateOfBirth = userUpdateReq.DateOfBirth;
             if(userUpdateReq.Sex != null) userFromDb.Sex = userUpdateReq.Sex;
             await _userRepository.UpdateAsync(userFromDb);

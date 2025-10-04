@@ -2,8 +2,7 @@
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import React, { useCallback, useState } from "react"
-import { ButtonStyled, InputStyled } from "@/components/styled"
-import { Icon } from "@iconify/react"
+import { ButtonStyled, ButtonToggleVisibility, InputStyled } from "@/components/styled"
 import { useTranslation } from "react-i18next"
 import { useResetPassword } from "@/hooks"
 
@@ -82,24 +81,10 @@ export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
                         formik.setFieldTouched("password")
                     }}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleVisibility}
-                        >
-                            {isVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isVisible}
+                            toggleVisibility={toggleVisibility}
+                        />
                     }
                 />
 
@@ -116,24 +101,10 @@ export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
                     }}
                     isInvalid={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleConFirmVisibility}
-                        >
-                            {isConfirmVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isConfirmVisible}
+                            toggleVisibility={toggleConFirmVisibility}
+                        />
                     }
                 />
             </div>

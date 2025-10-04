@@ -4,8 +4,12 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useCallback, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, DatePickerStyled, InputStyled } from "@/components/styled"
-import { Icon } from "@iconify/react"
+import {
+    ButtonStyled,
+    ButtonToggleVisibility,
+    DatePickerStyled,
+    InputStyled
+} from "@/components/styled"
 import dayjs from "dayjs"
 import { UserSetPasswordReq } from "@/models/auth/schema/request"
 
@@ -104,24 +108,10 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
                         formik.setFieldTouched("password")
                     }}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleVisibility}
-                        >
-                            {isVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isVisible}
+                            toggleVisibility={toggleVisibility}
+                        />
                     }
                 />
 
@@ -138,24 +128,10 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
                     }}
                     isInvalid={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleConFirmVisibility}
-                        >
-                            {isConfirmVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isConfirmVisible}
+                            toggleVisibility={toggleConFirmVisibility}
+                        />
                     }
                 />
             </div>

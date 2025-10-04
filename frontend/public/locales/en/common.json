@@ -19,6 +19,7 @@
         "logout": "Logout failed"
     },
     "common": {
+        "update": "Update",
         "too_many_request": "Too many request. Try again later",
         "unexpected_error": "An unexpected error occurred. Please try again later."
     },
@@ -70,6 +71,7 @@
         "phone": "Phone",
         "phone_require": "Phone is required",
         "invalid_phone": "Phone must be 10 digits and start with 0",
+        "phone_already_exist": "This phone already exists",
 
         "first_name": "First name",
         "first_name_is_required": "First name is required",
@@ -96,7 +98,8 @@
         "user_not_found": "User not found",
         "my_profile": "My Profile",
         "edit_information": "Edit Information",
-        "save_changes": "Save Changes"
+        "save_changes": "Save Changes",
+        "cancel": "Cancel"
     },
     "login": {
         "welcome": "Welcome Back",
