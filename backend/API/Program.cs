@@ -114,12 +114,16 @@ namespace API
             builder.Services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
             builder.Services.AddScoped<IDepositRepository, DepositRepository>();
             builder.Services.AddScoped<IStationRepository, StationRepository>();
-            //Add scope service
+            builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
+            //Add scope
+            builder.Services.AddScoped<IInvoiceService, InvoiceService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
             builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
             builder.Services.AddScoped<IVehicleService, VehicleService>();
             builder.Services.AddScoped<IRentalContractService, RentalContractService>();
+            //Add Client
+            builder.Services.AddHttpClient<IMomoService, MomoService>();
             //UOW
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             //Mapper
@@ -127,6 +131,8 @@ namespace API
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
 
             //configure <-> setting
+            //Momo
+            builder.Services.Configure<MomoSettings>(builder.Configuration.GetSection("MomoSettings"));
             //JWT
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var _jwtSetting = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
@@ -212,7 +218,7 @@ namespace API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -18,7 +18,6 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IPhotoService _photoService;
-        private readonly AppDbContext _db;
         private readonly ILogger<UserController> _logger;
 
         private readonly IGoogleCredentialService _googleService;

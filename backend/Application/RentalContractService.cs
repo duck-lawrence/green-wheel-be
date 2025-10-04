@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net.WebSockets;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,12 +48,37 @@ namespace Application
             }
             var station = await _uow.Stations.GetByIdAsync(createReq.StationId) ??
                                                         throw new NotFoundException(Message.Station.StationNotFound);
-            var vehicle = await _uow.Vehicles.GetVehicle(createReq.StationId,
-                                                        createReq.ModelId,
-                                                        createReq.StartDate,
-                                                        createReq.EndDate) ??
+            var vehicles = await _uow.Vehicles.GetVehicles(createReq.StationId,
+                                                        createReq.ModelId) ??
                                                         throw new NotFoundException(Message.Vehicle.VehicleNotFound);
-
+            Vehicle vehicle = null;
+            foreach(var _vehicle in vehicles)
+            {
+                if(_vehicle.Status == (int)VehicleStatus.Available)
+                {
+                    vehicle = _vehicle;
+                    break;
+                }
+                if(_vehicle.Status == (int)VehicleStatus.Unavaible || _vehicle.Status == (int)VehicleStatus.Rented)
+                {
+                    var isOverlap = false;
+                    foreach(var rentalContract in _vehicle.RentalContracts)
+                    {
+                        if(rentalContract.StartDate <= createReq.EndDate.AddDays(10)
+                            && rentalContract.EndDate >= createReq.StartDate.AddDays(-10))
+                        {
+                            isOverlap = true;
+                            break;
+                        } 
+                    }
+                    if (isOverlap == false)
+                    {
+                        vehicle = _vehicle;
+                        break;
+                    }
+                }
+            }
+            if (vehicle == null) throw new NotFoundException(Message.Vehicle.VehicleNotFound);
             var model = await _uow.VehicleModels.GetByIdAsync(createReq.ModelId);
 
             var days = (int)Math.Ceiling((createReq.EndDate - createReq.StartDate).TotalDays);
@@ -86,7 +112,11 @@ namespace Application
             await _uow.RentalContracts.AddAsync(contract);
 
             //Update vehicle
-            await _uow.Vehicles.UpdateStatusAsync(vehicle.Id, (int)VehicleStatus.Unavaible);
+            if(vehicle.Status == (int)VehicleStatus.Available)
+            {
+                vehicle.Status = (int)VehicleStatus.Unavaible;
+                await _uow.Vehicles.UpdateAsync(vehicle);
+            }
 
             //Create invoice
             Guid invoiceId;
@@ -173,60 +203,72 @@ namespace Application
             await _uow.RentalContracts.UpdateAsync(rentalContract);
         }
 
-        /*
-         Dear [CustomerName],
-
-        Thank you for booking a vehicle with GreenWheel.  
-        To complete your reservation, please proceed with the payment:
-
-        - Booking ID: {rentalContract.Id}  
-        - Rental period: [rentalContract.StartDate] – [rentalContract.EndDate]  
-        - Amount due: [TotalAmount]
-
-        You can pay directly in the GreenWheel app or click the link below:  
-        [LinkSet]
-
-        Note: Your reservation will be automatically cancelled if payment is not completed before [HUHU].
-
-        Best regards,  
-        The HYCAT Team
-         */
-        public async Task VerifyRentalContract(Guid id, int status)
+        
+        public async Task VerifyRentalContract(Guid id, bool haveVehicle = true)
         {
             var rentalContract = await _uow.RentalContracts.GetByIdAsync(id);
             if (rentalContract == null)
             {
                 throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
             }
-            await UpdateStatus(rentalContract, status);
             //Lấy customer
             var customer = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
             {
                 rc => rc.Customer
             })).Where(rc => rc.Id == id)
             .Select(rc => rc.Customer).FirstOrDefault();
-            
-            //Lấy invoice
-            var invoice = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
+            var vehicle = await _uow.Vehicles.GetByIdAsync((Guid)rentalContract.VehicleId);
+            var vehicleModel = await _uow.VehicleModels.GetByIdAsync(vehicle.ModelId);
+            var station = await _uow.Stations.GetByIdAsync(vehicle.StationId);
+            string subject;
+            string templatePath;
+            string body;
+
+
+            if (haveVehicle)
             {
+                if (rentalContract.Status == (int)RentalContractStatus.RequestPeding)
+                {
+                    await UpdateStatus(rentalContract, (int)RentalContractStatus.PaymentPending);
+                }
+                //Lấy invoice
+                var invoice = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
+                {
                 rc => rc.Invoices
-            })).Where(rc => rc.Id == id)
-            .Select(rc => rc.Invoices).FirstOrDefault();
+                })).Where(rc => rc.Id == id)
+                .Select(rc => rc.Invoices).FirstOrDefault();
 
-            string subject = "Hello đây là mail đến từ nhà vệ sinh";
-            string templatePath = Path.Combine("../Application", "Templates", "PaymentEmailTemplate.txt");
-            string body = System.IO.File.ReadAllText(templatePath);
+                subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
+                templatePath = Path.Combine("../Application", "Templates", "PaymentEmailTemplate.html");
+                body = System.IO.File.ReadAllText(templatePath);
 
-            body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
-                       .Replace("{BookingId}", rentalContract.Id.ToString())
-                       .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
-                       .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"))
-                       .Replace("{AmountDue}", (invoice.First().Tax * invoice.First().Subtotal).ToString("C"))
-                       .Replace("{PaymentLink}", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1")
-                       .Replace("{Deadline}", "NGU");
-
-
-            await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
+                body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
+                           .Replace("{BookingId}", rentalContract.Id.ToString())
+                           .Replace("{VehicleModelName}", vehicleModel.Name)
+                           .Replace("{LisencePlate}", vehicle.LicensePlate)
+                           .Replace("{StationName}", station.Name)
+                           .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
+                           .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"))
+                           .Replace("{AmountDue}", (invoice.First().Tax * invoice.First().Subtotal).ToString("N0") + "VNĐ")
+                           .Replace("{PaymentLink}", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1")
+                           .Replace("{Deadline}", "....");
+            }
+            else
+            {
+                if (rentalContract.Status == (int)RentalContractStatus.RequestPeding)
+                {
+                    await UpdateStatus(rentalContract, (int)RentalContractStatus.Cancelled);
+                }
+                subject = "[GreenWheel] Vehicle Unavailable, Booking Cancelled";
+                templatePath = Path.Combine("../Application", "Templates", "CancelRentalContractEmailTempate.html");
+                body = System.IO.File.ReadAllText(templatePath);
+                body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
+                           .Replace("{VehicleModelName}", vehicleModel.Name)
+                           .Replace("{StationName}", station.Name)
+                           .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
+                           .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"));
+            }
+             await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
 
         }
     }

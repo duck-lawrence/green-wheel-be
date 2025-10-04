@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20250927115311_UpdateSexNullAble")]
-    partial class UpdateSexNullAble
+    [Migration("20251004145325_update")]
+    partial class update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -478,10 +478,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
-
-                    b.Property<DateTimeOffset?>("ExpiresAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("expires_at");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(255)
@@ -1111,6 +1107,10 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("first_name");
+
+                    b.Property<bool>("IsGoogleLinked")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_google_linked");
 
                     b.Property<string>("LastName")
                         .IsRequired()
