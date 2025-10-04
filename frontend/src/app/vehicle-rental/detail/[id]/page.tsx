@@ -10,21 +10,22 @@ import { MathDate } from "@/utils/helpers/mathDate"
 import { vehicleData } from "@/data/vehicleData"
 import { useParams } from "next/navigation"
 import Vehicle from "@/models/user/type/vehicle"
-import { useToken } from "@/hooks"
+import { useBookingStore, useToken } from "@/hooks"
 
 export default function DetailPage() {
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { id } = useParams()
     const [vehicle, setVehicle] = useState<Vehicle | null>(null)
-
+    const { start, end } = useBookingStore()
     // handle render picture
     const [active, setActive] = useState(0)
 
     // handle count date
-    const [dates, setDates] = useState({ start: "2025-10-02", end: "2025-10-06" })
+    // const [dates, setDates] = useState({ start: "2025-10-02", end: "2025-10-06" })
+
     const totalDays = useMemo(() => {
-        return MathDate(dates)
-    }, [dates])
+        return MathDate({ start, end })
+    }, [start, end])
 
     useEffect(() => {
         const vehicleID = Array.isArray(id) ? id[0] : id
