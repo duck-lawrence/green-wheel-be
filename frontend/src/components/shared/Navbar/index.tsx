@@ -1,8 +1,8 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import "./index.css"
-import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
-import NextLink from "next/link"
+import { NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react"
+import Link from "next/link"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
 import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
@@ -127,27 +127,31 @@ export function Navbar() {
         >
             {/* start content */}
             <NavbarBrand>
-                <NextLink href={"/"} className="flex items-center">
+                <Link href={"/"} className="flex items-center">
                     <AcmeLogo />
                     <p className="font-bold text-inherit">ACME</p>
-                </NextLink>
+                </Link>
             </NavbarBrand>
             {/* middle content */}
             <NavbarContent className="hidden sm:flex gap-4 justify-center">
                 {menus.map((menu) => (
                     <NavbarItem
                         key={menu.key}
-                        onPress={() => setActiveMenuKey(menu.key)}
                         isActive={activeMenuKey == menu.key}
-                        as={Link}
-                        href={menu.key === "home" ? "/" : "/" + menu.key}
-                        className={
-                            scrollState === "top" || scrollState === "middle"
-                                ? "text-white"
-                                : "text-inherit"
-                        }
+                        className={`""text-center px-3 w-fit"
+                            ${
+                                scrollState === "top" || scrollState === "middle"
+                                    ? "text-white"
+                                    : "text-inherit"
+                            }`}
                     >
-                        <div className="text-center px-3 min-w-full">{menu.label}</div>
+                        <Link
+                            href={menu.key === "home" ? "/" : "/" + menu.key}
+                            onClick={() => setActiveMenuKey(menu.key)}
+                            className="h-full flex items-center"
+                        >
+                            {menu.label}
+                        </Link>
                     </NavbarItem>
                 ))}
             </NavbarContent>

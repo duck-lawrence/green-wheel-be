@@ -3,9 +3,9 @@ import { InputStyled } from "@/components/styled"
 import { useFormik } from "formik"
 import * as Yub from "yup"
 import React from "react"
-export function InputPhone({ style }: { style: boolean }) {
+export function InputPhone({ isReadOnly }: { isReadOnly: boolean }) {
     // const [isDisabled, setIsDisabled] = useState(style)
-    const handleDisable = style
+
     const formik = useFormik({
         initialValues: {
             phone: ""
@@ -23,7 +23,7 @@ export function InputPhone({ style }: { style: boolean }) {
     return (
         <form>
             <InputStyled
-                disabled={handleDisable}
+                isReadOnly={isReadOnly}
                 className="w-75"
                 variant="bordered"
                 label="Phone number"

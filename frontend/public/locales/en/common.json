@@ -8,7 +8,8 @@
         "logout": "Logout successful",
         "register": "Register successful",
         "reset_password": "Reset password successful",
-        "change_password": "Change password successful"
+        "change_password": "Change password successful",
+        "upload": "Upload successful"
     },
     "failed": {
         "create": "Failed to create",
@@ -19,6 +20,9 @@
         "logout": "Logout failed"
     },
     "common": {
+        "update": "Update",
+        "save_changes": "Save Changes",
+        "cancel": "Cancel",
         "too_many_request": "Too many request. Try again later",
         "unexpected_error": "An unexpected error occurred. Please try again later."
     },
@@ -62,7 +66,7 @@
         "confirm_password_equal": "Confirm password must be the same as the new password",
         "password_strength": "Password must contain at least 1 uppercase letter, 1 number, and 1 special character",
         "old_password_is_incorrect": "Old password is incorrect",
-        "old_password_is_required": "Old password is required",
+        "old_password_require": "Old password is required",
         "invalid_email_or_password": "Invalid email or password",
 
         "invalid_user_age": "Age must be at least 21",
@@ -70,13 +74,14 @@
         "phone": "Phone",
         "phone_require": "Phone is required",
         "invalid_phone": "Phone must be 10 digits and start with 0",
+        "phone_already_exist": "This phone already exists",
 
         "first_name": "First name",
-        "first_name_is_required": "First name is required",
+        "first_name_require": "First name is required",
         "invalid_first_name": "First name only contains letters",
 
         "last_name": "Last name",
-        "last_name_is_required": "Last name is required",
+        "last_name_require": "Last name is required",
         "invalid_last_name": "Last name only contains letters",
 
         "account_name": "Account Name",
@@ -87,16 +92,17 @@
         "date_of_birth_require": "Date of birth is required",
 
         "sex": "Sex",
-        "sex_is_required": "Sex is required",
+        "sex_require": "Sex is required",
         "choose_sex": "Choose Sex",
+
+        "upload_avatar": "Upload avatar",
 
         "unauthorized": "Unauthorized",
         "invalid_token": "Invalid token",
         "missing_token": "Missing token in header",
         "user_not_found": "User not found",
         "my_profile": "My Profile",
-        "edit_information": "Edit Information",
-        "save_changes": "Save Changes"
+        "edit_information": "Edit Information"
     },
     "login": {
         "welcome": "Welcome Back",

@@ -1,9 +1,8 @@
 "use client"
-import { ButtonStyled, InputStyled } from "@/components"
+import { ButtonStyled, ButtonToggleVisibility, InputStyled } from "@/components"
 import React, { useCallback, useState } from "react"
 import * as Yup from "yup"
 import { useFormik } from "formik"
-import { Icon } from "@iconify/react"
 import { useTranslation } from "react-i18next"
 import { useChangePassword } from "@/hooks"
 import { UserChangePasswordReq } from "@/models/auth/schema/request"
@@ -37,7 +36,7 @@ export default function ChangePasswordPage() {
         },
         validationSchema: Yup.object({
             oldPassword: Yup.string()
-                .required(t("user.old_password_is_required"))
+                .required(t("user.old_password_require"))
                 .min(8, t("user.password_too_short"))
                 .matches(
                     /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
@@ -58,7 +57,7 @@ export default function ChangePasswordPage() {
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="p-4">
+        <form onSubmit={formik.handleSubmit}>
             {/* Title */}
             <div className="text-3xl mb-4 p-4 font-bold">
                 <p>{t("auth.change_password")}</p>
@@ -80,24 +79,10 @@ export default function ChangePasswordPage() {
                         formik.setFieldTouched("oldPassword")
                     }}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleVisibility}
-                        >
-                            {isVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isVisible}
+                            toggleVisibility={toggleVisibility}
+                        />
                     }
                 />
 
@@ -115,24 +100,10 @@ export default function ChangePasswordPage() {
                         formik.setFieldTouched("password")
                     }}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleNewVisibility}
-                        >
-                            {isNewVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isNewVisible}
+                            toggleVisibility={toggleNewVisibility}
+                        />
                     }
                 />
 
@@ -150,24 +121,10 @@ export default function ChangePasswordPage() {
                     }}
                     isInvalid={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleConFirmVisibility}
-                        >
-                            {isConfirmVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isConfirmVisible}
+                            toggleVisibility={toggleConFirmVisibility}
+                        />
                     }
                 />
             </div>

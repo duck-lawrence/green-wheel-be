@@ -86,10 +86,10 @@ namespace Application.Constants
         //Cloudinary
         public static class Cloudinary
         {
-            public const string NotFoundObjectInFile = "File is emty";
-            public const string InvalidFileType = "Unsupported image type";
-            public const string UploadFailed = "Upload failed";
-            public const string DeleteSuccess = "Delete successful";
+            public const string NotFoundObjectInFile = "cloudinary.file_not_found";
+            public const string InvalidFileType = "cloudinary.invalid_file_type";
+            public const string UploadFailed = "failed.upload";
+            public const string DeleteSuccess = "success.delete";
         }
 
         //Rental Contract

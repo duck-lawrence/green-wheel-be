@@ -1,3 +1,4 @@
+export * from "./AvatarUploader"
 export * from "./LanguageSwitcher"
 export * from "./Carousel"
 export * from "./Navbar"
