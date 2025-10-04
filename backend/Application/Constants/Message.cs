@@ -82,5 +82,11 @@ namespace Application.Constants
             public const string UploadFailed = "Upload failed";
             public const string DeleteSuccess = "Delete successful";
         }
+
+        //Licenses
+        public static class Licenses
+        {
+            public const string InvalidLicenseData = "Could not extract driver license data";
+        }
     }
 }

@@ -9,6 +9,6 @@ namespace Application.Dtos.Common.Request
 {
     public class UploadImageReq
     {
-        public required IFormFile File { get; set; }
+        public IFormFile File { get; set; } = null!;
     }
 }
