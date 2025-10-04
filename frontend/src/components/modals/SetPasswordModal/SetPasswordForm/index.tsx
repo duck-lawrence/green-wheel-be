@@ -40,10 +40,10 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
-                .required(t("user.last_name_is_required"))
+                .required(t("user.last_name_require"))
                 .matches(/^[\p{L}\s]+$/u, t("user.invalid_last_name")),
             firstName: Yup.string()
-                .required(t("user.first_name_is_required"))
+                .required(t("user.first_name_require"))
                 .matches(/^[\p{L}\s]+$/u, t("user.invalid_first_name")),
             password: Yup.string()
                 .required(t("user.password_can_not_empty"))

@@ -1,7 +1,16 @@
 "use client"
-import { AvaterStyled, ButtonStyled, DatePickerStyled, EnumPicker, InputStyled } from "@/components"
+import {
+    AvatarUploadButton,
+    AvatarUploaderModal,
+    AvaterStyled,
+    ButtonStyled,
+    DatePickerStyled,
+    DropdownStyle,
+    EnumPicker,
+    InputStyled
+} from "@/components"
 import { parseDate } from "@internationalized/date"
-import { useProfileStore, useUpdateMe } from "@/hooks"
+import { useAvatarUploadDiscloresureSingleton, useProfileStore, useUpdateMe } from "@/hooks"
 import { UserUpdateReq } from "@/models/user/schema/request"
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
 import React, { useCallback, useState } from "react"
@@ -12,6 +21,7 @@ import { Sex } from "@/constants/enum"
 import { SexLabels } from "@/constants/labels"
 import dayjs from "dayjs"
 import { defaultAvatarUrl } from "@/constants/constants"
+import { DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react"
 
 export default function Page() {
     const { t } = useTranslation()
@@ -20,6 +30,30 @@ export default function Page() {
     const updateMeMutation = useUpdateMe({ onSuccess: updateUser })
     const [showChange, setShowChange] = useState(true)
 
+    // ===== Upload avatar =====
+    const [imgSrc, setImgSrc] = useState<string | null>(null)
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
+    const {
+        isOpen: isDropdownOpen,
+        onOpenChange: onDropdownOpenChange,
+        onClose: onDropdownClose
+    } = useDisclosure()
+    const { onOpen: onAvatarUploadOpen } = useAvatarUploadDiscloresureSingleton()
+
+    const handleSelectFile = (file: File) => {
+        const reader = new FileReader()
+        reader.addEventListener("load", () => {
+            // reset when choose new one
+            setImgSrc(reader.result as string)
+            onDropdownClose()
+            onAvatarUploadOpen()
+            // setCrop({ x: 0, y: 0 })
+            // setZoom(1)
+        })
+        reader.readAsDataURL(file)
+    }
+
+    // ===== Update Me =====
     const handleUpdateMe = useCallback(
         async (values: UserUpdateReq) => {
             await updateMeMutation.mutateAsync(values)
@@ -39,15 +73,15 @@ export default function Page() {
         },
         validationSchema: Yup.object({
             firstName: Yup.string()
-                .required(t("user.first_name_is_required"))
+                .required(t("user.first_name_require"))
                 .matches(/^[\p{L}\s]+$/u, t("user.invalid_first_name")),
             lastName: Yup.string()
-                .required(t("user.last_name_is_required"))
+                .required(t("user.last_name_require"))
                 .matches(/^[\p{L}\s]+$/u, t("user.invalid_last_name")),
             phone: Yup.string()
                 // .required(t("user.phone_require"))
                 .matches(/^(0[0-9]{9})$/, t("user.invalid_phone")),
-            sex: Yup.number().required(t("user.sex_is_required")),
+            sex: Yup.number().required(t("user.sex_require")),
             dateOfBirth: Yup.string().required(t("user.date_of_birth_require"))
         }),
         onSubmit: handleUpdateMe
@@ -58,18 +92,41 @@ export default function Page() {
             {/* Title */}
             <div className="text-3xl mb-4 p-4 font-bold">{t("user.account_information")}</div>
 
+            <AvatarUploaderModal
+                imgSrc={imgSrc}
+                setImgSrc={setImgSrc}
+                croppedAreaPixels={croppedAreaPixels}
+                setCroppedAreaPixels={setCroppedAreaPixels}
+            />
+
             {/* Title */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center px-36">
                 {/* logo and user full name */}
-                <div className="ml-6">
-                    <AvaterStyled
-                        name={`${user?.lastName.trim() || ""} ${user?.firstName.trim() || ""}`}
-                        img={user?.avatarUrl || defaultAvatarUrl}
-                    />
+                <div className="flex gap-4 items-center w-fit">
+                    <DropdownStyle
+                        placement="right-start"
+                        classNames={{ content: "min-w-fit max-w-fit" }}
+                        isOpen={isDropdownOpen}
+                        onOpenChange={onDropdownOpenChange}
+                        closeOnSelect={false}
+                    >
+                        <DropdownTrigger className="w-30 h-30 cursor-pointer">
+                            <AvaterStyled src={user?.avatarUrl || defaultAvatarUrl} />
+                        </DropdownTrigger>
+                        <DropdownMenu variant="flat" classNames={{ base: "p-0 w-fit" }}>
+                            <DropdownItem key="upload_avatar" className="block p-0">
+                                <AvatarUploadButton onFileSelect={handleSelectFile} />
+                            </DropdownItem>
+                        </DropdownMenu>
+                    </DropdownStyle>
+
+                    <div
+                        className="text-3xl" //
+                    >{`${user?.lastName.trim() || ""} ${user?.firstName.trim() || ""}`}</div>
                 </div>
 
                 {/* Button enable show change */}
-                <div className="mr-36">
+                <div>
                     {showChange ? (
                         <ButtonStyled
                             className="border-primary
@@ -101,7 +158,7 @@ export default function Page() {
                                     formik.resetForm()
                                 }}
                             >
-                                {t("user.cancel")}
+                                {t("common.cancel")}
                             </ButtonStyled>
                         </div>
                     )}
@@ -109,7 +166,7 @@ export default function Page() {
             </div>
 
             {/* Form for update */}
-            <div className="flex flex-col mt-5 px-36 pb-10 gap-2">
+            <div className="flex flex-col mt-5 pb-10 gap-2 px-36">
                 <div className="flex justify-center gap-2">
                     <InputStyled
                         {...(showChange === false ? { isReadOnly: false } : { isReadOnly: true })}

@@ -13,5 +13,13 @@ export const profileApi = {
     updateMe: (req: UserUpdateReq) =>
         requestWrapper<void>(async () => {
             await axiosInstance.patch("/users/me", req)
+        }),
+
+    uploadAvatar: (formData: FormData) =>
+        requestWrapper<{ avatarUrl: string }>(async () => {
+            const res = await axiosInstance.post("/users/avatar", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            })
+            return res.data
         })
 }

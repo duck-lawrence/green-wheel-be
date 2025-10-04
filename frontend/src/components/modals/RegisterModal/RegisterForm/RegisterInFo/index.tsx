@@ -49,10 +49,10 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
-                .required(t("user.last_name_is_required"))
+                .required(t("user.last_name_require"))
                 .matches(/^[\p{L}\s]+$/u, t("user.invalid_last_name")),
             firstName: Yup.string()
-                .required(t("user.first_name_is_required"))
+                .required(t("user.first_name_require"))
                 .matches(/^[\p{L}\s]+$/u, t("user.invalid_first_name")),
             password: Yup.string()
                 .required(t("user.password_can_not_empty"))
@@ -68,7 +68,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
             phone: Yup.string()
                 .required(t("user.phone_require"))
                 .matches(/^(0[0-9]{9})$/, t("user.invalid_phone")),
-            sex: Yup.number().required(t("user.sex_is_required"))
+            sex: Yup.number().required(t("user.sex_require"))
         }),
         onSubmit: handleRegisterComplete
     })

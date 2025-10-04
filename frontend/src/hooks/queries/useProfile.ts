@@ -1,4 +1,3 @@
-import { profileApi } from "@/services/profileApi"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { QUERY_KEYS } from "@/constants/queryKey"
 import { useTranslation } from "react-i18next"
@@ -7,8 +6,10 @@ import { BackendError } from "@/models/common/response"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { UserUpdateReq } from "@/models/user/schema/request"
 import { UserProfileViewRes } from "@/models/user/schema/response"
+import { useProfileStore } from "@/hooks"
+import { profileApi } from "@/services/profileApi"
 
-export const useGetMe = ({ enabled }: { enabled?: boolean } = { enabled: true }) => {
+export const useGetMe = ({ enabled }: { enabled?: boolean }) => {
     const query = useQuery({
         queryKey: QUERY_KEYS.ME,
         queryFn: profileApi.getMe,
@@ -34,6 +35,25 @@ export const useUpdateMe = ({
                 ...data
             })
             toast.success(t("success.update"))
+        },
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
+
+export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+    const updateUser = useProfileStore((s) => s.updateUser)
+
+    return useMutation({
+        mutationFn: profileApi.uploadAvatar,
+        onSuccess: (data) => {
+            onSuccess?.()
+            toast.success(t("success.upload"))
+            updateUser({ avatarUrl: data.avatarUrl })
         },
         onError: (error: BackendError) => {
             if (error.detail !== undefined) {

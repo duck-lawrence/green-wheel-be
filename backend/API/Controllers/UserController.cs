@@ -245,7 +245,7 @@ namespace API.Controllers
             await _userService.UpdateMe(userClaims, userUpdateReq);
             return Ok();
         }
-        [HttpPost("upload-avatar")]
+        [HttpPost("avatar")]
         [Authorize]
         public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq req)
         {
@@ -255,7 +255,7 @@ namespace API.Controllers
 
             return Ok(new { AvatarUrl = avatarUrl });
         }
-        [HttpDelete("Delete-avatar")]
+        [HttpDelete("avatar")]
         [Authorize]
         public async Task<IActionResult> DeleteAvatar()
         {

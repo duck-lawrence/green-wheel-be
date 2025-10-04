@@ -3,7 +3,8 @@ import {
     useLoginDiscloresureCore,
     useRegisterDiscloresureCore,
     useSetPasswordDiscloresureCore,
-    useForgotPasswordDiscloresureCore
+    useForgotPasswordDiscloresureCore,
+    useAvatarUploadDiscloresureCore
 } from "@/hooks"
 import { createContext } from "react"
 
@@ -12,6 +13,7 @@ export interface DisclosureContextType {
     useRegisterDiscloresure: ReturnType<typeof useRegisterDiscloresureCore>
     useSetPasswordDiscloresure: ReturnType<typeof useSetPasswordDiscloresureCore>
     useForgotPasswordDiscloresure: ReturnType<typeof useForgotPasswordDiscloresureCore>
+    useAvatarUploadDiscloresure: ReturnType<typeof useAvatarUploadDiscloresureCore>
 }
 
 export const DisclosureContext = createContext<DisclosureContextType | null>(null)

@@ -60,7 +60,10 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     })
 
     return (
-        <div className="flex h-full w-full items-center justify-center">
+        <form
+            onSubmit={formik.handleSubmit}
+            className="flex h-full w-full items-center justify-center"
+        >
             <div className="rounded-large flex w-full max-w-sm flex-col gap-4">
                 <div className="flex flex-col items-center pb-6">
                     {/* <AcmeIcon size={60} /> */}
@@ -155,6 +158,6 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                     </Link>
                 </p>
             </div>
-        </div>
+        </form>
     )
 }

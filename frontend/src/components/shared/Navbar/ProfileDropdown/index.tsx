@@ -49,7 +49,7 @@ export function ProfileDropdown() {
     if (isGetMeLoading) return <Spinner />
 
     return (
-        <div className="gap-4">
+        <div className="gap-4 flex items-center">
             <DropdownStyle>
                 <DropdownTrigger>
                     <User

@@ -1,11 +1,10 @@
-import { UserUpdateReq } from "@/models/user/schema/request"
 import { UserProfileViewRes } from "@/models/user/schema/response"
 import { create } from "zustand"
 
 type ProfileStore = {
     user: UserProfileViewRes | null
     setUser: (data: UserProfileViewRes | null) => void
-    updateUser: (data: UserUpdateReq) => void
+    updateUser: (data: Partial<UserProfileViewRes>) => void
     removeUser: () => void
 }
 
