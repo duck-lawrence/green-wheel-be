@@ -108,7 +108,7 @@ const similarVehicles = allVehicles
 export function Detail() {
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const [active, setActive] = useState(0)
-    const [dates, setDates] = useState({ start: "2025-10-04", end: "2025-10-06" })
+    const [dates, setDates] = useState({ start: "2025-10-02", end: "2025-10-06" })
 
     const totalDays = useMemo(() => {
         return MathDate(dates)
