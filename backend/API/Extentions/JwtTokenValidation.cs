@@ -28,14 +28,24 @@ namespace API.Extentions
                     };
                     options.Events = new JwtBearerEvents
                     {
+                        OnAuthenticationFailed = context =>
+                        {
+                            var endpoint = context.HttpContext.GetEndpoint();
+                            var hasAuthorize = endpoint?.Metadata.GetMetadata<Microsoft.AspNetCore.Authorization.AuthorizeAttribute>() != null;
+
+                            if (hasAuthorize)
+                            {
+
+                                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                            }
+
+
+                            return Task.CompletedTask;
+                        },
                         OnChallenge = context =>
                         {
                             throw new UnauthorizedAccessException(Message.User.MissingToken);
-                        },
-                        OnAuthenticationFailed = context =>
-                        {
-                            throw new UnauthorizedAccessException(Message.User.InvalidToken);
-                        }
+                        }, 
                     };
                 }
 

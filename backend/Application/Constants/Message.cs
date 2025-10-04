@@ -104,5 +104,25 @@ namespace Application.Constants
         {
             public const string StationNotFound = "station.station_not_found";
         }
+        public static class Momo
+        {
+            public const string InvalidSignature = "momo.invalid_signature";
+            public const string MissingAccessKeyPartnerCodeSecretKey = "momo.missing_access_key_partner_code_secret_key";
+            public const string NotHavePermission = "momo.not_have_permission";
+            public const string InvalidEndpoint = "momo.invalid_end_point";
+            public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
+
+        }
+
+        public static class Invoice
+        {
+            public const string InvoiceNotFound = "invoice.invoice_not_found";
+            public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
+        }
+        public static class Json
+        {
+            public const string ParsingFailed = "json.pasing_failed";
+
+        }
     }
 }

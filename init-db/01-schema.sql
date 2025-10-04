@@ -398,7 +398,6 @@ CREATE TABLE [invoices] (
     [status] int NOT NULL DEFAULT 0, -- Pending, Paid, Cancelled
 
     [paid_at] datetimeoffset,
-    [expires_at] datetimeoffset,
     [deleted_at] datetimeoffset,
 
     [contract_id] uniqueidentifier NOT NULL,
