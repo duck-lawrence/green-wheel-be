@@ -66,45 +66,6 @@ export default function DetailPage() {
         }
     ]
 
-    // const allVehicles = [
-    //     {
-    //         id: "1",
-    //         name: "VinFast VF 3",
-    //         costPerDay: 690000,
-    //         seatingCapacity: 4,
-    //         fuel: "Điện",
-    //         transmission: "Tự động",
-    //         img: "https://vinfasttimescity.vn/wp-content/uploads/2024/08/vinfast-vf7-mau-trang-scaled.jpg"
-    //     },
-    //     {
-    //         id: "2",
-    //         name: "VinFast VF 5",
-    //         costPerDay: 790000,
-    //         seatingCapacity: 5,
-    //         fuel: "Điện",
-    //         transmission: "Tự động",
-    //         img: "https://vinfast-cars.vn/wp-content/uploads/2024/10/vinfast-vf6-trang.png"
-    //     },
-    //     {
-    //         id: "3",
-    //         name: "VinFast VF 6",
-    //         costPerDay: 890000,
-    //         seatingCapacity: 5,
-    //         fuel: "Điện",
-    //         transmission: "Tự động",
-    //         img: "https://vinfast-khanhhoa.com/wp-content/uploads/2021/02/vinfast-president-color-9.png"
-    //     },
-    //     {
-    //         id: "4",
-    //         name: "VinFast VF 7",
-    //         costPerDay: 990000,
-    //         seatingCapacity: 7,
-    //         fuel: "Điện",
-    //         transmission: "Tự động",
-    //         img: "https://vinfastnewway.com.vn/wp-content/uploads/2019/09/lux-white_2-169.jpg"
-    //     }
-    // ]
-
     return (
         <div className="min-h-dvh bg-neutral-50 text-neutral-900 mt-20 rounded">
             {/* Breadcrumb */}
@@ -295,7 +256,7 @@ export default function DetailPage() {
                     {similarVehicles.map((i) => (
                         <Link
                             key={i.id}
-                            href={`/vehicles/${i.id}`}
+                            href={`/vehicle-rental/detail/${i.id}`}
                             className="group block rounded-2xl bg-white p-5 shadow-md hover:shadow-lg transition transform hover:scale-[1.02]"
                         >
                             <div className="aspect-[16/10] w-full overflow-hidden rounded-xl bg-neutral-200">
