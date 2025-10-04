@@ -19,37 +19,26 @@ namespace Infrastructure.Repositories
             return await _dbContext.Vehicles.FirstOrDefaultAsync(x => x.LicensePlate == licensePlate);
         }
 
-        public async Task<Vehicle> GetVehicle(Guid stationId, Guid modelId,
-            DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId)
         {
             // Query lọc trực tiếp từ DB (không ToList trước)
             var vehicles = await _dbContext.Vehicles
-                .Include(v => v.RentalContracts)
-                .Where(v => v.StationId == stationId && v.ModelId == modelId)
-                .ToListAsync();
+                .Include(v => v.RentalContracts) //join bảng rentalContracts để lấy xe có hợp đồng
+                .Where
+                (
+                    v => v.StationId == stationId
+                        && v.ModelId == modelId
+                        && v.Status != (int)VehicleStatus.Maintenance
+                ).AsNoTracking().ToListAsync();
 
-            // Lọc tiếp ở memory (sau khi có dữ liệu)
-            var result = vehicles.FirstOrDefault(v =>
-                v.Status == (int)VehicleStatus.Available
-                || (v.Status == (int)VehicleStatus.Unavaible
-                    && v.RentalContracts.Any() // tránh lỗi Min() khi rỗng
-                    && endDate < v.RentalContracts.Min(rc => rc.StartDate).AddDays(-10))
-                || (v.Status == (int)VehicleStatus.Rented
-                    && v.RentalContracts.Any() // tránh lỗi Max() khi rỗng
-                    && startDate > v.RentalContracts.Max(rc => rc.EndDate).AddDays(10))
-            );
-            return result;
-        }
-
-        public async Task UpdateStatusAsync(Guid id, int status)
-        {
-            var vehicle = await _dbContext.Vehicles.FirstOrDefaultAsync(t => t.Id == id);
-            if(vehicle == null)
+            foreach (var v in vehicles)
             {
-                throw new NotFoundException(Message.Vehicle.VehicleNotFound);
+                v.RentalContracts = v.RentalContracts.Where(rc => rc.Status != (int)RentalContractStatus.Cancelled &&
+                                              rc.Status != (int)RentalContractStatus.Completed).ToList();
             }
-            vehicle.Status = status;
-            await UpdateAsync(vehicle);
+            return vehicles;
         }
+
+       
     }
 }

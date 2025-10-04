@@ -2,7 +2,6 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
-using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
@@ -10,13 +9,10 @@ using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 
 namespace Application
@@ -168,8 +164,11 @@ namespace Application
             await _otpRepository.RemoveOTPAsync(email); //xoá cũ trước khi lưu cái ms
             string otp = GenerateOtpHelper.GenerateOtp();
             await _otpRepository.SaveOTPAsyns(email, otp);
-            string subject = "Your OTP code";
-            string body = $"OTP: {otp} có quá oke khum người đẹp";
+            string subject = "GreenWheel Verification Code";
+            var templatePath = Path.Combine("../Application", "Templates", "SendOtpTemplate.html");
+            var body = File.ReadAllText(templatePath);
+
+            body = body.Replace("{OtpCode}", otp);
             await EmailHelper.SendEmailAsync(_emailSettings, email, subject, body);
         }
 

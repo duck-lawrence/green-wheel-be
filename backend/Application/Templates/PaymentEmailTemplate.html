@@ -1,17 +1,39 @@
-﻿<p>Dear {CustomerName},</p>
+﻿<div style="font-family:Segoe UI, Arial, sans-serif; font-size:16px; color:#1f2937; line-height:1.6;">
+  <p style="font-size:18px;">Dear {CustomerName},</p>
 
-<p>Thank you for booking a vehicle with <b>GreenWheel</b>.<br/>
-To complete your reservation, please proceed with the payment:</p>
+  <p stype="color:#1f2937;">
+    Thank you for booking a vehicle with <b style="color:#33cc66;">GreenWheel</b>.<br />
+    To complete your reservation, please proceed with the payment:
+  </p>
 
-<ul>
-  <li><b>Booking ID:</b> {BookingId}</li>
-  <li><b>Rental period:</b> {StartDate} – {EndDate}</li>
-  <li><b>Amount due:</b> {AmountDue}</li>
-</ul>
+  <ul style="font-size:16px; line-height:1.7; color:#1f2937; list-style-type:none; padding-left:0;">
+    <li style="margin-bottom:4px;"><b>- Booking ID:</b> {BookingId}</li>
+    <li style="margin-bottom:4px;"><b>- Vehicle:</b> {VehicleModelName}</li>
+    <li style="margin-bottom:4px;"><b>- License plate:</b> {LicensePlate}</li>
+    <li style="margin-bottom:4px;"><b>- Station:</b> {StationName}</li>
+    <li style="margin-bottom:4px;"><b>- Rental period:</b> {StartDate} – {EndDate}</li>
+    <li style="margin-bottom:4px;"><b>- Amount due:</b> {AmountDue}</li>
+  </ul>
 
-<p>You can pay directly in the GreenWheel app or click the link below:<br/>
-<a href='{PaymentLink}'>Pay Now</a></p>
+  <p stype="color:#1f2937;">
+      You can pay directly in the  <b style="color:#33cc66;">GreenWheel</b> website or click the button below:
+  </p>
 
-<p><i>Note:</i> Your reservation will be automatically cancelled if payment is not completed before {Deadline}.</p>
+  <p>
+    <a href="{PaymentLink}" 
+       style="display:inline-block; background-color:#2563eb; color:#ffffff; 
+              text-decoration:none; padding:12px 28px; border-radius:8px; 
+              font-size:16px; font-weight:600;">
+      Pay Now
+    </a>
+  </p>
 
-<p>Best regards,<br/>The HYCAT Team</p>
+  <p style="font-size:16px; color:#1f2937;">
+      <i>Note:</i> Your reservation will be automatically cancelled if payment is not completed before {Deadline}.
+  </p>
+
+  <p style="font-size:16px; color:#1f2937;">
+    Best regards,<br />
+    <b>The HYCAT Team</b>
+  </p>
+</div>

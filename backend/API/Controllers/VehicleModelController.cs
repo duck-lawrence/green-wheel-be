@@ -26,7 +26,7 @@ namespace API.Controllers
          */
         [RoleAuthorize("Admin")]
         [HttpPost]
-        public async Task<IActionResult> CreateVehicleModel(CreateVehicleModelReq createVehicleModelReq)
+        public async Task<IActionResult> CreateVehicleModel([FromBody]CreateVehicleModelReq createVehicleModelReq)
         {
             var id = await _vehicleModelService.CreateVehicleModelAsync(createVehicleModelReq);
             return Ok(new

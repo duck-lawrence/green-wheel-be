@@ -26,6 +26,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Authorize]
+        [RoleAuthorize("Customer")]
         public async Task<IActionResult> CreateRentalContract(CreateRentalContractReq createReq)
         {
             var userClaims = HttpContext.User;
@@ -51,11 +52,24 @@ namespace API.Controllers
          404 rental contract not found
          200 succes
          */
-        [HttpPut("{id}/verify")]
+        [HttpPut("{id}/accept")]
         [RoleAuthorize("Staff")]
-        public async Task<IActionResult> VerifyRentalContract(Guid id)
+        public async Task<IActionResult> AcceptRentalContract(Guid id)
         {
             await _rentalContractService.VerifyRentalContract(id);
+            return Ok();
+        }
+
+        /*
+         status code
+         404 rental contract not found
+         200 succes
+         */
+        [HttpPut("{id}/reject")]
+        [RoleAuthorize("Staff")]
+        public async Task<IActionResult> RejectRentalContract(Guid id)
+        {
+            await _rentalContractService.VerifyRentalContract(id, false);
             return Ok();
         }
     }
