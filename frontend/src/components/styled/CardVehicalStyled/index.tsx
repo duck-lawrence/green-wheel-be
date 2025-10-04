@@ -14,7 +14,7 @@ function splitTitle(title: string) {
 }
 
 // className="gap-8 grid grid-cols-2 sm:grid-cols-3 "
-export default function CardVehicalStyled({ car }: { car: Vehicle }) {
+export function CardVehicalStyled({ car }: { car: Vehicle }) {
     const router = useRouter()
     // const isOutOfStock = car.quantity === 0
 

@@ -1,6 +1,6 @@
 "use client"
-import { FilterVehicleRental } from "@/components"
-import CardListVehicleRental from "@/components/modules/CardListVehicleRental"
+import { CardListVehicleRental, FilterVehicleRental } from "@/components"
+// import CardListVehicleRental from "@/components/modules/CardListVehicleRental"
 import { vehicleData } from "@/data/vehicleData"
 import { useBookingStore } from "@/hooks"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
