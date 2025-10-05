@@ -1,23 +1,21 @@
 "use client"
-import { FilterVehicleRental } from "@/components"
-import CardListVehicleRental from "@/components/modules/CardListVehicleRental"
+import { FilterVehicleRental, CardListVehicleRental } from "@/components"
 import { vehicleData } from "@/data/vehicleData"
-import { useBookingStore } from "@/hooks"
-import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
-import Vehicle from "@/models/user/type/vehicle"
-import React, { useEffect, useState } from "react"
+import { useBookingFilterStore, useNavbarItemStore } from "@/hooks"
+import React, { useEffect } from "react"
+// import Vehicle from "@/models/user/type/vehicle"
 
 export default function VehicleRental() {
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
-    const { setBookingInfo, setFilteredVehicles } = useBookingStore()
-    const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData)
+    const { setBookingFilter, setFilteredVehicleModels } = useBookingFilterStore()
+    // const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData)
     useEffect(() => {
         setActiveMenuKey("vehicle-rental")
     }, [setActiveMenuKey])
 
     useEffect(() => {
-        setFilteredVehicles(vehicleData)
-    }, [setFilteredVehicles])
+        setFilteredVehicleModels(vehicleData)
+    }, [setFilteredVehicleModels])
     // useEffect(() => {
     //     if (!station || !start || !end) return
     //     const filtered = allVehicles.filter(
@@ -27,7 +25,7 @@ export default function VehicleRental() {
     // }, [station, start, end, allVehicles, setFilteredVehicles])
 
     const handleFilter = (station: string, start: string, end: string) => {
-        setBookingInfo(station, start, end)
+        setBookingFilter(station, start, end)
     }
     return (
         <div className="h-30">

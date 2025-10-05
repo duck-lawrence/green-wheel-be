@@ -16,8 +16,6 @@ public partial class DispatchRequest : SorfDeletedEntity, IEntity
 
     public int Status { get; set; }
 
-    
-
     public Guid RequestAdminId { get; set; }
 
     public Guid? ApprovedAdminId { get; set; }

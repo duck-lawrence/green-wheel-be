@@ -49,7 +49,16 @@ export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmailProps
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+            className="flex flex-col gap-4"
+        >
             {/* Title */}
             {/* <div className="mx-8 mt-2 mb-0">
                 <h1 className="text-center font-bold text-xl">{t("auth.security_verification")}</h1>

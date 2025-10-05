@@ -20,15 +20,15 @@ export default function Page() {
     }, [filters])
     return (
         <div>
-            <div className="text-3xl mb-4 p-4 font-bold">
-                <p>{t("user.booking_history")}</p>
+            <div className="text-3xl mb-3 px-4 font-bold">
+                <p>{t("user.rental_contracts")}</p>
             </div>
 
-            <div className="p-4">
+            <div className="mb-3 px-4">
                 <FillterBarOrder onFilterChange={() => setFilter(filters)} />
             </div>
 
-            <div className="p-4">
+            <div className="px-4">
                 <TableStyled data={order} loading={loading} />
             </div>
         </div>

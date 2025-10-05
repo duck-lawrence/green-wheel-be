@@ -12,18 +12,18 @@ namespace API.Controllers
     [ApiController]
     public class RentalContractController : ControllerBase
     {
+        
+        private readonly IRentalContractService _rentalContractService;
+        public RentalContractController(IRentalContractService rentalContractService)
+        {
+            _rentalContractService = rentalContractService;
+        }
         /*
          status code
          404: vehicle, model not found
          422: business error (citizen id)
          200: success
          */
-        private readonly IRentalContractService _rentalContractService;
-        public RentalContractController(IRentalContractService rentalContractService)
-        {
-            _rentalContractService = rentalContractService;
-        }
-
         [HttpPost]
         [Authorize]
         [RoleAuthorize("Customer")]

@@ -5,6 +5,7 @@ import React, { useCallback, useState } from "react"
 import { ButtonStyled, ButtonToggleVisibility, InputStyled } from "@/components/styled"
 import { useTranslation } from "react-i18next"
 import { useResetPassword } from "@/hooks"
+import { PASSWORD_REGEX } from "@/constants/regex"
 
 interface ForgotInfoProps {
     onSuccess?: () => void
@@ -38,10 +39,7 @@ export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
             password: Yup.string()
                 .required(t("user.password_can_not_empty"))
                 .min(8, t("user.password_too_short"))
-                .matches(
-                    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    t("user.password_strength")
-                ),
+                .matches(PASSWORD_REGEX, t("user.password_strength")),
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], t("user.confirm_password_equal"))
                 .required(t("user.password_can_not_empty"))
@@ -50,7 +48,16 @@ export function ForgotInFo({ onSuccess }: ForgotInfoProps) {
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="flex flex-col">
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+            className="flex flex-col"
+        >
             {/* Title */}
             <div className="mx-auto mt-2 mb-2">
                 <div className="text-center">{t("auth.please_reset_password")}</div>

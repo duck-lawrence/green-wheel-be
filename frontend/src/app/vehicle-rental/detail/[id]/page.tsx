@@ -9,11 +9,11 @@ import { currency } from "@/utils/helpers/currentcy"
 import { MathDate } from "@/utils/helpers/mathDate"
 import { vehicleData } from "@/data/vehicleData"
 import { useParams } from "next/navigation"
-import Vehicle from "@/models/user/type/vehicle"
-import { useToken } from "@/hooks"
+import Vehicle from "@/models/vehicle/vehicle"
+import { useTokenStore } from "@/hooks"
 
 export default function DetailPage() {
-    const isLoggedIn = useToken((s) => !!s.accessToken)
+    const isLoggedIn = useTokenStore((s) => !!s.accessToken)
     const { id } = useParams()
     const [vehicle, setVehicle] = useState<Vehicle | null>(null)
 

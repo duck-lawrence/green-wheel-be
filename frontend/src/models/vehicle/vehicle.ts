@@ -1,5 +1,7 @@
-export default interface Vehicle {
+export default interface VehicleModel {
     id: string
+    createdAt: string
+    updatedAt: string
     name: string
     description: string
     costPerDay: number
@@ -10,9 +12,5 @@ export default interface Vehicle {
     batteryCapacity: number
     ecoRangeKm: number
     sportRangeKm: number
-    brandName: string
-    segmentName: string
-    availableVehicleCount: number
-    quantity: number
-    images: string[]
+    deletedAt?: string
 }

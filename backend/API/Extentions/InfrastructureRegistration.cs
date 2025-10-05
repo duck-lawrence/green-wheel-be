@@ -2,7 +2,6 @@
 using Application.Abstractions;
 using Application.AppSettingConfigurations;
 using Application.Repositories;
-using Application.Services;
 using Infrastructure.ApplicationDbContext;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;

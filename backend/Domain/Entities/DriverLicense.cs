@@ -1,4 +1,6 @@
 ﻿using Domain.Commons;
+using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities;
 
@@ -27,8 +29,6 @@ public partial class DriverLicense : SorfDeletedEntity, IEntity
     public string ImageUrl { get; set; } = null!;
 
     public string ImagePublicId { get; set; } = null!;
-
-    
 
     public Guid UserId { get; set; }
 

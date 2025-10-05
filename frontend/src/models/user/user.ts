@@ -1,6 +1,6 @@
 import { Sex } from "@/constants/enum"
 
-export type User = {
+export default interface User {
     id: string
     createdAt: string
     updatedAt: string

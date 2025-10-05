@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities
+﻿namespace Application.Dtos.Common.Request
 {
     public class PageResult<T>
     {

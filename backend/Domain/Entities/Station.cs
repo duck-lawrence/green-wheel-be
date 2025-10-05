@@ -16,8 +16,6 @@ public partial class Station : SorfDeletedEntity, IEntity
 
     public string Address { get; set; } = null!;
 
-    
-
     public virtual ICollection<DispatchRequest> DispatchRequestFromStations { get; set; } = new List<DispatchRequest>();
 
     public virtual ICollection<DispatchRequest> DispatchRequestToStations { get; set; } = new List<DispatchRequest>();

@@ -4,7 +4,6 @@ using Application.Dtos.Common.Request;
 using Application.Repositories;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

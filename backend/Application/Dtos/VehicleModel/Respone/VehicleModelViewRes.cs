@@ -27,7 +27,7 @@ namespace Application.Dtos.VehicleModel.Respone
 
         public Brand Brand { get; set; } = null!;
 
-        public VehicleSegment Segment { get; set; } = null!;
+        public Domain.Entities.VehicleSegment Segment { get; set; } = null!;
         public int AvailableVehicleCount { get; set; }
     }
 }
