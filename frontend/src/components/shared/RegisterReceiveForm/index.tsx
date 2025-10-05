@@ -24,7 +24,7 @@ type FormValues = {
   email: string
   pickupLocation: string
   note: string
-  paymentMethod: PaymentMethod | null
+  paymentMethod: PaymentMethod 
   agreeTerms: boolean
   agreeDataPolicy: boolean
 }
@@ -127,7 +127,10 @@ export const RegisterReceiveForm = () => {
                     onValueChange={(v) => formik.setFieldValue("phone", v)}
                     isInvalid={!!(formik.touched.phone && formik.errors.phone)}
                     errorMessage={formik.touched.phone ? formik.errors.phone : undefined}
-                    onBlur={() => formik.setFieldTouched("phone", true)}
+                    onBlur={() => {
+                      formik.setFieldTouched("phone", true)
+                      formik.setFieldValue("phone", formik.values.phone.trim(), true)
+                    }}
                     onClear={() => formik.setFieldValue("phone", "")}
                   />
 
