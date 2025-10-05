@@ -22,7 +22,7 @@ const getStoredToken = () => {
         : sessionStorage.getItem("access_token")
 }
 
-export const useToken = create<TokenStore>()((set) => ({
+export const useTokenStore = create<TokenStore>()((set) => ({
     accessToken: getStoredToken(),
     isHydrated: false,
 

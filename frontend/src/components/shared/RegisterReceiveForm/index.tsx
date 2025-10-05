@@ -6,7 +6,7 @@ import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 
-import { useProfileStore, useToken } from "@/hooks"
+import { useProfileStore, useTokenStore } from "@/hooks"
 import {
     ButtonStyled,
     InputStyled,
@@ -34,7 +34,7 @@ export const RegisterReceiveForm = () => {
 
     const [mounted, setMounted] = useState(false)
     const { user } = useProfileStore()
-    const isLoggedIn = useToken((s) => !!s.accessToken)
+    const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
     useEffect(() => {
         setMounted(true)
