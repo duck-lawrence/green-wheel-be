@@ -3,20 +3,21 @@ import React, { useMemo } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { CalendarDateTime, now, getLocalTimeZone, fromDate } from "@internationalized/date"
-import { ButtonStyled, LocalFilter } from "@/components/styled"
-import DateTimeStyled from "@/components/styled/DateTimeStyled"
+import { ButtonStyled, AutocompleteStyle, DateTimeStyled } from "@/components"
 import { useTranslation } from "react-i18next"
-
-const MIN_HOUR = 7
-const MAX_HOUR = 17
+import { AutocompleteItem } from "@heroui/react"
+import { locals } from "@/data/local"
+import { MapPinAreaIcon } from "@phosphor-icons/react"
 
 export function FilterVehicleRental({
     onFilterChange
 }: {
-    onFilterChange: (station: string, start: string, end: string) => void
+    onFilterChange: (stationId: string, start: string, end: string) => void
 }) {
     const { t } = useTranslation()
-    // Tính thời gian mặc định
+    // set up date time
+    const MIN_HOUR = 7
+    const MAX_HOUR = 17
     const zonedNow = fromDate(new Date(), getLocalTimeZone())
     const nowTime = new CalendarDateTime(
         zonedNow.year,
@@ -26,7 +27,6 @@ export function FilterVehicleRental({
         zonedNow.minute,
         zonedNow.second
     )
-
     const initialStart =
         nowTime.hour >= MAX_HOUR
             ? nowTime.add({ days: 1 }).set({ hour: MIN_HOUR, minute: 0, second: 0 })
@@ -36,9 +36,9 @@ export function FilterVehicleRental({
     const bookingSchema = useMemo(
         () =>
             Yup.object().shape({
-                station: Yup.string().required(t("vehical.pick_station")),
+                stationId: Yup.string().required(t("vehicle.pick_station")),
                 start: Yup.mixed<CalendarDateTime>()
-                    .required(t("vehical.pick_time_car"))
+                    .required(t("vehicle.pick_time_car"))
                     .test("is-valid-start", t("validate.date_received"), (value) => {
                         if (!value) return false
                         const today = now(getLocalTimeZone())
@@ -64,20 +64,20 @@ export function FilterVehicleRental({
     //  useFormik
     const formik = useFormik({
         initialValues: {
-            station: "",
+            stationId: "",
             start: initialStart,
             end: initialStart.add({ hours: 1 })
         },
         validationSchema: bookingSchema,
         onSubmit: (values) => {
             console.log("Booking values item:", {
-                station: values.station,
+                stationId: values.stationId,
                 start: values.start.toDate(getLocalTimeZone()).toISOString(),
                 end: values.end.toDate(getLocalTimeZone()).toISOString()
             })
 
             onFilterChange(
-                values.station,
+                values.stationId,
                 values.start.toDate(getLocalTimeZone()).toISOString(),
                 values.end.toDate(getLocalTimeZone()).toISOString()
             )
@@ -87,25 +87,40 @@ export function FilterVehicleRental({
     return (
         <>
             <form
-                onSubmit={formik.handleSubmit}
+                onSubmit={(e) => {
+                    if (formik.isSubmitting) {
+                        e.preventDefault()
+                        return
+                    }
+                    formik.handleSubmit(e)
+                }}
                 className="flex gap-6 pt-6 pb-6 justify-center items-center border border-gray-300 rounded-4xl shadow-2xl max-w-[1500px] bg-[#F4F4F4]"
             >
                 {/* ĐỊA ĐIỂM */}
                 <div className="flex flex-col h-14">
-                    <LocalFilter
-                        value={formik.values.station}
-                        onChange={(val) => formik.setFieldValue("station", val)}
+                    <AutocompleteStyle
+                        label={t("vehicle.station")}
+                        items={locals}
+                        startContent={<MapPinAreaIcon className="text-xl" />}
+                        value={formik.values.stationId}
+                        // onChange={(val) => formik.setFieldValue("station", val)}
+                        onSelectionChange={(key) => formik.setFieldValue("stationId", key)}
                         className="max-w-60 h-20 mr-0"
-                    />
-                    {formik.touched.station && typeof formik.errors.station === "string" && (
-                        <div className="text-red-500 text-sm mt-1">{formik.errors.station}</div>
+                    >
+                        {locals &&
+                            locals.map((item) => (
+                                <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>
+                            ))}
+                    </AutocompleteStyle>
+                    {formik.touched.stationId && typeof formik.errors.stationId === "string" && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.stationId}</div>
                     )}
                 </div>
 
                 {/* START */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
-                        label="Start Date & Time"
+                        label={t("vehicle.start_date_time")}
                         value={formik.values.start}
                         onChange={(val) => formik.setFieldValue("start", val)}
                     />
@@ -117,7 +132,7 @@ export function FilterVehicleRental({
                 {/* END */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
-                        label="End Date & Time"
+                        label={t("vehicle.end_date_time")}
                         value={formik.values.end}
                         onChange={(val) => formik.setFieldValue("end", val)}
                     />
@@ -128,7 +143,7 @@ export function FilterVehicleRental({
 
                 <div className="flex justify-center items-center mt-0">
                     <ButtonStyled type="submit" color="primary" className="w-40 h-13.5">
-                        {t("vehical.search_car")}
+                        {t("vehicle.search_car")}
                     </ButtonStyled>
                 </div>
             </form>

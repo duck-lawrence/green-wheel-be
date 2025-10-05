@@ -1,16 +1,14 @@
 "use client"
-import { FilterVehicleRental } from "@/components"
-import CardListVehicleRental from "@/components/modules/CardListVehicleRental"
+import { FilterVehicleRental, CardListVehicleRental } from "@/components"
 import { vehicleData } from "@/data/vehicleData"
-import { useBookingStore } from "@/hooks"
-import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
-import Vehicle from "@/models/user/type/vehicle"
-import React, { useEffect, useState } from "react"
+import { useBookingStore, useNavbarItemStore } from "@/hooks"
+import React, { useEffect } from "react"
+// import Vehicle from "@/models/user/type/vehicle"
 
 export default function VehicleRental() {
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
     const { setBookingInfo, setFilteredVehicles } = useBookingStore()
-    const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData)
+    // const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData)
     useEffect(() => {
         setActiveMenuKey("vehicle-rental")
     }, [setActiveMenuKey])

@@ -46,7 +46,7 @@ export default function HomePage() {
                     <div className="text-gray-500">{t("home.description")}</div>
                     <ButtonStyled
                         as={Link}
-                        href="/self-drive"
+                        href="/vehicle-rental"
                         className="text-black h-13 transition-all duration-500
                                             hover:bg-primary hover:text-white hover:border-black"
                         variant="bordered"

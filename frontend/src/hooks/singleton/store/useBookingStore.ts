@@ -1,5 +1,5 @@
 // src/store/useBookingStore.ts
-import Vehicle from "@/models/user/type/vehicle"
+import Vehicle from "@/models/vehicle/vehicle"
 // import { shallow } from "@/utils/helpers/shallow"
 import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"

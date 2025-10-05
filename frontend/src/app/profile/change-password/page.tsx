@@ -57,9 +57,17 @@ export default function ChangePasswordPage() {
     })
 
     return (
-        <form onSubmit={formik.handleSubmit}>
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+        >
             {/* Title */}
-            <div className="text-3xl mb-4 p-4 font-bold">
+            <div className="text-3xl mb-3 px-4 font-bold">
                 <p>{t("auth.change_password")}</p>
             </div>
 
@@ -135,7 +143,7 @@ export default function ChangePasswordPage() {
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid}
-                    className="flex min-w-30 mt-4 mb-4 mr-2"
+                    className="flex min-w-30"
                 >
                     {t("auth.change_password")}
                 </ButtonStyled>

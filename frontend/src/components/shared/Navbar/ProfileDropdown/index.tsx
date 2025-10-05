@@ -69,8 +69,13 @@ export function ProfileDropdown() {
                     <DropdownItem key="profile" as={Link} href="/profile" className="block">
                         {t("user.profile")}
                     </DropdownItem>
-                    <DropdownItem key="booking_history" as={Link} href="/#" className="block">
-                        {t("user.booking_history")}
+                    <DropdownItem
+                        key="rental_contracts"
+                        as={Link}
+                        href="/profile/rental-contracts"
+                        className="block"
+                    >
+                        {t("user.rental_contracts")}
                     </DropdownItem>
                     <DropdownItem
                         key="logout"

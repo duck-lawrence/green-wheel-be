@@ -74,7 +74,16 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="flex flex-col">
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+            className="flex flex-col"
+        >
             {/* Title */}
             <div className="mx-auto mt-2 mb-2">
                 <div className="text-center">{t("auth.complete_register")}</div>
