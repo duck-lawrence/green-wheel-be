@@ -4,7 +4,7 @@ import { authApi } from "@/services/authApi"
 import { useMutation } from "@tanstack/react-query"
 import { BackendError } from "@/models/common/response"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
-import { useProfileStore, useToken } from "@/hooks"
+import { useProfileStore, useTokenStore } from "@/hooks"
 
 // ===== Login and logout =====
 export const useLogin = ({
@@ -15,7 +15,7 @@ export const useLogin = ({
     onSuccess?: () => void
 }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
 
     return useMutation({
         mutationFn: authApi.login,
@@ -34,7 +34,7 @@ export const useLogin = ({
 
 export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const removeAccessToken = useToken((s) => s.removeAccessToken)
+    const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
     const removeUser = useProfileStore((s) => s.removeUser)
 
     return useMutation({
@@ -63,7 +63,7 @@ export const useLoginGoogle = ({
     onSuccess?: () => void
 }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
     const setUser = useProfileStore((s) => s.setUser)
 
     return useMutation({
@@ -92,7 +92,7 @@ export const useLoginGoogle = ({
 
 export const useSetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
 
     return useMutation({
         mutationFn: authApi.setPassword,
@@ -140,7 +140,7 @@ export const useRegisterVerify = ({ onSuccess }: { onSuccess?: () => void }) => 
 
 export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
 
     return useMutation({
         mutationFn: authApi.regsiterComplete,
@@ -205,7 +205,7 @@ export const useResetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
 
 export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const removeAccessToken = useToken((s) => s.removeAccessToken)
+    const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
     const removeUser = useProfileStore((s) => s.removeUser)
 
     return useMutation({
