@@ -16,11 +16,13 @@ public partial class User : SorfDeletedEntity, IEntity
 
     public string LastName { get; set; } = null!;
 
-    public string? Email { get; set; } = null!;
+    public string? Email { get; set; }
 
-    public string? Password { get; set; } = null!;
+    public string? Password { get; set; }
 
     public string? Phone { get; set; }
+
+    public bool IsGoogleLinked { get; set; }
 
     public int? Sex { get; set; }
 
@@ -31,7 +33,6 @@ public partial class User : SorfDeletedEntity, IEntity
     public string? AvatarPublicId { get; set; }
 
     public Guid RoleId { get; set; }
-    public bool IsGoogleLinked { get; set; }
 
     public virtual CitizenIdentity? CitizenIdentity { get; set; }
 

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace Infrastructure.Interceptors
+namespace Infrastructure.Interceptor
 {
     public class UpdateTimestampInterceptor : SaveChangesInterceptor
     {

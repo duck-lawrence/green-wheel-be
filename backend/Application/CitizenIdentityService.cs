@@ -3,7 +3,7 @@ using Application.Repositories;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services
+namespace Application
 {
     public class CitizenIdentityService : ICitizenIdentityService
     {

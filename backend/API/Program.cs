@@ -7,18 +7,17 @@ using Application.AppSettingConfigurations;
 using Application.Mappers;
 using Application.Repositories;
 using Application.UnitOfWorks;
-using Application.Services;
 using Application.Validators.User;
 using CloudinaryDotNet;
 using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
-using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.OpenApi.Models;
+using Infrastructure.Interceptor;
+using Infrastructure.UnitOfWorks;
 
 namespace API
 {

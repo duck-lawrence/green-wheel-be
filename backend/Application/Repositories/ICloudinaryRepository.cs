@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Common.Request;
-using Domain.Entities;
 
 namespace Application.Repositories
 {

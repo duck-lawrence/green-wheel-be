@@ -1,10 +1,9 @@
 ﻿using Application.Abstractions;
 using Application.Dtos.Common.Request;
 using Application.Repositories;
-using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services
+namespace Application
 {
     public class CloudinaryService : IPhotoService
     {

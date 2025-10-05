@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class VehicleImage : SorfDeletedEntity, IEntity
+public partial class ModelImage : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
@@ -16,9 +16,7 @@ public partial class VehicleImage : SorfDeletedEntity, IEntity
 
     public string PublicId { get; set; } = null!;
 
-    
+    public Guid ModelId { get; set; }
 
-    public Guid VehicleId { get; set; }
-
-    public virtual Vehicle Vehicle { get; set; } = null!;
+    public virtual VehicleModel Model { get; set; } = null!;
 }

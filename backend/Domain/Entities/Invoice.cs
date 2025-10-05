@@ -26,8 +26,6 @@ public partial class Invoice : SorfDeletedEntity, IEntity
 
     public DateTimeOffset? PaidAt { get; set; }
 
-    
-
     public Guid ContractId { get; set; }
 
     public Guid? ChecklistId { get; set; }

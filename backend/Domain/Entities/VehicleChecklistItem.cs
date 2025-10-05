@@ -16,7 +16,9 @@ public partial class VehicleChecklistItem : SorfDeletedEntity, IEntity
 
     public int Status { get; set; }
 
-    
+    public string? ImageUrl { get; set; }
+
+    public string? ImagePublicId { get; set; }
 
     public Guid ComponentId { get; set; }
 

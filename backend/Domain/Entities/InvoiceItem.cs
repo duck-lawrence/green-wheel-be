@@ -20,8 +20,6 @@ public partial class InvoiceItem : SorfDeletedEntity, IEntity
 
     public int Type { get; set; }
 
-    
-
     public Guid InvoiceId { get; set; }
 
     public Guid? ChecklistItemId { get; set; }
