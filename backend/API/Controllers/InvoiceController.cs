@@ -22,9 +22,9 @@ namespace API.Controllers
          * status code
          * 400 invalid signature 
          * 200 success
-         
+         * 404 not found
          */
-        [HttpPost("process-update-invoice")]
+        [HttpPost("process-update")]
         public async Task<IActionResult> ProcessUpdateInvoice([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
