@@ -4,10 +4,15 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useCallback, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, DatePickerStyled, InputStyled } from "@/components/styled"
-import { Icon } from "@iconify/react"
+import {
+    ButtonStyled,
+    ButtonToggleVisibility,
+    DatePickerStyled,
+    InputStyled
+} from "@/components/styled"
 import dayjs from "dayjs"
 import { UserSetPasswordReq } from "@/models/auth/schema/request"
+import { NAME_REGEX, PASSWORD_REGEX } from "@/constants/regex"
 
 export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
@@ -36,18 +41,15 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
         },
         validationSchema: Yup.object({
             lastName: Yup.string()
-                .required(t("user.last_name_is_required"))
-                .matches(/^[\p{L}\s]+$/u, t("user.invalid_last_name")),
+                .required(t("user.last_name_require"))
+                .matches(NAME_REGEX, t("user.invalid_last_name")),
             firstName: Yup.string()
-                .required(t("user.first_name_is_required"))
-                .matches(/^[\p{L}\s]+$/u, t("user.invalid_first_name")),
+                .required(t("user.first_name_require"))
+                .matches(NAME_REGEX, t("user.invalid_first_name")),
             password: Yup.string()
                 .required(t("user.password_can_not_empty"))
                 .min(8, t("user.password_too_short"))
-                .matches(
-                    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    t("user.password_strength")
-                ),
+                .matches(PASSWORD_REGEX, t("user.password_strength")),
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], t("user.confirm_password_equal"))
                 .required(t("user.password_can_not_empty")),
@@ -57,7 +59,16 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="flex flex-col">
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+            className="flex flex-col"
+        >
             {/* Title */}
             <div className="mx-auto mt-2 mb-2">
                 <div className="text-center">{t("auth.complete_register")}</div>
@@ -104,24 +115,10 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
                         formik.setFieldTouched("password")
                     }}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleVisibility}
-                        >
-                            {isVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isVisible}
+                            toggleVisibility={toggleVisibility}
+                        />
                     }
                 />
 
@@ -138,24 +135,10 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
                     }}
                     isInvalid={!!(formik.touched.confirmPassword && formik.errors.confirmPassword)}
                     endContent={
-                        <button
-                            aria-label="toggle password visibility"
-                            className="focus:outline-solid outline-transparent"
-                            type="button"
-                            onClick={toggleConFirmVisibility}
-                        >
-                            {isConfirmVisible ? (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-closed-linear"
-                                />
-                            ) : (
-                                <Icon
-                                    className="text-default-400 pointer-events-none text-2xl"
-                                    icon="solar:eye-bold"
-                                />
-                            )}
-                        </button>
+                        <ButtonToggleVisibility
+                            isVisible={isConfirmVisible}
+                            toggleVisibility={toggleConFirmVisibility}
+                        />
                     }
                 />
             </div>

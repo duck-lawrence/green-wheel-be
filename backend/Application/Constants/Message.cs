@@ -86,10 +86,10 @@ namespace Application.Constants
         //Cloudinary
         public static class Cloudinary
         {
-            public const string NotFoundObjectInFile = "File is emty";
-            public const string InvalidFileType = "Unsupported image type";
-            public const string UploadFailed = "Upload failed";
-            public const string DeleteSuccess = "Delete successful";
+            public const string NotFoundObjectInFile = "cloudinary.file_not_found";
+            public const string InvalidFileType = "cloudinary.invalid_file_type";
+            public const string UploadFailed = "failed.upload";
+            public const string DeleteSuccess = "success.delete";
         }
 
         //Rental Contract
@@ -97,6 +97,7 @@ namespace Application.Constants
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
+            public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
         }
 
         //Station
@@ -123,6 +124,15 @@ namespace Application.Constants
         {
             public const string ParsingFailed = "json.pasing_failed";
 
+        }
+        public static class VehicleSegment
+        {
+            public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
+        }
+        //Licenses
+        public static class Licenses
+        {
+            public const string InvalidLicenseData = "licenses.invalid_license_data";
         }
     }
 }

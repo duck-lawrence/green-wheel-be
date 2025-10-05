@@ -9,7 +9,7 @@ type DateTimeStyledProps = Omit<DatePickerProps, "value" | "onChange"> & {
     onChange?: (value: CalendarDateTime) => void
 }
 
-export default function DateTimeStyled({ value, onChange, ...props }: DateTimeStyledProps) {
+export function DateTimeStyled({ value, onChange, ...props }: DateTimeStyledProps) {
     return (
         <div className="w-full max-w-xl flex flex-row gap-4">
             <DatePicker

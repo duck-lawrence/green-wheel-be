@@ -9,7 +9,7 @@ import { currency } from "@/utils/helpers/currentcy"
 import { MathDate } from "@/utils/helpers/mathDate"
 import { vehicleData } from "@/data/vehicleData"
 import { useParams } from "next/navigation"
-import Vehicle from "@/models/user/type/vehicle"
+import Vehicle from "@/models/vehicle/vehicle"
 import { useBookingStore, useToken } from "@/hooks"
 
 export default function DetailPage() {
