@@ -1,4 +1,5 @@
 ﻿using Application.Repositories;
+
 namespace Application.UnitOfWorks
 {
     public interface IRentalContractUow : IDisposable
@@ -11,6 +12,8 @@ namespace Application.UnitOfWorks
         IInvoiceItemRepository InvoiceItems { get; }
         IDepositRepository Deposits { get; }
         IStationRepository Stations { get; }
+        IVehicleImageRepository VehicleImages { get; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
