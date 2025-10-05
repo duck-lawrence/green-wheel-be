@@ -37,7 +37,16 @@ export function FortgotEmail({ email, setEmail, onSuccess }: FortgotEmailProps) 
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+            className="flex flex-col gap-4"
+        >
             {/* Title */}
             {/* <div className="mx-8 mt-2 mb-0">
                 <h1 className="font-bold text-xl">{t("auth.forgot_step1")}</h1>

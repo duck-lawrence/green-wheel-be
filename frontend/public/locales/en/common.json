@@ -43,13 +43,8 @@
         "reset_password": "Reset password",
         "please_reset_password": "Please set your new password"
     },
-    "vehicle": {},
     "vehicle_model": {},
     "user": {
-        "account_information": "Account information",
-        "profile": "Profile",
-        "booking_history": "Booking history",
-
         "invalid_otp": "Invalid OTP",
         "otp_can_not_empty": "OTP is required",
         "otp_must_have_6_digits": "OTP must have 6 digits",
@@ -102,6 +97,10 @@
         "invalid_token": "Invalid token",
         "missing_token": "Missing token in header",
         "user_not_found": "User not found",
+
+        "account_information": "Account information",
+        "profile": "Profile",
+        "rental_contracts": "Rental Contract",
         "my_profile": "My Profile",
         "edit_information": "Edit Information"
     },
@@ -147,10 +146,13 @@
         "agree_terms_require": "You must agree to the payment terms",
         "agree_data_policy_require": "You must agree to the data sharing terms"
     },
-    "vehical": {
+    "vehicle": {
+        "station": "Station",
         "pick_station": "Please select a pick-up location",
         "pick_time_car": "Please select date and time to pick up the car",
-        "search_car": "Search car"
+        "search_car": "Search car",
+        "start_date_time": "Start date & time",
+        "end_date_time": "End date & time"
     },
     "validate": {
         "date_received": "Vehicle pick-up date is invalid",

@@ -7,7 +7,7 @@ import i18n from "@/lib/i18n"
 
 const tabs = [
     { key: "profile", label: i18n.t("user.my_profile"), href: "/profile" },
-    { key: "orders", label: i18n.t("user.booking_history"), href: "/profile/my-orders" },
+    { key: "orders", label: i18n.t("user.rental_contracts"), href: "/profile/rental-contracts" },
     // { key: "legal", label: t("user.legal"), href: "/user/legal" },
     {
         key: "changePassword",

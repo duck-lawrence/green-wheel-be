@@ -27,4 +27,8 @@
     <Folder Include="Dtos\VehicleSegment\Request\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Templates\**\*.*" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>

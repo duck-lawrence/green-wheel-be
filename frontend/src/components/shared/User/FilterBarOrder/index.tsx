@@ -30,7 +30,16 @@ export function FillterBarOrder({ onFilterChange }: { onFilterChange: () => void
     })
 
     return (
-        <form onSubmit={formik.handleSubmit} className="flex gap-4">
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+            className="flex gap-4"
+        >
             <VehicalModelPicker
                 value={formik.values.vehicalModel}
                 onChange={(val) => formik.setFieldValue("vehicalModel", val)}

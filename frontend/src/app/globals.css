@@ -19,6 +19,10 @@ button {
         @apply bg-[url('/textures/asfalt-dark.png')];
     }
 
+    .bannerBackground {
+        @apply bg-[url('/images/test-bg.png')] bg-contain bg-top bg-no-repeat;
+    }
+
     .diamondBackground {
         @apply bg-[url('/textures/diagmonds-light.png')];
     }

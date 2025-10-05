@@ -6,6 +6,7 @@ import { useFormik } from "formik"
 import { useTranslation } from "react-i18next"
 import { useChangePassword } from "@/hooks"
 import { UserChangePasswordReq } from "@/models/auth/schema/request"
+import { PASSWORD_REGEX } from "@/constants/regex"
 
 export default function ChangePasswordPage() {
     const { t } = useTranslation()
@@ -38,17 +39,11 @@ export default function ChangePasswordPage() {
             oldPassword: Yup.string()
                 .required(t("user.old_password_require"))
                 .min(8, t("user.password_too_short"))
-                .matches(
-                    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    t("user.password_strength")
-                ),
+                .matches(PASSWORD_REGEX, t("user.password_strength")),
             password: Yup.string()
                 .required(t("user.new_password_can_not_empty"))
                 .min(8, t("user.password_too_short"))
-                .matches(
-                    /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/,
-                    t("user.password_strength")
-                ),
+                .matches(PASSWORD_REGEX, t("user.password_strength")),
             confirmPassword: Yup.string()
                 .oneOf([Yup.ref("password")], t("user.confirm_password_equal"))
                 .required(t("user.password_can_not_empty"))
@@ -57,9 +52,17 @@ export default function ChangePasswordPage() {
     })
 
     return (
-        <form onSubmit={formik.handleSubmit}>
+        <form
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
+        >
             {/* Title */}
-            <div className="text-3xl mb-4 p-4 font-bold">
+            <div className="text-3xl mb-3 px-4 font-bold">
                 <p>{t("auth.change_password")}</p>
             </div>
 
@@ -135,7 +138,7 @@ export default function ChangePasswordPage() {
                     isLoading={formik.isSubmitting}
                     color="primary"
                     isDisabled={!formik.isValid}
-                    className="flex min-w-30 mt-4 mb-4 mr-2"
+                    className="flex min-w-30"
                 >
                     {t("auth.change_password")}
                 </ButtonStyled>

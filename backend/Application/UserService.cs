@@ -166,7 +166,8 @@ namespace Application
             string otp = GenerateOtpHelper.GenerateOtp();
             await _otpRepository.SaveOTPAsyns(email, otp);
             string subject = "GreenWheel Verification Code";
-            var templatePath = Path.Combine("../Application", "Templates", "SendOtpTemplate.html");
+            var basePath = AppContext.BaseDirectory;
+            var templatePath = Path.Combine(basePath, "Templates", "SendOtpTemplate.html");
             var body = File.ReadAllText(templatePath);
 
             body = body.Replace("{OtpCode}", otp);

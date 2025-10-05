@@ -61,7 +61,13 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
 
     return (
         <form
-            onSubmit={formik.handleSubmit}
+            onSubmit={(e) => {
+                if (formik.isSubmitting) {
+                    e.preventDefault()
+                    return
+                }
+                formik.handleSubmit(e)
+            }}
             className="flex h-full w-full items-center justify-center"
         >
             <div className="rounded-large flex w-full max-w-sm flex-col gap-4">

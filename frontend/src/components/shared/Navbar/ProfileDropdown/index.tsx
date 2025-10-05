@@ -9,7 +9,7 @@ import { DropdownStyle } from "@/components"
 import { useGetMe, useLogout, useProfileStore, useToken } from "@/hooks"
 import { BackendError } from "@/models/common/response"
 import Link from "next/link"
-import { defaultAvatarUrl } from "@/constants/constants"
+import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 
 export function ProfileDropdown() {
     const { t } = useTranslation()
@@ -56,7 +56,7 @@ export function ProfileDropdown() {
                         as="button"
                         avatarProps={{
                             isBordered: true,
-                            src: user?.avatarUrl || defaultAvatarUrl
+                            src: user?.avatarUrl || DEFAULT_AVATAR_URL
                         }}
                         className="transition-transform"
                         name={user?.firstName.trim() || ""}
@@ -69,8 +69,13 @@ export function ProfileDropdown() {
                     <DropdownItem key="profile" as={Link} href="/profile" className="block">
                         {t("user.profile")}
                     </DropdownItem>
-                    <DropdownItem key="booking_history" as={Link} href="/#" className="block">
-                        {t("user.booking_history")}
+                    <DropdownItem
+                        key="rental_contracts"
+                        as={Link}
+                        href="/profile/rental-contracts"
+                        className="block"
+                    >
+                        {t("user.rental_contracts")}
                     </DropdownItem>
                     <DropdownItem
                         key="logout"

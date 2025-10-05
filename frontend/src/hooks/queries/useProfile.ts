@@ -9,7 +9,7 @@ import { UserProfileViewRes } from "@/models/user/schema/response"
 import { useProfileStore } from "@/hooks"
 import { profileApi } from "@/services/profileApi"
 
-export const useGetMe = ({ enabled }: { enabled?: boolean }) => {
+export const useGetMe = ({ enabled = true }: { enabled?: boolean } = {}) => {
     const query = useQuery({
         queryKey: QUERY_KEYS.ME,
         queryFn: profileApi.getMe,

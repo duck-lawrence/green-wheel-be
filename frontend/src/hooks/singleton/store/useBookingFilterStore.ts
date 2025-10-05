@@ -1,5 +1,5 @@
-// src/store/useBookingStore.ts
-import Vehicle from "@/models/user/type/vehicle"
+// src/store/useBookingFilterStore.ts
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 // import { shallow } from "@/utils/helpers/shallow"
 import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
@@ -7,32 +7,34 @@ type BookingState = {
     station: string | null
     start: string | null
     end: string | null
-    filteredVehicles: Vehicle[]
+    filteredVehicleModels: VehicleModelViewRes[]
     // setBooking: (data: Partial<BookingState>) => void
-    // clearBooking: () => void
+    // clearBookingFilter: () => void
 }
 
 interface BookingActions {
-    setBookingInfo: (station: string, start: string, end: string) => void
-    setFilteredVehicles: (vehicles: Vehicle[]) => void
-    clearBooking: () => void
+    setBookingFilter: (station: string, start: string, end: string) => void
+    clearBookingFilter: () => void
+    setFilteredVehicleModels: (vehicleModels: VehicleModelViewRes[]) => void
 }
 
-export const useBookingStore = create<BookingState & BookingActions>((set) => ({
+export const useBookingFilterStore = create<BookingState & BookingActions>((set) => ({
     station: null,
     start: null,
     end: null,
-    filteredVehicles: [],
+    filteredVehicleModels: [],
 
-    setBookingInfo: (station, start, end) => set({ station, start, end }),
-    setFilteredVehicles: (vehicles) => set({ filteredVehicles: vehicles }),
-    clearBooking: () =>
+    setBookingFilter: (station, start, end) => set({ station, start, end }),
+
+    clearBookingFilter: () =>
         set({
             station: null,
             start: null,
             end: null,
-            filteredVehicles: []
-        })
+            filteredVehicleModels: []
+        }),
+
+    setFilteredVehicleModels: (vehicleModels) => set({ filteredVehicleModels: vehicleModels })
 }))
 
 // ----------------------
@@ -44,17 +46,17 @@ export const useBookingInfo = () => {
         start: s.start,
         end: s.end
     }))
-    return useBookingStore(selector)
+    return useBookingFilterStore(selector)
 }
 
-// export const useFilteredVehicles = () => useBookingStore((s) => s.filteredVehicles)
+// export const useFilteredVehicles = () => useBookingFilterStore((s) => s.filteredVehicles)
 
 // export const useBookingActions = () =>
-//     useBookingStore(
+//     useBookingFilterStore(
 //         (s) => ({
-//             setBookingInfo: s.setBookingInfo,
+//             setBookingFilter: s.setBookingFilter,
 //             setFilteredVehicles: s.setFilteredVehicles,
-//             clearBooking: s.clearBooking
+//             clearBookingFilter: s.clearBookingFilter
 //         }),
 //         shallow
 //     )
@@ -62,7 +64,7 @@ export const useBookingInfo = () => {
 // const savedBooking =
 //     typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("booking") || "{}") : {}
 
-// export const useBookingStore = create<BookingState>((set) => ({
+// export const useBookingFilterStore = create<BookingState>((set) => ({
 //     station: savedBooking.station ?? null,
 //     start: savedBooking.start ?? null,
 //     end: savedBooking.end ?? null,
@@ -77,7 +79,7 @@ export const useBookingInfo = () => {
 //         })
 //     },
 
-//     clearBooking: () => {
+//     clearBookingFilter: () => {
 //         if (typeof window !== "undefined") {
 //             sessionStorage.removeItem("booking")
 //         }
