@@ -1,7 +1,8 @@
-export default interface VehicleModel {
+import { Brand } from "@/models/brand/brand"
+import VehicleSegment from "@/models/vehicle-segment/vehicle-segment"
+
+export type VehicleModelViewRes = {
     id: string
-    createdAt: string
-    updatedAt: string
     name: string
     description: string
     costPerDay: number
@@ -12,5 +13,7 @@ export default interface VehicleModel {
     batteryCapacity: number
     ecoRangeKm: number
     sportRangeKm: number
-    deletedAt?: string
+    brand: Brand
+    segment: VehicleSegment
+    availableVehicleCount: number
 }

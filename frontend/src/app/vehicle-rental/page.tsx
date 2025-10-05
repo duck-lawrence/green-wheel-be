@@ -7,15 +7,15 @@ import React, { useEffect } from "react"
 
 export default function VehicleRental() {
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
-    const { setBookingFilter, setFilteredVehicles } = useBookingFilterStore()
+    const { setBookingFilter, setFilteredVehicleModels } = useBookingFilterStore()
     // const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData)
     useEffect(() => {
         setActiveMenuKey("vehicle-rental")
     }, [setActiveMenuKey])
 
     useEffect(() => {
-        setFilteredVehicles(vehicleData)
-    }, [setFilteredVehicles])
+        setFilteredVehicleModels(vehicleData)
+    }, [setFilteredVehicleModels])
     // useEffect(() => {
     //     if (!station || !start || !end) return
     //     const filtered = allVehicles.filter(

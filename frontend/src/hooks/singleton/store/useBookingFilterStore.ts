@@ -1,5 +1,5 @@
 // src/store/useBookingFilterStore.ts
-import Vehicle from "@/models/vehicle/vehicle"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 // import { shallow } from "@/utils/helpers/shallow"
 import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
@@ -7,32 +7,34 @@ type BookingState = {
     station: string | null
     start: string | null
     end: string | null
-    filteredVehicles: Vehicle[]
+    filteredVehicleModels: VehicleModelViewRes[]
     // setBooking: (data: Partial<BookingState>) => void
     // clearBookingFilter: () => void
 }
 
 interface BookingActions {
     setBookingFilter: (station: string, start: string, end: string) => void
-    setFilteredVehicles: (vehicles: Vehicle[]) => void
     clearBookingFilter: () => void
+    setFilteredVehicleModels: (vehicleModels: VehicleModelViewRes[]) => void
 }
 
 export const useBookingFilterStore = create<BookingState & BookingActions>((set) => ({
     station: null,
     start: null,
     end: null,
-    filteredVehicles: [],
+    filteredVehicleModels: [],
 
     setBookingFilter: (station, start, end) => set({ station, start, end }),
-    setFilteredVehicles: (vehicles) => set({ filteredVehicles: vehicles }),
+
     clearBookingFilter: () =>
         set({
             station: null,
             start: null,
             end: null,
-            filteredVehicles: []
-        })
+            filteredVehicleModels: []
+        }),
+
+    setFilteredVehicleModels: (vehicleModels) => set({ filteredVehicleModels: vehicleModels })
 }))
 
 // ----------------------

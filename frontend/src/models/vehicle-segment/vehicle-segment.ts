@@ -1,8 +1,8 @@
-export default interface Station {
+export default interface VehicleSegment {
     id: string
     createdAt: string
     updatedAt: string
     name: string
-    address: string
+    description: string
     deletedAt?: string
 }

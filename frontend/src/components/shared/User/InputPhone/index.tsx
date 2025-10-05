@@ -3,6 +3,7 @@ import { InputStyled } from "@/components/styled"
 import { useFormik } from "formik"
 import * as Yub from "yup"
 import React from "react"
+import { PHONE_REGEX } from "@/constants/regex"
 export function InputPhone({ isReadOnly }: { isReadOnly: boolean }) {
     // const [isDisabled, setIsDisabled] = useState(style)
 
@@ -13,7 +14,7 @@ export function InputPhone({ isReadOnly }: { isReadOnly: boolean }) {
         validationSchema: Yub.object({
             phone: Yub.string()
                 .required("Phone is required")
-                .matches(/^(0[0-9]{9})$/, "Phone must be 10 digits and start with 0")
+                .matches(PHONE_REGEX, "Phone must be 10 digits and start with 0")
         }),
         onSubmit: (values) => {
             alert(JSON.stringify(values))

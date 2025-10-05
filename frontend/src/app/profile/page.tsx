@@ -25,8 +25,9 @@ import * as Yup from "yup"
 import { Sex } from "@/constants/enum"
 import { SexLabels } from "@/constants/labels"
 import dayjs from "dayjs"
-import { defaultAvatarUrl } from "@/constants/constants"
+import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 import { DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react"
+import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 
 export default function Page() {
     const { t } = useTranslation()
@@ -85,13 +86,13 @@ export default function Page() {
         validationSchema: Yup.object({
             firstName: Yup.string()
                 .required(t("user.first_name_require"))
-                .matches(/^[\p{L}\s]+$/u, t("user.invalid_first_name")),
+                .matches(NAME_REGEX, t("user.invalid_first_name")),
             lastName: Yup.string()
                 .required(t("user.last_name_require"))
-                .matches(/^[\p{L}\s]+$/u, t("user.invalid_last_name")),
+                .matches(NAME_REGEX, t("user.invalid_last_name")),
             phone: Yup.string()
                 // .required(t("user.phone_require"))
-                .matches(/^(0[0-9]{9})$/, t("user.invalid_phone")),
+                .matches(PHONE_REGEX, t("user.invalid_phone")),
             sex: Yup.number().required(t("user.sex_require")),
             dateOfBirth: Yup.string().required(t("user.date_of_birth_require"))
         }),
@@ -121,7 +122,7 @@ export default function Page() {
                     closeOnSelect={false}
                 >
                     <DropdownTrigger className="w-47 h-47 cursor-pointer">
-                        <AvaterStyled src={user?.avatarUrl || defaultAvatarUrl} />
+                        <AvaterStyled src={user?.avatarUrl || DEFAULT_AVATAR_URL} />
                     </DropdownTrigger>
                     <DropdownMenu variant="flat" classNames={{ base: "p-0 w-fit" }}>
                         <DropdownItem key="upload_avatar" className="block p-0">
