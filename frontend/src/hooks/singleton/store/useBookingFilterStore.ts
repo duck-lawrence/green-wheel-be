@@ -1,4 +1,4 @@
-// src/store/useBookingStore.ts
+// src/store/useBookingFilterStore.ts
 import Vehicle from "@/models/vehicle/vehicle"
 // import { shallow } from "@/utils/helpers/shallow"
 import { create } from "zustand"
@@ -9,24 +9,24 @@ type BookingState = {
     end: string | null
     filteredVehicles: Vehicle[]
     // setBooking: (data: Partial<BookingState>) => void
-    // clearBooking: () => void
+    // clearBookingFilter: () => void
 }
 
 interface BookingActions {
-    setBookingInfo: (station: string, start: string, end: string) => void
+    setBookingFilter: (station: string, start: string, end: string) => void
     setFilteredVehicles: (vehicles: Vehicle[]) => void
-    clearBooking: () => void
+    clearBookingFilter: () => void
 }
 
-export const useBookingStore = create<BookingState & BookingActions>((set) => ({
+export const useBookingFilterStore = create<BookingState & BookingActions>((set) => ({
     station: null,
     start: null,
     end: null,
     filteredVehicles: [],
 
-    setBookingInfo: (station, start, end) => set({ station, start, end }),
+    setBookingFilter: (station, start, end) => set({ station, start, end }),
     setFilteredVehicles: (vehicles) => set({ filteredVehicles: vehicles }),
-    clearBooking: () =>
+    clearBookingFilter: () =>
         set({
             station: null,
             start: null,
@@ -44,17 +44,17 @@ export const useBookingInfo = () => {
         start: s.start,
         end: s.end
     }))
-    return useBookingStore(selector)
+    return useBookingFilterStore(selector)
 }
 
-// export const useFilteredVehicles = () => useBookingStore((s) => s.filteredVehicles)
+// export const useFilteredVehicles = () => useBookingFilterStore((s) => s.filteredVehicles)
 
 // export const useBookingActions = () =>
-//     useBookingStore(
+//     useBookingFilterStore(
 //         (s) => ({
-//             setBookingInfo: s.setBookingInfo,
+//             setBookingFilter: s.setBookingFilter,
 //             setFilteredVehicles: s.setFilteredVehicles,
-//             clearBooking: s.clearBooking
+//             clearBookingFilter: s.clearBookingFilter
 //         }),
 //         shallow
 //     )
@@ -62,7 +62,7 @@ export const useBookingInfo = () => {
 // const savedBooking =
 //     typeof window !== "undefined" ? JSON.parse(sessionStorage.getItem("booking") || "{}") : {}
 
-// export const useBookingStore = create<BookingState>((set) => ({
+// export const useBookingFilterStore = create<BookingState>((set) => ({
 //     station: savedBooking.station ?? null,
 //     start: savedBooking.start ?? null,
 //     end: savedBooking.end ?? null,
@@ -77,7 +77,7 @@ export const useBookingInfo = () => {
 //         })
 //     },
 
-//     clearBooking: () => {
+//     clearBookingFilter: () => {
 //         if (typeof window !== "undefined") {
 //             sessionStorage.removeItem("booking")
 //         }

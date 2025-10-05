@@ -1,4 +1,4 @@
-export * from "./useBookingStore"
+export * from "./useBookingFilterStore"
 export * from "./useNavbarItemStore"
 export * from "./useProfileStore"
 export * from "./useToken"

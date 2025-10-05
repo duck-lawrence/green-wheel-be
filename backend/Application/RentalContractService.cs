@@ -223,6 +223,7 @@ namespace Application
             string subject;
             string templatePath;
             string body;
+            var basePath = AppContext.BaseDirectory;
 
             if (rentalContract.Status != (int)RentalContractStatus.RequestPeding)
             {
@@ -239,7 +240,7 @@ namespace Application
                 .Select(rc => rc.Invoices).FirstOrDefault();
 
                 subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
-                templatePath = Path.Combine("../Application", "Templates", "PaymentEmailTemplate.html");
+                templatePath = Path.Combine(basePath, "Templates", "PaymentEmailTemplate.html");
                 body = System.IO.File.ReadAllText(templatePath);
 
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
@@ -260,7 +261,7 @@ namespace Application
                     await UpdateStatus(rentalContract, (int)RentalContractStatus.Cancelled);
                 }
                 subject = "[GreenWheel] Vehicle Unavailable, Booking Cancelled";
-                templatePath = Path.Combine("../Application", "Templates", "CancelRentalContractEmailTempate.html");
+                templatePath = Path.Combine(basePath, "Templates", "CancelRentalContractEmailTempate.html");
                 body = System.IO.File.ReadAllText(templatePath);
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
                            .Replace("{VehicleModelName}", vehicleModel.Name)
