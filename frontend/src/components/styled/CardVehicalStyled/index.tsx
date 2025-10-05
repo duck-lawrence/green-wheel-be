@@ -2,8 +2,9 @@
 import React from "react"
 import { Card, CardBody, CardFooter, Image } from "@heroui/react"
 import { BatteryChargingIcon, Couch, SuitcaseIcon, Users } from "@phosphor-icons/react"
-import Vehicle from "@/models/vehicle/vehicle"
 import { useRouter } from "next/navigation"
+import VehicleModel from "@/models/vehicle/vehicle"
+import { useTranslation } from "react-i18next"
 
 // cắt chuỗi để chỉnh format cho đẹp =)
 function splitTitle(title: string) {
@@ -14,14 +15,9 @@ function splitTitle(title: string) {
 }
 
 // className="gap-8 grid grid-cols-2 sm:grid-cols-3 "
-export default function CardVehicalStyled({ car }: { car: Vehicle }) {
+export default function CardVehicalStyled({ car }: { car: VehicleModel }) {
+    const { t } = useTranslation()
     const router = useRouter()
-    // const isOutOfStock = car.quantity === 0
-
-    // const handleClick = () => {
-    //     router.prefetch(`/vehicle-rental/detail/${car.id}`) // preload trước trang detail
-    //     router.push(`/vehicle-rental/detail/${car.id}`)
-    // }
 
     const { brand, model } = splitTitle(car.name)
     return (
@@ -47,7 +43,7 @@ export default function CardVehicalStyled({ car }: { car: Vehicle }) {
                     />
                     {car.quantity === 0 && (
                         <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 text-xs rounded-xl z-10">
-                            Hết xe
+                            {t("vehicle_model.out_of_stock")}
                         </span>
                     )}
                 </CardBody>
@@ -64,7 +60,7 @@ export default function CardVehicalStyled({ car }: { car: Vehicle }) {
                                 {car.costPerDay.toLocaleString()}
                             </span>
                             <br />
-                            <span className="text-black">VNĐ/Ngày</span>
+                            <span className="text-black">{t("vehicle_model.vnd_per_day")}</span>
                         </div>
                     </div>
 
@@ -72,7 +68,7 @@ export default function CardVehicalStyled({ car }: { car: Vehicle }) {
                     <div className="grid grid-cols-2 ">
                         <div className="flex gap-2 mb-4">
                             <Couch className="flex h-6 w-6" />
-                            <span>{car.segmentName}</span>
+                            <span>{car.segment}</span>
                         </div>
 
                         <div className="flex gap-2">
@@ -82,12 +78,16 @@ export default function CardVehicalStyled({ car }: { car: Vehicle }) {
 
                         <div className="flex gap-2">
                             <Users className="h-6 w-6" />
-                            <span>{car.seatingCapacity} chỗ</span>
+                            <span>
+                                {car.seatingCapacity} {t("vehicle_model.seats")}
+                            </span>
                         </div>
 
                         <div className="flex gap-0">
                             <SuitcaseIcon className="h-6 w-6" />
-                            <span>Dung Lượng pin {car.batteryCapacity ?? "-"}L</span>
+                            <span>
+                                {t("vehicle_model.battery_capacity")} {car.batteryCapacity ?? "-"}
+                            </span>
                         </div>
                     </div>
                 </CardFooter>

@@ -43,7 +43,7 @@
         "reset_password": "Reset password",
         "please_reset_password": "Please set your new password"
     },
-    "vehicle_model": {},
+
     "user": {
         "invalid_otp": "Invalid OTP",
         "otp_can_not_empty": "OTP is required",
@@ -146,13 +146,26 @@
         "agree_terms_require": "You must agree to the payment terms",
         "agree_data_policy_require": "You must agree to the data sharing terms"
     },
-    "vehicle": {
+    "vehicle_model": {
         "station": "Station",
         "pick_station": "Please select a pick-up location",
         "pick_time_car": "Please select date and time to pick up the car",
         "search_car": "Search car",
         "start_date_time": "Start date & time",
-        "end_date_time": "End date & time"
+        "end_date_time": "End date & time",
+        "remaining_vehicle_count": "Remaining vehicles",
+        "vnd_per_day": "VND/Day",
+        "vehicle_information": "Vehicle information",
+        "unit_price": "Unit price",
+        "number_of_days": "Number of days",
+        "deposit_fee": "Deposit fee",
+        "temporary_total": "Temporary total",
+        "rental_request": "Rental request",
+        "similar_vehicles": "Similar vehicles",
+        "view_all": "View all",
+        "out_of_stock": "Out of stock",
+        "seats": "Seats",
+        "battery_capacity": "Battery capacity"
     },
     "validate": {
         "date_received": "Vehicle pick-up date is invalid",

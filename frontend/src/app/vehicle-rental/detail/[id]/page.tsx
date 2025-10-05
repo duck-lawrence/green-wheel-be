@@ -9,14 +9,16 @@ import { currency } from "@/utils/helpers/currentcy"
 import { MathDate } from "@/utils/helpers/mathDate"
 import { vehicleData } from "@/data/vehicleData"
 import { useParams } from "next/navigation"
-import Vehicle from "@/models/vehicle/vehicle"
-import { useBookingStore, useToken } from "@/hooks"
+import { useBookingFilterStore, useToken } from "@/hooks"
+import VehicleModel from "@/models/vehicle/vehicle"
+import { useTranslation } from "react-i18next"
 
 export default function DetailPage() {
+    const { t } = useTranslation()
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { id } = useParams()
-    const [vehicle, setVehicle] = useState<Vehicle | null>(null)
-    const { start, end } = useBookingStore()
+    const [vehicle, setVehicle] = useState<VehicleModel | null>(null)
+    const { start, end } = useBookingFilterStore()
     // handle render picture
     const [active, setActive] = useState(0)
 
@@ -93,7 +95,7 @@ export default function DetailPage() {
                             Phân khúc: <span className="font-medium">{vehicle.segment_name}</span>
                         </p> */}
                         <p className="mt-1 text-sm text-neutral-500">
-                            Số lượng xe còn:{" "}
+                            {t("vehicle_model.remaining_vehicle_count")}
                             <span className="font-medium text-emerald-600">
                                 {vehicle.availableVehicleCount}
                             </span>
@@ -104,8 +106,7 @@ export default function DetailPage() {
                         <p className="text-2xl sm:text-3xl font-semibold text-emerald-600">
                             {currency(vehicle.costPerDay)}
                             <span className="text-base font-normal text-neutral-500">
-                                {" "}
-                                VND/Ngày
+                                {t("vehicle_model.vnd_per_day")}
                             </span>
                         </p>
                     </div>
@@ -178,9 +179,12 @@ export default function DetailPage() {
                 </section>
                 {/* ========================================================= */}
                 {/* Booking Card (sticky on desktop) */}
+                {/* lỗi nên chưa làm en chỗ này */}
                 <aside className="lg:col-span-4 lg:sticky lg:top-10 space-y-6 ">
                     <div className="rounded-2xl bg-white p-5 shadow-sm border border-neutral-100">
-                        <h2 className="text-lg font-semibold">Thông tin xe</h2>
+                        <h2 className="text-lg font-semibold">
+                            {t("vehicle_model.vehicle_information")}
+                        </h2>
                         <div className="mt-4 grid gap-4">
                             <div className="grid grid-cols-2 gap-3">
                                 <Field
@@ -208,17 +212,17 @@ export default function DetailPage() {
                             {/* Đơn tạm tính */}
                             <div className="rounded-xl bg-neutral-50 p-4">
                                 <div className="flex items-center justify-between text-sm">
-                                    <span>Đơn giá</span>
+                                    <span>{t("vehicle_model.unit_price")}</span>
                                     <span className="font-medium">
                                         {currency(vehicle.costPerDay)}
                                     </span>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between text-sm">
-                                    <span>Số ngày</span>
+                                    <span>{t("vehicle_model.number_of_days")}</span>
                                     <span className="font-medium">{totalDays}</span>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between text-sm">
-                                    <span>Tiền cọc</span>
+                                    <span>{t("vehicle_model.deposit_fee")}</span>
                                     <span className="font-medium">
                                         {currency(vehicle.depositFee)}
                                     </span>
@@ -226,7 +230,7 @@ export default function DetailPage() {
 
                                 <div className="mt-3 h-px bg-neutral-200" />
                                 <div className="mt-3 flex items-center justify-between text-base font-semibold">
-                                    <span>Tạm tính</span>
+                                    <span>{t("vehicle_model.temporary_total")}</span>
                                     <span className="text-emerald-700">{currency(total)} đ</span>
                                 </div>
                             </div>
@@ -235,7 +239,7 @@ export default function DetailPage() {
                                 isDisabled={isLoggedIn}
                                 className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             >
-                                <Link href={"/"}>Yêu cầu đặt xe</Link>
+                                <Link href={"/"}>{t("vehicle_model.rental_request")}</Link>
                             </ButtonStyled>
                         </div>
                     </div>
@@ -244,15 +248,17 @@ export default function DetailPage() {
 
             <section className="w-300 ml-10 flex flex-col pb-10">
                 <div className="flex items-end gap-250">
-                    <h2 className="text-2xl font-semibold">Xe tương tự</h2>
+                    <h2 className="text-2xl font-semibold">
+                        {t("vehicle_model.similar_vehicles")}
+                    </h2>
                     <Link
-                        href="/vehicles"
+                        href="/vehicle-rental"
                         className="text-sm text-emerald-700 hover:underline font-semibold"
                     >
-                        Xem tất cả
+                        {t("vehicle_model.view_all")}
                     </Link>
                 </div>
-
+                {/* chưa làm en */}
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {similarVehicles.map((i) => (
                         <Link

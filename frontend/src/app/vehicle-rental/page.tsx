@@ -3,7 +3,6 @@ import { FilterVehicleRental, CardListVehicleRental } from "@/components"
 import { vehicleData } from "@/data/vehicleData"
 import { useBookingFilterStore, useNavbarItemStore } from "@/hooks"
 import React, { useEffect } from "react"
-// import Vehicle from "@/models/user/type/vehicle"
 
 export default function VehicleRental() {
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)

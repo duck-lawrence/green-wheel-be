@@ -1,3 +1,5 @@
+// import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+
 export const vehicleData = [
     {
         id: "1",
@@ -11,8 +13,8 @@ export const vehicleData = [
         batteryCapacity: 18,
         ecoRangeKm: 210,
         sportRangeKm: 180,
-        brandName: "VinFast",
-        segmentName: "SUV",
+        brand: "VinFast",
+        segment: "SUV",
         availableVehicleCount: 5,
         quantity: 0,
         images: [
@@ -34,8 +36,8 @@ export const vehicleData = [
         batteryCapacity: 18,
         ecoRangeKm: 210,
         sportRangeKm: 180,
-        brandName: "VinFast",
-        segmentName: "SUV",
+        brand: "VinFast",
+        segment: "SUV",
         availableVehicleCount: 5,
         quantity: 2,
         images: [
@@ -57,8 +59,8 @@ export const vehicleData = [
         batteryCapacity: 18,
         ecoRangeKm: 210,
         sportRangeKm: 180,
-        brandName: "VinFast",
-        segmentName: "SUV",
+        brand: "VinFast",
+        segment: "SUV",
         availableVehicleCount: 5,
         quantity: 0,
         images: [
