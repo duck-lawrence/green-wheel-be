@@ -244,5 +244,19 @@
         "place2": "Place 2",
         "detail_table": "Detail table",
         "total": "Total"
+    },
+    "footer": {
+        "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",
+        "introduction": "Introduction",
+        "about_us": "About us",
+        "services": "Services",
+        "policy": "Policy",
+        "policy_and_regulations": "Policy and regulations",
+        "operating_regulations": "Operating regulations",
+        "information_security": "Information security",
+        "dispute_resolution": "Dispute resolution",
+        "contact": "Contact",
+        "hotline": "Hotline",
+        "copyright_notice": "© 2025 Green Wheel Corp. All rights reserved."
     }
 }
