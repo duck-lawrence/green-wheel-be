@@ -15,3 +15,10 @@ export type UserChangePasswordReq = {
     password: string
     confirmPassword: string
 }
+
+export type UserSetPasswordReq = {
+    firstName: string
+    lastName: string
+    password: string
+    confirmPassword: string
+}

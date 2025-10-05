@@ -1,14 +1,13 @@
 ﻿using Application.AppExceptions;
 using Application.Repositories;
 using Domain.Commons;
-using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class,IEntity
+    public class GenericRepository<T> : IGenericRepository<T> where T : class, IEntity
     {
         protected readonly IGreenWheelDbContext _dbContext;
         protected readonly DbSet<T> _dbSet;
@@ -18,7 +17,6 @@ namespace Infrastructure.Repositories
             _dbContext = dbContext;
             _dbSet = _dbContext.Set<T>();
         }
-
 
         public async Task<Guid> AddAsync(T entity)
         {
@@ -75,7 +73,8 @@ namespace Infrastructure.Repositories
             if (entityFromDb is SorfDeletedEntity softEntity1 && softEntity1.DeletedAt == null)
             {
                 return entityFromDb;
-            }else if(entityFromDb is SorfDeletedEntity softEntity2 && softEntity2.DeletedAt != null)
+            }
+            else if (entityFromDb is SorfDeletedEntity softEntity2 && softEntity2.DeletedAt != null)
             {
                 return null;
             }
@@ -85,7 +84,7 @@ namespace Infrastructure.Repositories
         public async Task<int> UpdateAsync(T entity)
         {
             var entityFromDb = await GetByIdAsync(entity.Id);
-            if(entityFromDb == null)
+            if (entityFromDb == null)
             {
                 throw new NotFoundException($"{typeof(T).Name} is not found");
             }

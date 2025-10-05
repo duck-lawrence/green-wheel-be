@@ -1,17 +1,20 @@
 "use client"
-import React from "react"
+import React, { useMemo } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { CalendarDateTime, now, getLocalTimeZone, fromDate } from "@internationalized/date"
 import { ButtonStyled, LocalFilter } from "@/components/styled"
 import DateTimeStyled from "@/components/styled/DateTimeStyled"
-import CardList from "@/components/modules/CardList"
 import { useTranslation } from "react-i18next"
 
 const MIN_HOUR = 7
 const MAX_HOUR = 17
 
-export function Filter() {
+export function FilterVehicleRental({
+    onFilterChange
+}: {
+    onFilterChange: (station: string, start: string, end: string) => void
+}) {
     const { t } = useTranslation()
     // Tính thời gian mặc định
     const zonedNow = fromDate(new Date(), getLocalTimeZone())
@@ -30,68 +33,77 @@ export function Filter() {
             : nowTime
 
     //  Validation schema
-    const bookingSchema = Yup.object().shape({
-        local: Yup.string().required(t("vehical.pick_station")),
-        start: Yup.mixed<CalendarDateTime>()
-            .required(t("vehical.pick_time_car"))
-            .test("is-valid-start", t("validate.date_received"), function (value) {
-                if (!value) return false
-                const today = now(getLocalTimeZone())
-                if (value.compare(today) < 0) return false
-                if (value.hour < MIN_HOUR || value.hour >= MAX_HOUR) return false
-                return true
+    const bookingSchema = useMemo(
+        () =>
+            Yup.object().shape({
+                station: Yup.string().required(t("vehical.pick_station")),
+                start: Yup.mixed<CalendarDateTime>()
+                    .required(t("vehical.pick_time_car"))
+                    .test("is-valid-start", t("validate.date_received"), (value) => {
+                        if (!value) return false
+                        const today = now(getLocalTimeZone())
+                        return (
+                            value.compare(today) >= 0 &&
+                            value.hour >= MIN_HOUR &&
+                            value.hour < MAX_HOUR
+                        )
+                    }),
+                end: Yup.mixed<CalendarDateTime>()
+                    .required(t("validate.date_return"))
+                    .test("is-after-start", t("validate.valid_date"), function (value) {
+                        const { start } = this.parent
+                        return value && start && value.compare(start) > 0
+                    })
+                    .test("is-valid-end", t("validate.time_return"), (value) => {
+                        return value && value.hour >= MIN_HOUR && value.hour < MAX_HOUR
+                    })
             }),
-        end: Yup.mixed<CalendarDateTime>()
-            .required(t("validate.date_return"))
-            .test("is-after-start", t("validate.valid_date"), function (value) {
-                const { start } = this.parent
-                if (!value || !start) return false
-                return value.compare(start) > 0
-            })
-            .test("is-valid-end", t("validate.time_return"), function (value) {
-                if (!value) return false
-                if (value.hour < MIN_HOUR || value.hour >= MAX_HOUR) return false
-                return true
-            })
-    })
+        [t]
+    )
 
     //  useFormik
     const formik = useFormik({
         initialValues: {
-            local: "",
+            station: "",
             start: initialStart,
             end: initialStart.add({ hours: 1 })
         },
         validationSchema: bookingSchema,
         onSubmit: (values) => {
-            console.log("Booking values:", values)
-            alert(
-                `Booking: stationId:: ${
-                    values.local
-                }, Time from ${values.start.toString()} to ${values.end.toString()}`
+            console.log("Booking values item:", {
+                station: values.station,
+                start: values.start.toDate(getLocalTimeZone()).toISOString(),
+                end: values.end.toDate(getLocalTimeZone()).toISOString()
+            })
+
+            onFilterChange(
+                values.station,
+                values.start.toDate(getLocalTimeZone()).toISOString(),
+                values.end.toDate(getLocalTimeZone()).toISOString()
             )
         }
     })
 
     return (
-        <div>
+        <>
             <form
                 onSubmit={formik.handleSubmit}
-                className="flex gap-4 p-4 pb-10 justify-center items-center border border-gray-300 rounded-lg shadow-md max-w-[1500px]"
+                className="flex gap-6 pt-6 pb-6 justify-center items-center border border-gray-300 rounded-4xl shadow-2xl max-w-[1500px] bg-[#F4F4F4]"
             >
                 {/* ĐỊA ĐIỂM */}
-                <div className="flex flex-col h-12">
+                <div className="flex flex-col h-14">
                     <LocalFilter
-                        value={formik.values.local}
-                        onChange={(val) => formik.setFieldValue("local", val)}
+                        value={formik.values.station}
+                        onChange={(val) => formik.setFieldValue("station", val)}
+                        className="max-w-60 h-20 mr-0"
                     />
-                    {formik.touched.local && typeof formik.errors.local === "string" && (
-                        <div className="text-red-500 text-sm mt-1">{formik.errors.local}</div>
+                    {formik.touched.station && typeof formik.errors.station === "string" && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.station}</div>
                     )}
                 </div>
 
                 {/* START */}
-                <div className="h-12">
+                <div className="flex flex-col h-14">
                     <DateTimeStyled
                         label="Start Date & Time"
                         value={formik.values.start}
@@ -103,7 +115,7 @@ export function Filter() {
                 </div>
 
                 {/* END */}
-                <div className="h-12">
+                <div className="flex flex-col h-14">
                     <DateTimeStyled
                         label="End Date & Time"
                         value={formik.values.end}
@@ -114,14 +126,12 @@ export function Filter() {
                     )}
                 </div>
 
-                <div className="flex justify-center items-center mt-2">
+                <div className="flex justify-center items-center mt-0">
                     <ButtonStyled type="submit" color="primary" className="w-40 h-13.5">
                         {t("vehical.search_car")}
                     </ButtonStyled>
                 </div>
             </form>
-
-            <CardList />
-        </div>
+        </>
     )
 }

@@ -3,19 +3,21 @@
 import React, { useCallback, useEffect } from "react"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@heroui/react"
-import Link from "next/link"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { DropdownStyle } from "@/components"
 import { useGetMe, useLogout, useProfileStore, useToken } from "@/hooks"
 import { BackendError } from "@/models/common/response"
+import Link from "next/link"
+import { defaultAvatarUrl } from "@/constants/constants"
 
 export function ProfileDropdown() {
-    const defaultAvatarUrl = "/images/avtFallback.jpg"
     const { t } = useTranslation()
-    const logoutMutation = useLogout({ onSuccess: undefined })
-    const { user, setUser } = useProfileStore()
+    const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
+    const user = useProfileStore((s) => s.user)
+    const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useToken((s) => !!s.accessToken)
+
     const {
         data: userRes,
         isLoading: isGetMeLoading,
@@ -47,7 +49,7 @@ export function ProfileDropdown() {
     if (isGetMeLoading) return <Spinner />
 
     return (
-        <div className="gap-4">
+        <div className="gap-4 flex items-center">
             <DropdownStyle>
                 <DropdownTrigger>
                     <User
@@ -64,11 +66,11 @@ export function ProfileDropdown() {
                     />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User Actions" variant="flat">
-                    <DropdownItem key="profile" textValue={t("user.profile")}>
-                        <Link href="/#">{t("user.profile")}</Link>
+                    <DropdownItem key="profile" as={Link} href="/profile" className="block">
+                        {t("user.profile")}
                     </DropdownItem>
-                    <DropdownItem key="team_settings" textValue={t("user.booking_history")}>
-                        <Link href="/#">{t("user.booking_history")}</Link>
+                    <DropdownItem key="booking_history" as={Link} href="/#" className="block">
+                        {t("user.booking_history")}
                     </DropdownItem>
                     <DropdownItem
                         key="logout"

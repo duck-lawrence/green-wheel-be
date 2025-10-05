@@ -2,6 +2,7 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
@@ -444,7 +445,7 @@ namespace Application
 
         }
 
-        public async Task<string> SetPassword(string setPasswordToken, string password, string firstName, string lastName)
+        public async Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req)
         {
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
@@ -465,12 +466,13 @@ namespace Application
             var user = new User
             {
                 Id = id,
-                FirstName = firstName,
-                LastName = lastName,
+                FirstName = req.FirstName,
+                LastName = req.LastName,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 Email = email,
-                Password = PasswordHelper.HashPassword(password),
+                Password = PasswordHelper.HashPassword(req.Password),
+                DateOfBirth = req.DateOfBirth,
                 RoleId = roles.FirstOrDefault(r => r.Name == "Customer")!.Id,
                 IsGoogleLinked = true,
                 DeletedAt = null,
@@ -497,7 +499,7 @@ namespace Application
 
         public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
-            if (userUpdateReq.Phone != null)
+            if (!string.IsNullOrEmpty(userUpdateReq.Phone))
             {
                 if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
                 {
@@ -512,9 +514,10 @@ namespace Application
             }
             if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
             if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
-            if (userUpdateReq.Phone != null) userFromDb.Phone = userUpdateReq.Phone;
+            if (!string.IsNullOrEmpty(userUpdateReq.Phone)) userFromDb.Phone = userUpdateReq.Phone;
             if(userUpdateReq.DateOfBirth != null) userFromDb.DateOfBirth = userUpdateReq.DateOfBirth;
             if(userUpdateReq.Sex != null) userFromDb.Sex = userUpdateReq.Sex;
+            if (!string.IsNullOrEmpty(userUpdateReq.AvatarUrl))userFromDb.AvatarUrl = userUpdateReq.AvatarUrl;
             await _userRepository.UpdateAsync(userFromDb);
 
         }
@@ -523,18 +526,23 @@ namespace Application
         {
             return await _userRepository.GetByIdAsync(id);
         }
-        
+
         public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
         {
-            if (file == null || file.Length == 0) throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
+            if (file == null || file.Length == 0)
+                throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
 
-            var result = await _photoService.UploadPhotoAsync(file, $"users/{userId}");
-            if (string.IsNullOrEmpty(result.Url)) throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                throw new KeyNotFoundException(Message.User.UserNotFound);
+            // Upload file lên Cloudinary
+            var uploadReq = new UploadImageReq { File = file };
+            var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
 
-            // Nếu có avatar cũ thì xoá trước (optional)
+            if (string.IsNullOrEmpty(result.Url))
+                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new KeyNotFoundException(Message.User.UserNotFound);
+
+            // Nếu có avatar cũ thì xoá
             if (!string.IsNullOrEmpty(user.AvatarPublicId))
             {
                 try
@@ -543,24 +551,29 @@ namespace Application
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Can not delete old avata {PublicId}", user.AvatarPublicId);
+                    _logger.LogWarning(ex, "Cannot delete old avatar {PublicId}", user.AvatarPublicId);
                 }
             }
 
             user.AvatarUrl = result.Url;
             user.AvatarPublicId = result.PublicID;
-            user.UpdatedAt = DateTimeOffset.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
 
             await _userRepository.UpdateAsync(user);
 
-            return user.AvatarUrl;
+            return user.AvatarUrl!;
         }
 
         public async Task DeleteAvatarAsync(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(userId) ?? throw new Exception(Message.User.UserNotFound);
-            if(string.IsNullOrEmpty(user.AvatarPublicId)) throw new Exception(Message.User.NotFoundAvatar);
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new Exception(Message.User.UserNotFound);
+
+            if (string.IsNullOrEmpty(user.AvatarPublicId))
+                throw new Exception(Message.User.NotFoundAvatar);
+
             await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+
             user.AvatarUrl = null;
             user.AvatarPublicId = null;
             await _userRepository.UpdateAsync(user);

@@ -42,8 +42,8 @@ export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmailProps
         },
         validationSchema: Yup.object({
             email: Yup.string()
-                .required(t("email.require"))
-                .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("email.invalid"))
+                .required(t("user.email_require"))
+                .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("user.invalid_email"))
         }),
         onSubmit: handleRegister
     })
@@ -60,7 +60,7 @@ export function RegisterEmail({ email, setEmail, onSuccess }: RegisterEmailProps
                 <InputStyled
                     // className="my-3"
                     variant="bordered"
-                    label="Email"
+                    label={t("auth.email")}
                     value={formik.values.email}
                     onValueChange={(value) => formik.setFieldValue("email", value)}
                     isInvalid={!!(formik.touched.email && formik.errors.email)}

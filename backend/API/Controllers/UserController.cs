@@ -17,25 +17,23 @@ namespace API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IPhotoService _photoService;
-        private readonly ILogger<UserController> _logger;
-
         private readonly IGoogleCredentialService _googleService;
 
         public UserController(IUserService service
-            ,IGoogleCredentialService googleCredentialService
+            , IGoogleCredentialService googleCredentialService
             )
         {
             _userService = service;
             _googleService = googleCredentialService;
-
         }
+
         /*
          Status code:
          200: Login successfully
          401: Invalid email or password
          400: Incorrect form of email, email is empty, password < 6 character, password empty
          */
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginReq user)
         {
@@ -45,11 +43,13 @@ namespace API.Controllers
                 AccessToken = accessToken
             });
         }
+
         /*
          Status code
          200: logout successfully
          401: Invalid refresh token
          */
+
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
@@ -61,12 +61,14 @@ namespace API.Controllers
             }
             return Unauthorized(Message.User.Unauthorized);
         }
+
         /*
-         Status code: 
+         Status code:
          200: send email successfully
          400: incorrect form of email
          429: send to much request per minutes
          */
+
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
         {
@@ -74,12 +76,14 @@ namespace API.Controllers
             await _userService.SendOTP(email.Email);
             return Ok();
         }
+
         /*
          Status code:
          200: verify email successfully
          401: incorrect OTP or this email not have otp, or send to much request
          400: inccorect from of email or otp is not digit
          */
+
         [HttpPost("register/verify-otp")]
         public async Task<IActionResult> RegisterVerifyOtp([FromBody] VerifyOTPReq verifyOTPDto)
         {
@@ -94,12 +98,12 @@ namespace API.Controllers
          409: email is exists
          200: register successfully
          */
+
         [HttpPost("register/complete")]
         public async Task<IActionResult> Register([FromBody] UserRegisterReq registerUserDto)
         {
             if (Request.Cookies.TryGetValue(CookieKeys.RegisterToken, out var registerToken))
             {
-
                 string accessToken = await _userService.RegisterAsync(registerToken, registerUserDto);
                 return Ok(new
                 {
@@ -111,17 +115,19 @@ namespace API.Controllers
                 return Unauthorized(Message.User.InvalidToken);
             }
         }
+
         /*
          status code:
          400: pass is too short, empty password/oldpassword/confirmpassword, confirm password not match
          401: invalid old password
          200: change password successfully
          */
+
         [HttpPut("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordReq userChangePasswordDto)
         {
-            if(userChangePasswordDto.OldPassword == null)
+            if (userChangePasswordDto.OldPassword == null)
             {
                 return BadRequest(Message.User.OldPasswordIsRequired);
             }
@@ -129,12 +135,14 @@ namespace API.Controllers
             await _userService.ChangePassword(user, userChangePasswordDto);
             return Ok();
         }
+
         /*
-         Status code: 
+         Status code:
          200: send email successfully
          400: incorrect form of email
          429: send to much request per minute
          */
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] SendEmailReq sendEmailRequestDto)
         {
@@ -148,6 +156,7 @@ namespace API.Controllers
          401: incorrect OTP or this email not have otp, or send to much request
          400: incorect from of email or otp is not digit
          */
+
         [HttpPost("forgot-password/verify-otp")]
         public async Task<IActionResult> ForgotPasswordVerifyOTP([FromBody] VerifyOTPReq verifyOTPDto)
         {
@@ -157,10 +166,11 @@ namespace API.Controllers
 
         /*
          status code:
-         400: password is too short / confirm password does not match 
+         400: password is too short / confirm password does not match
          200: reset password successfully
          401: invalid token
          */
+
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] UserChangePasswordReq userChangePasswordDto)
         {
@@ -170,7 +180,6 @@ namespace API.Controllers
                 return Ok();
             }
             return Unauthorized(Message.User.InvalidToken);
-
         }
 
         /*
@@ -178,6 +187,7 @@ namespace API.Controllers
          200: refresh token successfully
          401: invalid token
          */
+
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken()
@@ -191,7 +201,6 @@ namespace API.Controllers
                 });
             }
             return Unauthorized(Message.User.Unauthorized);
-
         }
 
         [HttpPost("login-google")]
@@ -219,8 +228,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.SetPasswordToken, out var setPasswordToken))
             {
-                string accesstoken = await _userService.SetPassword(setPasswordToken, googleSetPasswordReqDto.Password,
-                    googleSetPasswordReqDto.FirstName, googleSetPasswordReqDto.LastName);
+                string accesstoken = await _userService.SetPassword(setPasswordToken, googleSetPasswordReqDto);
                 return Ok(new
                 {
                     AccessToken = accesstoken
@@ -228,6 +236,7 @@ namespace API.Controllers
             }
             return BadRequest();
         }
+
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMe()
@@ -239,29 +248,29 @@ namespace API.Controllers
 
         [HttpPatch("me")]
         [Authorize]
-        public async Task<IActionResult> UpdateMe([FromBody]UserUpdateReq userUpdateReq)
+        public async Task<IActionResult> UpdateMe([FromBody] UserUpdateReq userUpdateReq)
         {
             var userClaims = HttpContext.User;
             await _userService.UpdateMe(userClaims, userUpdateReq);
             return Ok();
         }
-        [HttpPost("upload-avatar")]
+        [HttpPut("avatar")]
         [Authorize]
-        public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq req)
+        public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq request)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-
-            var avatarUrl = await _userService.UploadAvatarAsync(userId, req.File);
+            var avatarUrl = await _userService.UploadAvatarAsync(userId, request.File);
 
             return Ok(new { AvatarUrl = avatarUrl });
         }
-        [HttpDelete("Delete-avatar")]
+        [HttpDelete("avatar")]
         [Authorize]
         public async Task<IActionResult> DeleteAvatar()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _userService.DeleteAvatarAsync(userId);
-            return Ok(new {Message = Message.Cloudinary.DeleteSuccess});
+
+            return Ok(new { Message = Message.Cloudinary.DeleteSuccess });
         }
     }
 }

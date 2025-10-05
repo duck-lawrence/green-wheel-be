@@ -1,7 +1,8 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import "./index.css"
-import { NavbarBrand, NavbarContent, NavbarItem, Link } from "@heroui/react"
+import { NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react"
+import Link from "next/link"
 import { useTranslation } from "react-i18next"
 import { ButtonStyled, NavbarStyled, LanguageSwitcher } from "@/components/"
 import { useLoginDiscloresureSingleton, useToken } from "@/hooks"
@@ -28,7 +29,9 @@ export function Navbar() {
     const [scrollState, setScroledState] = useState<NavbarState>("default")
     const [isHiddenNavbar, setIsHiddenNavbar] = useState(false)
     const [lastScrollY, setLastScrollY] = useState(0)
-    const { activeMenuKey, setActiveMenuKey } = useNavbarItemStore()
+    const activeMenuKey = useNavbarItemStore((s) => s.activeMenuKey)
+    const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
+
     // handle when login
     const isLoggedIn = useToken((s) => !!s.accessToken)
     const { onOpen: onOpenLogin } = useLoginDiscloresureSingleton()
@@ -46,8 +49,8 @@ export function Navbar() {
         ${isHiddenNavbar ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100"}
         ${
             scrollState === "top" || scrollState === "middle"
-                ? "text-white rounded-3xl bg-[#080808]/60 mx-auto max-w-3xl scale-95"
-                : ""
+                ? "text-white rounded-3xl bg-[#080808]/60 backdrop-blur-md mx-auto max-w-3xl scale-95"
+                : "backdrop-blur-none"
         }
     `
     const itemClasses = [
@@ -124,25 +127,31 @@ export function Navbar() {
         >
             {/* start content */}
             <NavbarBrand>
-                <AcmeLogo />
-                <p className="font-bold text-inherit">ACME</p>
+                <Link href={"/"} className="flex items-center">
+                    <AcmeLogo />
+                    <p className="font-bold text-inherit">ACME</p>
+                </Link>
             </NavbarBrand>
             {/* middle content */}
             <NavbarContent className="hidden sm:flex gap-4 justify-center">
                 {menus.map((menu) => (
                     <NavbarItem
                         key={menu.key}
-                        onPress={() => setActiveMenuKey(menu.key)}
                         isActive={activeMenuKey == menu.key}
-                        as={Link}
-                        href={menu.key === "home" ? "/" : "/" + menu.key}
-                        className={
-                            scrollState === "top" || scrollState === "middle"
-                                ? "text-white"
-                                : "text-inherit"
-                        }
+                        className={`""text-center px-3 w-fit"
+                            ${
+                                scrollState === "top" || scrollState === "middle"
+                                    ? "text-white"
+                                    : "text-inherit"
+                            }`}
                     >
-                        <div className="text-center px-3 min-w-full">{menu.label}</div>
+                        <Link
+                            href={menu.key === "home" ? "/" : "/" + menu.key}
+                            onClick={() => setActiveMenuKey(menu.key)}
+                            className="h-full flex items-center"
+                        >
+                            {menu.label}
+                        </Link>
                     </NavbarItem>
                 ))}
             </NavbarContent>

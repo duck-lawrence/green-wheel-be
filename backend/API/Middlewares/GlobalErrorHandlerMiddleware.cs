@@ -79,7 +79,7 @@ namespace API.Middleware
             }
             catch (ConflictDuplicateException cDEx)
             {
-                await WriteProblemDetailsAsync(context, 409, "Too Many Requests", cDEx.Message);
+                await WriteProblemDetailsAsync(context, 409, "Conflict", cDEx.Message);
             }
             catch (Exception ex)
             {
