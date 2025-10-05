@@ -17,9 +17,15 @@ export const profileApi = {
 
     uploadAvatar: (formData: FormData) =>
         requestWrapper<{ avatarUrl: string }>(async () => {
-            const res = await axiosInstance.post("/users/avatar", formData, {
+            const res = await axiosInstance.put("/users/avatar", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             })
+            return res.data
+        }),
+
+    deleteAvatar: () =>
+        requestWrapper<{ message: string }>(async () => {
+            const res = await axiosInstance.delete("/users/avatar")
             return res.data
         })
 }

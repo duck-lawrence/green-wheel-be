@@ -254,7 +254,7 @@ namespace API.Controllers
             await _userService.UpdateMe(userClaims, userUpdateReq);
             return Ok();
         }
-        [HttpPost("avatar")]
+        [HttpPut("avatar")]
         [Authorize]
         public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq request)
         {

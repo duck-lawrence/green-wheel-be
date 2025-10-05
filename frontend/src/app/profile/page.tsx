@@ -10,7 +10,12 @@ import {
     InputStyled
 } from "@/components"
 import { parseDate } from "@internationalized/date"
-import { useAvatarUploadDiscloresureSingleton, useProfileStore, useUpdateMe } from "@/hooks"
+import {
+    useAvatarUploadDiscloresureSingleton,
+    useDeleteAvatar,
+    useProfileStore,
+    useUpdateMe
+} from "@/hooks"
 import { UserUpdateReq } from "@/models/user/schema/request"
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
 import React, { useCallback, useState } from "react"
@@ -28,6 +33,7 @@ export default function Page() {
     const user = useProfileStore((s) => s.user)
     const updateUser = useProfileStore((s) => s.updateUser)
     const updateMeMutation = useUpdateMe({ onSuccess: updateUser })
+    const deleteAvatarMutation = useDeleteAvatar({ onSuccess: undefined })
     const [showChange, setShowChange] = useState(true)
 
     // ===== Upload avatar =====
@@ -52,6 +58,11 @@ export default function Page() {
         })
         reader.readAsDataURL(file)
     }
+
+    // ===== Delete avatar =====
+    const handleDeleteAvatar = useCallback(async () => {
+        await deleteAvatarMutation.mutateAsync()
+    }, [deleteAvatarMutation])
 
     // ===== Update Me =====
     const handleUpdateMe = useCallback(
@@ -104,7 +115,7 @@ export default function Page() {
                 {/* logo and user full name */}
                 <div className="flex gap-4 items-center w-fit">
                     <DropdownStyle
-                        placement="right-start"
+                        placement="right-end"
                         classNames={{ content: "min-w-fit max-w-fit" }}
                         isOpen={isDropdownOpen}
                         onOpenChange={onDropdownOpenChange}
@@ -116,6 +127,14 @@ export default function Page() {
                         <DropdownMenu variant="flat" classNames={{ base: "p-0 w-fit" }}>
                             <DropdownItem key="upload_avatar" className="block p-0">
                                 <AvatarUploadButton onFileSelect={handleSelectFile} />
+                            </DropdownItem>
+                            <DropdownItem key="delete_avatar" className="block p-0">
+                                <ButtonStyled
+                                    className="block w-fit bg-transparent"
+                                    onPress={handleDeleteAvatar}
+                                >
+                                    {t("user.delete_avatar")}
+                                </ButtonStyled>
                             </DropdownItem>
                         </DropdownMenu>
                     </DropdownStyle>

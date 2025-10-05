@@ -96,6 +96,7 @@
         "choose_sex": "Choose Sex",
 
         "upload_avatar": "Upload avatar",
+        "delete_avatar": "Delete avatar",
 
         "unauthorized": "Unauthorized",
         "invalid_token": "Invalid token",
@@ -250,5 +251,9 @@
         "place2": "Place 2",
         "detail_table": "Detail table",
         "total": "Total"
+    },
+    "cloudinary": {
+        "file_not_found": "File not fount",
+        "invalid_file_type": "Invalid file type"
     }
 }

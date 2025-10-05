@@ -62,3 +62,22 @@ export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
         }
     })
 }
+
+export const useDeleteAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
+    const { t } = useTranslation()
+    const updateUser = useProfileStore((s) => s.updateUser)
+
+    return useMutation({
+        mutationFn: profileApi.deleteAvatar,
+        onSuccess: (data) => {
+            onSuccess?.()
+            toast.success(translateWithFallback(t, data.message))
+            updateUser({ avatarUrl: undefined })
+        },
+        onError: (error: BackendError) => {
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    })
+}
