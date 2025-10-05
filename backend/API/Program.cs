@@ -79,21 +79,20 @@ namespace API
             builder.Services.AddScoped<IDepositRepository, DepositRepository>();
             builder.Services.AddScoped<IStationRepository, StationRepository>();
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
-            //Add scope
+            //Add Services
             builder.Services.AddScoped<IInvoiceService, InvoiceService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
             builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
             builder.Services.AddScoped<IVehicleService, VehicleService>();
             builder.Services.AddScoped<IRentalContractService, RentalContractService>();
-            //Add Client
-            builder.Services.AddHttpClient<IMomoService, MomoService>();
-            //UOW
-            builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             builder.Services.AddScoped<ICitizenIdentityService, CitizenIdentityService>();
             builder.Services.AddScoped<IDriverLicenseService, DriverLicenseService>();
+            //Add Client
+            builder.Services.AddHttpClient<IMomoService, MomoService>();
             builder.Services.AddHttpClient<IGeminiService, GeminiService>();
-
+            //UOW
+            builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
