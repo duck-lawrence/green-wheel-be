@@ -22,4 +22,9 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dtos\Station\Request\" />
+    <Folder Include="Dtos\VehicleSegment\Request\" />
+  </ItemGroup>
+
 </Project>

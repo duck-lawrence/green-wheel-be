@@ -97,6 +97,7 @@ namespace Application.Constants
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
+            public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
         }
 
         //Station
@@ -123,6 +124,10 @@ namespace Application.Constants
         {
             public const string ParsingFailed = "json.pasing_failed";
 
+        }
+        public static class VehicleSegment
+        {
+            public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
         }
     }
 }
