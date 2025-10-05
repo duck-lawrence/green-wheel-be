@@ -1,5 +1,5 @@
 "use client"
-import { ButtonStyled, Carousel } from "@/components"
+import { ButtonStyled, Carousel, Footer } from "@/components"
 import Link from "next/link"
 import React, { useEffect, useRef } from "react"
 import { slides } from "../../public/cars"
@@ -62,7 +62,7 @@ export default function HomePage() {
             <Carousel slides={slides} />
             <Carousel slides={slides} />
             <Carousel slides={slides} />
-            <Carousel slides={slides} />
+            <Footer />
         </div>
     )
 }
