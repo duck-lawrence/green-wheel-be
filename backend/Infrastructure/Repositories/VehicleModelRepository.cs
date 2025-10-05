@@ -29,6 +29,7 @@ namespace Infrastructure.Repositories
                 throw new ArgumentException(Message.VehicleModel.RentTimeIsNotAvailable);
 
             var query = _dbContext.VehicleModels.Where(vm => vm.DeletedAt == null)
+                .Include(vm => vm.ModelImages)
                 .Include(vm => vm.Vehicles)
                     .ThenInclude(v => v.RentalContracts)
                 .AsQueryable();
@@ -38,7 +39,8 @@ namespace Infrastructure.Repositories
             {
                 query = query.Where(vm => vm.SegmentId == segmentId.Value);
             }
-
+           
+            
             // lọc vehicles trong station
             var result = await query
                 .Select(vm => new VehicleModelViewRes
@@ -56,6 +58,7 @@ namespace Infrastructure.Repositories
                     SportRangeKm = vm.SportRangeKm,
                     Brand = vm.Brand,
                     Segment = vm.Segment,
+                    ImageUrls = vm.ModelImages.Select(x => x.Url),
                     AvailableVehicleCount = vm.Vehicles.Count(v =>
                         v.StationId == stationId &&
                         (
