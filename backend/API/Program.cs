@@ -6,16 +6,19 @@ using Application.Abstractions;
 using Application.AppSettingConfigurations;
 using Application.Mappers;
 using Application.Repositories;
+using Application.UnitOfWorks;
 using Application.Services;
 using Application.Validators.User;
 using CloudinaryDotNet;
 using DotNetEnv;
 using FluentValidation;
+using FluentValidation.AspNetCore;
+using Infrastructure.Interceptors;
 using Infrastructure.Repositories;
+using Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Infrastructure.UnitOfWork;
-using Application.UnitOfWorks;
+using Microsoft.OpenApi.Models;
 
 namespace API
 {
@@ -79,20 +82,27 @@ namespace API
             builder.Services.AddScoped<IDepositRepository, DepositRepository>();
             builder.Services.AddScoped<IStationRepository, StationRepository>();
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
+            builder.Services.AddScoped<IVehicleSegmentRepository, VehicleSegmentRepository>();
+            
             //Add Services
+            builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
             builder.Services.AddScoped<IInvoiceService, InvoiceService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IGoogleCredentialService, GoogleCredentialService>();
             builder.Services.AddScoped<IVehicleModelService, VehicleModelService>();
             builder.Services.AddScoped<IVehicleService, VehicleService>();
             builder.Services.AddScoped<IRentalContractService, RentalContractService>();
+            builder.Services.AddScoped<IStationService, StationService>();
             builder.Services.AddScoped<ICitizenIdentityService, CitizenIdentityService>();
             builder.Services.AddScoped<IDriverLicenseService, DriverLicenseService>();
+            //Interceptor
+            builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
             builder.Services.AddHttpClient<IMomoService, MomoService>();
             builder.Services.AddHttpClient<IGeminiService, GeminiService>();
             //UOW
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
+            builder.Services.AddScoped<IInvoiceUow, InvoiceUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi

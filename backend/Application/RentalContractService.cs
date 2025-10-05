@@ -204,7 +204,7 @@ namespace Application
         }
 
         
-        public async Task VerifyRentalContract(Guid id, bool haveVehicle = true)
+        public async Task VerifyRentalContract(Guid id, bool hasVehicle = true)
         {
             var rentalContract = await _uow.RentalContracts.GetByIdAsync(id);
             if (rentalContract == null)
@@ -224,13 +224,13 @@ namespace Application
             string templatePath;
             string body;
 
-
-            if (haveVehicle)
+            if (rentalContract.Status != (int)RentalContractStatus.RequestPeding)
             {
-                if (rentalContract.Status == (int)RentalContractStatus.RequestPeding)
-                {
-                    await UpdateStatus(rentalContract, (int)RentalContractStatus.PaymentPending);
-                }
+                throw new BadRequestException(Message.RentalContract.ThisRentalContractAlreadyProcess);
+            }
+            if (hasVehicle)
+            {
+                await UpdateStatus(rentalContract, (int)RentalContractStatus.PaymentPending);
                 //Lấy invoice
                 var invoice = (await _uow.RentalContracts.GetAllAsync(new Expression<Func<RentalContract, object>>[]
                 {

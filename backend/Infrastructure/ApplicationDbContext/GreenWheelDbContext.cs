@@ -1,19 +1,20 @@
 ﻿using Domain.Commons;
 using Domain.Entities;
+using Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
 namespace Infrastructure.ApplicationDbContext;
 
 public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 {
-    public GreenWheelDbContext()
-    {
-    }
+    private readonly UpdateTimestampInterceptor _updateInterceptor;
 
-    public GreenWheelDbContext(DbContextOptions<GreenWheelDbContext> options)
+    public GreenWheelDbContext(DbContextOptions<GreenWheelDbContext> options, UpdateTimestampInterceptor updateInterceptor)
         : base(options)
     {
+        _updateInterceptor = updateInterceptor;
     }
 
     public virtual DbSet<Brand> Brands { get; set; }
@@ -83,6 +84,10 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
         );
 
         return result.ToLower();
+    }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(_updateInterceptor);
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
