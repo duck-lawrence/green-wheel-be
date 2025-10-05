@@ -1,77 +1,55 @@
 ﻿using Application.Abstractions;
-using Application.AppSettingConfigurations;
-using Application.Constants;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
+using Application.Dtos.Common.Request;
+using Application.Repositories;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
-namespace Application
+namespace Application.Services
 {
-    public class CloudinayService : IPhotoService
+    public class CloudinaryService : IPhotoService
     {
-        private readonly Cloudinary _cloudinary;
-        private readonly CloudinarySettings _settings;
-        private readonly ILogger<CloudinayService> _logger;
+        private readonly ICloudinaryRepository _cloudRepo;
+        private readonly ILogger<CloudinaryService> _logger;
 
-        // allowed type
-        private static readonly string[] _allowedType = new[] { "image/jpeg", "image/jpg", "image/png", "image/webp" };
-
-        public CloudinayService(
-            Cloudinary cloudinary,
-            IOptions<CloudinarySettings> options,
-            ILogger<CloudinayService> logger)
+        public CloudinaryService(ICloudinaryRepository cloudRepo, ILogger<CloudinaryService> logger)
         {
-            _cloudinary = cloudinary;
-            _settings = options.Value;
+            _cloudRepo = cloudRepo;
             _logger = logger;
+        }
+
+        public async Task<PhotoUploadResult> UploadPhotoAsync(UploadImageReq file, string? folder = null)
+        {
+            try
+            {
+                folder ??= "uploads";
+                var result = await _cloudRepo.UploadAsync(file, folder);
+                _logger.LogInformation("Image uploaded successfully: {Url}", result.Url);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Upload failed for file {File}", file.File.FileName);
+                throw;
+            }
         }
 
         public async Task<bool> DeletePhotoAsync(string publicId)
         {
-            if (string.IsNullOrWhiteSpace(publicId)) return false;
-            var delParams = new DeletionParams(publicId);
-            var result = await _cloudinary.DestroyAsync(delParams);
-
-            var ok = string.Equals(result.Result, "ok", StringComparison.OrdinalIgnoreCase)
-                 || string.Equals(result.Result, "not_found", StringComparison.OrdinalIgnoreCase);
-
-            if (!ok)
-                _logger.LogWarning($"Cloudinary delete returned: {result.Result} for {publicId}");
-
-            return ok;
-        }
-
-        public async Task<PhotoUploadResult> UploadPhotoAsync(IFormFile file, string? folder = null)
-        {
-            if (file == null || file.Length == 0)
-                throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
-
-            if (!_allowedType.Contains(file.ContentType))
-                throw new ArgumentException(Message.Cloudinary.InvalidFileType);
-
-            folder ??= _settings.ApiFolder;
-
-            using var stream = file.OpenReadStream();
-            var uploadParams = new ImageUploadParams
+            try
             {
-                File = new FileDescription(file.FileName, stream),
-                Folder = folder,
-                Transformation = new Transformation().Crop("limit").FetchFormat("auto").Quality("auto")
-            };
+                var deleted = await _cloudRepo.DeleteAsync(publicId);
+                if (deleted)
+                    _logger.LogInformation("Deleted image {PublicId} successfully", publicId);
+                else
+                    _logger.LogWarning("Failed to delete image {PublicId}", publicId);
 
-            var result = await _cloudinary.UploadAsync(uploadParams);
-
-            if (result.Error != null)
-                throw new InvalidOperationException(result.Error.Message);
-
-            return new PhotoUploadResult
+                return deleted;
+            }
+            catch (Exception ex)
             {
-                Url = result.Url?.ToString() ?? "",
-                PublicID = result.PublicId
-            };
+                _logger.LogError(ex, "Error deleting image {PublicId}", publicId);
+                return false;
+            }
         }
     }
 }

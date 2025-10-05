@@ -124,5 +124,11 @@ namespace Application.Constants
             public const string ParsingFailed = "json.pasing_failed";
 
         }
+
+        //Licenses
+        public static class Licenses
+        {
+            public const string InvalidLicenseData = "Could not extract driver license data";
+        }
     }
 }

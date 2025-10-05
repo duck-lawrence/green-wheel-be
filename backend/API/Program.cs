@@ -1,18 +1,16 @@
-﻿using Microsoft.OpenApi.Models;
-using API.Extentions;
+﻿using API.Extentions;
 using API.Filters;
 using API.Middleware;
-using API.Policy;
 using Application;
 using Application.Abstractions;
 using Application.AppSettingConfigurations;
 using Application.Mappers;
 using Application.Repositories;
+using Application.Services;
 using Application.Validators.User;
-using DotNetEnv;
 using CloudinaryDotNet;
+using DotNetEnv;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -30,7 +28,7 @@ namespace API
             Env.Load("../.env");
 
             // Frontend Url
-            var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN") 
+            var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
 
             // Add services to the container.
@@ -40,43 +38,7 @@ namespace API
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            //builder.Services.AddSwaggerGen();
-
-            builder.Services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "API",
-                    Version = "v1"
-                });
-
-                // Thêm Security Definition để hiện nút Authorize
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "Nhập JWT theo format: Bearer {your token}"
-                });
-
-                // Áp dụng cho tất cả request
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] {}
-                    }
-                });
-                        });
+            builder.Services.AddSwaggerGen();
 
             //Cors frontEnd
             builder.Services.AddCors(options =>
@@ -109,6 +71,8 @@ namespace API
             builder.Services.AddScoped<IJwtBlackListRepository, JwtBlackListRepository>();
             builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
             builder.Services.AddScoped<IVehicleModelRepository, VehicleModelRepository>();
+            builder.Services.AddScoped<ICitizenIdentityRepository, CitizenIdentityRepository>();
+            builder.Services.AddScoped<IDriverLicenseRepository, DriverLicenseRepository>();
             builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
             builder.Services.AddScoped<IInvoiceRepository, InvoiceRepository>();
             builder.Services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
@@ -126,6 +90,10 @@ namespace API
             builder.Services.AddHttpClient<IMomoService, MomoService>();
             //UOW
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
+            builder.Services.AddScoped<ICitizenIdentityService, CitizenIdentityService>();
+            builder.Services.AddScoped<IDriverLicenseService, DriverLicenseService>();
+            builder.Services.AddHttpClient<IGeminiService, GeminiService>();
+
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
@@ -143,6 +111,8 @@ namespace API
             builder.Services.Configure<OTPSettings>(builder.Configuration.GetSection("OTPSettings"));
             //Google
             builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("GoogleAuthSettings"));
+            //Gemini
+            builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("Gemini"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             //sử dụng cahce
@@ -165,10 +135,8 @@ namespace API
             //khai báo sử dụng DI cho cloudinary
             builder.Services.AddInfrastructureServices(builder.Configuration);
 
-
-
             //Cấu hình request nhận request, nó tự chuyển trường của các đối tượng trong
-            //DTO thành snakeCase để binding giá trị, và lúc trả ra 
+            //DTO thành snakeCase để binding giá trị, và lúc trả ra
             //thì các trường trong respone cũng sẽ bị chỉnh thành snake case
             //Ảnh hưởng khi map từ json sang object và object về json : json <-> object
             // builder.Services.AddControllers()
@@ -190,9 +158,6 @@ namespace API
             };
             builder.Services.AddSingleton(cloudinary);
 
-            // Đăng ký PhotoService
-            builder.Services.AddScoped<IPhotoService, CloudinayService>();
-
             var app = builder.Build();
             //accept frontend
             app.UseCors("AllowFrontend");
@@ -209,7 +174,6 @@ namespace API
                     //cache này sẽ tồn tại suốt vòng đời của cache
                     Priority = CacheItemPriority.NeverRemove
                 });
-
             }
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
