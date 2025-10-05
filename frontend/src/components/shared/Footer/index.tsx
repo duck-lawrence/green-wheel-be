@@ -29,13 +29,13 @@ export function Footer() {
                     <h1 className="font-semibold mb-3 text-xl">Giới thiệu</h1>
                     <ul className="space-y-4 text-sm">
                         <li>
-                            <a href="#">Về chúng tôi</a>
+                            <Link href="#">Về chúng tôi</Link>
                         </li>
                         <li>
-                            <a href="#">Dịch vụ</a>
+                            <Link href="#">Dịch vụ</Link>
                         </li>
                         <li>
-                            <a href="#">Tin tức</a>
+                            <Link href="#">Tin tức</Link>
                         </li>
                     </ul>
                 </div>
@@ -45,16 +45,16 @@ export function Footer() {
                     <h1 className="font-semibold mb-3 text-xl">Chính Sách</h1>
                     <ul className="space-y-4 text-sm">
                         <li>
-                            <a href="#">Chính sách và quy định</a>
+                            <Link href="#">Chính sách và quy định</Link>
                         </li>
                         <li>
-                            <a href="#">Quy chế hoạt động</a>
+                            <Link href="#">Quy chế hoạt động</Link>
                         </li>
                         <li>
-                            <a href="#">Bảo mật thông tin</a>
+                            <Link href="#">Bảo mật thông tin</Link>
                         </li>
                         <li>
-                            <a href="#">Giải quyết tranh chấp</a>
+                            <Link href="#">Giải quyết tranh chấp</Link>
                         </li>
                     </ul>
                 </div>
@@ -64,22 +64,22 @@ export function Footer() {
                     <h1 className="font-semibold mb-3 text-xl">Liên hệ</h1>
                     <ul className="space-y-4 text-sm">
                         <li>
-                            <a href="#">Hotline: 0797 123 432</a>
+                            <Link href="#">Hotline: 0797 123 432</Link>
                         </li>
                         <li>
-                            <a href="#">Email: greenwhell.work@gmail.com</a>
+                            <Link href="#">Email: greenwhell.work@gmail.com</Link>
                         </li>
                         {/* Social icons */}
                         <div className="flex gap-3 mt-4 text-2xl">
-                            <a href="#" className="bg-primary rounded-2xl p-1 text-black ">
+                            <Link href="#" className="bg-primary rounded-2xl p-1 text-black ">
                                 <FacebookLogoIcon />
-                            </a>
-                            <a href="#" className="bg-primary rounded-2xl p-1 text-black  ">
+                            </Link>
+                            <Link href="#" className="bg-primary rounded-2xl p-1 text-black  ">
                                 <TiktokLogoIcon />
-                            </a>
-                            <a href="#" className="bg-primary rounded-2xl p-1 text-black ">
+                            </Link>
+                            <Link href="#" className="bg-primary rounded-2xl p-1 text-black ">
                                 <InstagramLogoIcon />
-                            </a>
+                            </Link>
                         </div>
                     </ul>
                 </div>
