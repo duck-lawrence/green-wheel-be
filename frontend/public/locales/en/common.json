@@ -148,6 +148,7 @@
     },
     "vehicle": {
         "station": "Station",
+        "segment": "Segment",
         "pick_station": "Please select a pick-up location",
         "pick_time_car": "Please select date and time to pick up the car",
         "search_car": "Search car",

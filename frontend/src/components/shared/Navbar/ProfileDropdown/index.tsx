@@ -46,7 +46,7 @@ export function ProfileDropdown() {
         }
     }, [isGetMeError, getMeError, t])
 
-    if (isGetMeLoading) return <Spinner />
+    if (isGetMeLoading || isGetMeError) return <Spinner />
 
     return (
         <div className="gap-4 flex items-center">

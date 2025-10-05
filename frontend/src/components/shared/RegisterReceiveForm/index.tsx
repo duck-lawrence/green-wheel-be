@@ -95,17 +95,7 @@ export const RegisterReceiveForm = () => {
                         <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
                     </div>
 
-                    <form
-                        onSubmit={(e) => {
-                            if (formik.isSubmitting) {
-                                e.preventDefault()
-                                return
-                            }
-                            formik.handleSubmit(e)
-                        }}
-                        className="px-6 pb-8 pt-6"
-                        noValidate
-                    >
+                    <form onSubmit={formik.handleSubmit} className="px-6 pb-8 pt-6" noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Cột trái */}
                             <div>

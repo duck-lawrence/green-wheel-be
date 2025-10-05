@@ -1,53 +1,89 @@
-// src/store/useBookingFilterStore.ts
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
-// import { shallow } from "@/utils/helpers/shallow"
 import { create } from "zustand"
-import { useShallow } from "zustand/react/shallow"
-type BookingState = {
-    station: string | null
-    start: string | null
-    end: string | null
-    filteredVehicleModels: VehicleModelViewRes[]
-    // setBooking: (data: Partial<BookingState>) => void
-    // clearBookingFilter: () => void
+import { persist, createJSONStorage } from "zustand/middleware"
+
+interface BookingState {
+    stationId: string | null
+    segmentId: string | null
+    startDate: string | null
+    endDate: string | null
+    filteredVehicleModels: string[]
 }
 
 interface BookingActions {
-    setBookingFilter: (station: string, start: string, end: string) => void
+    setStationId: (id: string | null) => void
+    setSegmentId: (id: string | null) => void
+    setStartDate: (date: string | null) => void
+    setEndDate: (date: string | null) => void
+    setBookingFilter: (
+        station: string | null,
+        segment: string | null,
+        start: string | null,
+        end: string | null
+    ) => void
     clearBookingFilter: () => void
-    setFilteredVehicleModels: (vehicleModels: VehicleModelViewRes[]) => void
+    setFilteredVehicleModels: (vehicleModels: string[]) => void
 }
 
-export const useBookingFilterStore = create<BookingState & BookingActions>((set) => ({
-    station: null,
-    start: null,
-    end: null,
-    filteredVehicleModels: [],
+export const useBookingFilterStore = create<BookingState & BookingActions>()(
+    persist(
+        (set) => ({
+            // --- State ---
+            stationId: null,
+            segmentId: null,
+            startDate: null,
+            endDate: null,
+            filteredVehicleModels: [],
 
-    setBookingFilter: (station, start, end) => set({ station, start, end }),
+            // --- Actions ---
+            setStationId: (id) => set({ stationId: id }),
+            setSegmentId: (id) => set({ segmentId: id }),
+            setStartDate: (date) => set({ startDate: date }),
+            setEndDate: (date) => set({ endDate: date }),
 
-    clearBookingFilter: () =>
-        set({
-            station: null,
-            start: null,
-            end: null,
-            filteredVehicleModels: []
+            setBookingFilter: (station, segment, start, end) =>
+                set({
+                    stationId: station,
+                    segmentId: segment,
+                    startDate: start,
+                    endDate: end
+                }),
+
+            clearBookingFilter: () =>
+                set({
+                    stationId: null,
+                    segmentId: null,
+                    startDate: null,
+                    endDate: null,
+                    filteredVehicleModels: []
+                }),
+
+            setFilteredVehicleModels: (vehicleModels) =>
+                set({ filteredVehicleModels: vehicleModels })
         }),
-
-    setFilteredVehicleModels: (vehicleModels) => set({ filteredVehicleModels: vehicleModels })
-}))
+        {
+            name: "booking_filter_storage",
+            storage: createJSONStorage(() => sessionStorage),
+            partialize: (state) => ({
+                stationId: state.stationId,
+                segmentId: state.segmentId,
+                startDate: state.startDate,
+                endDate: state.endDate
+            })
+        }
+    )
+)
 
 // ----------------------
 // Selectors (để tối ưu render)
 // ----------------------
-export const useBookingInfo = () => {
-    const selector = useShallow((s: BookingState) => ({
-        station: s.station,
-        start: s.start,
-        end: s.end
-    }))
-    return useBookingFilterStore(selector)
-}
+// export const useBookingInfo = () => {
+//     const selector = useShallow((s: BookingState) => ({
+//         station: s.station,
+//         start: s.start,
+//         end: s.end
+//     }))
+//     return useBookingFilterStore(selector)
+// }
 
 // export const useFilteredVehicles = () => useBookingFilterStore((s) => s.filteredVehicles)
 

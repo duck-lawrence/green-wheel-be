@@ -1,20 +1,48 @@
 "use client"
-import React, { useMemo } from "react"
+import React, { useEffect, useMemo } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
-import { CalendarDateTime, now, getLocalTimeZone, fromDate } from "@internationalized/date"
-import { ButtonStyled, AutocompleteStyle, DateTimeStyled } from "@/components"
+import {
+    CalendarDateTime,
+    now,
+    getLocalTimeZone,
+    fromDate,
+    parseAbsolute
+} from "@internationalized/date"
 import { useTranslation } from "react-i18next"
-import { AutocompleteItem } from "@heroui/react"
-import { locals } from "@/data/local"
+import { AutocompleteItem, Spinner } from "@heroui/react"
 import { MapPinAreaIcon } from "@phosphor-icons/react"
+import { ButtonStyled, AutocompleteStyle, DateTimeStyled } from "@/components"
+import { useBookingFilterStore, useGetAllStations, useGetAllVehicleSegments } from "@/hooks"
+import { BackendError } from "@/models/common/response"
+import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import toast from "react-hot-toast"
 
-export function FilterVehicleRental({
-    onFilterChange
-}: {
-    onFilterChange: (stationId: string, start: string, end: string) => void
-}) {
+export function FilterVehicleRental() {
     const { t } = useTranslation()
+    const {
+        data: stations,
+        isLoading: isGetStationsLoading,
+        error: getStationsError,
+        isError: isGetStationsError
+    } = useGetAllStations()
+    const {
+        data: vehicleSegments,
+        isLoading: isGetVehicleSegmentsLoading,
+        error: getVehicleSegmentsError,
+        isError: isGetVehicleSegmentsError
+    } = useGetAllVehicleSegments()
+
+    // manage filter store
+    const stationId = useBookingFilterStore((s) => s.stationId)
+    const segmentId = useBookingFilterStore((s) => s.segmentId)
+    const startDate = useBookingFilterStore((s) => s.startDate)
+    const endDate = useBookingFilterStore((s) => s.endDate)
+    const setStationId = useBookingFilterStore((s) => s.setStationId)
+    const setSegmentId = useBookingFilterStore((s) => s.setSegmentId)
+    const setStartDate = useBookingFilterStore((s) => s.setStartDate)
+    const setEndDate = useBookingFilterStore((s) => s.setEndDate)
+
     // set up date time
     const MIN_HOUR = 7
     const MAX_HOUR = 17
@@ -37,9 +65,9 @@ export function FilterVehicleRental({
         () =>
             Yup.object().shape({
                 stationId: Yup.string().required(t("vehicle.pick_station")),
-                start: Yup.mixed<CalendarDateTime>()
+                startDate: Yup.mixed<CalendarDateTime>()
                     .required(t("vehicle.pick_time_car"))
-                    .test("is-valid-start", t("validate.date_received"), (value) => {
+                    .test("is-valid-startDate", t("validate.date_received"), (value) => {
                         if (!value) return false
                         const today = now(getLocalTimeZone())
                         return (
@@ -48,13 +76,13 @@ export function FilterVehicleRental({
                             value.hour < MAX_HOUR
                         )
                     }),
-                end: Yup.mixed<CalendarDateTime>()
+                endDate: Yup.mixed<CalendarDateTime>()
                     .required(t("validate.date_return"))
-                    .test("is-after-start", t("validate.valid_date"), function (value) {
-                        const { start } = this.parent
-                        return value && start && value.compare(start) > 0
+                    .test("is-after-startDate", t("validate.valid_date"), function (value) {
+                        const { startDate } = this.parent
+                        return value && startDate && value.compare(startDate) > 0
                     })
-                    .test("is-valid-end", t("validate.time_return"), (value) => {
+                    .test("is-valid-endDate", t("validate.time_return"), (value) => {
                         return value && value.hour >= MIN_HOUR && value.hour < MAX_HOUR
                     })
             }),
@@ -64,80 +92,141 @@ export function FilterVehicleRental({
     //  useFormik
     const formik = useFormik({
         initialValues: {
-            stationId: "",
-            start: initialStart,
-            end: initialStart.add({ hours: 1 })
+            stationId: stationId,
+            segmentId: segmentId,
+            startDate: (startDate && parseAbsolute(startDate, getLocalTimeZone())) || initialStart,
+            endDate:
+                (endDate && parseAbsolute(endDate, getLocalTimeZone())) ||
+                initialStart.add({ hours: 1 })
         },
         validationSchema: bookingSchema,
         onSubmit: (values) => {
             console.log("Booking values item:", {
                 stationId: values.stationId,
-                start: values.start.toDate(getLocalTimeZone()).toISOString(),
-                end: values.end.toDate(getLocalTimeZone()).toISOString()
+                segmentId: values.segmentId,
+                startDate: values.startDate.toDate(getLocalTimeZone()).toISOString(),
+                endDate: values.endDate.toDate(getLocalTimeZone()).toISOString()
             })
-
-            onFilterChange(
-                values.stationId,
-                values.start.toDate(getLocalTimeZone()).toISOString(),
-                values.end.toDate(getLocalTimeZone()).toISOString()
-            )
         }
     })
+
+    useEffect(() => {
+        if (!stationId && !isGetStationsLoading && stations!?.length > 0) {
+            formik.values.stationId = stations![0].id
+            setStationId(stations![0].id)
+        }
+    }, [formik.values, isGetStationsLoading, setStationId, stationId, stations])
+
+    useEffect(() => {
+        if (isGetStationsError && getStationsError) {
+            const error = getStationsError as BackendError
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    }, [isGetStationsError, getStationsError, t])
+
+    useEffect(() => {
+        if (isGetVehicleSegmentsError && getVehicleSegmentsError) {
+            const error = getVehicleSegmentsError as BackendError
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    }, [isGetVehicleSegmentsError, getVehicleSegmentsError, t])
+
+    if (
+        isGetStationsLoading ||
+        isGetStationsError ||
+        isGetVehicleSegmentsLoading ||
+        isGetVehicleSegmentsError
+    )
+        return <Spinner />
 
     return (
         <>
             <form
-                onSubmit={(e) => {
-                    if (formik.isSubmitting) {
-                        e.preventDefault()
-                        return
-                    }
-                    formik.handleSubmit(e)
-                }}
-                className="flex gap-6 pt-6 pb-6 justify-center items-center border border-gray-300 rounded-4xl shadow-2xl max-w-[1500px] bg-[#F4F4F4]"
+                onSubmit={formik.handleSubmit}
+                className="flex gap-6 px-5 pt-3 pb-9 justify-center items-center 
+                    border border-gray-300 rounded-4xl shadow-2xl min-w-fit bg-secondary"
             >
-                {/* ĐỊA ĐIỂM */}
                 <div className="flex flex-col h-14">
                     <AutocompleteStyle
                         label={t("vehicle.station")}
-                        items={locals}
+                        items={stations}
                         startContent={<MapPinAreaIcon className="text-xl" />}
-                        value={formik.values.stationId}
-                        // onChange={(val) => formik.setFieldValue("station", val)}
-                        onSelectionChange={(key) => formik.setFieldValue("stationId", key)}
+                        selectedKey={formik.values.stationId}
+                        onSelectionChange={(id) => {
+                            formik.setFieldValue("stationId", id)
+                            setStationId(id as string | null)
+                        }}
                         className="max-w-60 h-20 mr-0"
+                        isClearable={false}
                     >
-                        {locals &&
-                            locals.map((item) => (
-                                <AutocompleteItem key={item.key}>{item.label}</AutocompleteItem>
-                            ))}
+                        {(stations ?? []).map((item) => (
+                            <AutocompleteItem key={item.id}>{item.name}</AutocompleteItem>
+                        ))}
                     </AutocompleteStyle>
+                    <div className="text-sm mt-1 ml-4">
+                        {
+                            stations?.find((station) => station.id === formik.values.stationId)
+                                ?.address
+                        }
+                    </div>
                     {formik.touched.stationId && typeof formik.errors.stationId === "string" && (
                         <div className="text-red-500 text-sm mt-1">{formik.errors.stationId}</div>
                     )}
                 </div>
 
-                {/* START */}
                 <div className="flex flex-col h-14">
-                    <DateTimeStyled
-                        label={t("vehicle.start_date_time")}
-                        value={formik.values.start}
-                        onChange={(val) => formik.setFieldValue("start", val)}
-                    />
-                    {formik.touched.start && typeof formik.errors.start === "string" && (
-                        <div className="text-red-500 text-sm mt-1">{formik.errors.start}</div>
+                    <AutocompleteStyle
+                        label={t("vehicle.segment")}
+                        items={vehicleSegments}
+                        startContent={<MapPinAreaIcon className="text-xl" />}
+                        value={formik.values.segmentId || ""}
+                        // onChange={(val) => formik.setFieldValue("segment", val)}
+                        onSelectionChange={(id) => {
+                            formik.setFieldValue("segmentId", id)
+                            setSegmentId(id as string | null)
+                        }}
+                        className="max-w-40 h-20 mr-0"
+                    >
+                        {(vehicleSegments ?? []).map((item) => (
+                            <AutocompleteItem key={item.id}>{item.name}</AutocompleteItem>
+                        ))}
+                    </AutocompleteStyle>
+                    {formik.touched.segmentId && typeof formik.errors.segmentId === "string" && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.segmentId}</div>
                     )}
                 </div>
 
-                {/* END */}
+                {/* STARTDate */}
+                <div className="flex flex-col h-14">
+                    <DateTimeStyled
+                        label={t("vehicle.start_date_time")}
+                        value={formik.values.startDate as CalendarDateTime}
+                        onChange={(val) => {
+                            formik.setFieldValue("startDate", val)
+                            setStartDate(val.toDate(getLocalTimeZone()).toISOString())
+                        }}
+                    />
+                    {formik.touched.startDate && typeof formik.errors.startDate === "string" && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.startDate}</div>
+                    )}
+                </div>
+
+                {/* ENDDate */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
                         label={t("vehicle.end_date_time")}
-                        value={formik.values.end}
-                        onChange={(val) => formik.setFieldValue("end", val)}
+                        value={formik.values.endDate as CalendarDateTime}
+                        onChange={(val) => {
+                            formik.setFieldValue("endDate", val)
+                            setEndDate(val.toDate(getLocalTimeZone()).toISOString())
+                        }}
                     />
-                    {formik.touched.end && typeof formik.errors.end === "string" && (
-                        <div className="text-red-500 text-sm mt-1">{formik.errors.end}</div>
+                    {formik.touched.endDate && typeof formik.errors.endDate === "string" && (
+                        <div className="text-red-500 text-sm mt-1">{formik.errors.endDate}</div>
                     )}
                 </div>
 
