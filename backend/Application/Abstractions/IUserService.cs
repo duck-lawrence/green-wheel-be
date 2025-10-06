@@ -42,17 +42,17 @@ namespace Application.Abstractions
         //Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
 
-        Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req);
+        Task<string> SetPasswordAsync(string setPasswordToken, GoogleSetPasswordReq req);
 
-        Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
+        Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims);
 
-        Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
+        Task UpdateMeAsync(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
 
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
 
         Task DeleteAvatarAsync(Guid pulicId);
 
-        Task CheckDupEmail(string email);
+        Task CheckDupEmailAsync(string email);
 
         Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file);
 
@@ -62,7 +62,9 @@ namespace Application.Abstractions
 
         Task<object?> GetMyDriverLicenseAsync(Guid userId);
         Task<Guid> CreateAnounymousAccount(CreateUserReq req);
-        Task<User> GetUserByPhoneAsync(string phone);
-        Task<IEnumerable<User>> GetAllUsers();
+        Task<UserProfileViewRes> GetUserByPhoneAsync(string phone);
+        Task<IEnumerable<User>> GetAllUsersAsync();
+        Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber);
+        Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
     }
 }

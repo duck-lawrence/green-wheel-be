@@ -32,7 +32,7 @@ namespace Application
 
         public async Task<CitizenIdentity?> GetByIdentityNumberAsync(string identityNumber)
         {
-            var citizenIdentity = await _citizenRepo.GetIdNumberAsync(identityNumber);
+            var citizenIdentity = await _citizenRepo.GetByIdNumberAsync(identityNumber);
             if(citizenIdentity == null)
             {
                 throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
