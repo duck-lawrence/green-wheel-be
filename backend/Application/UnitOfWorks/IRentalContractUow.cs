@@ -12,7 +12,7 @@ namespace Application.UnitOfWorks
         IInvoiceItemRepository InvoiceItems { get; }
         IDepositRepository Deposits { get; }
         IStationRepository Stations { get; }
-        IVehicleImageRepository VehicleImages { get; }
+        IModelImageRepository ModelImages { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
