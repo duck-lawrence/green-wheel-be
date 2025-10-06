@@ -36,9 +36,9 @@ export function FilterVehicleRental({
     const bookingSchema = useMemo(
         () =>
             Yup.object().shape({
-                stationId: Yup.string().required(t("vehicle.pick_station")),
+                stationId: Yup.string().required(t("vehicle_model.pick_station")),
                 start: Yup.mixed<CalendarDateTime>()
-                    .required(t("vehicle.pick_time_car"))
+                    .required(t("vehicle_model.pick_time_car"))
                     .test("is-valid-start", t("validate.date_received"), (value) => {
                         if (!value) return false
                         const today = now(getLocalTimeZone())
@@ -72,14 +72,14 @@ export function FilterVehicleRental({
         onSubmit: (values) => {
             console.log("Booking values item:", {
                 stationId: values.stationId,
-                start: values.start.toDate(getLocalTimeZone()).toISOString(),
-                end: values.end.toDate(getLocalTimeZone()).toISOString()
+                start: values.start.toDate(getLocalTimeZone()),
+                end: values.end.toDate(getLocalTimeZone())
             })
 
             onFilterChange(
                 values.stationId,
-                values.start.toDate(getLocalTimeZone()).toISOString(),
-                values.end.toDate(getLocalTimeZone()).toISOString()
+                values.start.toDate(getLocalTimeZone()).toString(),
+                values.end.toDate(getLocalTimeZone()).toString()
             )
         }
     })
@@ -99,7 +99,7 @@ export function FilterVehicleRental({
                 {/* ĐỊA ĐIỂM */}
                 <div className="flex flex-col h-14">
                     <AutocompleteStyle
-                        label={t("vehicle.station")}
+                        label={t("vehicle_model.station")}
                         items={locals}
                         startContent={<MapPinAreaIcon className="text-xl" />}
                         value={formik.values.stationId}
@@ -120,7 +120,7 @@ export function FilterVehicleRental({
                 {/* START */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
-                        label={t("vehicle.start_date_time")}
+                        label={t("vehicle_model.start_date_time")}
                         value={formik.values.start}
                         onChange={(val) => formik.setFieldValue("start", val)}
                     />
@@ -132,7 +132,7 @@ export function FilterVehicleRental({
                 {/* END */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
-                        label={t("vehicle.end_date_time")}
+                        label={t("vehicle_model.end_date_time")}
                         value={formik.values.end}
                         onChange={(val) => formik.setFieldValue("end", val)}
                     />
@@ -143,7 +143,7 @@ export function FilterVehicleRental({
 
                 <div className="flex justify-center items-center mt-0">
                     <ButtonStyled type="submit" color="primary" className="w-40 h-13.5">
-                        {t("vehicle.search_car")}
+                        {t("vehicle_model.search_car")}
                     </ButtonStyled>
                 </div>
             </form>

@@ -16,12 +16,15 @@ namespace Application.Constants
             public const string UserIdIsRequired = "user.user_id_is_required";
             //otp
             public const string InvalidOTP = "user.invalid_otp";
+
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
             public const string OTPMustHave6Digits = "user.otp_must_have_6_digits";
             public const string RateLimitOtp = "user.rate_limit_otp";
             public const string AttemptOtp = "user.attemp_otp";
+
             //register
             public const string EmailAlreadyExists = "user.email_already_exists";
+
             public const string EmailIsRequired = "user.email_require";
             public const string InvalidEmail = "user.invalid_email";
             public const string PasswordTooShort = "user.password_too_short";
@@ -37,13 +40,17 @@ namespace Application.Constants
             
             //change password
             public const string DoNotHavePermission = "user.do_not_have_permission";
+
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
             public const string OldPasswordIsRequired = "user.old_password_is_required";
+
             //login
             public const string InvalidEmailOrPassword = "user.invalid_email_or_password";
+
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
             public const string UserNotFound = "user.user_not_found";
+
             //change avatar
             public const string NotFoundAvatar = "No avatar to delete";
             //Citizen Identity
@@ -58,6 +65,12 @@ namespace Application.Constants
         {
             public const string TooManyRequest = "common.too_many_request";
             public const string UnexpectedError = "common.unexpected_error";
+            public const string ValidationFailed = "common.validation_failed";
+            public const string NotFound = "common.not_found";
+            public const string BadRequest = "common.bad_request";
+            public const string Conflict = "common.conflict";
+            public const string Forbidden = "common.forbidden";
+            public const string DatabaseError = "common.database_error";
         }
 
         public static class VehicleMessage
@@ -86,6 +99,7 @@ namespace Application.Constants
             public const string BrandIdIsRequired = "vehicle_model.brand_id_is_required";
             public const string SegmentIdIsRequired = "vehicle_model.segment_id_is_required";
         }
+
         //change password
 
         //Cloudinary
@@ -93,8 +107,10 @@ namespace Application.Constants
         {
             public const string NotFoundObjectInFile = "cloudinary.file_not_found";
             public const string InvalidFileType = "cloudinary.invalid_file_type";
-            public const string UploadFailed = "failed.upload";
-            public const string DeleteSuccess = "success.delete";
+            public const string UploadFailed = "cloudinary.upload_failed";
+            public const string DeleteFailed = "cloudinary.delete_failed";
+            public const string DeleteSuccess = "cloudinary.delete_success";
+            public const string FolderNotFound = "cloudinary.folder_not_found";
         }
 
         //Rental Contract
@@ -117,7 +133,6 @@ namespace Application.Constants
             public const string NotHavePermission = "momo.not_have_permission";
             public const string InvalidEndpoint = "momo.invalid_end_point";
             public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
-
         }
 
         public static class InvoiceMessage
@@ -128,16 +143,35 @@ namespace Application.Constants
         public static class JsonMessage
         {
             public const string ParsingFailed = "json.pasing_failed";
-
         }
         public static class VehicleSegmentMessage
         {
             public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
         }
+
         //Licenses
         public static class LicensesMessage
         {
             public const string InvalidLicenseData = "licenses.invalid_license_data";
+            public const string LicenseNotFound = "licenses.not_found";
+        }
+
+        //VEHICLE IMAGE
+        public static class ModelImage
+        {
+            public const string ModelImageNotFound = "model_image.not_found";
+            public const string InvalidModelId = "model_image.invalid_model_id";
+            public const string UploadFailed = "model_image.upload_failed";
+            public const string DeleteFailed = "model_image.delete_failed";
+            public const string NoFileChosen = "model_image.no_file_chosen";
+        }
+
+        //upload
+        public static class Upload
+        {
+            public const string EmptyFile = "upload.empty_file";
+            public const string InvalidFile = "upload.invalid_file";
+            public const string Failed = "upload.failed";
         }
     }
 }

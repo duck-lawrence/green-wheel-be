@@ -274,7 +274,7 @@ namespace API.Controllers
             return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        [HttpPost("citizen-identity")]
+        [HttpPost("citizen-identities")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -289,7 +289,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("my_identity")]
+        [HttpGet("citizen-identities")]
         [Authorize]
         public async Task<IActionResult> GetMyCitizenIdentity()
         {
@@ -318,7 +318,7 @@ namespace API.Controllers
         }
 
         // Lấy bằng user trong token
-        [HttpGet("my_driver_license")]
+        [HttpGet("driver-licenses")]
         [Authorize]
         public async Task<IActionResult> GetMyDriverLicense()
         {

@@ -39,7 +39,7 @@ export default async function RootLayout({
             <body className="antialiased bg-[#f4f4f4] diamondBackground">
                 <AppProviders locale={locale}>
                     <ClientHydration>
-                        <div className="min-h-screen flex flex-col items-center">
+                        <div className="min-h-screen flex flex-col items-stretch w-full">
                             <Navbar />
                             {children}
                         </div>
@@ -52,3 +52,5 @@ export default async function RootLayout({
         </html>
     )
 }
+
+

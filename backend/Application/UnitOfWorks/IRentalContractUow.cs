@@ -1,4 +1,5 @@
 ﻿using Application.Repositories;
+
 namespace Application.UnitOfWorks
 {
     public interface IRentalContractUow : IDisposable
