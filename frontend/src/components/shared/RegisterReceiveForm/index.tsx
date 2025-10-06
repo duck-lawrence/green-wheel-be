@@ -88,7 +88,7 @@ export const RegisterReceiveForm = () => {
     const emailFilled = !!formik.values.email?.trim()
 
     return (
-        <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 mt-30">
+        <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 mt-[100px]">
             {mounted ? (
                 <div className="mx-auto max-w-5xl bg-white rounded-lg ">
                     <div className="flex items-center justify-between border-b border-gray-100 px-6 py-6">

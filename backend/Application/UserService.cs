@@ -34,6 +34,7 @@ namespace Application
         private readonly ILogger<UserService> _logger;
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
+        private readonly IRentalContractRepository _rentalContractRepository;
 
         public UserService(IUserRepository repository,
             IOptions<JwtSettings> jwtSettings,
@@ -48,7 +49,8 @@ namespace Application
              IPhotoService photoService,
              ILogger<UserService> logger,
              ICitizenIdentityService citizenService,
-             IDriverLicenseService driverService
+             IDriverLicenseService driverService,
+             IRentalContractRepository rentalContractRepository
             )
         {
             _userRepository = repository;
@@ -65,6 +67,7 @@ namespace Application
             _logger = logger;
             _citizenService = citizenService;
             _driverService = driverService;
+            _rentalContractRepository = rentalContractRepository;
         }
 
         /*
@@ -88,7 +91,7 @@ namespace Application
                     return GenerateAccessToken(userFromDB.Id);
                 }
             }
-            throw new UnauthorizedAccessException(Message.User.InvalidEmailOrPassword);
+            throw new UnauthorizedAccessException(Message.UserMessage.InvalidEmailOrPassword);
         }
 
         /*
@@ -166,7 +169,7 @@ namespace Application
             int count = await _otpRepository.CountRateLimitAsync(email);
             if (count > _otpSettings.OtpRateLimit)
             {
-                throw new RateLimitExceededException(Message.User.RateLimitOtp);
+                throw new RateLimitExceededException(Message.UserMessage.RateLimitOtp);
             }
             await _otpRepository.RemoveOTPAsync(email); //xoá cũ trước khi lưu cái ms
             string otp = GenerateOtpHelper.GenerateOtp();
@@ -203,7 +206,7 @@ namespace Application
             string? otpFromRedis = await _otpRepository.GetOtpAsync(verifyOTPDto.Email);
             if (otpFromRedis == null)
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidOTP);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidOTP);
             }
             if (verifyOTPDto.OTP != otpFromRedis)
             {
@@ -212,9 +215,9 @@ namespace Application
                 {
                     await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
                     await _otpRepository.ResetAttemptAsync(verifyOTPDto.Email);
-                    throw new UnauthorizedAccessException(Message.Common.TooManyRequest);
+                    throw new UnauthorizedAccessException(Message.CommonMessage.TooManyRequest);
                 }
-                throw new UnauthorizedAccessException(Message.User.InvalidOTP);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidOTP);
             }
             var _context = _contextAccessor.HttpContext;
             await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
@@ -259,12 +262,12 @@ namespace Application
         {
             if (await _userRepository.GetByPhoneAsync(userRegisterReq.Phone) != null)
             {
-                throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
             }
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(token))
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             //------------------------
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
@@ -276,7 +279,7 @@ namespace Application
 
             if (userFromDB != null)
             {
-                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists); //email đã tồn tại
+                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists); //email đã tồn tại
             }
             Guid id;
             do
@@ -320,11 +323,11 @@ namespace Application
             var userFromDB = await _userRepository.GetByIdAsync(Guid.Parse(userID));
             if (userFromDB == null)
             {
-                throw new UnauthorizedAccessException(Message.User.Unauthorized);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             if (!PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
             {
-                throw new UnauthorizedAccessException(Message.User.OldPasswordIsIncorrect);
+                throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userID);
             userFromDB.Password = PasswordHelper.HashPassword(userChangePasswordReq.Password);
@@ -349,7 +352,7 @@ namespace Application
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(forgotPasswordToken))
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             //------------------------
             var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenSecret,
@@ -360,7 +363,7 @@ namespace Application
             var userFromDB = await _userRepository.GetByEmailAsync(email);
             if (userFromDB == null)
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userFromDB.Id.ToString());
             userFromDB.Password = PasswordHelper.HashPassword(password);
@@ -406,7 +409,7 @@ namespace Application
                 RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
                 if (refreshTokenFromDB == null)
                 {
-                    throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                    throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
                 }
                 string newAccessToken = GenerateAccessToken(refreshTokenFromDB.UserId);
                 string newRefreshToken = await GenerateRefreshToken(refreshTokenFromDB.UserId, claims);
@@ -415,7 +418,7 @@ namespace Application
                 return newAccessToken;
             }
 
-            throw new UnauthorizedAccessException(Message.User.InvalidToken);
+            throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
         }
 
         public async Task<Dictionary<string, string>> LoginWithGoogle(string email)
@@ -453,7 +456,7 @@ namespace Application
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             //------------------------
             var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
@@ -493,10 +496,17 @@ namespace Application
         public async Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-            User userFromDb = await _userRepository.GetByIdAsync(userID);
+             //User userFromDb = await _userRepository.GetByIdAsync(userID);
+            // Lấy hồ sơ người dùng KÈM theo thông tin Role (Phúc thêm)
+            // Mục đích: khi trả về UserProfileViewRes cần có tên/quyền của vai trò (vd: "Customer", "Staff")
+            // Lý do: tránh phải query thêm để lấy Role, đồng thời đảm bảo mapping có đủ dữ liệu quyền hạn
+            // added: include role data when retrieving staff profile
+            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
+            // giúp useAuth ở frontend biết chắc user có role “staff”.
+            User? userFromDb = await _userRepository.GetByIdWithRoleAsync(userID);
             if (userFromDb == null)
             {
-                throw new DirectoryNotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.User.UserNotFound);
             }
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
@@ -507,14 +517,14 @@ namespace Application
             {
                 if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
                 {
-                    throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+                    throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
                 }
             }
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             User userFromDb = await _userRepository.GetByIdAsync(userID);
             if (userFromDb == null)
             {
-                throw new DirectoryNotFoundException(Message.User.UserNotFound);
+                throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
             }
             if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
             if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
@@ -533,17 +543,17 @@ namespace Application
         public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
         {
             if (file == null || file.Length == 0)
-                throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
+                throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             // Upload file lên Cloudinary
             var uploadReq = new UploadImageReq { File = file };
             var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
 
             if (string.IsNullOrEmpty(result.Url))
-                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
             var user = await _userRepository.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException(Message.User.UserNotFound);
+                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
 
             // Nếu có avatar cũ thì xoá
             if (!string.IsNullOrEmpty(user.AvatarPublicId))
@@ -570,10 +580,10 @@ namespace Application
         public async Task DeleteAvatarAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId)
-                ?? throw new Exception(Message.User.UserNotFound);
+                ?? throw new Exception(Message.UserMessage.UserNotFound);
 
             if (string.IsNullOrEmpty(user.AvatarPublicId))
-                throw new Exception(Message.User.NotFoundAvatar);
+                throw new Exception(Message.UserMessage.NotFoundAvatar);
 
             await _photoService.DeletePhotoAsync(user.AvatarPublicId);
 
@@ -586,7 +596,7 @@ namespace Application
         {
             if (await _userRepository.GetByEmailAsync(email) != null)
             {
-                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists);
+                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists);
             }
         }
 
@@ -663,6 +673,45 @@ namespace Application
                 image_url = entity.ImageUrl,
                 user_id = entity.UserId
             };
+        }
+
+        public async Task<Guid> CreateAnounymousAccount(CreateUserReq req)
+        {
+            var user = await _userRepository.GetByPhoneAsync(req.Phone);
+            if (user != null)
+            {
+                var rentalContract = _rentalContractRepository.GetByCustomerAsync(user.Id);
+                if(rentalContract != null)
+                {
+                    throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
+                }
+                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
+            }
+            user = _mapper.Map<User>(req);
+            Guid userId;
+            do
+            {
+                userId = Guid.NewGuid();
+            }while (await _userRepository.GetByIdAsync(userId) != null);
+            user.Id = userId;
+            await _userRepository.AddAsync(user);
+            return userId;
+        }
+
+        public async Task<User> GetUserByPhoneAsync(string phone)
+        {
+            var user = await _userRepository.GetByPhoneAsync(phone);
+            if(user == null)
+            {
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
+            }
+            return user;
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsers()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return users;
         }
     }
 }

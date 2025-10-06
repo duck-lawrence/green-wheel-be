@@ -26,7 +26,7 @@ namespace Infrastructure.Repositories
         Guid? segmentId = null)
         {
             if ((endDate - startDate).TotalHours < 24)
-                throw new ArgumentException(Message.VehicleModel.RentTimeIsNotAvailable);
+                throw new ArgumentException(Message.VehicleModelMessage.RentTimeIsNotAvailable);
 
             var query = _dbContext.VehicleModels.Where(vm => vm.DeletedAt == null)
                 .Include(vm => vm.ModelImages)
@@ -58,7 +58,7 @@ namespace Infrastructure.Repositories
                     SportRangeKm = vm.SportRangeKm,
                     Brand = vm.Brand,
                     Segment = vm.Segment,
-                    ImageUrls = vm.ModelImages.Select(x => x.Url),
+                    ImageUrl = vm.ImageUrl,
                     AvailableVehicleCount = vm.Vehicles.Count(v =>
                         v.StationId == stationId &&
                         (
@@ -82,6 +82,7 @@ namespace Infrastructure.Repositories
         DateTimeOffset endDate)
         {
             var query = _dbContext.VehicleModels.Where(vm => vm.Id == id)
+                .Include(vm => vm.ModelImages)
                 .Include(vm => vm.Segment)
                 .Include(vm => vm.Vehicles)
                     .ThenInclude(v => v.RentalContracts)
@@ -102,6 +103,8 @@ namespace Infrastructure.Repositories
                     SportRangeKm = vm.SportRangeKm,
                     Brand = vm.Brand,
                     Segment = vm.Segment,
+                    ImageUrl = vm.ImageUrl,
+                    ImageUrls = vm.ModelImages.Select(x => x.Url),
                     AvailableVehicleCount = vm.Vehicles.Count(v =>
                         v.StationId == stationId &&
                         (
