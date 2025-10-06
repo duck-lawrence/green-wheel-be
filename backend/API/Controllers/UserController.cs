@@ -17,13 +17,18 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IGoogleCredentialService _googleService;
-
+        private readonly ICitizenIdentityService _citizenIdentityService;
+        private readonly IDriverLicenseService _driverLicenseService;
         public UserController(IUserService service
-            , IGoogleCredentialService googleCredentialService
+            , IGoogleCredentialService googleCredentialService,
+            ICitizenIdentityService citizenIdentityService,
+            IDriverLicenseService driverLicenseService
             )
         {
             _userService = service;
             _googleService = googleCredentialService;
+            _citizenIdentityService = citizenIdentityService;
+            _driverLicenseService = driverLicenseService;
         }
 
         /*
@@ -274,7 +279,7 @@ namespace API.Controllers
             return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        [HttpPost("citizen-identities")]
+        [HttpPost("citizen-identity")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -289,7 +294,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("citizen-identities")]
+        [HttpGet("citizen-identity")]
         [Authorize]
         public async Task<IActionResult> GetMyCitizenIdentity()
         {
@@ -302,7 +307,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("driver-licenses")]
+        [HttpPost("driver-license")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -318,7 +323,7 @@ namespace API.Controllers
         }
 
         // Lấy bằng user trong token
-        [HttpGet("driver-licenses")]
+        [HttpGet("driver-license")]
         [Authorize]
         public async Task<IActionResult> GetMyDriverLicense()
         {
@@ -377,12 +382,28 @@ namespace API.Controllers
          * Status code
          * 200 success
          */
-        [HttpGet()]
+        [HttpGet]
         [RoleAuthorize("Staff", "Admin")]
         public async Task<IActionResult> GetAll ()
         {
             var users = await _userService.GetAllUsers();
             return Ok(users);
+        }
+
+        [HttpGet("citizen-identity/{idNumber}")]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
+        {
+            var citizenIdentity = await _citizenIdentityService.GetByIdentityNumberAsync(idNumber);
+            return Ok(citizenIdentity.User);
+        }
+
+        [HttpGet("driver-license/{number}")]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> getUserByDriverLisence(string number)
+        {
+            var driverLisence = await _driverLicenseService.GetByLicenseNumberAsync(number);
+            return Ok(driverLisence.User);
         }
 
     }

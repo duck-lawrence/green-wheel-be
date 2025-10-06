@@ -21,7 +21,8 @@ namespace Infrastructure.Repositories
 
         public async Task<CitizenIdentity> GetIdNumberAsync(string idNumber)
         {
-            return await _dbContext.CitizenIdentities.FirstOrDefaultAsync(x => x.Number == idNumber && x.DeletedAt == null);
+            return await _dbContext.CitizenIdentities
+                        .Include(u => u.User).FirstOrDefaultAsync(x => x.Number == idNumber && x.DeletedAt == null);
         }
     }
 }
