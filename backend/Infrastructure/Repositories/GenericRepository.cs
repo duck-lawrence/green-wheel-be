@@ -91,5 +91,15 @@ namespace Infrastructure.Repositories
             _dbContext.Entry(entityFromDb).CurrentValues.SetValues(entity);
             return await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
+        public void Remove(T entity)
+        {
+            _dbSet.Remove(entity);
+        }
     }
 }

@@ -15,7 +15,8 @@ import { useTranslation } from "react-i18next"
 
 export default function DetailPage() {
     const { t } = useTranslation()
-    const isLoggedIn = useToken((s) => !!s.accessToken)
+    const isLoggedIn = useTokenStore((s) => !!s.accessToken)
+
     const { id } = useParams()
     const [vehicle, setVehicle] = useState<VehicleModel | null>(null)
     const { start, end } = useBookingFilterStore()

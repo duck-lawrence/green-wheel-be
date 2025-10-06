@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20250927105151_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251005164304_refactorDB")]
+    partial class refactorDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -72,7 +72,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__brands__3213E83F268FE849");
+                        .HasName("PK__brands__3213E83F39FD01A6");
 
                     b.ToTable("brands", (string)null);
                 });
@@ -148,12 +148,12 @@ namespace Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__citizen___3213E83FDB5A0581");
+                        .HasName("PK__citizen___3213E83F5AA98353");
 
-                    b.HasIndex(new[] { "UserId" }, "UQ__citizen___B9BE370E25FD9C10")
+                    b.HasIndex(new[] { "UserId" }, "UQ__citizen___B9BE370E6D3C6B98")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Number" }, "UQ__citizen___FD291E411CA2B7AB")
+                    b.HasIndex(new[] { "Number" }, "UQ__citizen___FD291E41F15782F6")
                         .IsUnique();
 
                     b.HasIndex(new[] { "UserId" }, "uq_citizen_identities_user_id")
@@ -208,9 +208,9 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__deposits__3213E83F15782E11");
+                        .HasName("PK__deposits__3213E83FA62669D9");
 
-                    b.HasIndex(new[] { "InvoiceId" }, "UQ__deposits__F58DFD48B95264A6")
+                    b.HasIndex(new[] { "InvoiceId" }, "UQ__deposits__F58DFD48A531CFB0")
                         .IsUnique();
 
                     b.HasIndex(new[] { "InvoiceId" }, "uq_deposits_invoice_id")
@@ -269,7 +269,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__dispatch__3213E83F8BB52086");
+                        .HasName("PK__dispatch__3213E83F4F8E6A7E");
 
                     b.HasIndex(new[] { "ApprovedAdminId" }, "idx_dispatch_requests_approved_admin_id");
 
@@ -315,7 +315,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__dispatch__3213E83F0DFB7CEF");
+                        .HasName("PK__dispatch__3213E83FF6079550");
 
                     b.HasIndex(new[] { "DispatchRequestId" }, "idx_dispatch_request_staffs_dispatch_request_id");
 
@@ -357,7 +357,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__dispatch__3213E83FDCB5F750");
+                        .HasName("PK__dispatch__3213E83FF618BAA1");
 
                     b.HasIndex(new[] { "DispatchRequestId" }, "idx_dispatch_request_vehicles_dispatch_request_id");
 
@@ -441,12 +441,12 @@ namespace Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__driver_l__3213E83F9882F5A0");
+                        .HasName("PK__driver_l__3213E83F0C52E57F");
 
-                    b.HasIndex(new[] { "UserId" }, "UQ__driver_l__B9BE370EAF079999")
+                    b.HasIndex(new[] { "UserId" }, "UQ__driver_l__B9BE370EC7CF60FE")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Number" }, "UQ__driver_l__FD291E41057DDF24")
+                    b.HasIndex(new[] { "Number" }, "UQ__driver_l__FD291E41C4B31239")
                         .IsUnique();
 
                     b.HasIndex(new[] { "UserId" }, "uq_driver_licenses_user_id")
@@ -478,10 +478,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
-
-                    b.Property<DateTimeOffset?>("ExpiresAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("expires_at");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(255)
@@ -517,7 +513,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id")
-                        .HasName("PK__invoices__3213E83F3C6175A1");
+                        .HasName("PK__invoices__3213E83FD78CB2FD");
 
                     b.HasIndex(new[] { "ContractId" }, "idx_invoices_contract_id");
 
@@ -580,7 +576,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__invoice___3213E83FEFFF66A8");
+                        .HasName("PK__invoice___3213E83FA6AF7666");
 
                     b.HasIndex(new[] { "ChecklistItemId" }, "idx_invoice_items_checklist_item_id")
                         .IsUnique()
@@ -624,13 +620,64 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__model_co__3213E83F3E460DA4");
+                        .HasName("PK__model_co__3213E83F3C4DADC3");
 
                     b.HasIndex(new[] { "ComponentId" }, "idx_model_components_component_id");
 
                     b.HasIndex(new[] { "ModelId" }, "idx_model_components_model_id");
 
                     b.ToTable("model_components", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ModelImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("(newid())");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysdatetimeoffset())");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("ModelId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("model_id");
+
+                    b.Property<string>("PublicId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("public_id");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("(sysdatetimeoffset())");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("url");
+
+                    b.HasKey("Id")
+                        .HasName("PK__model_im__3213E83FF3E97981");
+
+                    b.HasIndex(new[] { "Url" }, "UQ__model_im__DD7784175340E62A")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "ModelId" }, "idx_model_images_model_id");
+
+                    b.ToTable("model_images", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.RefreshToken", b =>
@@ -676,7 +723,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__refresh___3213E83FBC3AE1EB");
+                        .HasName("PK__refresh___3213E83F8B43C8C7");
 
                     b.HasIndex(new[] { "UserId" }, "idx_refresh_tokens_user_id");
 
@@ -763,7 +810,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__rental_c__3213E83FA1754E1B");
+                        .HasName("PK__rental_c__3213E83F817349DC");
 
                     b.HasIndex(new[] { "CustomerId" }, "idx_rental_contracts_customer_id");
 
@@ -813,7 +860,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__roles__3213E83F27F2E65B");
+                        .HasName("PK__roles__3213E83F94B3D944");
 
                     b.ToTable("roles", (string)null);
                 });
@@ -833,7 +880,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("station_id");
 
                     b.HasKey("UserId")
-                        .HasName("PK__staffs__B9BE370FCEC46396");
+                        .HasName("PK__staffs__B9BE370FBBD826E4");
 
                     b.HasIndex(new[] { "StationId" }, "idx_staffs_station_id");
 
@@ -900,7 +947,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__staff_re__3213E83FF23CAB38");
+                        .HasName("PK__staff_re__3213E83F5156E646");
 
                     b.HasIndex(new[] { "AdminId" }, "idx_staff_reports_admin_id");
 
@@ -948,7 +995,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__stations__3213E83F65C937F2");
+                        .HasName("PK__stations__3213E83FDE57DAC6");
 
                     b.ToTable("stations", (string)null);
                 });
@@ -994,7 +1041,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__station___3213E83F33408F3E");
+                        .HasName("PK__station___3213E83F2B055C9C");
 
                     b.HasIndex(new[] { "CustomerId" }, "idx_station_feedbacks_customer_id");
 
@@ -1059,7 +1106,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__support___3213E83FAF7946B7");
+                        .HasName("PK__support___3213E83F22E367C7");
 
                     b.HasIndex(new[] { "StaffId" }, "idx_support_requests_staff_id");
 
@@ -1101,7 +1148,6 @@ namespace Infrastructure.Migrations
                         .HasColumnName("deleted_at");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .IsUnicode(false)
                         .HasColumnType("varchar(255)")
@@ -1113,6 +1159,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("first_name");
 
+                    b.Property<bool>("IsGoogleLinked")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_google_linked");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -1120,7 +1170,6 @@ namespace Infrastructure.Migrations
                         .HasColumnName("last_name");
 
                     b.Property<string>("Password")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("password");
@@ -1135,7 +1184,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("role_id");
 
-                    b.Property<int>("Sex")
+                    b.Property<int?>("Sex")
                         .HasColumnType("int")
                         .HasColumnName("sex");
 
@@ -1146,7 +1195,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__users__3213E83FFB353554");
+                        .HasName("PK__users__3213E83F083E0E83");
 
                     b.HasIndex(new[] { "RoleId" }, "idx_users_role_id");
 
@@ -1196,9 +1245,9 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicles__3213E83FC71D3EDF");
+                        .HasName("PK__vehicles__3213E83F1CEAB601");
 
-                    b.HasIndex(new[] { "LicensePlate" }, "UQ__vehicles__F72CD56EE1C45A04")
+                    b.HasIndex(new[] { "LicensePlate" }, "UQ__vehicles__F72CD56E11B6394E")
                         .IsUnique();
 
                     b.HasIndex(new[] { "ModelId" }, "idx_vehicles_model_id");
@@ -1262,7 +1311,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83F15B22915");
+                        .HasName("PK__vehicle___3213E83F5B95E7CD");
 
                     b.HasIndex(new[] { "ContractId" }, "idx_vehicle_checklists_contract_id");
 
@@ -1301,6 +1350,16 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
 
+                    b.Property<string>("ImagePublicId")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("image_public_id");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("image_url");
+
                     b.Property<string>("Notes")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
@@ -1317,11 +1376,15 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83FC33F6FF3");
+                        .HasName("PK__vehicle___3213E83F906FB6F6");
 
                     b.HasIndex(new[] { "ChecklistId" }, "idx_vehicle_checklist_items_checklist_id");
 
                     b.HasIndex(new[] { "ComponentId" }, "idx_vehicle_checklist_items_component_id");
+
+                    b.HasIndex(new[] { "ImageUrl" }, "idx_vehicle_checklist_items_image_url")
+                        .IsUnique()
+                        .HasFilter("([image_url] IS NOT NULL)");
 
                     b.ToTable("vehicle_checklist_items", (string)null);
                 });
@@ -1363,60 +1426,9 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83FFAC07EE1");
+                        .HasName("PK__vehicle___3213E83F39DCC37F");
 
                     b.ToTable("vehicle_components", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.VehicleImage", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("(newid())");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("(sysdatetimeoffset())");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("PublicId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("public_id");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("(sysdatetimeoffset())");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("url");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("vehicle_id");
-
-                    b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83FE59545DD");
-
-                    b.HasIndex(new[] { "Url" }, "UQ__vehicle___DD778417A8A510F3")
-                        .IsUnique();
-
-                    b.HasIndex(new[] { "VehicleId" }, "idx_vehicle_images_vehicle_id");
-
-                    b.ToTable("vehicle_images", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.VehicleModel", b =>
@@ -1496,7 +1508,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83F3EC26636");
+                        .HasName("PK__vehicle___3213E83F7DCE480B");
 
                     b.HasIndex(new[] { "SegmentId" }, "idx_vehicle_models__segment_id");
 
@@ -1542,7 +1554,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83FC8B2ADFF");
+                        .HasName("PK__vehicle___3213E83FB644C5D3");
 
                     b.ToTable("vehicle_segments", (string)null);
                 });
@@ -1703,6 +1715,17 @@ namespace Infrastructure.Migrations
                         .HasConstraintName("fk_model_components_vehicle_models");
 
                     b.Navigation("Component");
+
+                    b.Navigation("Model");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ModelImage", b =>
+                {
+                    b.HasOne("Domain.Entities.VehicleModel", "Model")
+                        .WithMany("ModelImages")
+                        .HasForeignKey("ModelId")
+                        .IsRequired()
+                        .HasConstraintName("fk_model_images_vehicle_models");
 
                     b.Navigation("Model");
                 });
@@ -1913,17 +1936,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Component");
                 });
 
-            modelBuilder.Entity("Domain.Entities.VehicleImage", b =>
-                {
-                    b.HasOne("Domain.Entities.Vehicle", "Vehicle")
-                        .WithMany("VehicleImages")
-                        .HasForeignKey("VehicleId")
-                        .IsRequired()
-                        .HasConstraintName("fk_vehicle_images_vehicles");
-
-                    b.Navigation("Vehicle");
-                });
-
             modelBuilder.Entity("Domain.Entities.VehicleModel", b =>
                 {
                     b.HasOne("Domain.Entities.Brand", "Brand")
@@ -2039,8 +2051,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("RentalContracts");
 
                     b.Navigation("VehicleChecklists");
-
-                    b.Navigation("VehicleImages");
                 });
 
             modelBuilder.Entity("Domain.Entities.VehicleChecklist", b =>
@@ -2065,6 +2075,8 @@ namespace Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.VehicleModel", b =>
                 {
                     b.Navigation("ModelComponents");
+
+                    b.Navigation("ModelImages");
 
                     b.Navigation("Vehicles");
                 });

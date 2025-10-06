@@ -1,12 +1,9 @@
-﻿using API.Filters;
-using Application.Abstractions;
+﻿using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.User.Request;
 using Application.Dtos.Common.Request;
 using Application.Dtos.User.Respone;
-using Infrastructure.ApplicationDbContext;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -254,6 +251,7 @@ namespace API.Controllers
             await _userService.UpdateMe(userClaims, userUpdateReq);
             return Ok();
         }
+
         [HttpPut("avatar")]
         [Authorize]
         public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq request)
@@ -263,6 +261,7 @@ namespace API.Controllers
 
             return Ok(new { AvatarUrl = avatarUrl });
         }
+
         [HttpDelete("avatar")]
         [Authorize]
         public async Task<IActionResult> DeleteAvatar()
@@ -271,6 +270,63 @@ namespace API.Controllers
             await _userService.DeleteAvatarAsync(userId);
 
             return Ok(new { Message = Message.Cloudinary.DeleteSuccess });
+        }
+
+        [HttpPost("citizen-identities")]
+        [Authorize]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadCitizenId([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UploadCitizenIdAsync(userId, file);
+            return Ok(new
+            {
+                message = "Citizen ID processed successfully",
+                citizen_identity = result
+            });
+        }
+
+        [HttpGet("citizen-identities")]
+        [Authorize]
+        public async Task<IActionResult> GetMyCitizenIdentity()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.GetMyCitizenIdentityAsync(userId);
+
+            if (result == null)
+                return NotFound("Citizen identity not found for this user");
+
+            return Ok(result);
+        }
+
+        [HttpPost("driver-licenses")]
+        [Authorize]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UploadDriverLicenseAsync(userId, file);
+            return Ok(new
+            {
+                message = "Driver license processed successfully",
+                driver_license = result
+            });
+        }
+
+        // Lấy bằng user trong token
+        [HttpGet("driver-licenses")]
+        [Authorize]
+        public async Task<IActionResult> GetMyDriverLicense()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.GetMyDriverLicenseAsync(userId);
+
+            if (result == null)
+                return NotFound("Driver license not found for this user");
+
+            return Ok(result);
         }
     }
 }

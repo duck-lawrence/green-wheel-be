@@ -6,7 +6,7 @@
 // import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 // import Link from "next/link"
 // import { currency } from "@/utils/helpers/currentcy"
-// import { useToken } from "@/hooks"
+// import { useTokenStore } from "@/hooks"
 // import { MathDate } from "@/utils/helpers/mathDate"
 // import { BreadCrumbsStyled } from "../../styled"
 // // import { vehicle } from "@/data/vehicleData"
@@ -82,7 +82,7 @@
 // // ===================================
 
 // export function Detail() {
-//     const isLoggedIn = useToken((s) => !!s.accessToken)
+//     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 //     const [active, setActive] = useState(0)
 //     const [dates, setDates] = useState({ start: "2025-10-02", end: "2025-10-06" })
 

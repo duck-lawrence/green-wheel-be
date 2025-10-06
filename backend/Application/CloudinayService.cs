@@ -1,55 +1,43 @@
 ﻿using Application.Abstractions;
+using Application.Constants;
+using Application.AppExceptions;
 using Application.Dtos.Common.Request;
 using Application.Repositories;
-using Domain.Entities;
-using Microsoft.Extensions.Logging;
 
-namespace Application.Services
+namespace Application
 {
     public class CloudinaryService : IPhotoService
     {
         private readonly ICloudinaryRepository _cloudRepo;
-        private readonly ILogger<CloudinaryService> _logger;
 
-        public CloudinaryService(ICloudinaryRepository cloudRepo, ILogger<CloudinaryService> logger)
+        public CloudinaryService(ICloudinaryRepository cloudRepo)
         {
             _cloudRepo = cloudRepo;
-            _logger = logger;
         }
 
         public async Task<PhotoUploadResult> UploadPhotoAsync(UploadImageReq file, string? folder = null)
         {
-            try
-            {
-                folder ??= "uploads";
-                var result = await _cloudRepo.UploadAsync(file, folder);
-                _logger.LogInformation("Image uploaded successfully: {Url}", result.Url);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Upload failed for file {File}", file.File.FileName);
-                throw;
-            }
+            if (file.File == null || file.File.Length == 0)
+                throw new BadRequestException(Message.Cloudinary.NotFoundObjectInFile);
+
+            folder ??= "uploads";
+
+            var result = await _cloudRepo.UploadAsync(file, folder);
+
+            if (result == null || string.IsNullOrEmpty(result.Url))
+                throw new BusinessException(Message.Cloudinary.UploadFailed);
+
+            return result;
         }
 
         public async Task<bool> DeletePhotoAsync(string publicId)
         {
-            try
-            {
-                var deleted = await _cloudRepo.DeleteAsync(publicId);
-                if (deleted)
-                    _logger.LogInformation("Deleted image {PublicId} successfully", publicId);
-                else
-                    _logger.LogWarning("Failed to delete image {PublicId}", publicId);
+            if (string.IsNullOrWhiteSpace(publicId))
+                throw new BadRequestException(Message.Cloudinary.NotFoundObjectInFile);
 
-                return deleted;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting image {PublicId}", publicId);
-                return false;
-            }
+            var deleted = await _cloudRepo.DeleteAsync(publicId);
+
+            return deleted;
         }
     }
 }

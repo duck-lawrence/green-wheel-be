@@ -1,4 +1,6 @@
 ﻿using Domain.Commons;
+using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities;
 

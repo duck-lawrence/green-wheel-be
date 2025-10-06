@@ -1,8 +1,9 @@
 ﻿using Domain.Commons;
 using Domain.Entities;
-using Infrastructure.Interceptors;
+using Infrastructure.Interceptor;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace Infrastructure.ApplicationDbContext;
@@ -10,11 +11,14 @@ namespace Infrastructure.ApplicationDbContext;
 public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 {
     private readonly UpdateTimestampInterceptor _updateInterceptor;
+    public GreenWheelDbContext()
+    {
+    }
 
-    public GreenWheelDbContext(DbContextOptions<GreenWheelDbContext> options, UpdateTimestampInterceptor updateInterceptor)
+    public GreenWheelDbContext(DbContextOptions<GreenWheelDbContext> options, UpdateTimestampInterceptor updateTimestampInterceptor)
         : base(options)
     {
-        _updateInterceptor = updateInterceptor;
+        _updateInterceptor = updateTimestampInterceptor;
     }
 
     public virtual DbSet<Brand> Brands { get; set; }
@@ -36,6 +40,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
     public virtual DbSet<InvoiceItem> InvoiceItems { get; set; }
 
     public virtual DbSet<ModelComponent> ModelComponents { get; set; }
+
+    public virtual DbSet<ModelImage> ModelImages { get; set; }
 
     public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
 
@@ -63,15 +69,13 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
     public virtual DbSet<VehicleComponent> VehicleComponents { get; set; }
 
-    public virtual DbSet<VehicleImage> VehicleImages { get; set; }
-
     public virtual DbSet<VehicleModel> VehicleModels { get; set; }
 
     public virtual DbSet<VehicleSegment> VehicleSegments { get; set; }
     public DbSet<T> Set<T>() where T : class, IEntity => base.Set<T>();
-    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        return await base.SaveChangesAsync(cancellationToken);
+        optionsBuilder.AddInterceptors(_updateInterceptor);
     }
     private static string ToSnakeCase(string name)
     {
@@ -85,15 +89,11 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         return result.ToLower();
     }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.AddInterceptors(_updateInterceptor);
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Brand>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__brands__3213E83F268FE849");
+            entity.HasKey(e => e.Id).HasName("PK__brands__3213E83F39FD01A6");
 
             entity.ToTable("brands");
 
@@ -121,13 +121,13 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<CitizenIdentity>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__citizen___3213E83FDB5A0581");
+            entity.HasKey(e => e.Id).HasName("PK__citizen___3213E83F5AA98353");
 
             entity.ToTable("citizen_identities");
 
-            entity.HasIndex(e => e.UserId, "UQ__citizen___B9BE370E25FD9C10").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__citizen___B9BE370E6D3C6B98").IsUnique();
 
-            entity.HasIndex(e => e.Number, "UQ__citizen___FD291E411CA2B7AB").IsUnique();
+            entity.HasIndex(e => e.Number, "UQ__citizen___FD291E41F15782F6").IsUnique();
 
             entity.HasIndex(e => e.UserId, "uq_citizen_identities_user_id").IsUnique();
 
@@ -169,11 +169,11 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Deposit>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__deposits__3213E83F15782E11");
+            entity.HasKey(e => e.Id).HasName("PK__deposits__3213E83FA62669D9");
 
             entity.ToTable("deposits");
 
-            entity.HasIndex(e => e.InvoiceId, "UQ__deposits__F58DFD48B95264A6").IsUnique();
+            entity.HasIndex(e => e.InvoiceId, "UQ__deposits__F58DFD48A531CFB0").IsUnique();
 
             entity.HasIndex(e => e.InvoiceId, "uq_deposits_invoice_id").IsUnique();
 
@@ -205,7 +205,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DispatchRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83F8BB52086");
+            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83F4F8E6A7E");
 
             entity.ToTable("dispatch_requests");
 
@@ -258,7 +258,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DispatchRequestStaff>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83F0DFB7CEF");
+            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83FF6079550");
 
             entity.ToTable("dispatch_request_staffs");
 
@@ -292,7 +292,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DispatchRequestVehicle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83FDCB5F750");
+            entity.HasKey(e => e.Id).HasName("PK__dispatch__3213E83FF618BAA1");
 
             entity.ToTable("dispatch_request_vehicles");
 
@@ -326,13 +326,13 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<DriverLicense>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__driver_l__3213E83F9882F5A0");
+            entity.HasKey(e => e.Id).HasName("PK__driver_l__3213E83F0C52E57F");
 
             entity.ToTable("driver_licenses");
 
-            entity.HasIndex(e => e.UserId, "UQ__driver_l__B9BE370EAF079999").IsUnique();
+            entity.HasIndex(e => e.UserId, "UQ__driver_l__B9BE370EC7CF60FE").IsUnique();
 
-            entity.HasIndex(e => e.Number, "UQ__driver_l__FD291E41057DDF24").IsUnique();
+            entity.HasIndex(e => e.Number, "UQ__driver_l__FD291E41C4B31239").IsUnique();
 
             entity.HasIndex(e => e.UserId, "uq_driver_licenses_user_id").IsUnique();
 
@@ -375,7 +375,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Invoice>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__invoices__3213E83F3C6175A1");
+            entity.HasKey(e => e.Id).HasName("PK__invoices__3213E83FD78CB2FD");
 
             entity.ToTable("invoices");
 
@@ -392,7 +392,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.ContractId).HasColumnName("contract_id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            
             entity.Property(e => e.Notes)
                 .HasMaxLength(255)
                 .HasColumnName("notes");
@@ -422,7 +421,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<InvoiceItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__invoice___3213E83FEFFF66A8");
+            entity.HasKey(e => e.Id).HasName("PK__invoice___3213E83FA6AF7666");
 
             entity.ToTable("invoice_items");
 
@@ -467,7 +466,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<ModelComponent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__model_co__3213E83F3E460DA4");
+            entity.HasKey(e => e.Id).HasName("PK__model_co__3213E83F3C4DADC3");
 
             entity.ToTable("model_components");
 
@@ -499,9 +498,43 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasConstraintName("fk_model_components_vehicle_models");
         });
 
+        modelBuilder.Entity<ModelImage>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__model_im__3213E83FF3E97981");
+
+            entity.ToTable("model_images");
+
+            entity.HasIndex(e => e.Url, "UQ__model_im__DD7784175340E62A").IsUnique();
+
+            entity.HasIndex(e => e.ModelId, "idx_model_images_model_id");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.ModelId).HasColumnName("model_id");
+            entity.Property(e => e.PublicId)
+                .HasMaxLength(255)
+                .HasColumnName("public_id");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysdatetimeoffset())")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.Url)
+                .HasMaxLength(500)
+                .HasColumnName("url");
+
+            entity.HasOne(d => d.Model).WithMany(p => p.ModelImages)
+                .HasForeignKey(d => d.ModelId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_model_images_vehicle_models");
+        });
+
         modelBuilder.Entity<RefreshToken>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__refresh___3213E83FBC3AE1EB");
+            entity.HasKey(e => e.Id).HasName("PK__refresh___3213E83F8B43C8C7");
 
             entity.ToTable("refresh_tokens");
 
@@ -532,7 +565,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<RentalContract>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__rental_c__3213E83FA1754E1B");
+            entity.HasKey(e => e.Id).HasName("PK__rental_c__3213E83F817349DC");
 
             entity.ToTable("rental_contracts");
 
@@ -592,7 +625,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__roles__3213E83F27F2E65B");
+            entity.HasKey(e => e.Id).HasName("PK__roles__3213E83F94B3D944");
 
             entity.ToTable("roles");
 
@@ -616,7 +649,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Staff>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__staffs__B9BE370FCEC46396");
+            entity.HasKey(e => e.UserId).HasName("PK__staffs__B9BE370FBBD826E4");
 
             entity.ToTable("staffs");
 
@@ -641,7 +674,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<StaffReport>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__staff_re__3213E83FF23CAB38");
+            entity.HasKey(e => e.Id).HasName("PK__staff_re__3213E83F5156E646");
 
             entity.ToTable("staff_reports");
 
@@ -688,7 +721,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Station>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__stations__3213E83F65C937F2");
+            entity.HasKey(e => e.Id).HasName("PK__stations__3213E83FDE57DAC6");
 
             entity.ToTable("stations");
 
@@ -712,7 +745,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<StationFeedback>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__station___3213E83F33408F3E");
+            entity.HasKey(e => e.Id).HasName("PK__station___3213E83F2B055C9C");
 
             entity.ToTable("station_feedbacks");
 
@@ -748,7 +781,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<SupportRequest>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__support___3213E83FAF7946B7");
+            entity.HasKey(e => e.Id).HasName("PK__support___3213E83F22E367C7");
 
             entity.ToTable("support_requests");
 
@@ -788,7 +821,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__users__3213E83FFB353554");
+            entity.HasKey(e => e.Id).HasName("PK__users__3213E83F083E0E83");
 
             entity.ToTable("users");
 
@@ -815,6 +848,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.FirstName)
                 .HasMaxLength(50)
                 .HasColumnName("first_name");
+            entity.Property(e => e.IsGoogleLinked).HasColumnName("is_google_linked");
             entity.Property(e => e.LastName)
                 .HasMaxLength(50)
                 .HasColumnName("last_name");
@@ -839,11 +873,11 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<Vehicle>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicles__3213E83FC71D3EDF");
+            entity.HasKey(e => e.Id).HasName("PK__vehicles__3213E83F1CEAB601");
 
             entity.ToTable("vehicles");
 
-            entity.HasIndex(e => e.LicensePlate, "UQ__vehicles__F72CD56EE1C45A04").IsUnique();
+            entity.HasIndex(e => e.LicensePlate, "UQ__vehicles__F72CD56E11B6394E").IsUnique();
 
             entity.HasIndex(e => e.ModelId, "idx_vehicles_model_id");
 
@@ -879,7 +913,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleChecklist>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F15B22915");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F5B95E7CD");
 
             entity.ToTable("vehicle_checklists");
 
@@ -932,13 +966,17 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleChecklistItem>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FC33F6FF3");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F906FB6F6");
 
             entity.ToTable("vehicle_checklist_items");
 
             entity.HasIndex(e => e.ChecklistId, "idx_vehicle_checklist_items_checklist_id");
 
             entity.HasIndex(e => e.ComponentId, "idx_vehicle_checklist_items_component_id");
+
+            entity.HasIndex(e => e.ImageUrl, "idx_vehicle_checklist_items_image_url")
+                .IsUnique()
+                .HasFilter("([image_url] IS NOT NULL)");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -949,6 +987,12 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.ImagePublicId)
+                .HasMaxLength(255)
+                .HasColumnName("image_public_id");
+            entity.Property(e => e.ImageUrl)
+                .HasMaxLength(500)
+                .HasColumnName("image_url");
             entity.Property(e => e.Notes)
                 .HasMaxLength(255)
                 .HasColumnName("notes");
@@ -970,7 +1014,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleComponent>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FFAC07EE1");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F39DCC37F");
 
             entity.ToTable("vehicle_components");
 
@@ -992,43 +1036,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnName("updated_at");
         });
 
-        modelBuilder.Entity<VehicleImage>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FE59545DD");
-
-            entity.ToTable("vehicle_images");
-
-            entity.HasIndex(e => e.Url, "UQ__vehicle___DD778417A8A510F3").IsUnique();
-
-            entity.HasIndex(e => e.VehicleId, "idx_vehicle_images_vehicle_id");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("(newid())")
-                .HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(sysdatetimeoffset())")
-                .HasColumnName("created_at");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.PublicId)
-                .HasMaxLength(255)
-                .HasColumnName("public_id");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("(sysdatetimeoffset())")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.Url)
-                .HasMaxLength(500)
-                .HasColumnName("url");
-            entity.Property(e => e.VehicleId).HasColumnName("vehicle_id");
-
-            entity.HasOne(d => d.Vehicle).WithMany(p => p.VehicleImages)
-                .HasForeignKey(d => d.VehicleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_vehicle_images_vehicles");
-        });
-
         modelBuilder.Entity<VehicleModel>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F3EC26636");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83F7DCE480B");
 
             entity.ToTable("vehicle_models");
 
@@ -1088,7 +1098,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         modelBuilder.Entity<VehicleSegment>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FC8B2ADFF");
+            entity.HasKey(e => e.Id).HasName("PK__vehicle___3213E83FB644C5D3");
 
             entity.ToTable("vehicle_segments");
 
@@ -1120,7 +1130,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 property.SetColumnName(ToSnakeCase(property.Name));
             }
         }
-
         OnModelCreatingPartial(modelBuilder);
     }
 

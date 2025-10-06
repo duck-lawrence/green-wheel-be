@@ -18,8 +18,6 @@ public partial class VehicleChecklist : SorfDeletedEntity, IEntity
 
     public bool IsSignedByCustomer { get; set; }
 
-    
-
     public Guid StaffId { get; set; }
 
     public Guid? CustomerId { get; set; }

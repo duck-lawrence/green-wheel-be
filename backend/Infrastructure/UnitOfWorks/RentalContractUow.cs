@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.UnitOfWork
+namespace Infrastructure.UnitOfWorks
 {
     public class RentalContractUow : IRentalContractUow
     {
@@ -22,6 +22,8 @@ namespace Infrastructure.UnitOfWork
         public IInvoiceRepository Invoices { get; }
         public IInvoiceItemRepository InvoiceItems { get; }
         public IDepositRepository Deposits { get; }
+        public IModelImageRepository ModelImages { get; }
+
         public RentalContractUow(
         IGreenWheelDbContext context,
         IVehicleRepository vehicleRepository,
@@ -31,7 +33,8 @@ namespace Infrastructure.UnitOfWork
         IInvoiceRepository invoiceRepository,
         IInvoiceItemRepository invoiceItemRepository,
         IDepositRepository depositRepository,
-        IStationRepository stationRepository)
+        IStationRepository stationRepository,
+        IModelImageRepository modelImageRepository)
         {
             _context = context;
             Vehicles = vehicleRepository;
@@ -42,7 +45,9 @@ namespace Infrastructure.UnitOfWork
             Deposits = depositRepository;
             Stations = stationRepository;
             InvoiceItems = invoiceItemRepository;
+            ModelImages = modelImageRepository;
         }
+
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return await _context.SaveChangesAsync(cancellationToken);

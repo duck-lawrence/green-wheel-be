@@ -19,6 +19,5 @@ public partial class Brand : SorfDeletedEntity, IEntity
     public string Country { get; set; } = null!;
 
     public int FoundedYear { get; set; }
-
     public virtual ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
 }

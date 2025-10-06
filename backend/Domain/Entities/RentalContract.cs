@@ -46,7 +46,7 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
 
     public virtual Staff? ReturnStaff { get; set; }
 
-    public virtual Vehicle Vehicle { get; set; } = null!;
+    public virtual Vehicle? Vehicle { get; set; }
 
     public virtual ICollection<VehicleChecklist> VehicleChecklists { get; set; } = new List<VehicleChecklist>();
 }

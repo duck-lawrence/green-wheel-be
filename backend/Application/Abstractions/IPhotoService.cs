@@ -1,5 +1,4 @@
 ﻿using Application.Dtos.Common.Request;
-using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Abstractions

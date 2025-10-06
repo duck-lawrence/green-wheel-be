@@ -16,7 +16,5 @@ public partial class VehicleSegment : SorfDeletedEntity, IEntity
 
     public string Description { get; set; } = null!;
 
-    
-
     public virtual ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
 }

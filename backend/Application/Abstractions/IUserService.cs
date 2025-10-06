@@ -42,8 +42,8 @@ namespace Application.Abstractions
         //Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
         //Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
 
-        
         Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req);
+
         Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims);
 
         Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
@@ -51,6 +51,15 @@ namespace Application.Abstractions
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
 
         Task DeleteAvatarAsync(Guid pulicId);
+
         Task CheckDupEmail(string email);
+
+        Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file);
+
+        Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file);
+
+        Task<object?> GetMyCitizenIdentityAsync(Guid userId);
+
+        Task<object?> GetMyDriverLicenseAsync(Guid userId);
     }
 }
