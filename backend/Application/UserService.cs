@@ -506,7 +506,7 @@ namespace Application
             User? userFromDb = await _userRepository.GetByIdWithRoleAsync(userID);
             if (userFromDb == null)
             {
-                throw new NotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
             }
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }

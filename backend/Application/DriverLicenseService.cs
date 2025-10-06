@@ -41,7 +41,7 @@ namespace Application
         {
             var existing = await _licenseRepo.GetByUserId(userId);
             if (existing == null)
-                throw new NotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             await _licenseRepo.DeleteAsync(existing.Id);
             return true;
@@ -51,7 +51,7 @@ namespace Application
         {
             var existing = await _licenseRepo.GetByIdAsync(license.Id);
             if (existing == null)
-                throw new NotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             license.UpdatedAt = DateTimeOffset.UtcNow;
             await _licenseRepo.UpdateAsync(license);
@@ -62,7 +62,7 @@ namespace Application
         {
             var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.Licenses.InvalidLicenseData);
+                throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
