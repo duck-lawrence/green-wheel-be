@@ -6,56 +6,72 @@ import { Field } from "@/components/styled/FieldStyled"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 import Link from "next/link"
 import { currency } from "@/utils/helpers/currentcy"
-import { MathDate } from "@/utils/helpers/mathDate"
+import { getDatesDiff } from "@/utils/helpers/mathDate"
 import { useParams } from "next/navigation"
 import { useBookingFilterStore, useTokenStore } from "@/hooks"
 import { useTranslation } from "react-i18next"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { Spinner } from "@heroui/react"
+import { useGetVehicleModelById } from "@/hooks/queries/useVehicleModel"
 
 export default function DetailPage() {
+    const { id } = useParams()
+    const modelId = id?.toString()
+
     const { t } = useTranslation()
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
-
-    const { id } = useParams()
     const [vehicle, setVehicle] = useState<VehicleModelViewRes | null>(null)
-    const startDate = useBookingFilterStore((s) => s.startDate)
-    const endDate = useBookingFilterStore((s) => s.endDate)
-    const vehicleModels = useBookingFilterStore((s) => s.filteredVehicleModels)
     // handle render picture
     const [active, setActive] = useState(0)
 
     // handle count date
     // const [dates, setDates] = useState({ startDate: "2025-10-02", endDate: "2025-10-06" })
 
-    const totalDays = useMemo(() => {
-        return MathDate({ startDate, endDate })
-    }, [startDate, endDate])
+    const stationId = useBookingFilterStore((s) => s.stationId)
+    const startDate = useBookingFilterStore((s) => s.startDate)
+    const endDate = useBookingFilterStore((s) => s.endDate)
+
+    const {
+        data: model,
+        isLoading: isModelLoading,
+        isError: isModelError
+    } = useGetVehicleModelById({
+        modelId: modelId || "",
+        query: {
+            stationId: stationId || "",
+            startDate: startDate || "",
+            endDate: endDate || ""
+        }
+    })
+
+    const { totalDays, total } = useMemo(() => {
+        if (!vehicle) return { totalDays: 0, total: 0 }
+
+        const totalDays = getDatesDiff({ startDate, endDate })
+        return {
+            totalDays,
+            total: totalDays * vehicle.costPerDay + vehicle.depositFee
+        }
+    }, [endDate, startDate, vehicle])
 
     useEffect(() => {
-        // const vehicleID = Array.isArray(id) ? id[0] : id
-        const model = vehicleModels.find((v) => v.id === id)
         if (model) setVehicle(model)
-    }, [id, vehicleModels])
-
-    if (!vehicle) return <Spinner />
+    }, [model])
 
     // display item similar
-    const similarVehicles = vehicleModels
-        .filter((v) => v.id !== id)
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 3)
+    // const similarVehicles = vehicleModels
+    //     .filter((v) => v.id !== id)
+    //     .sort(() => Math.random() - 0.5)
+    //     .slice(0, 3)
 
-    const total = totalDays * vehicle.costPerDay + vehicle.depositFee
-
-    function mapSpecs(vehicle: any) {
+    function mapSpecs(vehicle: VehicleModelViewRes) {
         return [
             { key: "Số chỗ", value: vehicle.seatingCapacity },
             { key: "Công suất", value: vehicle.motorPower + " kW" },
             { key: "Dung lượng pin", value: vehicle.batteryCapacity + " kWh" },
             { key: "Eco Range", value: vehicle.ecoRangeKm + " km" },
             { key: "Sport Range", value: vehicle.sportRangeKm + " km" },
-            { key: "Hộp số", value: vehicle.transmission }
+            { key: "Hộp số", value: vehicle.numberOfAirbags }
         ]
     }
 
@@ -71,6 +87,8 @@ export default function DetailPage() {
             text: "Trả trước. Thời hạn thanh toán: đặt cọc giữ xe thanh toán 100% khi kí hợp đồng và nhận xe"
         }
     ]
+
+    if (!vehicle || isModelLoading || isModelError) return <Spinner />
 
     return (
         <div className="min-h-dvh bg-neutral-50 text-neutral-900 mt-20 rounded">
@@ -98,7 +116,7 @@ export default function DetailPage() {
                             Phân khúc: <span className="font-medium">{vehicle.segment_name}</span>
                         </p> */}
                         <p className="mt-1 text-sm text-neutral-500">
-                            {t("vehicle_model.remaining_vehicle_count")}
+                            {t("vehicle_model.remaining_vehicle_count")} &nbsp;
                             <span className="font-medium text-emerald-600">
                                 {vehicle.availableVehicleCount}
                             </span>
@@ -107,7 +125,7 @@ export default function DetailPage() {
                     {/*  font-extrabold*/}
                     <div className="text-right">
                         <p className="text-2xl sm:text-3xl font-semibold text-emerald-600">
-                            {currency(vehicle.costPerDay)}
+                            {currency(vehicle.costPerDay)} &nbsp;
                             <span className="text-base font-normal text-neutral-500">
                                 {t("vehicle_model.vnd_per_day")}
                             </span>
@@ -134,9 +152,10 @@ export default function DetailPage() {
                             />
                         </div>
 
+                        {/* List sub img */}
                         <div className="row-span-1 grid grid-cols-4 gap-3">
                             {vehicle.imageUrls &&
-                                vehicle.imageUrls.map((src, idx) => (
+                                [vehicle.imageUrl, ...vehicle.imageUrls].map((src, idx) => (
                                     <button
                                         key={src}
                                         onClick={() => setActive(idx)}
@@ -263,7 +282,7 @@ export default function DetailPage() {
                     </Link>
                 </div>
                 {/* chưa làm en */}
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {similarVehicles.map((i) => (
                         <Link
                             key={i.id}
@@ -292,7 +311,7 @@ export default function DetailPage() {
                             </div>
                         </Link>
                     ))}
-                </div>
+                </div> */}
             </section>
         </div>
     )

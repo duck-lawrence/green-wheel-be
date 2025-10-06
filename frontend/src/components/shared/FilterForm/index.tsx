@@ -48,28 +48,6 @@ export function FilterVehicleRental() {
     const setEndDate = useBookingFilterStore((s) => s.setEndDate)
     const setFilteredVehicleModels = useBookingFilterStore((s) => s.setFilteredVehicleModels)
 
-    // function
-    const {
-        // data: vehicleModels,
-        // isLoading: isGetVehicleModelsLoading,
-        // error: getVehicleModelsError,
-        // isError: isGetVehicleModelsError,
-        refetch: refetchVehicleModels
-    } = useGetAllVehicleModels({
-        query: {
-            stationId,
-            segmentId,
-            startDate,
-            endDate
-        },
-        enabled: false
-    })
-
-    const handleSubmit = useCallback(async () => {
-        const res = await refetchVehicleModels()
-        setFilteredVehicleModels(res.data || [])
-    }, [refetchVehicleModels, setFilteredVehicleModels])
-
     // setup date time
     const { minStartDate, minEndDate } = useMemo(() => {
         const zonedNow = fromDate(new Date(), DEFAULT_TIMEZONE)
@@ -101,6 +79,22 @@ export function FilterVehicleRental() {
         if (!endDate)
             setEndDate(dayjs(minEndDate.toDate(DEFAULT_TIMEZONE)).format(DEFAULT_DATE_TIME_FORMAT))
     }, [endDate, minEndDate, minStartDate, setEndDate, setStartDate, startDate])
+
+    // get models
+    const { refetch: refetchVehicleModels } = useGetAllVehicleModels({
+        query: {
+            stationId: stationId || "",
+            startDate: startDate || formatDateTime({ date: minStartDate }),
+            endDate: endDate || formatDateTime({ date: minEndDate }),
+            segmentId
+        },
+        enabled: false
+    })
+
+    const handleSubmit = useCallback(async () => {
+        const res = await refetchVehicleModels()
+        setFilteredVehicleModels(res.data || [])
+    }, [refetchVehicleModels, setFilteredVehicleModels])
 
     //  Validation schema
     const bookingSchema = useMemo(
@@ -217,7 +211,7 @@ export function FilterVehicleRental() {
                             <AutocompleteItem key={item.id}>{item.name}</AutocompleteItem>
                         ))}
                     </AutocompleteStyle>
-                    <div className="text-sm mt-1 ml-4">
+                    <div className="text-sm mt-1 ml-4 truncate w-full min-h-fit">
                         {
                             stations?.find((station) => station.id === formik.values.stationId)
                                 ?.address
@@ -265,7 +259,7 @@ export function FilterVehicleRental() {
                                 return
                             }
 
-                            const date = formatDateTime({ value })
+                            const date = formatDateTime({ date: value })
 
                             formik.setFieldValue("startDate", date)
                             setStartDate(date)
@@ -293,7 +287,7 @@ export function FilterVehicleRental() {
                                 return
                             }
 
-                            const date = formatDateTime({ value })
+                            const date = formatDateTime({ date: value })
 
                             formik.setFieldValue("endDate", date)
                             setEndDate(date)
