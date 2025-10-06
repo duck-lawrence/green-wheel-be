@@ -2,7 +2,6 @@
 import { FilterVehicleRental, CardListVehicleRental } from "@/components"
 import { useNavbarItemStore } from "@/hooks"
 import React, { useEffect } from "react"
-// import Vehicle from "@/models/user/type/vehicle"
 
 export default function VehicleRentalPage() {
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
@@ -18,9 +17,11 @@ export default function VehicleRentalPage() {
     //     )
     //     setFilteredVehicles(filtered)
     // }, [station, start, end, allVehicles, setFilteredVehicles])
-
+    const handleFilter = (station: string, start: string, end: string) => {
+        setBookingFilter(station, start, end)
+    }
     return (
-        <div className="h-30">
+        <div className="h-30 mt-30 min-h-[80vh]">
             <div className="mt-30">
                 <FilterVehicleRental />
             </div>

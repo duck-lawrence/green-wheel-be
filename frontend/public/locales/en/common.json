@@ -43,7 +43,7 @@
         "reset_password": "Reset password",
         "please_reset_password": "Please set your new password"
     },
-    "vehicle_model": {},
+
     "user": {
         "invalid_otp": "Invalid OTP",
         "otp_can_not_empty": "OTP is required",
@@ -146,13 +146,13 @@
         "agree_terms_require": "You must agree to the payment terms",
         "agree_data_policy_require": "You must agree to the data sharing terms"
     },
-    "vehicle": {
+    "vehicle_model": {
         "station": "Station",
         "segment": "Segment",
         "pick_station": "Please select a pick-up location",
         "search_car": "Search car",
-        "start_date_time": "Pick-up date & time",
-        "end_date_time": "Return date & time"
+        "start_date_time": "Start date & time",
+        "end_date_time": "End date & time"
     },
     "vehicle_filter": {
         "start_date_require": "Please select date and time to pick up the car",
