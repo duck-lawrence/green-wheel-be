@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from "react"
 import { useLoginGoogle, useSetPasswordDiscloresureSingleton } from "@/hooks"
-import { GOOGLE_CLIENT_ID } from "@/constants/api"
+import { GOOGLE_CLIENT_ID } from "@/constants/env"
 import { GoogleCredentialResponse } from "@/types/google"
 
 export function GoogleLoginButton({

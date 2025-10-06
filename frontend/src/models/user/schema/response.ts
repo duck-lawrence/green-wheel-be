@@ -1,17 +1,8 @@
-// export type UserProfileViewRes = {
-//     email: string
-//     firstName: string
-//     lastName: string
-//     sex?: number
-//     dateOfBirth?: string
-//     avatarUrl?: string
-//     phone?: string
-//     licenseUrl?: string
-//     citizenUrl?: string
-// }
+import { RoleViewRes } from "@/models/role/response"
+import { StationViewRes } from "@/models/station/schema/response"
 
 export type UserProfileViewRes = {
-    email: string
+    email?: string
     firstName: string
     lastName: string
     sex?: number
@@ -20,12 +11,6 @@ export type UserProfileViewRes = {
     phone?: string
     licenseUrl?: string
     citizenUrl?: string
-    role?: string
-    roleId?: string
-    roleDetail?: {
-        id: string
-        name: string
-        description?: string
-    }
-    stationId?: string
+    role?: RoleViewRes
+    station?: StationViewRes
 }
