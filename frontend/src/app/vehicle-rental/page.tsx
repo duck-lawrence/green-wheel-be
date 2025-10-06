@@ -17,12 +17,13 @@ export default function VehicleRentalPage() {
     //     )
     //     setFilteredVehicles(filtered)
     // }, [station, start, end, allVehicles, setFilteredVehicles])
-    const handleFilter = (station: string, start: string, end: string) => {
-        setBookingFilter(station, start, end)
-    }
+
+    // const handleFilter = (station: string, start: string, end: string) => {
+    //     setBookingFilter(station, start, end)
+    // }
     return (
-        <div className="h-30 mt-30 min-h-[80vh]">
-            <div className="mt-30">
+        <div className="min-h-[80vh] h-fit p-4">
+            <div className="">
                 <FilterVehicleRental />
             </div>
 

@@ -1,3 +1,4 @@
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
@@ -6,7 +7,7 @@ interface BookingState {
     segmentId: string | null
     startDate: string | null
     endDate: string | null
-    filteredVehicleModels: string[]
+    filteredVehicleModels: VehicleModelViewRes[]
 }
 
 interface BookingActions {
@@ -21,7 +22,7 @@ interface BookingActions {
         end: string | null
     ) => void
     clearBookingFilter: () => void
-    setFilteredVehicleModels: (vehicleModels: string[]) => void
+    setFilteredVehicleModels: (filteredVehicleModels: VehicleModelViewRes[]) => void
 }
 
 export const useBookingFilterStore = create<BookingState & BookingActions>()(
@@ -57,8 +58,7 @@ export const useBookingFilterStore = create<BookingState & BookingActions>()(
                     filteredVehicleModels: []
                 }),
 
-            setFilteredVehicleModels: (vehicleModels) =>
-                set({ filteredVehicleModels: vehicleModels })
+            setFilteredVehicleModels: (filteredVehicleModels) => set({ filteredVehicleModels })
         }),
         {
             name: "booking_filter_storage",

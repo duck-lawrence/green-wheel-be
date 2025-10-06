@@ -29,12 +29,14 @@ export function FilterVehicleRental() {
         error: getStationsError,
         isError: isGetStationsError
     } = useGetAllStations()
+
     const {
         data: vehicleSegments,
         isLoading: isGetVehicleSegmentsLoading,
         error: getVehicleSegmentsError,
         isError: isGetVehicleSegmentsError
     } = useGetAllVehicleSegments()
+
     // manage filter store
     const stationId = useBookingFilterStore((s) => s.stationId)
     const segmentId = useBookingFilterStore((s) => s.segmentId)
@@ -44,6 +46,7 @@ export function FilterVehicleRental() {
     const setSegmentId = useBookingFilterStore((s) => s.setSegmentId)
     const setStartDate = useBookingFilterStore((s) => s.setStartDate)
     const setEndDate = useBookingFilterStore((s) => s.setEndDate)
+    const setFilteredVehicleModels = useBookingFilterStore((s) => s.setFilteredVehicleModels)
 
     // function
     const {
@@ -64,8 +67,8 @@ export function FilterVehicleRental() {
 
     const handleSubmit = useCallback(async () => {
         const res = await refetchVehicleModels()
-        console.log(res.data)
-    }, [refetchVehicleModels])
+        setFilteredVehicleModels(res.data || [])
+    }, [refetchVehicleModels, setFilteredVehicleModels])
 
     // setup date time
     const { minStartDate, minEndDate } = useMemo(() => {
@@ -103,7 +106,7 @@ export function FilterVehicleRental() {
     const bookingSchema = useMemo(
         () =>
             Yup.object().shape({
-                stationId: Yup.string().required(t("vehicle.pick_station")),
+                stationId: Yup.string().required(t("vehicle_model.pick_station")),
                 startDate: Yup.string()
                     .required(t("vehicle_filter.start_date_require"))
                     .test(
@@ -198,7 +201,7 @@ export function FilterVehicleRental() {
             >
                 <div className="flex flex-col h-14">
                     <AutocompleteStyle
-                        label={t("vehicle.station")}
+                        label={t("vehicle_model.station")}
                         items={stations}
                         startContent={<MapPinAreaIcon className="text-xl" />}
                         selectedKey={formik.values.stationId}
@@ -227,7 +230,7 @@ export function FilterVehicleRental() {
 
                 <div className="flex flex-col h-14">
                     <AutocompleteStyle
-                        label={t("vehicle.segment")}
+                        label={t("vehicle_model.segment")}
                         items={vehicleSegments}
                         // startContent={<MapPinAreaIcon className="text-xl" />}
                         value={formik.values.segmentId || ""}
@@ -251,7 +254,7 @@ export function FilterVehicleRental() {
                 {/* STARTDate */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
-                        label={t("vehicle.start_date_time")}
+                        label={t("vehicle_model.start_date_time")}
                         value={toCalenderDateTime(formik.values.startDate)}
                         minValue={minStartDate}
                         isInvalid={!!(formik.touched.startDate && formik.errors.startDate)}
@@ -279,7 +282,7 @@ export function FilterVehicleRental() {
                 {/* ENDDate */}
                 <div className="flex flex-col h-14">
                     <DateTimeStyled
-                        label={t("vehicle.end_date_time")}
+                        label={t("vehicle_model.end_date_time")}
                         value={toCalenderDateTime(formik.values.endDate)}
                         minValue={minEndDate}
                         isInvalid={!!(formik.touched.endDate && formik.errors.endDate)}
@@ -311,7 +314,7 @@ export function FilterVehicleRental() {
                         // isDisabled={!formik.isValid}
                         className="w-40 h-13.5"
                     >
-                        {t("vehicle.search_car")}
+                        {t("vehicle_model.search_car")}
                     </ButtonStyled>
                 </div>
             </form>

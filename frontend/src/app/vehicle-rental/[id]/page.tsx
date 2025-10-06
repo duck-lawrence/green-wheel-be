@@ -7,39 +7,41 @@ import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/
 import Link from "next/link"
 import { currency } from "@/utils/helpers/currentcy"
 import { MathDate } from "@/utils/helpers/mathDate"
-import { vehicleData } from "@/data/vehicleData"
 import { useParams } from "next/navigation"
-import { useBookingFilterStore, useToken } from "@/hooks"
-import VehicleModel from "@/models/vehicle/vehicle"
+import { useBookingFilterStore, useTokenStore } from "@/hooks"
 import { useTranslation } from "react-i18next"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { Spinner } from "@heroui/react"
 
 export default function DetailPage() {
     const { t } = useTranslation()
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
     const { id } = useParams()
-    const [vehicle, setVehicle] = useState<VehicleModel | null>(null)
-    const { start, end } = useBookingFilterStore()
+    const [vehicle, setVehicle] = useState<VehicleModelViewRes | null>(null)
+    const startDate = useBookingFilterStore((s) => s.startDate)
+    const endDate = useBookingFilterStore((s) => s.endDate)
+    const vehicleModels = useBookingFilterStore((s) => s.filteredVehicleModels)
     // handle render picture
     const [active, setActive] = useState(0)
 
     // handle count date
-    // const [dates, setDates] = useState({ start: "2025-10-02", end: "2025-10-06" })
+    // const [dates, setDates] = useState({ startDate: "2025-10-02", endDate: "2025-10-06" })
 
     const totalDays = useMemo(() => {
-        return MathDate({ start, end })
-    }, [start, end])
+        return MathDate({ startDate, endDate })
+    }, [startDate, endDate])
 
     useEffect(() => {
-        const vehicleID = Array.isArray(id) ? id[0] : id
-        const car = vehicleData.find((v) => v.id === vehicleID)
-        if (car) setVehicle(car)
-    }, [id])
+        // const vehicleID = Array.isArray(id) ? id[0] : id
+        const model = vehicleModels.find((v) => v.id === id)
+        if (model) setVehicle(model)
+    }, [id, vehicleModels])
 
-    if (!vehicle) return <p>Loading....</p>
+    if (!vehicle) return <Spinner />
 
     // display item similar
-    const similarVehicles = vehicleData
+    const similarVehicles = vehicleModels
         .filter((v) => v.id !== id)
         .sort(() => Math.random() - 0.5)
         .slice(0, 3)
@@ -126,28 +128,29 @@ export default function DetailPage() {
                                 initial={{ opacity: 0, scale: 1.02 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.35 }}
-                                src={vehicle.images[active]}
+                                src={vehicle.imageUrls && vehicle.imageUrls[active]}
                                 alt={`${vehicle.name} - ${active + 1}`}
                                 className="h-full w-full object-cover"
                             />
                         </div>
 
                         <div className="row-span-1 grid grid-cols-4 gap-3">
-                            {vehicle.images.map((src, idx) => (
-                                <button
-                                    key={src}
-                                    onClick={() => setActive(idx)}
-                                    className={`group relative aspect-[4/3] overflow-hidden rounded-2xl outline-none ring-2 ring-transparent focus:ring-emerald-500 ${
-                                        active === idx ? "ring-emerald-500" : ""
-                                    }`}
-                                >
-                                    <img
-                                        src={src}
-                                        alt={`thumb ${idx + 1}`}
-                                        className="h-full w-full object-cover group-hover:scale-[1.02] transition"
-                                    />
-                                </button>
-                            ))}
+                            {vehicle.imageUrls &&
+                                vehicle.imageUrls.map((src, idx) => (
+                                    <button
+                                        key={src}
+                                        onClick={() => setActive(idx)}
+                                        className={`group relative aspect-[4/3] overflow-hidden rounded-2xl outline-none ring-2 ring-transparent focus:ring-emerald-500 ${
+                                            active === idx ? "ring-emerald-500" : ""
+                                        }`}
+                                    >
+                                        <img
+                                            src={src}
+                                            alt={`thumb ${idx + 1}`}
+                                            className="h-full w-full object-cover group-hover:scale-[1.02] transition"
+                                        />
+                                    </button>
+                                ))}
                         </div>
                     </div>
 
@@ -270,7 +273,7 @@ export default function DetailPage() {
                             <div className="aspect-[16/10] w-full overflow-hidden rounded-xl bg-neutral-200">
                                 <img
                                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    src={i.images[0]}
+                                    src={i.imageUrls && i.imageUrls[0]}
                                     alt={i.name}
                                 />
                             </div>
