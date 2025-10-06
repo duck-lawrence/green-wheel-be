@@ -150,16 +150,17 @@
         "station": "Station",
         "segment": "Segment",
         "pick_station": "Please select a pick-up location",
-        "pick_time_car": "Please select date and time to pick up the car",
         "search_car": "Search car",
-        "start_date_time": "Start date & time",
-        "end_date_time": "End date & time"
+        "start_date_time": "Pick-up date & time",
+        "end_date_time": "Return date & time"
     },
-    "validate": {
-        "date_received": "Vehicle pick-up date is invalid",
-        "date_return": "Please select return date and time",
-        "valid_date": "The return date must be after the pick-up date",
-        "time_return": "Car return date must be between 7am-5pm"
+    "vehicle_filter": {
+        "start_date_require": "Please select date and time to pick up the car",
+        "invalid_start_date_range": "Vehicle pick-up date must be between 7 AM - 5 PM",
+        "invalid_start_date": "Start time must be at least 3 hours from now and within working hours (7 AM - 5 PM)",
+        "return_date_require": "Please select return date and time",
+        "invalid_end_date_range": "Vehicle return date must be between 7 AM - 5 PM",
+        "min_end_date": "The return day must be after the pick-up day 24 hours"
     },
     "enum": {
         "male": "Male",

@@ -84,7 +84,6 @@ export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
                         onBlur={() => {
                             formik.setFieldTouched("email")
                         }}
-                        onClear={() => console.log("input cleared")}
                     />
                     <InputStyled
                         variant="bordered"

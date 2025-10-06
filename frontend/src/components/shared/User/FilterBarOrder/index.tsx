@@ -8,6 +8,7 @@ import dayjs from "dayjs"
 import { VehicalModelPicker } from "../VehicalModelPicker"
 import { EnumPicker } from "@/components/modules/EnumPicker"
 import { OrderStatusLabels } from "@/constants/labels"
+import { DEFAULT_TIMEZONE } from "@/constants/constants"
 
 export function FillterBarOrder({ onFilterChange }: { onFilterChange: () => void }) {
     const formik = useFormik({
@@ -54,10 +55,10 @@ export function FillterBarOrder({ onFilterChange }: { onFilterChange: () => void
                     }
 
                     const startStr = val.start
-                        ? dayjs(val.start.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
+                        ? dayjs(val.start.toDate(DEFAULT_TIMEZONE)).format("YYYY-MM-DD")
                         : ""
                     const endStr = val.end
-                        ? dayjs(val.end.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
+                        ? dayjs(val.end.toDate(DEFAULT_TIMEZONE)).format("YYYY-MM-DD")
                         : ""
 
                     formik.setFieldValue("start", startStr)

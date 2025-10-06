@@ -44,7 +44,9 @@ export enum VehicleStatus {
     Available = 0,
     Unavailable = 1,
     Rented = 2,
-    Maintenance = 3
+    Maintenance = 3,
+    MissingNoReason = 4,
+    LateReturn = 5
 }
 
 export enum InvoiceItemType {
