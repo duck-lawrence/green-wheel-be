@@ -6,7 +6,7 @@ import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@her
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { DropdownStyle } from "@/components"
-import { useGetMe, useLogout, useProfileStore, useTokenStore } from "@/hooks"
+import { useGetMe, useGetMeFromCache, useLogout, useProfileStore, useTokenStore } from "@/hooks"
 import { BackendError } from "@/models/common/response"
 import Link from "next/link"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
@@ -14,7 +14,8 @@ import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 export function ProfileDropdown() {
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
-    const user = useProfileStore((s) => s.user)
+    // const user = useProfileStore((s) => s.user)
+    const user = useGetMeFromCache()
     const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 

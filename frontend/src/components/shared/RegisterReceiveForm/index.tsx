@@ -6,7 +6,7 @@ import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 
-import { useProfileStore, useTokenStore } from "@/hooks"
+import { useGetMeFromCache, useTokenStore } from "@/hooks"
 import {
     ButtonStyled,
     InputStyled,
@@ -33,7 +33,8 @@ export const RegisterReceiveForm = () => {
     const { t } = useTranslation("common")
 
     const [mounted, setMounted] = useState(false)
-    const { user } = useProfileStore()
+    // const { user } = useProfileStore()
+    const user = useGetMeFromCache()
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
     useEffect(() => {
@@ -183,12 +184,17 @@ export const RegisterReceiveForm = () => {
                                     <AutocompleteStyle
                                         selectedKey={formik.values.pickupLocation || undefined}
                                         onSelectionChange={(key) => {
-                                            const next = typeof key === "string" ? key : key?.toString() ?? ""
+                                            const next =
+                                                typeof key === "string"
+                                                    ? key
+                                                    : key?.toString() ?? ""
                                             formik.setFieldValue("pickupLocation", next)
                                             formik.setFieldTouched("pickupLocation", true)
                                         }}
                                         inputValue={formik.values.pickupLocation}
-                                        onInputChange={(val) => formik.setFieldValue("pickupLocation", val ?? "")}
+                                        onInputChange={(val) =>
+                                            formik.setFieldValue("pickupLocation", val ?? "")
+                                        }
                                     >
                                         {null}
                                     </AutocompleteStyle>

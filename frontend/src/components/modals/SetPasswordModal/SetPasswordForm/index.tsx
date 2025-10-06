@@ -1,5 +1,5 @@
 import React from "react"
-import { useProfileStore, useSetPassword } from "@/hooks"
+import { useGetMeFromCache, useSetPassword } from "@/hooks"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useCallback, useState } from "react"
@@ -18,7 +18,8 @@ import { DEFAULT_TIMEZONE } from "@/constants/constants"
 export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
     const setPasswordMutation = useSetPassword({ onSuccess })
-    const user = useProfileStore((s) => s.user)
+    // const user = useProfileStore((s) => s.user)
+    const user = useGetMeFromCache()
 
     const [isVisible, setIsVisible] = useState(false)
     const toggleVisibility = () => setIsVisible(!isVisible)

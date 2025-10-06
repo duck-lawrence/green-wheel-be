@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo } from "react"
 // import { useAuth } from "@/hooks/queries/useAuth"
 import { useRouter } from "next/navigation"
-import { useProfileStore } from "@/hooks"
+import { useGetMeFromCache } from "@/hooks"
 import { ROLE_ADMIN, ROLE_STAFF } from "@/constants/constants"
 
 // type MaybeRoleDetail = { name?: string | null } | null | undefined
@@ -22,7 +22,8 @@ import { ROLE_ADMIN, ROLE_STAFF } from "@/constants/constants"
 
 export default function RoleGuard({ children }: { children: React.ReactNode }) {
     // const { data, isLoading, isFetching } = useAuth()
-    const user = useProfileStore((s) => s.user)
+    // const user = useProfileStore((s) => s.user)
+    const user = useGetMeFromCache()
     const router = useRouter()
 
     const isStaff = useMemo(() => {

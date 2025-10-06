@@ -14,7 +14,7 @@ import {
     useAvatarUploadDiscloresureSingleton,
     useDay,
     useDeleteAvatar,
-    useProfileStore,
+    useGetMeFromCache,
     useUpdateMe
 } from "@/hooks"
 import { UserUpdateReq } from "@/models/user/schema/request"
@@ -32,9 +32,10 @@ import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 export default function Page() {
     const { t } = useTranslation()
     const { formatDateTime } = useDay({})
-    const user = useProfileStore((s) => s.user)
-    const updateUser = useProfileStore((s) => s.updateUser)
-    const updateMeMutation = useUpdateMe({ onSuccess: updateUser })
+    // const user = useProfileStore((s) => s.user)
+    const user = useGetMeFromCache()
+    // const updateUser = useProfileStore((s) => s.updateUser)
+    const updateMeMutation = useUpdateMe({ onSuccess: undefined })
     const deleteAvatarMutation = useDeleteAvatar({ onSuccess: undefined })
     const [showChange, setShowChange] = useState(true)
 
@@ -307,7 +308,7 @@ export default function Page() {
                                         return
                                     }
 
-                                    const dob = formatDateTime({ value })
+                                    const dob = formatDateTime({ date: value })
 
                                     updateMeFormik.setFieldValue("dateOfBirth", dob)
                                 }}

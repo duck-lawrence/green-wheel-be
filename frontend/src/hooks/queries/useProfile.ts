@@ -16,7 +16,7 @@ export function useInvalidateMeQuery() {
     return () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ME })
 }
 
-export function useMeFromCache(): UserProfileViewRes | undefined {
+export function useGetMeFromCache(): UserProfileViewRes | undefined {
     const queryClient = getQueryClient()
     return queryClient.getQueryData<UserProfileViewRes>(QUERY_KEYS.ME)
 }
@@ -30,12 +30,9 @@ export const useGetMe = ({ enabled = true }: { enabled?: boolean } = {}) => {
     return query
 }
 
-export const useUpdateMe = ({
-    onSuccess
-}: {
-    onSuccess?: (data: Partial<UserProfileViewRes>) => void
-}) => {
+export const useUpdateMe = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
+    const updateUser = useProfileStore((s) => s.updateUser)
     const queryClient = getQueryClient()
 
     return useMutation({
@@ -53,7 +50,8 @@ export const useUpdateMe = ({
                 }
             })
 
-            onSuccess?.(data)
+            updateUser(data)
+            onSuccess?.()
             toast.success(t("success.update"))
         },
         onError: (error: BackendError) => {

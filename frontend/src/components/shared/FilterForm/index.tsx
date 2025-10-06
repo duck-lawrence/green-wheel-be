@@ -60,9 +60,14 @@ export function FilterVehicleRental() {
             zonedNow.second
         )
 
+        const isAfterMax = nowTime.hour + 3 >= MAX_HOUR
+        const isBeforeMin = nowTime.hour + 3 < MIN_HOUR
+
         const initialStart =
-            nowTime.hour + 3 >= MAX_HOUR
-                ? nowTime.add({ days: 1 }).set({ hour: MIN_HOUR, minute: 0, second: 0 })
+            isBeforeMin || isAfterMax
+                ? nowTime
+                      .add({ days: isAfterMax ? 1 : 0 })
+                      .set({ hour: MIN_HOUR, minute: 0, second: 0 })
                 : nowTime.set({ hour: nowTime.hour + 3, second: 0 })
 
         return {
