@@ -15,5 +15,6 @@ export type VehicleModelViewRes = {
     sportRangeKm: number
     brand: Brand
     segment: VehicleSegment
+    imageUrls?: string[]
     availableVehicleCount: number
 }

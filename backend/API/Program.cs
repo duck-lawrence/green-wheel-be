@@ -107,6 +107,7 @@ namespace API
             //UOW
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             builder.Services.AddScoped<IInvoiceUow, InvoiceUow>();
+            builder.Services.AddScoped<IModelImageUow, ModelImageUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi

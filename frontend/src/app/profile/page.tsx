@@ -12,6 +12,7 @@ import {
 import { parseDate } from "@internationalized/date"
 import {
     useAvatarUploadDiscloresureSingleton,
+    useDay,
     useDeleteAvatar,
     useProfileStore,
     useUpdateMe
@@ -24,13 +25,13 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { Sex } from "@/constants/enum"
 import { SexLabels } from "@/constants/labels"
-import dayjs from "dayjs"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 import { DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react"
 import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 
 export default function Page() {
     const { t } = useTranslation()
+    const { formatDateTime } = useDay({})
     const user = useProfileStore((s) => s.user)
     const updateUser = useProfileStore((s) => s.updateUser)
     const updateMeMutation = useUpdateMe({ onSuccess: updateUser })
@@ -300,15 +301,13 @@ export default function Page() {
                                         ? parseDate(updateMeFormik.values.dateOfBirth.split("T")[0]) // ✅ convert string → DateValue
                                         : null
                                 }
-                                onChange={(val) => {
-                                    if (!val) {
+                                onChange={(value) => {
+                                    if (!value) {
                                         updateMeFormik.setFieldValue("dateOfBirth", null)
                                         return
                                     }
 
-                                    const dob = val
-                                        ? dayjs(val.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
-                                        : ""
+                                    const dob = formatDateTime({ value })
 
                                     updateMeFormik.setFieldValue("dateOfBirth", dob)
                                 }}

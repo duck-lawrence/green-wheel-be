@@ -13,7 +13,9 @@ namespace Application.Constants
         {
             //auth
             public const string MissingToken = "user.missing_token";
+
             public const string UserIdIsRequired = "user.user_id_is_required";
+
             //otp
             public const string InvalidOTP = "user.invalid_otp";
 
@@ -37,7 +39,7 @@ namespace Application.Constants
             public const string LastNameIsRequired = "user.last_name_is_required";
             public const string DateOfBirthIsRequired = "user.date_of_birth_require";
             public const string PhoneAlreadyExist = "user.phone_already_exist";
-            
+
             //change password
             public const string DoNotHavePermission = "user.do_not_have_permission";
 
@@ -53,11 +55,11 @@ namespace Application.Constants
 
             //change avatar
             public const string NotFoundAvatar = "No avatar to delete";
+
             //Citizen Identity
             public const string NotHaveCitizenIdentity = "user.not_have_citizen_identity";
+
             public const string NotHaveDriverLicense = "user.not_have_driver_license";
-
-
         }
 
         //Common error
@@ -78,6 +80,7 @@ namespace Application.Constants
             public const string VehicleNotFound = "vehicle.vehicle_not_found";
             public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
         }
+
         public static class VehicleModelMessage
         {
             public const string VehicleModelNotFound = "vehicle_model.vehicle_model_not_found";
@@ -126,6 +129,7 @@ namespace Application.Constants
         {
             public const string StationNotFound = "station.station_not_found";
         }
+
         public static class MomoMessage
         {
             public const string InvalidSignature = "momo.invalid_signature";
@@ -140,10 +144,12 @@ namespace Application.Constants
             public const string InvoiceNotFound = "invoice.invoice_not_found";
             public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
         }
+
         public static class JsonMessage
         {
             public const string ParsingFailed = "json.pasing_failed";
         }
+
         public static class VehicleSegmentMessage
         {
             public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
@@ -157,7 +163,7 @@ namespace Application.Constants
         }
 
         //VEHICLE IMAGE
-        public static class ModelImage
+        public static class ModelImageMessage
         {
             public const string ModelImageNotFound = "model_image.not_found";
             public const string InvalidModelId = "model_image.invalid_model_id";
@@ -167,7 +173,7 @@ namespace Application.Constants
         }
 
         //upload
-        public static class Upload
+        public static class UploadMessage
         {
             public const string EmptyFile = "upload.empty_file";
             public const string InvalidFile = "upload.invalid_file";

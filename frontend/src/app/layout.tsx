@@ -36,10 +36,10 @@ export default async function RootLayout({
 
     return (
         <html lang={locale} className={`${geistSans.variable} ${geistMono.variable}`}>
-            <body className="antialiased bg-[#f4f4f4] diamondBackground">
+            <body className="antialiased bg-secondary diamondBackground">
                 <AppProviders locale={locale}>
                     <ClientHydration>
-                        <div className="min-h-screen flex flex-col items-stretch w-full">
+                        <div className="min-h-screen flex flex-col items-center pt-25">
                             <Navbar />
                             {children}
                         </div>
@@ -52,5 +52,3 @@ export default async function RootLayout({
         </html>
     )
 }
-
-
