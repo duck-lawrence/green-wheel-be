@@ -25,6 +25,9 @@ namespace Application.Mappers
             CreateMap<UserRegisterReq, User>()
                 .ForMember(dest => dest.Password,
                            opt => opt.MapFrom(src => PasswordHelper.HashPassword(src.Password)));
+
+            CreateMap<User, UserProfileViewRes>();
+            CreateMap<CreateUserReq, User>();
         }
     }
 }

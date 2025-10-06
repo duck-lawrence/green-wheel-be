@@ -6,6 +6,8 @@ using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using API.Filters;
+using Application;
 
 namespace API.Controllers
 {
@@ -56,7 +58,7 @@ namespace API.Controllers
                 await _userService.Logout(refreshToken);
                 return Ok();
             }
-            return Unauthorized(Message.User.Unauthorized);
+            return Unauthorized(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -109,7 +111,7 @@ namespace API.Controllers
             }
             else
             {
-                return Unauthorized(Message.User.InvalidToken);
+                return Unauthorized(Message.UserMessage.InvalidToken);
             }
         }
 
@@ -126,7 +128,7 @@ namespace API.Controllers
         {
             if (userChangePasswordDto.OldPassword == null)
             {
-                return BadRequest(Message.User.OldPasswordIsRequired);
+                return BadRequest(Message.UserMessage.OldPasswordIsRequired);
             }
             var user = HttpContext.User;
             await _userService.ChangePassword(user, userChangePasswordDto);
@@ -176,7 +178,7 @@ namespace API.Controllers
                 await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
                 return Ok();
             }
-            return Unauthorized(Message.User.InvalidToken);
+            return Unauthorized(Message.UserMessage.InvalidToken);
         }
 
         /*
@@ -197,7 +199,7 @@ namespace API.Controllers
                     AccessToken = accessToken
                 });
             }
-            return Unauthorized(Message.User.Unauthorized);
+            return Unauthorized(Message.UserMessage.Unauthorized);
         }
 
         [HttpPost("login-google")]
@@ -269,7 +271,7 @@ namespace API.Controllers
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _userService.DeleteAvatarAsync(userId);
 
-            return Ok(new { Message = Message.Cloudinary.DeleteSuccess });
+            return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
         [HttpPost("citizen-identities")]
@@ -328,5 +330,60 @@ namespace API.Controllers
 
             return Ok(result);
         }
+
+        //Create anonymouse account
+        [RoleAuthorize("Staff")]
+        [HttpPost("anonymous")]
+        public async Task<IActionResult> CreateAnonymouseAccount([FromForm] CreateUserReq req)
+        {
+            var userId = await _userService.CreateAnounymousAccount(req);
+            return Ok(userId);
+        }
+
+        //upload citizenId for Anonymous
+        [HttpPost("{id}/citizen-identity")]
+        [RoleAuthorize("Staff")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadCitizenIdForAnonymous(Guid id, [FromForm] IFormFile file)
+        { 
+            var citizenIdentity = await _userService.UploadCitizenIdAsync(id, file);
+            return Ok(citizenIdentity);
+        }
+
+        [HttpPost("{id}/driver-license")]
+        [RoleAuthorize("Staff")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadDriverLicenseForAnonymous(Guid id, [FromForm] IFormFile file)
+        {
+            var driverLisence = await _userService.UploadDriverLicenseAsync(id, file);
+            return Ok(driverLisence);
+        }
+        /*
+         * Status code
+         * 200 success
+         * 404 not found
+         */
+        [HttpGet("/phone/{phone}")]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> GetUserByPhone(string phone)
+        {
+            var user = await _userService.GetUserByPhoneAsync(phone);
+            return Ok(user);
+        }
+
+        /*
+         * Status code
+         * 200 success
+         */
+        [HttpGet()]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> GetAll ()
+        {
+            var users = await _userService.GetAllUsers();
+            return Ok(users);
+        }
+
     }
 }

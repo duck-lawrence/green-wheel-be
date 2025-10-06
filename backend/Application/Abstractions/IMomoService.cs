@@ -10,7 +10,7 @@ namespace Application.Abstractions
 {
     public interface IMomoService
     {
-        Task<string> CreatePaymentAsync(CreateMomoPaymentReq req);
+        Task<string> CreatePaymentAsync(decimal amount, Guid invoiceId, string description);
         Task VerifyMomoIpnReq(MomoIpnReq req);
     }
 }

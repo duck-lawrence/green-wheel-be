@@ -61,5 +61,8 @@ namespace Application.Abstractions
         Task<object?> GetMyCitizenIdentityAsync(Guid userId);
 
         Task<object?> GetMyDriverLicenseAsync(Guid userId);
+        Task<Guid> CreateAnounymousAccount(CreateUserReq req);
+        Task<User> GetUserByPhoneAsync(string phone);
+        Task<IEnumerable<User>> GetAllUsers();
     }
 }
