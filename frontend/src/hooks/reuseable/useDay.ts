@@ -16,15 +16,15 @@ export const useDay = ({
     }
 
     const formatDateTime = ({
-        value,
+        date,
         timeZone = DEFAULT_TIMEZONE
     }: {
-        value: DateValue
+        date: DateValue
         timeZone?: string
     }) => {
-        if (!value) return ""
-        const date = dayjs(value.toDate(timeZone))
-        return date.format(defaultFormat)
+        if (!date) return ""
+        const dateJs = dayjs(date.toDate(timeZone))
+        return dateJs.format(defaultFormat)
     }
 
     return { toCalenderDateTime, formatDateTime }

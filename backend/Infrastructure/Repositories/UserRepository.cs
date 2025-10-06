@@ -39,7 +39,8 @@ namespace Infrastructure.Repositories
             // added: eager load role to expose its metadata for clients
             return await _dbContext.Users
                 .Include(user => user.Role)
-                .Include(user => user.Staff)
+                .Include(user => user.Staff!)
+                    .ThenInclude(staff => staff.Station)
                 .FirstOrDefaultAsync(user => user.Id == id);
         }
     }

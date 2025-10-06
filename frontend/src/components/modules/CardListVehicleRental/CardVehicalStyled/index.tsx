@@ -39,7 +39,7 @@ export default function CardVehicalStyled({ vehicleModel }: { vehicleModel: Vehi
                         className="w-[300px] object-cover h-[280px] shadow-lg"
                         radius="lg"
                         shadow="sm"
-                        src={vehicleModel.imageUrls && vehicleModel.imageUrls[0]}
+                        src={vehicleModel.imageUrl && vehicleModel.imageUrl}
                         width="100%"
                     />
                     {vehicleModel.availableVehicleCount === 0 && (
