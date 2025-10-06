@@ -41,7 +41,12 @@ const nextConfig: NextConfig = {
             },
             {
                 protocol: "https",
-                hostname: "img.pikbest.com",
+                hostname: "baovephapluat.vn",
+                pathname: "/**"
+            },
+            {
+                protocol: "https",
+                hostname: "sohanews.sohacdn.com",
                 pathname: "/**"
             }
         ]
