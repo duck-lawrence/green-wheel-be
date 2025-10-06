@@ -15,7 +15,7 @@ namespace Application.Mappers
         {
             CreateMap<Invoice, InvoiceViewRes>()
                 .ForMember(dest => dest.Total,
-                otp => otp.MapFrom(src => src.Subtotal * src.Tax));
+                otp => otp.MapFrom(src => src.Subtotal + src.Subtotal * src.Tax));
                 
             
         }

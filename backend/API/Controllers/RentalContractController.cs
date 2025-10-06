@@ -5,6 +5,8 @@ using Application.Constants;
 using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.WebSockets;
+using System.Runtime.CompilerServices;
 
 namespace API.Controllers
 {
@@ -12,11 +14,14 @@ namespace API.Controllers
     [ApiController]
     public class RentalContractController : ControllerBase
     {
-        
+
         private readonly IRentalContractService _rentalContractService;
-        public RentalContractController(IRentalContractService rentalContractService)
+        
+        public RentalContractController(IRentalContractService rentalContractService
+            )
         {
             _rentalContractService = rentalContractService;
+            
         }
         /*
          status code
@@ -67,10 +72,12 @@ namespace API.Controllers
          */
         [HttpPut("{id}/reject")]
         [RoleAuthorize("Staff")]
-        public async Task<IActionResult> RejectRentalContract(Guid id)
+        public async Task<IActionResult> RejectRentalContract(Guid id, [FromBody] int vehicleStatus)
         {
-            await _rentalContractService.VerifyRentalContract(id, false);
+            await _rentalContractService.VerifyRentalContract(id, false, vehicleStatus);
             return Ok();
         }
+
+        
     }
 }

@@ -28,14 +28,14 @@ namespace Application
             _momoPaymentLinkRepositorys = momoPaymentLinkRepositorys;
             _invoiceRepository = invoiceRepository;
         }
-        public async Task<string> CreatePaymentAsync(CreateMomoPaymentReq req)
+        public async Task<string> CreatePaymentAsync(decimal amount, Guid invoiceId, string description)
         {
-            var paymentLink = await _momoPaymentLinkRepositorys.GetPaymentLinkAsync(req.InvoiceId.ToString());
+            var paymentLink = await _momoPaymentLinkRepositorys.GetPaymentLinkAsync(invoiceId.ToString());
             if(!string.IsNullOrEmpty(paymentLink))
             {
                 return paymentLink;
             }
-            var invoice = await _invoiceRepository.GetByIdAsync(req.InvoiceId);
+            var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
             if(invoice == null)
             {
                 throw new NotFoundException(Message.Invoice.InvoiceNotFound);
@@ -48,11 +48,11 @@ namespace Application
             
             var rawData =
                     $"accessKey={_momoSettings.AccessKey}" +
-                    $"&amount={req.Amount.ToString("0", CultureInfo.InvariantCulture)}" +
+                    $"&amount={amount.ToString("0", CultureInfo.InvariantCulture)}" +
                     $"&extraData={""}" +
                     $"&ipnUrl={_momoSettings.IpnUrl}" +
-                    $"&orderId={req.InvoiceId}" +
-                    $"&orderInfo={req.InvoiceDescription}" +
+                    $"&orderId={invoiceId}" +
+                    $"&orderInfo={description}(Invoice ID: {invoiceId})" +
                     $"&partnerCode={_momoSettings.PartnerCode}" +
                     $"&redirectUrl={_momoSettings.RedirectUrl}" +
                     $"&requestId={requestId}" +
@@ -67,9 +67,9 @@ namespace Application
             {
                 PartnerCode = _momoSettings.PartnerCode,
                 RequestId = requestId,
-                Amount = req.Amount.ToString("0"),
-                OrderId = req.InvoiceId.ToString(),
-                OrderInfo = req.InvoiceDescription,
+                Amount = amount.ToString("0"),
+                OrderId = invoiceId.ToString(),
+                OrderInfo = $"{description}(Invoice ID: {invoiceId})",
                 RedirectUrl = _momoSettings.RedirectUrl,
                 IpnUrl = _momoSettings.IpnUrl,
                 RequestType = _momoSettings.RequestType,
@@ -116,7 +116,7 @@ namespace Application
                 throw new Exception(Message.Momo.FailedToCreateMomoPayment);
             }
             //save to redis
-            await _momoPaymentLinkRepositorys.SavePaymentLinkPAsyns(req.InvoiceId.ToString(), momoResponse.ShortLink);
+            await _momoPaymentLinkRepositorys.SavePaymentLinkPAsyns(invoiceId.ToString(), momoResponse.ShortLink);
             return momoResponse.ShortLink;
         }
 

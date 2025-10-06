@@ -134,7 +134,7 @@ namespace Application
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow,
                 DeletedAt = null,
-                Notes = "System generated invoice for rental contract"
+                Notes = $"GreenWheel – Invoice for your order {contractId}"
             };
             await _uow.Invoices.AddAsync(invoice);
 
@@ -204,7 +204,7 @@ namespace Application
         }
 
         
-        public async Task VerifyRentalContract(Guid id, bool hasVehicle = true)
+        public async Task VerifyRentalContract(Guid id, bool hasVehicle = true, int? vehicleStatus = null)
         {
             var rentalContract = await _uow.RentalContracts.GetByIdAsync(id);
             if (rentalContract == null)
@@ -263,6 +263,11 @@ namespace Application
                 subject = "[GreenWheel] Vehicle Unavailable, Booking Cancelled";
                 templatePath = Path.Combine(basePath, "Templates", "CancelRentalContractEmailTempate.html");
                 body = System.IO.File.ReadAllText(templatePath);
+                if(vehicleStatus != null)
+                {
+                    vehicle.Status = (int)vehicleStatus;
+                    await _uow.Vehicles.UpdateAsync(vehicle);
+                }
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
                            .Replace("{VehicleModelName}", vehicleModel.Name)
                            .Replace("{StationName}", station.Name)
@@ -270,7 +275,7 @@ namespace Application
                            .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"));
             }
              await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
-
+            await _uow.SaveChangesAsync();
         }
     }
 }

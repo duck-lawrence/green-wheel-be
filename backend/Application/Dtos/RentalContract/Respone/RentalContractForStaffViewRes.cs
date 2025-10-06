@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Application.Dtos.Invoice.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,7 @@ namespace Application.Dtos.RentalContract.Respone
 
         public DateTimeOffset? ActualEndDate { get; set; }
 
+        public IEnumerable<InvoiceViewRes> Invoices { get; set; }
         public bool IsSignedByStaff { get; set; }
 
         public bool IsSignedByCustomer { get; set; }

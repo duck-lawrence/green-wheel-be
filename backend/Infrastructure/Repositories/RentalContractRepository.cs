@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,6 +26,10 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<RentalContract>> GetByStatus(int status)
         {
+            var rentalContracts = await _dbContext.RentalContracts.Where(rc => rc.Status == status)
+                .Include(x => x.Invoices)
+                .AsQueryable()
+                .ToListAsync();
             return await _dbContext.RentalContracts.Where(rc => rc.Status == status).ToArrayAsync();
         }
 

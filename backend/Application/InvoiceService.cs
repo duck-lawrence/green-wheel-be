@@ -22,15 +22,35 @@ namespace Application
 
         }
 
-        public async Task<Invoice> GetInvoiceById(Guid id)
+        public async Task CashPayment(Invoice invoice)
         {
-            var invoice = await _uow.InvoiceRepository.GetByIdAsync(id);
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
+            if(contract == null)
+            {
+                throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
+            }
+            if(contract.Status != (int)RentalContractStatus.PaymentPending)
+            {
+                throw new BadRequestException(Message.RentalContract.ThisRentalContractAlreadyProcess);
+            }
+            contract.Status = (int)RentalContractStatus.Active;
+            invoice.PaymentMethod = (int)PaymentMethod.Cash;
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+            await _uow.InvoiceRepository.UpdateAsync(invoice);
+            await _uow.SaveChangesAsync();
+        }
+
+        public async Task<Invoice> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if(invoice == null)
             {
                 throw new NotFoundException(Message.Invoice.InvoiceNotFound);
             }
             return invoice;
         }
+
+        
 
         public async Task ProcessUpdateInvoice(MomoIpnReq momoIpnReq, Guid invoiceId)
         {
@@ -57,5 +77,7 @@ namespace Application
                 await _uow.SaveChangesAsync();
             }
         }
+
+
     }
 }
