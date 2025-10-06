@@ -1,4 +1,6 @@
-﻿using Application.Abstractions;
+﻿using Application;
+using Application.Abstractions;
+using Application.Dtos.Common.Request;
 using Application.Dtos.Momo.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +22,11 @@ namespace API.Controllers
 
         /*
          * status code
-         * 400 invalid signature 
+         * 400 invalid signature
          * 200 success
          * 404 not found
          */
+
         [HttpPost("process-update")]
         public async Task<IActionResult> ProcessUpdateInvoice([FromBody] MomoIpnReq req)
         {
@@ -37,12 +40,19 @@ namespace API.Controllers
          * 200 success
          * 400 invoice not found
          */
-        
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetInvoiceById(Guid id)
         {
             var invoice = await _invoiceItemService.GetInvoiceById(id);
             return Ok(invoice);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
+        {
+            var result = await _invoiceItemService.GetAllInvoicesAsync(pagination);
+            return Ok(result);
         }
     }
 }

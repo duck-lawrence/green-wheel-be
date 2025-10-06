@@ -11,14 +11,11 @@ using Application.Validators.User;
 using CloudinaryDotNet;
 using DotNetEnv;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Infrastructure.Interceptor;
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 
 namespace API
 {
