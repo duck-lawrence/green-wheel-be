@@ -72,14 +72,14 @@ export function FilterVehicleRental({
         onSubmit: (values) => {
             console.log("Booking values item:", {
                 stationId: values.stationId,
-                start: values.start.toDate(getLocalTimeZone()).toISOString(),
-                end: values.end.toDate(getLocalTimeZone()).toISOString()
+                start: values.start.toDate(getLocalTimeZone()),
+                end: values.end.toDate(getLocalTimeZone())
             })
 
             onFilterChange(
                 values.stationId,
-                values.start.toDate(getLocalTimeZone()).toISOString(),
-                values.end.toDate(getLocalTimeZone()).toISOString()
+                values.start.toDate(getLocalTimeZone()).toString(),
+                values.end.toDate(getLocalTimeZone()).toString()
             )
         }
     })
