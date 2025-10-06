@@ -22,7 +22,7 @@ namespace Infrastructure.UnitOfWorks
         public IInvoiceRepository Invoices { get; }
         public IInvoiceItemRepository InvoiceItems { get; }
         public IDepositRepository Deposits { get; }
-        public IVehicleImageRepository VehicleImages { get; }
+        public IModelImageRepository ModelImages { get; }
 
         public RentalContractUow(
         IGreenWheelDbContext context,
@@ -34,7 +34,7 @@ namespace Infrastructure.UnitOfWorks
         IInvoiceItemRepository invoiceItemRepository,
         IDepositRepository depositRepository,
         IStationRepository stationRepository,
-        IVehicleImageRepository vehicleImages)
+        IModelImageRepository modelImageRepository)
         {
             _context = context;
             Vehicles = vehicleRepository;
@@ -45,7 +45,7 @@ namespace Infrastructure.UnitOfWorks
             Deposits = depositRepository;
             Stations = stationRepository;
             InvoiceItems = invoiceItemRepository;
-            VehicleImages = vehicleImages;
+            ModelImages = modelImageRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
