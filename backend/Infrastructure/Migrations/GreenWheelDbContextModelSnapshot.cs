@@ -4,7 +4,6 @@ using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,11 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251005164304_refactorDB")]
-    partial class refactorDB
+    partial class GreenWheelDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1474,6 +1471,14 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("EcoRangeKm")
                         .HasColumnType("decimal(6, 1)")
                         .HasColumnName("eco_range_km");
+
+                    b.Property<string>("ImagePublicId")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("image_public_id");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("image_url");
 
                     b.Property<decimal>("MotorPower")
                         .HasColumnType("decimal(5, 1)")

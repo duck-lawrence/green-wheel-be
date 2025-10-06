@@ -21,7 +21,7 @@ namespace Application
         {
             if(await _vehicleRepository.GetByLicensePlateAsync(createVehicleReq.LicensePlate) != null)
             {
-                throw new ConflictDuplicateException(Message.Vehicle.LicensePlateIsExist);
+                throw new ConflictDuplicateException(Message.VehicleMessage.LicensePlateIsExist);
             }
             var vehicle = _mapper.Map<Vehicle>(createVehicleReq);
             Guid id;
@@ -51,7 +51,7 @@ namespace Application
             var vehicleFromDb = await _vehicleRepository.GetByIdAsync(Id);
             if(vehicleFromDb == null)
             {
-                throw new NotFoundException(Message.Vehicle.VehicleNotFound);
+                throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
             }
             if(updateVehicleReq.LicensePlate != null)
             {

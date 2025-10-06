@@ -28,9 +28,8 @@ namespace Infrastructure.Repositories
         {
             var rentalContracts = await _dbContext.RentalContracts.Where(rc => rc.Status == status)
                 .Include(x => x.Invoices)
-                .AsQueryable()
                 .ToListAsync();
-            return await _dbContext.RentalContracts.Where(rc => rc.Status == status).ToArrayAsync();
+            return rentalContracts;
         }
 
         public async Task<bool> HasActiveContractAsync(Guid customerId)

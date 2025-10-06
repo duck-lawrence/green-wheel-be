@@ -53,7 +53,7 @@ namespace Application
             var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate);
             if(vehicleModelViewRes == null)
             {
-                throw new NotFoundException(Message.VehicleModel.VehicleModelNotFound);
+                throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
             }
             return vehicleModelViewRes;
         }
@@ -63,7 +63,7 @@ namespace Application
             var vehicleModelFromDB = await _vehicleModelRepository.GetByIdAsync(Id);
             if(vehicleModelFromDB == null)
             {
-                throw new NotFoundException(Message.VehicleModel.VehicelModelNotFound);
+                throw new NotFoundException(Message.VehicleModelMessage.VehicelModelNotFound);
             }
             if(updateVehicleModelReq.Name != null)
             {

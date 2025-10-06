@@ -24,9 +24,9 @@ namespace Application.Dtos.VehicleModel.Respone
         public decimal EcoRangeKm { get; set; }
 
         public decimal SportRangeKm { get; set; }
-
+        public string? ImageUrl { get; set; }
         public Brand Brand { get; set; } = null!;
-        public IEnumerable<string>? ImageUrls { get; set; } 
+        public IEnumerable<string> ImageUrls { get; set; } = [];
         public Domain.Entities.VehicleSegment Segment { get; set; } = null!;
         public int AvailableVehicleCount { get; set; }
     }

@@ -12,7 +12,7 @@ namespace Application.Abstractions
 {
     public interface IRentalContractService
     {
-        Task<RentalContractViewRes> CreateRentalContractAsync(ClaimsPrincipal userClaim, CreateRentalContractReq createRentalContractReq);
+        Task<RentalContractViewRes> CreateRentalContractAsync(Guid UserID, CreateRentalContractReq createRentalContractReq);
         Task<IEnumerable<RentalContractForStaffViewRes>> GetByStatus(int status);
          Task VerifyRentalContract(Guid id, bool haveVehicle = true, int? vehicleStatus = null);
         Task UpdateStatus(RentalContract rentalContract, int status);

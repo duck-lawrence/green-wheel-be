@@ -23,7 +23,10 @@ namespace Infrastructure.Repositories
 
         public async Task<User?> GetByPhoneAsync(string phone)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(user => user.Phone == phone);
+            var user = await _dbContext.Users
+                .Include(x => x.CitizenIdentity)
+                .Include(x => x.DriverLicense).FirstOrDefaultAsync(x => x.Phone == phone);
+            return user;
         }
     }
 }

@@ -17,5 +17,6 @@ namespace Application.Dtos.User.Respone
         public string? Phone { get; set; }
         public string? LicenseUrl { get; set; }
         public string? CitizenUrl { get; set; }
+        
     }
 }

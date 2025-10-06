@@ -16,14 +16,14 @@ namespace Application.Validators.User
         {
            
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage(Message.User.PasswordCanNotEmpty)
-                .MinimumLength(6).WithMessage(Message.User.PasswordTooShort);
+                .NotEmpty().WithMessage(Message.UserMessage.PasswordCanNotEmpty)
+                .MinimumLength(6).WithMessage(Message.UserMessage.PasswordTooShort);
 
             RuleFor(x => x.ConfirmPassword)
-                .Equal(x => x.Password).WithMessage(Message.User.ConfirmPasswordIsIncorrect);
+                .Equal(x => x.Password).WithMessage(Message.UserMessage.ConfirmPasswordIsIncorrect);
 
             RuleFor(x => x.DateOfBirth)
-                .NotEmpty().WithMessage(Message.User.DateOfBirthIsRequired)
+                .NotEmpty().WithMessage(Message.UserMessage.DateOfBirthIsRequired)
                 .Must(dob =>
                 {
                     var today = DateTime.Now;
@@ -34,12 +34,12 @@ namespace Application.Validators.User
                         age--;
                     }
                     return age >= 21;
-                }).WithMessage(Message.User.InvalidUserAge);
+                }).WithMessage(Message.UserMessage.InvalidUserAge);
 
             RuleFor(x => x.Phone)
-                .NotEmpty().WithMessage(Message.User.PhoneIsRequired)
+                .NotEmpty().WithMessage(Message.UserMessage.PhoneIsRequired)
                 .Matches(@"^(?:\+84|0)(?:3\d|5[6-9]|7\d|8[1-9]|9\d)\d{7}$")
-                .WithMessage(Message.User.InvalidPhone);
+                .WithMessage(Message.UserMessage.InvalidPhone);
         }
     }
 }

@@ -38,11 +38,11 @@ namespace Application
             var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
             if(invoice == null)
             {
-                throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
             if (invoice.Status == (int)InvoiceStatus.Paid || invoice.Status == (int)InvoiceStatus.Cancelled)
             {
-                throw new BadRequestException(Message.Invoice.ThisInvoiceWasPaidOrCancel);
+                throw new BadRequestException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             }
             var requestId = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
             
@@ -85,19 +85,19 @@ namespace Application
             {
                 if((int)response.StatusCode == 400)
                 {
-                    throw new BadRequestException(Message.Momo.InvalidSignature);
+                    throw new BadRequestException(Message.MomoMessage.InvalidSignature);
                 }
                 if ((int)response.StatusCode == 401)
                 {
-                    throw new UnauthorizedAccessException(Message.Momo.MissingAccessKeyPartnerCodeSecretKey);
+                    throw new UnauthorizedAccessException(Message.MomoMessage.MissingAccessKeyPartnerCodeSecretKey);
                 }
                 if ((int)response.StatusCode == 403)
                 {
-                    throw new BadRequestException(Message.Momo.NotHavePermission);
+                    throw new BadRequestException(Message.MomoMessage.NotHavePermission);
                 }
                 if ((int)response.StatusCode == 404)
                 {
-                    throw new BadRequestException(Message.Momo.InvalidEndpoint);
+                    throw new BadRequestException(Message.MomoMessage.InvalidEndpoint);
                 }
 
             }
@@ -108,12 +108,12 @@ namespace Application
             
             if (momoResponse == null)
             {
-                throw new Exception(Message.Json.ParsingFailed);
+                throw new Exception(Message.JsonMessage.ParsingFailed);
             }
 
             if (momoResponse.ResultCode != 0)
             {
-                throw new Exception(Message.Momo.FailedToCreateMomoPayment);
+                throw new Exception(Message.MomoMessage.FailedToCreateMomoPayment);
             }
             //save to redis
             await _momoPaymentLinkRepositorys.SavePaymentLinkPAsyns(invoiceId.ToString(), momoResponse.ShortLink);

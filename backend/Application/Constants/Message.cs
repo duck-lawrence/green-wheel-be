@@ -9,10 +9,11 @@ namespace Application.Constants
     public static class Message
     {
         //Register
-        public static class User
+        public static class UserMessage
         {
             //auth
             public const string MissingToken = "user.missing_token";
+            public const string UserIdIsRequired = "user.user_id_is_required";
             //otp
             public const string InvalidOTP = "user.invalid_otp";
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
@@ -33,6 +34,7 @@ namespace Application.Constants
             public const string LastNameIsRequired = "user.last_name_is_required";
             public const string DateOfBirthIsRequired = "user.date_of_birth_require";
             public const string PhoneAlreadyExist = "user.phone_already_exist";
+            
             //change password
             public const string DoNotHavePermission = "user.do_not_have_permission";
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
@@ -44,23 +46,26 @@ namespace Application.Constants
             public const string UserNotFound = "user.user_not_found";
             //change avatar
             public const string NotFoundAvatar = "No avatar to delete";
+            //Citizen Identity
+            public const string NotHaveCitizenIdentity = "user.not_have_citizen_identity";
+            public const string NotHaveDriverLicense = "user.not_have_driver_license";
 
 
         }
 
         //Common error
-        public static class Common
+        public static class CommonMessage
         {
             public const string TooManyRequest = "common.too_many_request";
             public const string UnexpectedError = "common.unexpected_error";
         }
 
-        public static class Vehicle
+        public static class VehicleMessage
         {
             public const string VehicleNotFound = "vehicle.vehicle_not_found";
             public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
         }
-        public static class VehicleModel
+        public static class VehicleModelMessage
         {
             public const string VehicleModelNotFound = "vehicle_model.vehicle_model_not_found";
             public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
@@ -84,7 +89,7 @@ namespace Application.Constants
         //change password
 
         //Cloudinary
-        public static class Cloudinary
+        public static class CloudinaryMessage
         {
             public const string NotFoundObjectInFile = "cloudinary.file_not_found";
             public const string InvalidFileType = "cloudinary.invalid_file_type";
@@ -93,7 +98,7 @@ namespace Application.Constants
         }
 
         //Rental Contract
-        public static class RentalContract
+        public static class RentalContractMessage
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
@@ -101,11 +106,11 @@ namespace Application.Constants
         }
 
         //Station
-        public static class Station
+        public static class StationMessage
         {
             public const string StationNotFound = "station.station_not_found";
         }
-        public static class Momo
+        public static class MomoMessage
         {
             public const string InvalidSignature = "momo.invalid_signature";
             public const string MissingAccessKeyPartnerCodeSecretKey = "momo.missing_access_key_partner_code_secret_key";
@@ -115,22 +120,22 @@ namespace Application.Constants
 
         }
 
-        public static class Invoice
+        public static class InvoiceMessage
         {
             public const string InvoiceNotFound = "invoice.invoice_not_found";
             public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
         }
-        public static class Json
+        public static class JsonMessage
         {
             public const string ParsingFailed = "json.pasing_failed";
 
         }
-        public static class VehicleSegment
+        public static class VehicleSegmentMessage
         {
             public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
         }
         //Licenses
-        public static class Licenses
+        public static class LicensesMessage
         {
             public const string InvalidLicenseData = "licenses.invalid_license_data";
         }

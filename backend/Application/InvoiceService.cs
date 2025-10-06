@@ -27,11 +27,11 @@ namespace Application
             var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
             if(contract == null)
             {
-                throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
+                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             }
             if(contract.Status != (int)RentalContractStatus.PaymentPending)
             {
-                throw new BadRequestException(Message.RentalContract.ThisRentalContractAlreadyProcess);
+                throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
             }
             contract.Status = (int)RentalContractStatus.Active;
             invoice.PaymentMethod = (int)PaymentMethod.Cash;
@@ -45,7 +45,7 @@ namespace Application
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if(invoice == null)
             {
-                throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
             return invoice;
         }
@@ -59,12 +59,12 @@ namespace Application
                 var invoice = await _uow.InvoiceRepository.GetByIdAsync(invoiceId);
                 if(invoice == null)
                 {
-                    throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                    throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
                 }
                 var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
                 if(rentalContract == null)
                 {
-                    throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
+                    throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
                 }
                 rentalContract.Status = (int)RentalContractStatus.Active;
                 invoice.Status = (int)InvoiceStatus.Paid;

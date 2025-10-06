@@ -16,6 +16,7 @@ namespace Application.Mappers
                            opt => opt.MapFrom(src => PasswordHelper.HashPassword(src.Password)));
 
             CreateMap<User, UserProfileViewRes>();
+            CreateMap<CreateUserReq, User>();
         }
             
     }
