@@ -503,11 +503,8 @@ namespace Application
             // added: include role data when retrieving staff profile
             // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
             // giúp useAuth ở frontend biết chắc user có role “staff”.
-            User? userFromDb = await _userRepository.GetByIdWithRoleAsync(userID);
-            if (userFromDb == null)
-            {
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
-            }
+            User? userFromDb = await _userRepository.GetByIdWithFullInfoAsync(userID)
+                ?? throw new NotFoundException(Message.UserMessage.UserNotFound);
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
 

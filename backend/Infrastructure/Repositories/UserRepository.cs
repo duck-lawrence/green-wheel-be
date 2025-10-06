@@ -34,12 +34,15 @@ namespace Infrastructure.Repositories
         // Bây giờ UserService.GetMe gọi hàm mới, nhờ đó JSON phản hồi có role, roleId, roleDetail, stationId. (Phúc thêm)
         // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
         // giúp useAuth ở frontend biết chắc user có role “staff”.
-        public async Task<User?> GetByIdWithRoleAsync(Guid id)
+        public async Task<User?> GetByIdWithFullInfoAsync(Guid id)
         {
             // added: eager load role to expose its metadata for clients
             return await _dbContext.Users
                 .Include(user => user.Role)
+                .Include(user => user.DriverLicense)
+                .Include(user => user.CitizenIdentity)
                 .Include(user => user.Staff)
+                    .ThenInclude(staff => staff.Station)
                 .FirstOrDefaultAsync(user => user.Id == id);
         }
     }

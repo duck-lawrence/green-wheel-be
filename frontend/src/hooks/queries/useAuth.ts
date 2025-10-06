@@ -1,13 +1,11 @@
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { authApi } from "@/services/authApi"
-import { profileApi } from "@/services/profileApi"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { BackendError } from "@/models/common/response"
-import { UserProfileViewRes } from "@/models/user/schema/response"
+// import { UserProfileViewRes } from "@/models/user/schema/response"
+import { useInvalidateMeQuery, useProfileStore, useTokenStore } from "@/hooks"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
-import { useProfileStore, useTokenStore } from "@/hooks"
-import { QUERY_KEY } from "@/constants/queryKey"
 
 // ===== Login and logout =====
 export const useLogin = ({
@@ -19,7 +17,7 @@ export const useLogin = ({
 }) => {
     const { t } = useTranslation()
     const setAccessToken = useTokenStore((s) => s.setAccessToken)
-    const invalidateAuthQuery = useInvalidateAuthQuery()
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.login,
@@ -41,7 +39,7 @@ export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
     const removeUser = useProfileStore((s) => s.removeUser)
-    const invalidateAuthQuery = useInvalidateAuthQuery()
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.logout,
@@ -72,7 +70,7 @@ export const useLoginGoogle = ({
     const { t } = useTranslation()
     const setAccessToken = useTokenStore((s) => s.setAccessToken)
     const setUser = useProfileStore((s) => s.setUser)
-    const invalidateAuthQuery = useInvalidateAuthQuery()
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.loginGoogle,
@@ -102,7 +100,7 @@ export const useLoginGoogle = ({
 export const useSetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const setAccessToken = useTokenStore((s) => s.setAccessToken)
-    const invalidateAuthQuery = useInvalidateAuthQuery()
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.setPassword,
@@ -152,7 +150,7 @@ export const useRegisterVerify = ({ onSuccess }: { onSuccess?: () => void }) => 
 export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const setAccessToken = useTokenStore((s) => s.setAccessToken)
-    const invalidateAuthQuery = useInvalidateAuthQuery()
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.regsiterComplete,
@@ -220,12 +218,14 @@ export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => 
     const { t } = useTranslation()
     const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
     const removeUser = useProfileStore((s) => s.removeUser)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.changePassword,
         onSuccess: () => {
             removeAccessToken()
             removeUser()
+            invalidateAuthQuery()
             onSuccess?.()
             toast.success(t("success.change_password"))
         },
@@ -237,56 +237,44 @@ export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => 
     })
 }
 
+// export const useAuth = () => {
+//     return useQuery({
+//         queryKey: [QUERY_KEY.AUTH],
+//         queryFn: async () => {
+//             try {
+//                 const profile = await profileApi.getMe()
+//                 const roleFromObject =
+//                     typeof (profile as { role?: unknown }).role === "object"
+//                         ? (profile as { role?: { name?: string } }).role?.name
+//                         : undefined
 
-function useInvalidateAuthQuery() {
-    const queryClient = useQueryClient()
+//                 let normalizedRole =
+//                     profile.role ?? roleFromObject ?? profile.roleDetail?.name ?? profile.roleId
 
-    return () =>
-        queryClient.invalidateQueries({
-            predicate: (query) =>
-                Array.isArray(query.queryKey) && query.queryKey[0] === QUERY_KEY.AUTH
-        })
-}
-
-export const useAuth = () => {
-    return useQuery({
-        queryKey: [QUERY_KEY.AUTH],
-        queryFn: async () => {
-            try {
-                const profile = await profileApi.getMe()
-                const roleFromObject =
-                    typeof (profile as { role?: unknown }).role === "object"
-                        ? (profile as { role?: { name?: string } }).role?.name
-                        : undefined
-
-                let normalizedRole =
-                    profile.role ?? roleFromObject ?? profile.roleDetail?.name ?? profile.roleId
-
-                return {
-                    ...profile,
-                    role: typeof normalizedRole === "string" ? normalizedRole : undefined,
-                    roleId:
-                        typeof normalizedRole === "string"
-                            ? normalizedRole
-                            : typeof profile.roleId === "string"
-                              ? profile.roleId
-                              : undefined,
-                    roleDetail:
-                        profile.roleDetail ??
-                        (typeof profile.role === "object" && profile.role !== null
-                            ? (profile.role as { id?: string; name?: string; description?: string })
-                            : undefined)
-                }
-            } catch (error) {
-                const backendError = error as BackendError
-                if (backendError?.status === 401) {
-                    return undefined
-                }
-                throw error
-            }
-        },
-        retry: false,
-        staleTime: Infinity
-    })
-}
-
+//                 return {
+//                     ...profile,
+//                     role: typeof normalizedRole === "string" ? normalizedRole : undefined,
+//                     roleId:
+//                         typeof normalizedRole === "string"
+//                             ? normalizedRole
+//                             : typeof profile.roleId === "string"
+//                             ? profile.roleId
+//                             : undefined,
+//                     roleDetail:
+//                         profile.roleDetail ??
+//                         (typeof profile.role === "object" && profile.role !== null
+//                             ? (profile.role as { id?: string; name?: string; description?: string })
+//                             : undefined)
+//                 }
+//             } catch (error) {
+//                 const backendError = error as BackendError
+//                 if (backendError?.status === 401) {
+//                     return undefined
+//                 }
+//                 throw error
+//             }
+//         },
+//         retry: false,
+//         staleTime: Infinity
+//     })
+// }

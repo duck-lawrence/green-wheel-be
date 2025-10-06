@@ -7,16 +7,32 @@ export const useGetAllVehicleModels = ({
     enabled = true
 }: {
     query: {
-        stationId: string | null
+        stationId: string
+        startDate: string
+        endDate: string
         segmentId: string | null
-        startDate: string | null
-        endDate: string | null
     }
     enabled?: boolean
 }) => {
     return useQuery({
         queryKey: [QUERY_KEYS.VEHICLE_MODELS, query],
         queryFn: async () => await vehicleModelApi.getAll(query),
+        enabled
+    })
+}
+
+export const useGetVehicleModelById = ({
+    modelId,
+    query,
+    enabled = true
+}: {
+    modelId: string
+    query: { stationId: string; startDate: string; endDate: string }
+    enabled?: boolean
+}) => {
+    return useQuery({
+        queryKey: QUERY_KEYS.VEHICLE_MODEL(modelId),
+        queryFn: async () => await vehicleModelApi.getById({ modelId, query }),
         enabled
     })
 }
