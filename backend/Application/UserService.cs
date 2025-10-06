@@ -493,10 +493,17 @@ namespace Application
         public async Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-            User userFromDb = await _userRepository.GetByIdAsync(userID);
+             //User userFromDb = await _userRepository.GetByIdAsync(userID);
+            // Lấy hồ sơ người dùng KÈM theo thông tin Role (Phúc thêm)
+            // Mục đích: khi trả về UserProfileViewRes cần có tên/quyền của vai trò (vd: "Customer", "Staff")
+            // Lý do: tránh phải query thêm để lấy Role, đồng thời đảm bảo mapping có đủ dữ liệu quyền hạn
+            // added: include role data when retrieving staff profile
+            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
+            // giúp useAuth ở frontend biết chắc user có role “staff”.
+            User? userFromDb = await _userRepository.GetByIdWithRoleAsync(userID);
             if (userFromDb == null)
             {
-                throw new DirectoryNotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.User.UserNotFound);
             }
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
