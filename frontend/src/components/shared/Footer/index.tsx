@@ -9,7 +9,7 @@ export function Footer() {
     const { t } = useTranslation()
     return (
         <footer className="bg-black text-white border-t mt-10">
-            <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 bg-primary">
                 {/* Logo + contact */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
