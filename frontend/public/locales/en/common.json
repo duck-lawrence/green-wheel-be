@@ -165,7 +165,8 @@
         "view_all": "View all",
         "out_of_stock": "Out of stock",
         "seats": "Seats",
-        "battery_capacity": "Battery capacity"
+        "battery_capacity": "Battery capacity",
+        "airbag": "airbag"
     },
     "validate": {
         "date_received": "Vehicle pick-up date is invalid",

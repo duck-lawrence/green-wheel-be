@@ -77,7 +77,7 @@ export default function CardVehicalStyled({ car }: { car: VehicleModel }) {
 
                         <div className="flex gap-2 justify-end">
                             <BatteryChargingIcon className="h-6 w-6" />
-                            <span>{car.ecoRangeKm}Km</span>
+                            <span>{car.ecoRangeKm} Km</span>
                         </div>
 
                         <div className="flex gap-2">
@@ -89,7 +89,9 @@ export default function CardVehicalStyled({ car }: { car: VehicleModel }) {
 
                         <div className="flex gap-2 justify-end">
                             <SuitcaseIcon className="h-6 w-6" />
-                            <span>{car.batteryCapacity ?? "-"} Eco</span>
+                            <span>
+                                {car.numberOfAirbags} {t("vehicle_model.airbag")}
+                            </span>
                         </div>
                     </div>
                 </CardFooter>
