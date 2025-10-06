@@ -1,6 +1,6 @@
 "use client"
 import { LogoStyle } from "@/components/styled"
-import { FacebookLogoIcon, InstagramLogoIcon, TiktokLogoIcon } from "@phosphor-icons/react"
+import { FacebookLogoIcon, InstagramLogoIcon, YoutubeLogoIcon } from "@phosphor-icons/react"
 import Link from "next/link"
 import React from "react"
 import { useTranslation } from "react-i18next"
@@ -9,8 +9,8 @@ export function Footer() {
     const { t } = useTranslation()
     return (
         <footer className="bg-black text-white border-t mt-10">
-            <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 bg-primary">
-                {/* Logo + contact */}
+            <div className="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8">
+                {/* Logo - contact */}
                 <div className="space-y-4">
                     <div className="flex items-center gap-2 mb-4">
                         <Link href={"/"}>
@@ -26,20 +26,24 @@ export function Footer() {
                     </p>
                 </div>
 
-                {/* giới thiệu*/}
+                {/* Introduction */}
                 <div className="ml-6">
                     <h1 className="font-semibold mb-3 text-xl">{t("footer.introduction")}</h1>
                     <ul className="space-y-4 text-sm">
                         <li>
-                            <Link href="#">{t("footer.about_us")}</Link>
+                            <Link href="/about" className="text-sm">
+                                {t("footer.about_us")}
+                            </Link>
                         </li>
                         <li>
-                            <Link href="#">{t("footer.services")}</Link>
+                            <Link href="#" className="text-sm">
+                                {t("footer.services")}
+                            </Link>
                         </li>
                     </ul>
                 </div>
 
-                {/* Chính sách */}
+                {/* Policy */}
                 <div className="">
                     <h1 className="font-semibold mb-3 text-xl">{t("footer.policy")}</h1>
                     <ul className="space-y-4 text-sm">
@@ -58,7 +62,7 @@ export function Footer() {
                     </ul>
                 </div>
 
-                {/* Đối tác */}
+                {/* Contact */}
                 <div>
                     <h1 className="font-semibold mb-3 text-xl">{t("footer.contact")}</h1>
                     <ul className="space-y-4 text-sm">
@@ -74,7 +78,7 @@ export function Footer() {
                                 <FacebookLogoIcon />
                             </Link>
                             <Link href="#" className="bg-primary rounded-2xl p-1 text-black  ">
-                                <TiktokLogoIcon />
+                                <YoutubeLogoIcon />
                             </Link>
                             <Link href="#" className="bg-primary rounded-2xl p-1 text-black ">
                                 <InstagramLogoIcon />
