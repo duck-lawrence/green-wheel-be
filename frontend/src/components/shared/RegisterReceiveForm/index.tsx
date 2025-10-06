@@ -191,12 +191,17 @@ export const RegisterReceiveForm = () => {
 
                                     {/* Pickup location */}
                                     <AutocompleteStyle
-                                        value={formik.values.pickupLocation || null}
-                                        onChange={(val) => {
-                                            formik.setFieldValue("pickupLocation", val ?? "")
+                                        selectedKey={formik.values.pickupLocation || undefined}
+                                        onSelectionChange={(key) => {
+                                            const next = typeof key === "string" ? key : key?.toString() ?? ""
+                                            formik.setFieldValue("pickupLocation", next)
                                             formik.setFieldTouched("pickupLocation", true)
                                         }}
-                                    />
+                                        inputValue={formik.values.pickupLocation}
+                                        onInputChange={(val) => formik.setFieldValue("pickupLocation", val ?? "")}
+                                    >
+                                        {null}
+                                    </AutocompleteStyle>
                                     {formik.touched.pickupLocation &&
                                         formik.errors.pickupLocation && (
                                             <p className="text-red-500 text-sm mt-1">
