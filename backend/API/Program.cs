@@ -12,12 +12,13 @@ using CloudinaryDotNet;
 using DotNetEnv;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Interceptor;
 using Infrastructure.Repositories;
+using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Infrastructure.Interceptor;
-using Infrastructure.UnitOfWorks;
 
 namespace API
 {
@@ -83,6 +84,7 @@ namespace API
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
             builder.Services.AddScoped<IModelImageRepository, ModelImageRepository>();
             builder.Services.AddScoped<IVehicleSegmentRepository, VehicleSegmentRepository>();
+            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();
 
             //Add Services
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -96,6 +98,7 @@ namespace API
             builder.Services.AddScoped<ICitizenIdentityService, CitizenIdentityService>();
             builder.Services.AddScoped<IDriverLicenseService, DriverLicenseService>();
             builder.Services.AddScoped<IModelImageService, ModelImageService>();
+            builder.Services.AddScoped<IPhotoService, CloudinaryService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -123,6 +126,8 @@ namespace API
             builder.Services.Configure<GoogleAuthSettings>(builder.Configuration.GetSection("GoogleAuthSettings"));
             //Gemini
             builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("Gemini"));
+            //Cloudinary
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             //sử dụng cahce
@@ -143,7 +148,6 @@ namespace API
             });
 
             //khai báo sử dụng DI cho cloudinary
-            builder.Services.AddInfrastructureServices(builder.Configuration);
 
             //Cấu hình request nhận request, nó tự chuyển trường của các đối tượng trong
             //DTO thành snakeCase để binding giá trị, và lúc trả ra
