@@ -81,9 +81,9 @@ namespace API
             builder.Services.AddScoped<IDepositRepository, DepositRepository>();
             builder.Services.AddScoped<IStationRepository, StationRepository>();
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
-            builder.Services.AddScoped<IVehicleImageRepository, VehicleImageRepository>();
+            builder.Services.AddScoped<IModelImageRepository, ModelImageRepository>();
             builder.Services.AddScoped<IVehicleSegmentRepository, VehicleSegmentRepository>();
-            
+
             //Add Services
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
             builder.Services.AddScoped<IInvoiceService, InvoiceService>();
@@ -95,7 +95,7 @@ namespace API
             builder.Services.AddScoped<IStationService, StationService>();
             builder.Services.AddScoped<ICitizenIdentityService, CitizenIdentityService>();
             builder.Services.AddScoped<IDriverLicenseService, DriverLicenseService>();
-            builder.Services.AddScoped<IVehicleImageService, VehicleImageService>();
+            builder.Services.AddScoped<IModelImageService, ModelImageService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client

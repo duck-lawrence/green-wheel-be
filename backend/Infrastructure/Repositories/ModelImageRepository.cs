@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
-    public class VehicleImageRepository : GenericRepository<VehicleImage>, IVehicleImageRepository
+    public class ModelImageRepository : GenericRepository<ModelImage>, IModelImageRepository
     {
-        public VehicleImageRepository(GreenWheelDbContext context) : base(context)
+        public ModelImageRepository(GreenWheelDbContext context) : base(context)
         {
         }
     }

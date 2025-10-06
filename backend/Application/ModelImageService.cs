@@ -7,86 +7,88 @@ using Microsoft.Extensions.Logging;
 
 namespace Application
 {
-    public class VehicleImageService : IVehicleImageService
+    public class ModelImageService : IModelImageService
     {
         private readonly IRentalContractUow _uow;
         private readonly IPhotoService _photoService;
-        private readonly ILogger<VehicleImageService> _logger;
+        private readonly ILogger<ModelImageService> _logger;
 
-        public VehicleImageService(
+        public ModelImageService(
             IRentalContractUow uow,
             IPhotoService photoService,
-            ILogger<VehicleImageService> logger)
+            ILogger<ModelImageService> logger)
         {
             _uow = uow;
             _photoService = photoService;
             _logger = logger;
         }
 
-        public async Task<List<VehicleImage>> UploadVehicleImagesAsync(Guid vehicleId, List<IFormFile> files)
+        public async Task<List<ModelImage>> UploadModelImagesAsync(Guid modelId, List<IFormFile> files)
         {
             if (files == null || !files.Any())
                 throw new ArgumentException("No file chosen.");
 
-            var uploadedImages = new List<VehicleImage>();
-            _logger.LogInformation(">>> Uploading images for vehicleId: {VehicleId}", vehicleId);
+            var uploadedImages = new List<ModelImage>();
+            _logger.LogInformation(">>> Uploading images for modelId: {ModelId}", modelId);
+
             foreach (var file in files)
             {
                 try
                 {
                     var uploadReq = new UploadImageReq { File = file };
-                    var result = await _photoService.UploadPhotoAsync(uploadReq, $"vehicles/{vehicleId}");
+                    var result = await _photoService.UploadPhotoAsync(uploadReq, $"models/{modelId}");
 
                     if (string.IsNullOrEmpty(result.Url))
-                        throw new Exception("Upload fail.");
+                        throw new Exception("Upload failed.");
 
-                    var image = new VehicleImage
+                    var image = new ModelImage
                     {
                         Id = Guid.NewGuid(),
-                        VehicleId = vehicleId,
+                        ModelId = modelId,
                         Url = result.Url,
                         PublicId = result.PublicID,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        CreatedAt = DateTimeOffset.UtcNow,
+                        UpdatedAt = DateTimeOffset.UtcNow
                     };
 
-                    await _uow.VehicleImages.AddAsync(image);
+                    await _uow.ModelImages.AddAsync(image);
                     uploadedImages.Add(image);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "fail upload {File} for car {VehicleId}", file.FileName, vehicleId);
+                    _logger.LogError(ex, "fail upload {File} for model {ModelId}", file.FileName, modelId);
                     throw;
                 }
             }
 
             await _uow.SaveChangesAsync();
-            _logger.LogInformation("Đã upload {Count} ảnh cho xe {VehicleId}", uploadedImages.Count, vehicleId);
+            _logger.LogInformation("Uploaded {Count} image(s) for model {ModelId}", uploadedImages.Count, modelId);
+
             return uploadedImages;
         }
 
-        public async Task DeleteVehicleImagesAsync(Guid vehicleId, List<Guid> imageIds)
+        public async Task DeleteModelImagesAsync(Guid modelId, List<Guid> imageIds)
         {
             if (imageIds == null || !imageIds.Any())
-                throw new ArgumentException("no id found to delete");
+                throw new ArgumentException("No image IDs to delete.");
 
-            var images = await _uow.VehicleImages.FindAsync(x => imageIds.Contains(x.Id) && x.VehicleId == vehicleId);
+            var images = await _uow.ModelImages.FindAsync(x => imageIds.Contains(x.Id) && x.ModelId == modelId);
 
             foreach (var image in images)
             {
                 try
                 {
                     await _photoService.DeletePhotoAsync(image.PublicId);
-                    _uow.VehicleImages.Remove(image);
+                    _uow.ModelImages.Remove(image);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "can not delete {PublicId} on Cloudinary", image.PublicId);
+                    _logger.LogWarning(ex, "Cannot delete {PublicId} on Cloudinary", image.PublicId);
                 }
             }
 
             await _uow.SaveChangesAsync();
-            _logger.LogInformation("Deleted {Count} picture(s) of {VehicleId}", images.Count(), vehicleId);
+            _logger.LogInformation("Deleted {Count} image(s) of model {ModelId}", images.Count(), modelId);
         }
     }
 }
