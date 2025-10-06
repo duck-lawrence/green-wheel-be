@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useMemo } from "react"
+import React, { useCallback, useEffect, useMemo } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { CalendarDateTime, fromDate } from "@internationalized/date"
@@ -18,6 +18,7 @@ import {
     MIN_HOUR
 } from "@/constants/constants"
 import dayjs from "dayjs"
+import { useGetAllVehicleModels } from "@/hooks/queries/useVehicleModel"
 
 export function FilterVehicleRental() {
     const { t } = useTranslation()
@@ -34,7 +35,6 @@ export function FilterVehicleRental() {
         error: getVehicleSegmentsError,
         isError: isGetVehicleSegmentsError
     } = useGetAllVehicleSegments()
-
     // manage filter store
     const stationId = useBookingFilterStore((s) => s.stationId)
     const segmentId = useBookingFilterStore((s) => s.segmentId)
@@ -44,6 +44,28 @@ export function FilterVehicleRental() {
     const setSegmentId = useBookingFilterStore((s) => s.setSegmentId)
     const setStartDate = useBookingFilterStore((s) => s.setStartDate)
     const setEndDate = useBookingFilterStore((s) => s.setEndDate)
+
+    // function
+    const {
+        // data: vehicleModels,
+        // isLoading: isGetVehicleModelsLoading,
+        // error: getVehicleModelsError,
+        // isError: isGetVehicleModelsError,
+        refetch: refetchVehicleModels
+    } = useGetAllVehicleModels({
+        query: {
+            stationId,
+            segmentId,
+            startDate,
+            endDate
+        },
+        enabled: false
+    })
+
+    const handleSubmit = useCallback(async () => {
+        const res = await refetchVehicleModels()
+        console.log(res.data)
+    }, [refetchVehicleModels])
 
     // setup date time
     const { minStartDate, minEndDate } = useMemo(() => {
@@ -112,7 +134,9 @@ export function FilterVehicleRental() {
                         }
                     )
                     .test("is-valid-min-end-date", t("vehicle_filter.min_end_date"), (value) => {
-                        return dayjs(startDate).isBefore(dayjs(value).add(-1, "day"))
+                        return dayjs(startDate).isBefore(
+                            dayjs(value).add(-1, "day").add(1, "minute")
+                        )
                     })
             }),
         [minStartDate, startDate, t, toCalenderDateTime]
@@ -127,14 +151,7 @@ export function FilterVehicleRental() {
             endDate: endDate || minEndDate.toString()
         },
         validationSchema: bookingSchema,
-        onSubmit: (values) => {
-            console.log("Booking values item:", {
-                stationId: values.stationId,
-                segmentId: values.segmentId,
-                startDate: values.startDate,
-                endDate: values.endDate
-            })
-        }
+        onSubmit: handleSubmit
     })
 
     // Load station
