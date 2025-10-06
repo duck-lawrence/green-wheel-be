@@ -38,6 +38,11 @@ const nextConfig: NextConfig = {
                 protocol: "https",
                 hostname: "marketplace.canva.com",
                 pathname: "/**"
+            },
+            {
+                protocol: "https",
+                hostname: "img.pikbest.com",
+                pathname: "/**"
             }
         ]
     }
