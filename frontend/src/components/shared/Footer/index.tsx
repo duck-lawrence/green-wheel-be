@@ -17,7 +17,7 @@ export function Footer() {
     const { t } = useTranslation()
 
     return (
-        <footer className="bg-neutral-950 text-gray-200 border-t border-gray-800">
+        <footer className="bg-neutral-950 text-gray-200 border-t border-gray-800 w-full">
             {/* CONTENT GRID */}
             <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
                 {/* Logo + About */}

@@ -40,7 +40,7 @@ export default function HomePage() {
     }, [params, t, router])
 
     return (
-        <div>
+        <>
             <div className="min-h-[80vh]">
                 <div className="bannerBackground min-h-[80vh] min-w-full flex flex-col items-start justify-center gap-4">
                     {/* <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
@@ -65,8 +65,7 @@ export default function HomePage() {
             <Carousel slides={slides} />
             <CriclesChart />
             <Footer />
-            <DashBoard />
             <ScrollToTopButton />
-        </div>
+        </>
     )
 }
