@@ -1,7 +1,7 @@
 "use client"
-
 import React, { useRef } from "react"
 import { ButtonStyled } from "@/components/styled"
+import { cn } from "@heroui/react"
 
 type ImageUploadButtonProps = {
     onFileSelect: (file: File) => void
@@ -24,7 +24,7 @@ export function ImageUploadButton({
     }
 
     return (
-        <div className={`w-fit ${className}`}>
+        <div className={cn("w-fit", className)}>
             <input
                 ref={fileRef}
                 type="file"

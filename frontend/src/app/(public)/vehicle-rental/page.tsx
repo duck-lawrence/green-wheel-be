@@ -1,6 +1,5 @@
 "use client"
-import { FilterVehicleRental } from "@/components"
-import CardVehicalStyled from "@/components/modules/VehicleCard"
+import { FilterVehicleRental, CardVehicalStyled } from "@/components"
 import { useBookingFilterStore, useNavbarItemStore } from "@/hooks"
 import Link from "next/link"
 import React, { useEffect } from "react"

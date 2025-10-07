@@ -17,7 +17,7 @@ import { Icon } from "@iconify/react"
 // }
 
 // className="gap-8 grid grid-cols-2 sm:grid-cols-3 "
-export default function CardVehicalStyled({ vehicleModel }: { vehicleModel: VehicleModelViewRes }) {
+export function CardVehicalStyled({ vehicleModel }: { vehicleModel: VehicleModelViewRes }) {
     const { t } = useTranslation()
 
     return (
@@ -28,7 +28,7 @@ export default function CardVehicalStyled({ vehicleModel }: { vehicleModel: Vehi
             //     router.prefetch(`/vehicle-rental/detail/${vehicleModel.id}`)
             //     router.push(`/vehicle-rental/detail/${vehicleModel.id}`)
             // }}
-            className="hover:shadow-xl hover:scale-[1.02] active:scale-[0.95] transition-transform duration-300 ease-in-out"
+            className="hover:shadow-xl interactive-scale"
             shadow="sm"
         >
             <CardBody className="overflow-visible ">

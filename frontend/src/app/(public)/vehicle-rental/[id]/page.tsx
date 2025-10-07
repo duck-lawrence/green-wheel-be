@@ -1,18 +1,16 @@
 "use client"
 import React, { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { BreadCrumbsStyled, ButtonStyled } from "@/components/styled"
-import { Field } from "@/components/styled/FieldStyled"
+import { BreadCrumbsStyled, ButtonStyled, FieldStyled } from "@/components"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 import Link from "next/link"
 import { formatCurrency } from "@/utils/helpers/currentcy"
 import { getDatesDiff } from "@/utils/helpers/mathDate"
 import { useParams } from "next/navigation"
-import { useBookingFilterStore, useTokenStore } from "@/hooks"
+import { useBookingFilterStore, useTokenStore, useGetVehicleModelById } from "@/hooks"
 import { useTranslation } from "react-i18next"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { Spinner } from "@heroui/react"
-import { useGetVehicleModelById } from "@/hooks/queries/useVehicleModel"
 
 export default function VehicleDetailPage() {
     const { id } = useParams()
@@ -207,22 +205,22 @@ export default function VehicleDetailPage() {
                         </h2>
                         <div className="mt-4 grid gap-4">
                             <div className="grid grid-cols-2 gap-3">
-                                <Field
+                                <FieldStyled
                                     label="Nhiên liệu"
                                     value="Điện"
                                     icon={<GasPump size={18} weight="duotone" />}
                                 />
-                                <Field
+                                <FieldStyled
                                     label="Số chỗ"
                                     value={`${vehicle.seatingCapacity}`}
                                     icon={<UsersFour size={18} />}
                                 />
-                                <Field
+                                <FieldStyled
                                     label="Hộp số"
                                     value="Tự động"
                                     icon={<SteeringWheel size={18} />}
                                 />
-                                <Field
+                                <FieldStyled
                                     label="Quãng đường"
                                     value={`~${vehicle.ecoRangeKm} km`}
                                     icon={<RoadHorizon size={18} />}

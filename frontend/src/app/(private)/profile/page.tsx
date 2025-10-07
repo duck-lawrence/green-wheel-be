@@ -1,21 +1,22 @@
 "use client"
 import {
-    AvatarUploadButton,
-    AvatarUploaderModal,
     AvaterStyled,
     ButtonStyled,
     DatePickerStyled,
-    DropdownStyle,
+    DropdownStyled,
     EnumPicker,
+    ImageUploadButton,
+    ImageUploaderModal,
     InputStyled
 } from "@/components"
 import { parseDate } from "@internationalized/date"
 import {
-    useAvatarUploadDiscloresureSingleton,
     useDay,
     useDeleteAvatar,
-    useGetMeFromCache,
-    useUpdateMe
+    useImageUploadModal,
+    useProfileStore,
+    useUpdateMe,
+    useUploadAvatar
 } from "@/hooks"
 import { UserUpdateReq } from "@/models/user/schema/request"
 import { NotePencilIcon } from "@phosphor-icons/react/dist/ssr"
@@ -32,35 +33,21 @@ import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 export default function Page() {
     const { t } = useTranslation()
     const { formatDateTime } = useDay({})
-    // const user = useProfileStore((s) => s.user)
-    const user = useGetMeFromCache()
-    // const updateUser = useProfileStore((s) => s.updateUser)
+    const user = useProfileStore((s) => s.user)
     const updateMeMutation = useUpdateMe({ onSuccess: undefined })
     const deleteAvatarMutation = useDeleteAvatar({ onSuccess: undefined })
     const [showChange, setShowChange] = useState(true)
 
-    // ===== Upload avatar =====
-    const [imgSrc, setImgSrc] = useState<string | null>(null)
-    const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null)
     const {
         isOpen: isDropdownOpen,
         onOpenChange: onDropdownOpenChange,
         onClose: onDropdownClose
     } = useDisclosure()
-    const { onOpen: onAvatarUploadOpen } = useAvatarUploadDiscloresureSingleton()
 
-    const handleSelectFile = (file: File) => {
-        const reader = new FileReader()
-        reader.addEventListener("load", () => {
-            // reset when choose new one
-            setImgSrc(reader.result as string)
-            onDropdownClose()
-            onAvatarUploadOpen()
-            // setCrop({ x: 0, y: 0 })
-            // setZoom(1)
-        })
-        reader.readAsDataURL(file)
-    }
+    const { imgSrc, setImgSrc, isOpen, onOpenChange, onClose, onFileSelect } = useImageUploadModal({
+        onBeforeOpenModal: onDropdownClose
+    })
+    const uploadAvatar = useUploadAvatar({ onSuccess: undefined })
 
     // ===== Delete avatar =====
     const handleDeleteAvatar = useCallback(async () => {
@@ -107,16 +94,21 @@ export default function Page() {
             <div className="text-3xl mb-4 px-4 pb-4 font-bold">{t("user.account_information")}</div>
 
             {/* Avatar Upload Modal */}
-            <AvatarUploaderModal
+            <ImageUploaderModal
+                isOpen={isOpen}
+                onOpenChange={onOpenChange}
+                onClose={onClose}
                 imgSrc={imgSrc}
                 setImgSrc={setImgSrc}
-                croppedAreaPixels={croppedAreaPixels}
-                setCroppedAreaPixels={setCroppedAreaPixels}
+                uploadFn={uploadAvatar.mutateAsync}
+                aspect={1}
+                cropShape="round"
+                label={t("user.upload_avatar")}
             />
 
             <div className="flex justify-center gap-20 items-center">
                 {/* Avatar */}
-                <DropdownStyle
+                <DropdownStyled
                     placement="right-end"
                     classNames={{ content: "min-w-fit max-w-fit" }}
                     isOpen={isDropdownOpen}
@@ -128,7 +120,10 @@ export default function Page() {
                     </DropdownTrigger>
                     <DropdownMenu variant="flat" classNames={{ base: "p-0 w-fit" }}>
                         <DropdownItem key="upload_avatar" className="block p-0">
-                            <AvatarUploadButton onFileSelect={handleSelectFile} />
+                            <ImageUploadButton
+                                label={t("user.upload_avatar")}
+                                onFileSelect={onFileSelect}
+                            />
                         </DropdownItem>
                         <DropdownItem key="delete_avatar" className="block p-0">
                             <ButtonStyled
@@ -139,7 +134,7 @@ export default function Page() {
                             </ButtonStyled>
                         </DropdownItem>
                     </DropdownMenu>
-                </DropdownStyle>
+                </DropdownStyled>
 
                 {/* Preview info */}
                 <div>

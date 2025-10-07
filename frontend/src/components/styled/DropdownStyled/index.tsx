@@ -7,7 +7,7 @@ type DropdownStyleProps = DropdownProps & {
     children: React.ReactNode
 }
 
-export function DropdownStyle({ children, ...props }: DropdownStyleProps) {
+export function DropdownStyled({ children, ...props }: DropdownStyleProps) {
     return (
         <Dropdown placement="bottom-start" {...props}>
             {children}

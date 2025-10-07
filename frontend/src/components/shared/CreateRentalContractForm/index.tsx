@@ -18,7 +18,6 @@ import {
 import { PaymentMethod } from "@/constants/enum"
 import { PaymentMethodLabels } from "@/constants/labels"
 import { AutocompleteItem, Spinner } from "@heroui/react"
-import { formatCurrency } from "@/utils/helpers/currentcy"
 import { PHONE_REGEX } from "@/constants/regex"
 import { MapPinAreaIcon } from "@phosphor-icons/react"
 import toast from "react-hot-toast"
@@ -55,8 +54,8 @@ export const CreateRentalContractForm = () => {
 
     // get filter item
     const stationId = useBookingFilterStore((s) => s.stationId)
-    const startDate = useBookingFilterStore((s) => s.startDate)
-    const endDate = useBookingFilterStore((s) => s.endDate)
+    // const startDate = useBookingFilterStore((s) => s.startDate)
+    // const endDate = useBookingFilterStore((s) => s.endDate)
 
     useEffect(() => {
         setMounted(!isGetStationsLoading && !isGetStationsError)
@@ -377,7 +376,7 @@ export const CreateRentalContractForm = () => {
                                             {t("car_rental.detail_table")}
                                         </h4>
                                         <div className="mt-2 space-y-2">
-                                            <div className="flex justify-between">
+                                            {/* <div className="flex justify-between">
                                                 <span>{t("car_rental.listed_fee")}</span>
                                                 <span>{formatCurrency(listedFee)}</span>
                                             </div>
@@ -388,7 +387,7 @@ export const CreateRentalContractForm = () => {
                                             <div className="flex justify-between">
                                                 <span>{t("car_rental.deposit")}</span>
                                                 <span>{formatCurrency(deposit)}</span>
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
 
@@ -403,7 +402,7 @@ export const CreateRentalContractForm = () => {
                                                 </span>
                                             </div>
                                             <span className="text-2xl font-bold text-green-500">
-                                                {formatCurrency(totalPayment)}
+                                                {/* {formatCurrency(totalPayment)} */}
                                             </span>
                                         </div>
                                     </div>

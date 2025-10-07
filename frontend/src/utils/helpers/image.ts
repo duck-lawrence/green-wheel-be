@@ -9,7 +9,7 @@ const createImage = (url: string): Promise<HTMLImageElement> =>
         image.src = url
     })
 
-export async function getCroppedAvatar(imageSrc: string, crop: Area): Promise<Blob> {
+export async function getCroppedImage(imageSrc: string, crop: Area): Promise<Blob> {
     const image = await createImage(imageSrc)
     const canvas = document.createElement("canvas")
     const ctx = canvas.getContext("2d")!
