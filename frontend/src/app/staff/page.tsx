@@ -17,7 +17,7 @@ export default function StaffDashboardPage() {
     return (
         <div className="rounded-2xl bg-white shadow p-6">
             <div className="mb-6">
-                <h1 className="text-xl font-semibold text-gray-900">{t("staff.dashboard_title")}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{t("staff.dashboard_title")}</h1>
                 {/* <p className="text-gray-600 mt-2">{t("staff.dashboard_subtitle")}</p> */}
             </div>
             <div className="grid gap-5 md:grid-cols-3 ">
