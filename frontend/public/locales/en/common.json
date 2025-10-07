@@ -294,7 +294,28 @@
         "handovers_table_actions_continue": "Continue",
         "handovers_table_range_separator": "to",
         "dashboard_title": "Staff dashboard",
-        "dashboard_subtitle": "Select a module from the sidebar to get started."
+        "dashboard_subtitle": "Select a module from the sidebar to get started.",
+        "report_page_title": "Submit report",
+        "report_page_description": "Share operational issues or feedback with the management team.",
+        "report_form_staff_name_label": "Staff name",
+        "report_form_report_type_label": "Report type",
+        "report_form_type_options_technical": "Technical",
+        "report_form_type_options_payment": "Payment",
+        "report_form_type_options_other": "Other",
+        "report_form_title_label": "Title",
+        "report_form_title_placeholder": "Enter the report title",
+        "report_form_description_label": "Description",
+        "report_form_description_placeholder": "Provide details for the report",
+        "report_form_submit": "Send",
+        "report_form_success_message": "Report sent successfully.",
+        "report_form_validation_staff_name_required": "Staff name is required.",
+        "report_form_validation_report_type_required": "Please select a report type.",
+        "report_form_validation_title_required": "Title is required.",
+        "report_form_validation_title_max": "Title must be 100 characters or less.",
+        "report_form_validation_description_required": "Description is required.",
+        "report_form_validation_description_max": "Description must be 1000 characters or less."
+      
+        
     },
     "footer": {
         "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",

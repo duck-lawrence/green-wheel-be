@@ -27,7 +27,7 @@ export default function StaffDashboardPage() {
     return (
         <div className="rounded-2xl bg-white shadow p-6">
             <div className="mb-6">
-                <h1 className="text-3xl font-bold text-gray-900">{t("staff.dashboard_title")}</h1>
+                <h1 className="text-3xl mb-3 px-4 font-bold text-gray-900">{t("staff.dashboard_title")}</h1>
             </div>
             <div className="grid gap-5 md:grid-cols-3">
                 {METRICS_CARDS.map((card) => {
