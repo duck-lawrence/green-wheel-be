@@ -9,11 +9,11 @@ using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
 using Application.Repositories;
+using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
@@ -35,6 +35,7 @@ namespace Application
         private readonly IPhotoService _photoService;
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
+        private readonly IMediaUow _mediaUow;
 
         public UserService(IUserRepository repository,
             IOptions<JwtSettings> jwtSettings,
@@ -48,7 +49,8 @@ namespace Application
              IMemoryCache cache,
              IPhotoService photoService,
              ICitizenIdentityService citizenService,
-             IDriverLicenseService driverService
+             IDriverLicenseService driverService,
+             IMediaUow mediaUow
             )
         {
             _userRepository = repository;
@@ -64,6 +66,7 @@ namespace Application
             _photoService = photoService;
             _citizenService = citizenService;
             _driverService = driverService;
+            _mediaUow = mediaUow;
         }
 
         /*
@@ -534,34 +537,42 @@ namespace Application
             if (file == null || file.Length == 0)
                 throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
 
-            // Upload file lên Cloudinary
+            // 1. Upload ảnh mới
             var uploadReq = new UploadImageReq { File = file };
-            var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
-
-            if (string.IsNullOrEmpty(result.Url))
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
+            if (string.IsNullOrEmpty(uploaded.Url))
                 throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
 
-            var user = await _userRepository.GetByIdAsync(userId)
+            // 2. Lấy user và nhớ avatar cũ
+            var user = await _mediaUow.Users.GetByIdAsync(userId)
                 ?? throw new KeyNotFoundException(Message.User.UserNotFound);
+            var oldPublicId = user.AvatarPublicId;
 
-            // Nếu có avatar cũ thì xoá
-            if (!string.IsNullOrEmpty(user.AvatarPublicId))
+            // 3. Transaction DB
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    await _photoService.DeletePhotoAsync(user.AvatarPublicId);
-                }
-                catch (Exception ex)
-                {
-                    throw new BadRequestException(ex.Message);
-                }
+                user.AvatarUrl = uploaded.Url;
+                user.AvatarPublicId = uploaded.PublicID;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _mediaUow.Users.UpdateAsync(user);
+                await _mediaUow.SaveChangesAsync();
+                await trx.CommitAsync();
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                // rollback cloud nếu DB lỗi
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
             }
 
-            user.AvatarUrl = result.Url;
-            user.AvatarPublicId = result.PublicID;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            await _userRepository.UpdateAsync(user);
+            // 4. Sau commit: xóa ảnh cũ (best-effort)
+            if (!string.IsNullOrEmpty(oldPublicId))
+            {
+                try { await _photoService.DeletePhotoAsync(oldPublicId); } catch { }
+            }
 
             return user.AvatarUrl!;
         }
@@ -592,19 +603,69 @@ namespace Application
         public async Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
-            var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
+            if (string.IsNullOrEmpty(uploaded.Url))
+                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
 
-            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url, uploadResult.PublicID) ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
-            return _mapper.Map<CitizenIdentityRes>(entity);
+            // Lấy bản ghi cũ (nếu có)
+            var old = await _mediaUow.CitizenIdentities.GetByUserIdAsync(userId);
+
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
+            {
+                var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
+                    ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
+
+                await _mediaUow.SaveChangesAsync();
+                await trx.CommitAsync();
+
+                // Sau commit: xóa ảnh cũ
+                if (!string.IsNullOrEmpty(old?.ImagePublicId))
+                {
+                    try { await _photoService.DeletePhotoAsync(old.ImagePublicId); } catch { }
+                }
+
+                return _mapper.Map<CitizenIdentityRes>(entity);
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
+            }
         }
 
         public async Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
-            var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
+            if (string.IsNullOrEmpty(uploaded.Url))
+                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
 
-            var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploadResult.Url, uploadResult.PublicID);
-            return _mapper.Map<DriverLicenseRes>(entity);
+            var old = await _mediaUow.DriverLicenses.GetByUserId(userId);
+
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
+            {
+                var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploaded.Url, uploaded.PublicID)
+                    ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
+
+                await _mediaUow.SaveChangesAsync();
+                await trx.CommitAsync();
+
+                if (!string.IsNullOrEmpty(old?.ImagePublicId))
+                {
+                    try { await _photoService.DeletePhotoAsync(old.ImagePublicId); } catch { }
+                }
+
+                return _mapper.Map<DriverLicenseRes>(entity);
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
+            }
         }
 
         public async Task<object?> GetMyCitizenIdentityAsync(Guid userId)
