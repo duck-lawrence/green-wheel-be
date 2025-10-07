@@ -7,6 +7,7 @@ import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
 import DashBoard from "@/components/shared/DashBoard"
+import ScrollToTopButton from "@/components/modules/ScrollToTopButton"
 
 export default function HomePage() {
     const { t } = useTranslation()
@@ -65,6 +66,7 @@ export default function HomePage() {
             <CriclesChart />
             <Footer />
             <DashBoard />
+            <ScrollToTopButton />
         </div>
     )
 }
