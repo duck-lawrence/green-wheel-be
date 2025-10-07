@@ -31,9 +31,8 @@ public partial class VehicleModel : SorfDeletedEntity, IEntity
     public decimal EcoRangeKm { get; set; }
 
     public decimal SportRangeKm { get; set; }
-
-    
-
+    public string? ImageUrl { get; set; }
+    public string? ImagePublicId { get; set; }
     public Guid BrandId { get; set; }
 
     public Guid SegmentId { get; set; }
@@ -42,7 +41,10 @@ public partial class VehicleModel : SorfDeletedEntity, IEntity
 
     public virtual ICollection<ModelComponent> ModelComponents { get; set; } = new List<ModelComponent>();
 
+    public virtual ICollection<ModelImage> ModelImages { get; set; } = new List<ModelImage>();
+
     public virtual VehicleSegment Segment { get; set; } = null!;
 
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+
 }

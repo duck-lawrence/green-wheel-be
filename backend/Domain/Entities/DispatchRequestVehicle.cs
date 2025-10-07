@@ -12,8 +12,6 @@ public partial class DispatchRequestVehicle : SorfDeletedEntity, IEntity
 
     public DateTimeOffset UpdatedAt { get; set; }
 
-    
-
     public Guid DispatchRequestId { get; set; }
 
     public Guid VehicleId { get; set; }

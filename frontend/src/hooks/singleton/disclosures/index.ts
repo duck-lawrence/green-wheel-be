@@ -1,4 +1,5 @@
 export * from "./useLoginDiscloresure"
 export * from "./useRegisterDiscloresure"
-export * from "./useChangePasswordDiscloresure"
+export * from "./useSetPasswordDiscloresure"
 export * from "./useForgotPasswordDiscloresure"
+export * from "./useAvatarUploadDiscloresure"

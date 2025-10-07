@@ -2,6 +2,7 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
@@ -30,8 +31,12 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private readonly IPhotoService _photoService;
-        private readonly ILogger<UserService > _logger;
-        public UserService(IUserRepository repository, 
+        private readonly ILogger<UserService> _logger;
+        private readonly ICitizenIdentityService _citizenService;
+        private readonly IDriverLicenseService _driverService;
+        private readonly IRentalContractRepository _rentalContractRepository;
+
+        public UserService(IUserRepository repository,
             IOptions<JwtSettings> jwtSettings,
             IRefreshTokenRepository refreshTokenRepository,
              IJwtBlackListRepository jwtBackListRepository,
@@ -42,7 +47,10 @@ namespace Application
              IMapper mapper,
              IMemoryCache cache,
              IPhotoService photoService,
-             ILogger<UserService> logger
+             ILogger<UserService> logger,
+             ICitizenIdentityService citizenService,
+             IDriverLicenseService driverService,
+             IRentalContractRepository rentalContractRepository
             )
         {
             _userRepository = repository;
@@ -57,9 +65,11 @@ namespace Application
             _cache = cache;
             _photoService = photoService;
             _logger = logger;
+            _citizenService = citizenService;
+            _driverService = driverService;
+            _rentalContractRepository = rentalContractRepository;
         }
 
-        
         /*
          Login fuction
          this func receive UserLoginReq (dto) form controller incluce (user email and password)
@@ -67,6 +77,7 @@ namespace Application
             -> null <=> wrong email or password => throw Unauthorize Exception (401)
             -> !null <=> correct email and password => generate refreshToken (set to cookie) and accessToken return to frontend
          */
+
         public async Task<string?> Login(UserLoginReq user)
         {
             User userFromDB = await _userRepository.GetByEmailAsync(user.Email);
@@ -80,7 +91,7 @@ namespace Application
                     return GenerateAccessToken(userFromDB.Id);
                 }
             }
-            throw new UnauthorizedAccessException(Message.User.InvalidEmailOrPassword);
+            throw new UnauthorizedAccessException(Message.UserMessage.InvalidEmailOrPassword);
         }
 
         /*
@@ -89,25 +100,24 @@ namespace Application
         use jwtHelper and give userID, accesstoken secret secret, type: accesstoken, access token expired time, isser and audience
         to generate access token
          */
+
         public string GenerateAccessToken(Guid userId)
         {
-
             return JwtHelper.GenerateUserIDToken(userId, _jwtSettings.AccessTokenSecret, TokenType.AccessToken.ToString(), _jwtSettings.AccessTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
         }
 
-
-
         /*
          Generate Refresh Token Func
-         This func recieve userId and a ClaimsPrincipal if any 
-            - When we use refresh token to got a new access token, we will generate a new refresh 
+         This func recieve userId and a ClaimsPrincipal if any
+            - When we use refresh token to got a new access token, we will generate a new refresh
               token with expired time of old refresh token if it was not expired
               so that we will give a ClaimsPricipal for that func
         It use jwt helper to generate a token
         then verify this token to got a claimPricipal to take Iat (created time), Exp (expired time) to save this toke to DB
-        
+
         Then set this token to cookie
          */
+
         public async Task<string> GenerateRefreshToken(Guid userId, ClaimsPrincipal? oldClaims)
         {
             var _context = _contextAccessor.HttpContext;
@@ -142,7 +152,6 @@ namespace Application
                 Expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiredTime) // hạn sử dụng
             });
             return token;
-
         }
 
         /*
@@ -154,18 +163,20 @@ namespace Application
         generate new otp -> save to DB
         send this otp to user email
          */
+
         public async Task SendOTP(string email)
         {
             int count = await _otpRepository.CountRateLimitAsync(email);
             if (count > _otpSettings.OtpRateLimit)
             {
-                throw new RateLimitExceededException(Message.User.RateLimitOtp);
+                throw new RateLimitExceededException(Message.UserMessage.RateLimitOtp);
             }
             await _otpRepository.RemoveOTPAsync(email); //xoá cũ trước khi lưu cái ms
             string otp = GenerateOtpHelper.GenerateOtp();
             await _otpRepository.SaveOTPAsyns(email, otp);
             string subject = "GreenWheel Verification Code";
-            var templatePath = Path.Combine("../Application", "Templates", "SendOtpTemplate.html");
+            var basePath = AppContext.BaseDirectory;
+            var templatePath = Path.Combine(basePath, "Templates", "SendOtpTemplate.html");
             var body = File.ReadAllText(templatePath);
 
             body = body.Replace("{OtpCode}", otp);
@@ -182,30 +193,31 @@ namespace Application
             - !null => this email got a OTP
 
         Next check OTP & OTP form DB
-            - if != => count number of times entered & throw Unauthorize Exception (401) 
+            - if != => count number of times entered & throw Unauthorize Exception (401)
                        if count > number of entries allowed -> delete otp form DB
-        
+
         Then generate token by email belong to token type and set it to cookie
             - Register token when register account
             - forgot password token when user forgot thier password
         */
+
         public async Task<string> VerifyOTP(VerifyOTPReq verifyOTPDto, TokenType type, string cookieKey)
         {
             string? otpFromRedis = await _otpRepository.GetOtpAsync(verifyOTPDto.Email);
             if (otpFromRedis == null)
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidOTP);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidOTP);
             }
-            if(verifyOTPDto.OTP != otpFromRedis)
+            if (verifyOTPDto.OTP != otpFromRedis)
             {
                 int count = await _otpRepository.CountAttemptAsync(verifyOTPDto.Email);
                 if (count > _otpSettings.OtpAttempts)
                 {
                     await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
                     await _otpRepository.ResetAttemptAsync(verifyOTPDto.Email);
-                    throw new UnauthorizedAccessException(Message.Common.TooManyRequest);
+                    throw new UnauthorizedAccessException(Message.CommonMessage.TooManyRequest);
                 }
-                throw new UnauthorizedAccessException(Message.User.InvalidOTP);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidOTP);
             }
             var _context = _contextAccessor.HttpContext;
             await _otpRepository.RemoveOTPAsync(verifyOTPDto.Email);
@@ -232,13 +244,12 @@ namespace Application
             return token;
         }
 
-
         /*
          Register account func
-         This function receive token from controller ( register token ) => done verify otp And userRegisterReq 
+         This function receive token from controller ( register token ) => done verify otp And userRegisterReq
                                                                                             include user info
          it map userRegisterReq to user
-         Then verify this token 
+         Then verify this token
             -   401 : invalid token
             - If success -> got claimsPricipal of this token
          got email form this claimPrincipal
@@ -246,29 +257,29 @@ namespace Application
             - != null -> throw Duplicate Exception (409)
             - == null -> create new account =>  generate refreshToken (set to cookie) and accessToken return to frontend
          */
+
         public async Task<string> RegisterAsync(string token, UserRegisterReq userRegisterReq)
         {
-            if(await _userRepository.GetByPhoneAsync(userRegisterReq.Phone) != null)
+            if (await _userRepository.GetByPhoneAsync(userRegisterReq.Phone) != null)
             {
-                throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
             }
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(token))
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             //------------------------
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
-            var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret, 
+            var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret,
                 TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
 
-            
             var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var userFromDB = await _userRepository.GetByEmailAsync(email);
 
             if (userFromDB != null)
             {
-                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists); //email đã tồn tại
+                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists); //email đã tồn tại
             }
             Guid id;
             do
@@ -294,53 +305,54 @@ namespace Application
             return accesstoken;
         }
 
-
         /*
          Change password func
          This func use for change password use case
          IT recieve userClaims from token of accessToken, oldPassword and new password => verify => take user ID from claims
-         got user from DB by id 
+         got user from DB by id
             - null -> throw unauthorized exception (401) (invalid accesstoken)
             - != null  -> verify password in DB == old password ?
                 - == -> set new passwrd
                 - != return unauthorized (401) (old password is incorrect)
-            
+
          */
+
         public async Task ChangePassword(ClaimsPrincipal userClaims, UserChangePasswordReq userChangePasswordReq)
         {
             var userID = userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             var userFromDB = await _userRepository.GetByIdAsync(Guid.Parse(userID));
             if (userFromDB == null)
             {
-                throw new UnauthorizedAccessException(Message.User.Unauthorized);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             if (!PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
             {
-                throw new UnauthorizedAccessException(Message.User.OldPasswordIsIncorrect);
+                throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userID);
             userFromDB.Password = PasswordHelper.HashPassword(userChangePasswordReq.Password);
             await _userRepository.UpdateAsync(userFromDB);
         }
-        
+
         /*
          Reset Password Func
          This function use for forgot password use case
          it recieve forgotPasswordToken (after verify email) and password from Controller
-         verify this token 
+         verify this token
             - 401 : Invalid token
-           
+
          if success -> got a claims -> take email form claim -> find user in DB by email
             - == null -> throw unAuthorized exception (401) : invalid token (hacker)
-            - != null => revoke all refresh token of this account from DB and change password 
-            
+            - != null => revoke all refresh token of this account from DB and change password
+
          */
+
         public async Task ResetPassword(string forgotPasswordToken, string password)
         {
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(forgotPasswordToken))
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             //------------------------
             var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenSecret,
@@ -351,7 +363,7 @@ namespace Application
             var userFromDB = await _userRepository.GetByEmailAsync(email);
             if (userFromDB == null)
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userFromDB.Id.ToString());
             userFromDB.Password = PasswordHelper.HashPassword(password);
@@ -361,22 +373,21 @@ namespace Application
             await _jwtBackListRepository.SaveTokenAsyns(forgotPasswordToken, expSeconds);
         }
 
-
         /*
          Logout func
          this function got refresh token from controller (cookie)
          -> revoke this token
          */
+
         public async Task<int> Logout(string refreshToken)
         {
             JwtHelper.VerifyToken(refreshToken, _jwtSettings.RefreshTokenSecret, TokenType.RefreshToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
             return await _refreshTokenRepository.RevokeRefreshToken(refreshToken);
         }
 
-
         /*
          Refresh token func
-         this function use to got new accesstoken by refresh token 
+         this function use to got new accesstoken by refresh token
          it receive refreshToken from controller, and a bool variable (want to be got a revoked token)
          verify this token
             - 401 : invalid token
@@ -384,9 +395,9 @@ namespace Application
             - == null => 401 exception
            - != null -> generate new access token and refresh token with expired time = old refresh token expired time (use old claims)
          */
+
         public async Task<string> RefreshToken(string refreshToken, bool getRevoked)
         {
-
             ClaimsPrincipal claims = JwtHelper.VerifyToken(refreshToken,
                                                             _jwtSettings.RefreshTokenSecret,
                                                             TokenType.RefreshToken.ToString(),
@@ -398,20 +409,17 @@ namespace Application
                 RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
                 if (refreshTokenFromDB == null)
                 {
-                    throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                    throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
                 }
                 string newAccessToken = GenerateAccessToken(refreshTokenFromDB.UserId);
                 string newRefreshToken = await GenerateRefreshToken(refreshTokenFromDB.UserId, claims);
                 await _refreshTokenRepository.RevokeRefreshToken(refreshTokenFromDB.Token);
 
                 return newAccessToken;
-
-
             }
 
-            throw new UnauthorizedAccessException(Message.User.InvalidToken);
+            throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
         }
-
 
         public async Task<Dictionary<string, string>> LoginWithGoogle(string email)
         {
@@ -441,7 +449,6 @@ namespace Application
             {
                 { TokenType.AccessToken.ToString() , accessToken}
             };
-
         }
 
         public async Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req)
@@ -449,7 +456,7 @@ namespace Application
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
             //------------------------
             var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
@@ -482,60 +489,70 @@ namespace Application
             //----save to black list
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
             await _jwtBackListRepository.SaveTokenAsyns(setPasswordToken, expSeconds);
-            
+
             return GenerateAccessToken(id);
         }
+
         public async Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-            User userFromDb = await _userRepository.GetByIdAsync(userID);
-            if (userFromDb == null)
-            {
-                throw new DirectoryNotFoundException(Message.User.UserNotFound);
-            }
+             //User userFromDb = await _userRepository.GetByIdAsync(userID);
+            // Lấy hồ sơ người dùng KÈM theo thông tin Role (Phúc thêm)
+            // Mục đích: khi trả về UserProfileViewRes cần có tên/quyền của vai trò (vd: "Customer", "Staff")
+            // Lý do: tránh phải query thêm để lấy Role, đồng thời đảm bảo mapping có đủ dữ liệu quyền hạn
+            // added: include role data when retrieving staff profile
+            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
+            // giúp useAuth ở frontend biết chắc user có role “staff”.
+            User? userFromDb = await _userRepository.GetByIdWithFullInfoAsync(userID)
+                ?? throw new NotFoundException(Message.UserMessage.UserNotFound);
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
 
         public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
-            if (userUpdateReq.Phone != null)
+            if (!string.IsNullOrEmpty(userUpdateReq.Phone))
             {
                 if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
                 {
-                    throw new ConflictDuplicateException(Message.User.PhoneAlreadyExist);
+                    throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
                 }
             }
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             User userFromDb = await _userRepository.GetByIdAsync(userID);
             if (userFromDb == null)
             {
-                throw new DirectoryNotFoundException(Message.User.UserNotFound);
+                throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
             }
             if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
             if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
-            if (userUpdateReq.Phone != null) userFromDb.Phone = userUpdateReq.Phone;
-            if(userUpdateReq.DateOfBirth != null) userFromDb.DateOfBirth = userUpdateReq.DateOfBirth;
-            if(userUpdateReq.Sex != null) userFromDb.Sex = userUpdateReq.Sex;
+            if (!string.IsNullOrEmpty(userUpdateReq.Phone)) userFromDb.Phone = userUpdateReq.Phone;
+            if (userUpdateReq.DateOfBirth != null) userFromDb.DateOfBirth = userUpdateReq.DateOfBirth;
+            if (userUpdateReq.Sex != null) userFromDb.Sex = userUpdateReq.Sex;
+            if (!string.IsNullOrEmpty(userUpdateReq.AvatarUrl)) userFromDb.AvatarUrl = userUpdateReq.AvatarUrl;
             await _userRepository.UpdateAsync(userFromDb);
-
         }
 
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
             return await _userRepository.GetByIdAsync(id);
         }
-        
+
         public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
         {
-            if (file == null || file.Length == 0) throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
+            if (file == null || file.Length == 0)
+                throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
-            var result = await _photoService.UploadPhotoAsync(file, $"users/{userId}");
-            if (string.IsNullOrEmpty(result.Url)) throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
-            var user = await _userRepository.GetByIdAsync(userId);
-            if (user == null)
-                throw new KeyNotFoundException(Message.User.UserNotFound);
+            // Upload file lên Cloudinary
+            var uploadReq = new UploadImageReq { File = file };
+            var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
 
-            // Nếu có avatar cũ thì xoá trước (optional)
+            if (string.IsNullOrEmpty(result.Url))
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
+
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
+
+            // Nếu có avatar cũ thì xoá
             if (!string.IsNullOrEmpty(user.AvatarPublicId))
             {
                 try
@@ -544,24 +561,29 @@ namespace Application
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Can not delete old avata {PublicId}", user.AvatarPublicId);
+                    _logger.LogWarning(ex, "Cannot delete old avatar {PublicId}", user.AvatarPublicId);
                 }
             }
 
             user.AvatarUrl = result.Url;
             user.AvatarPublicId = result.PublicID;
-            user.UpdatedAt = DateTimeOffset.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
 
             await _userRepository.UpdateAsync(user);
 
-            return user.AvatarUrl;
+            return user.AvatarUrl!;
         }
 
         public async Task DeleteAvatarAsync(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(userId) ?? throw new Exception(Message.User.UserNotFound);
-            if(string.IsNullOrEmpty(user.AvatarPublicId)) throw new Exception(Message.User.NotFoundAvatar);
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new Exception(Message.UserMessage.UserNotFound);
+
+            if (string.IsNullOrEmpty(user.AvatarPublicId))
+                throw new Exception(Message.UserMessage.NotFoundAvatar);
+
             await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+
             user.AvatarUrl = null;
             user.AvatarPublicId = null;
             await _userRepository.UpdateAsync(user);
@@ -569,10 +591,124 @@ namespace Application
 
         public async Task CheckDupEmail(string email)
         {
-            if(await _userRepository.GetByEmailAsync(email) != null)
+            if (await _userRepository.GetByEmailAsync(email) != null)
             {
-                throw new ConflictDuplicateException(Message.User.EmailAlreadyExists);
+                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists);
             }
+        }
+
+        public async Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file)
+        {
+            var uploadReq = new UploadImageReq { File = file };
+            var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
+
+            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url);
+            return new
+            {
+                entity.Id,
+                entity.Number,
+                entity.FullName,
+                entity.Nationality,
+                entity.Sex,
+                entity.DateOfBirth,
+                entity.ExpiresAt,
+                entity.ImageUrl
+            };
+        }
+
+        public async Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file)
+        {
+            var uploadReq = new UploadImageReq { File = file };
+            var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
+
+            var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploadResult.Url);
+            return new
+            {
+                entity.Id,
+                entity.Number,
+                entity.FullName,
+                entity.Class,
+                entity.ExpiresAt,
+                entity.ImageUrl
+            };
+        }
+
+        public async Task<object?> GetMyCitizenIdentityAsync(Guid userId)
+        {
+            var entity = await _citizenService.GetByUserId(userId);
+            if (entity == null) return null;
+
+            return new
+            {
+                id = entity.Id,
+                number = entity.Number,
+                full_name = entity.FullName,
+                nationality = entity.Nationality,
+                sex = entity.Sex == 0 ? "Nam" : "Nữ",
+                date_of_birth = entity.DateOfBirth.ToString("yyyy-MM-dd"),
+                expires_at = entity.ExpiresAt.ToString("yyyy-MM-dd"),
+                image_url = entity.ImageUrl,
+                user_id = entity.UserId
+            };
+        }
+
+        public async Task<object?> GetMyDriverLicenseAsync(Guid userId)
+        {
+            var entity = await _driverService.GetByUserIdAsync(userId);
+            if (entity == null) return null;
+
+            return new
+            {
+                id = entity.Id,
+                number = entity.Number,
+                full_name = entity.FullName,
+                nationality = entity.Nationality,
+                sex = entity.Sex == 0 ? "Nam" : "Nữ",
+                date_of_birth = entity.DateOfBirth.ToString("yyyy-MM-dd"),
+                expires_at = entity.ExpiresAt.ToString("yyyy-MM-dd"),
+                @class = entity.Class,
+                image_url = entity.ImageUrl,
+                user_id = entity.UserId
+            };
+        }
+
+        public async Task<Guid> CreateAnounymousAccount(CreateUserReq req)
+        {
+            var user = await _userRepository.GetByPhoneAsync(req.Phone);
+            if (user != null)
+            {
+                var rentalContract = _rentalContractRepository.GetByCustomerAsync(user.Id);
+                if(rentalContract != null)
+                {
+                    throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
+                }
+                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
+            }
+            user = _mapper.Map<User>(req);
+            Guid userId;
+            do
+            {
+                userId = Guid.NewGuid();
+            }while (await _userRepository.GetByIdAsync(userId) != null);
+            user.Id = userId;
+            await _userRepository.AddAsync(user);
+            return userId;
+        }
+
+        public async Task<User> GetUserByPhoneAsync(string phone)
+        {
+            var user = await _userRepository.GetByPhoneAsync(phone);
+            if(user == null)
+            {
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
+            }
+            return user;
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsers()
+        {
+            var users = await _userRepository.GetAllAsync();
+            return users;
         }
     }
 }

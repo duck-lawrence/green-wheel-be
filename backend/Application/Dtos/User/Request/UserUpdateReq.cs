@@ -13,7 +13,7 @@ namespace Application.Dtos.User.Request
         public string? Phone { get; set; }
         public int? Sex { get; set; }
         public DateTimeOffset? DateOfBirth { get; set; }
-
+        public string? AvatarUrl { get; set; }
 
     }
 }

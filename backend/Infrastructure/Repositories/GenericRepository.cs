@@ -1,14 +1,13 @@
 ﻿using Application.AppExceptions;
 using Application.Repositories;
 using Domain.Commons;
-using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class,IEntity
+    public class GenericRepository<T> : IGenericRepository<T> where T : class, IEntity
     {
         protected readonly IGreenWheelDbContext _dbContext;
         protected readonly DbSet<T> _dbSet;
@@ -19,15 +18,14 @@ namespace Infrastructure.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-
-        public async Task<Guid> AddAsync(T entity)
+        public virtual async Task<Guid> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             return entity.Id;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public virtual async Task<bool> DeleteAsync(Guid id)
         {
             var entityFromDb = await GetByIdAsync(id)
         ?? throw new NotFoundException($"{typeof(T).Name} is not found");
@@ -46,7 +44,7 @@ namespace Infrastructure.Repositories
             return entityFromDb != null;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[]? includes = null)
+        public virtual async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[]? includes = null)
         {
             var query = _dbSet.AsQueryable();
 
@@ -68,29 +66,40 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<T?> GetByIdAsync(Guid id)
+        public virtual async Task<T?> GetByIdAsync(Guid id)
         {
             //return  await _dbSet.FirstOrDefault(t => t.Id == id && t.);
             var entityFromDb = await _dbSet.FindAsync(id);
             if (entityFromDb is SorfDeletedEntity softEntity1 && softEntity1.DeletedAt == null)
             {
                 return entityFromDb;
-            }else if(entityFromDb is SorfDeletedEntity softEntity2 && softEntity2.DeletedAt != null)
+            }
+            else if (entityFromDb is SorfDeletedEntity softEntity2 && softEntity2.DeletedAt != null)
             {
                 return null;
             }
             return entityFromDb;
         }
 
-        public async Task<int> UpdateAsync(T entity)
+        public virtual async Task<int> UpdateAsync(T entity)
         {
             var entityFromDb = await GetByIdAsync(entity.Id);
-            if(entityFromDb == null)
+            if (entityFromDb == null)
             {
                 throw new NotFoundException($"{typeof(T).Name} is not found");
             }
             _dbContext.Entry(entityFromDb).CurrentValues.SetValues(entity);
             return await _dbContext.SaveChangesAsync();
+        }
+
+        public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.Where(predicate).ToListAsync();
+        }
+
+        public virtual void Remove(T entity)
+        {
+            _dbSet.Remove(entity);
         }
     }
 }

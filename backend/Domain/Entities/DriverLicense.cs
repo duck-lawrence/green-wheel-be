@@ -30,8 +30,6 @@ public partial class DriverLicense : SorfDeletedEntity, IEntity
 
     public string ImagePublicId { get; set; } = null!;
 
-    
-
     public Guid UserId { get; set; }
 
     public virtual User User { get; set; } = null!;

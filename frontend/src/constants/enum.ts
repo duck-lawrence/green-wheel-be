@@ -25,11 +25,11 @@ export enum InvoiceStatus {
 
 export enum RentalContractStatus {
     RequestPending = 0,
-    ConfirmChangeStationPending = 1,
-    PaymentPending = 2,
-    Active = 3,
-    Completed = 4,
-    Cancelled = 5
+    PaymentPending = 1,
+    Active = 2,
+    Completed = 3,
+    Cancelled = 4,
+    ConfirmChangeStationPending = 5
 }
 
 export enum DamageStatus {
@@ -44,7 +44,9 @@ export enum VehicleStatus {
     Available = 0,
     Unavailable = 1,
     Rented = 2,
-    Maintenance = 3
+    Maintenance = 3,
+    MissingNoReason = 4,
+    LateReturn = 5
 }
 
 export enum InvoiceItemType {

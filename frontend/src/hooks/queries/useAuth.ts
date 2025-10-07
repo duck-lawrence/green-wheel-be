@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next"
 import { authApi } from "@/services/authApi"
 import { useMutation } from "@tanstack/react-query"
 import { BackendError } from "@/models/common/response"
+// import { UserProfileViewRes } from "@/models/user/schema/response"
+import { useInvalidateMeQuery, useProfileStore, useTokenStore } from "@/hooks"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
-import { useProfileStore, useToken } from "@/hooks"
 
 // ===== Login and logout =====
 export const useLogin = ({
@@ -15,12 +16,14 @@ export const useLogin = ({
     onSuccess?: () => void
 }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.login,
         onSuccess: (data) => {
             setAccessToken(data.accessToken, rememberMe)
+            invalidateAuthQuery()
             onSuccess?.()
             toast.success(t("success.login"))
         },
@@ -34,15 +37,17 @@ export const useLogin = ({
 
 export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const removeAccessToken = useToken((s) => s.removeAccessToken)
+    const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
     const removeUser = useProfileStore((s) => s.removeUser)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.logout,
         onSuccess: () => {
+            onSuccess?.()
             removeAccessToken()
             removeUser()
-            onSuccess?.()
+            invalidateAuthQuery()
             toast.success(t("success.logout"))
         },
         onError: (error: BackendError) => {
@@ -63,14 +68,16 @@ export const useLoginGoogle = ({
     onSuccess?: () => void
 }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
     const setUser = useProfileStore((s) => s.setUser)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.loginGoogle,
         onSuccess: (data) => {
             if (!data.needSetPassword) {
                 setAccessToken(data.accessToken!, rememberMe)
+                invalidateAuthQuery()
                 toast.success(t("success.login"))
             } else {
                 setUser({
@@ -92,12 +99,14 @@ export const useLoginGoogle = ({
 
 export const useSetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.setPassword,
         onSuccess: (data) => {
             setAccessToken(data.accessToken)
+            invalidateAuthQuery()
             onSuccess?.()
             toast.success(t("success.login"))
         },
@@ -140,12 +149,14 @@ export const useRegisterVerify = ({ onSuccess }: { onSuccess?: () => void }) => 
 
 export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const setAccessToken = useToken((s) => s.setAccessToken)
+    const setAccessToken = useTokenStore((s) => s.setAccessToken)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.regsiterComplete,
         onSuccess: (data) => {
             setAccessToken(data.accessToken)
+            invalidateAuthQuery()
             onSuccess?.()
             toast.success(t("success.register"))
         },
@@ -205,14 +216,16 @@ export const useResetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
 
 export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const removeAccessToken = useToken((s) => s.removeAccessToken)
+    const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
     const removeUser = useProfileStore((s) => s.removeUser)
+    const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.changePassword,
         onSuccess: () => {
             removeAccessToken()
             removeUser()
+            invalidateAuthQuery()
             onSuccess?.()
             toast.success(t("success.change_password"))
         },
@@ -223,3 +236,45 @@ export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => 
         }
     })
 }
+
+// export const useAuth = () => {
+//     return useQuery({
+//         queryKey: [QUERY_KEY.AUTH],
+//         queryFn: async () => {
+//             try {
+//                 const profile = await profileApi.getMe()
+//                 const roleFromObject =
+//                     typeof (profile as { role?: unknown }).role === "object"
+//                         ? (profile as { role?: { name?: string } }).role?.name
+//                         : undefined
+
+//                 let normalizedRole =
+//                     profile.role ?? roleFromObject ?? profile.roleDetail?.name ?? profile.roleId
+
+//                 return {
+//                     ...profile,
+//                     role: typeof normalizedRole === "string" ? normalizedRole : undefined,
+//                     roleId:
+//                         typeof normalizedRole === "string"
+//                             ? normalizedRole
+//                             : typeof profile.roleId === "string"
+//                             ? profile.roleId
+//                             : undefined,
+//                     roleDetail:
+//                         profile.roleDetail ??
+//                         (typeof profile.role === "object" && profile.role !== null
+//                             ? (profile.role as { id?: string; name?: string; description?: string })
+//                             : undefined)
+//                 }
+//             } catch (error) {
+//                 const backendError = error as BackendError
+//                 if (backendError?.status === 401) {
+//                     return undefined
+//                 }
+//                 throw error
+//             }
+//         },
+//         retry: false,
+//         staleTime: Infinity
+//     })
+// }

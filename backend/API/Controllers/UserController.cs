@@ -1,14 +1,13 @@
-﻿using API.Filters;
-using Application.Abstractions;
+﻿using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.User.Request;
 using Application.Dtos.Common.Request;
 using Application.Dtos.User.Respone;
-using Infrastructure.ApplicationDbContext;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using API.Filters;
+using Application;
 
 namespace API.Controllers
 {
@@ -17,25 +16,23 @@ namespace API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly IPhotoService _photoService;
-        private readonly ILogger<UserController> _logger;
-
         private readonly IGoogleCredentialService _googleService;
 
         public UserController(IUserService service
-            ,IGoogleCredentialService googleCredentialService
+            , IGoogleCredentialService googleCredentialService
             )
         {
             _userService = service;
             _googleService = googleCredentialService;
-
         }
+
         /*
          Status code:
          200: Login successfully
          401: Invalid email or password
          400: Incorrect form of email, email is empty, password < 6 character, password empty
          */
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginReq user)
         {
@@ -45,11 +42,13 @@ namespace API.Controllers
                 AccessToken = accessToken
             });
         }
+
         /*
          Status code
          200: logout successfully
          401: Invalid refresh token
          */
+
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
@@ -59,14 +58,16 @@ namespace API.Controllers
                 await _userService.Logout(refreshToken);
                 return Ok();
             }
-            return Unauthorized(Message.User.Unauthorized);
+            return Unauthorized(Message.UserMessage.Unauthorized);
         }
+
         /*
-         Status code: 
+         Status code:
          200: send email successfully
          400: incorrect form of email
          429: send to much request per minutes
          */
+
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
         {
@@ -74,12 +75,14 @@ namespace API.Controllers
             await _userService.SendOTP(email.Email);
             return Ok();
         }
+
         /*
          Status code:
          200: verify email successfully
          401: incorrect OTP or this email not have otp, or send to much request
          400: inccorect from of email or otp is not digit
          */
+
         [HttpPost("register/verify-otp")]
         public async Task<IActionResult> RegisterVerifyOtp([FromBody] VerifyOTPReq verifyOTPDto)
         {
@@ -94,12 +97,12 @@ namespace API.Controllers
          409: email is exists
          200: register successfully
          */
+
         [HttpPost("register/complete")]
         public async Task<IActionResult> Register([FromBody] UserRegisterReq registerUserDto)
         {
             if (Request.Cookies.TryGetValue(CookieKeys.RegisterToken, out var registerToken))
             {
-
                 string accessToken = await _userService.RegisterAsync(registerToken, registerUserDto);
                 return Ok(new
                 {
@@ -108,33 +111,37 @@ namespace API.Controllers
             }
             else
             {
-                return Unauthorized(Message.User.InvalidToken);
+                return Unauthorized(Message.UserMessage.InvalidToken);
             }
         }
+
         /*
          status code:
          400: pass is too short, empty password/oldpassword/confirmpassword, confirm password not match
          401: invalid old password
          200: change password successfully
          */
+
         [HttpPut("change-password")]
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordReq userChangePasswordDto)
         {
-            if(userChangePasswordDto.OldPassword == null)
+            if (userChangePasswordDto.OldPassword == null)
             {
-                return BadRequest(Message.User.OldPasswordIsRequired);
+                return BadRequest(Message.UserMessage.OldPasswordIsRequired);
             }
             var user = HttpContext.User;
             await _userService.ChangePassword(user, userChangePasswordDto);
             return Ok();
         }
+
         /*
-         Status code: 
+         Status code:
          200: send email successfully
          400: incorrect form of email
          429: send to much request per minute
          */
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] SendEmailReq sendEmailRequestDto)
         {
@@ -148,6 +155,7 @@ namespace API.Controllers
          401: incorrect OTP or this email not have otp, or send to much request
          400: incorect from of email or otp is not digit
          */
+
         [HttpPost("forgot-password/verify-otp")]
         public async Task<IActionResult> ForgotPasswordVerifyOTP([FromBody] VerifyOTPReq verifyOTPDto)
         {
@@ -157,10 +165,11 @@ namespace API.Controllers
 
         /*
          status code:
-         400: password is too short / confirm password does not match 
+         400: password is too short / confirm password does not match
          200: reset password successfully
          401: invalid token
          */
+
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] UserChangePasswordReq userChangePasswordDto)
         {
@@ -169,8 +178,7 @@ namespace API.Controllers
                 await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
                 return Ok();
             }
-            return Unauthorized(Message.User.InvalidToken);
-
+            return Unauthorized(Message.UserMessage.InvalidToken);
         }
 
         /*
@@ -178,6 +186,7 @@ namespace API.Controllers
          200: refresh token successfully
          401: invalid token
          */
+
         [HttpPost]
         [Route("refresh-token")]
         public async Task<IActionResult> RefreshToken()
@@ -190,8 +199,7 @@ namespace API.Controllers
                     AccessToken = accessToken
                 });
             }
-            return Unauthorized(Message.User.Unauthorized);
-
+            return Unauthorized(Message.UserMessage.Unauthorized);
         }
 
         [HttpPost("login-google")]
@@ -227,6 +235,7 @@ namespace API.Controllers
             }
             return BadRequest();
         }
+
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMe()
@@ -238,29 +247,143 @@ namespace API.Controllers
 
         [HttpPatch("me")]
         [Authorize]
-        public async Task<IActionResult> UpdateMe([FromBody]UserUpdateReq userUpdateReq)
+        public async Task<IActionResult> UpdateMe([FromBody] UserUpdateReq userUpdateReq)
         {
             var userClaims = HttpContext.User;
             await _userService.UpdateMe(userClaims, userUpdateReq);
             return Ok();
         }
-        [HttpPost("upload-avatar")]
+
+        [HttpPut("avatar")]
         [Authorize]
-        public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq req)
+        public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq request)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-
-            var avatarUrl = await _userService.UploadAvatarAsync(userId, req.File);
+            var avatarUrl = await _userService.UploadAvatarAsync(userId, request.File);
 
             return Ok(new { AvatarUrl = avatarUrl });
         }
-        [HttpDelete("Delete-avatar")]
+
+        [HttpDelete("avatar")]
         [Authorize]
         public async Task<IActionResult> DeleteAvatar()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _userService.DeleteAvatarAsync(userId);
-            return Ok(new {Message = Message.Cloudinary.DeleteSuccess});
+
+            return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
+
+        [HttpPost("citizen-identities")]
+        [Authorize]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadCitizenId([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UploadCitizenIdAsync(userId, file);
+            return Ok(new
+            {
+                message = "Citizen ID processed successfully",
+                citizen_identity = result
+            });
+        }
+
+        [HttpGet("citizen-identities")]
+        [Authorize]
+        public async Task<IActionResult> GetMyCitizenIdentity()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.GetMyCitizenIdentityAsync(userId);
+
+            if (result == null)
+                return NotFound("Citizen identity not found for this user");
+
+            return Ok(result);
+        }
+
+        [HttpPost("driver-licenses")]
+        [Authorize]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UploadDriverLicenseAsync(userId, file);
+            return Ok(new
+            {
+                message = "Driver license processed successfully",
+                driver_license = result
+            });
+        }
+
+        // Lấy bằng user trong token
+        [HttpGet("driver-licenses")]
+        [Authorize]
+        public async Task<IActionResult> GetMyDriverLicense()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.GetMyDriverLicenseAsync(userId);
+
+            if (result == null)
+                return NotFound("Driver license not found for this user");
+
+            return Ok(result);
+        }
+
+        //Create anonymouse account
+        [RoleAuthorize("Staff")]
+        [HttpPost("anonymous")]
+        public async Task<IActionResult> CreateAnonymouseAccount([FromForm] CreateUserReq req)
+        {
+            var userId = await _userService.CreateAnounymousAccount(req);
+            return Ok(userId);
+        }
+
+        //upload citizenId for Anonymous
+        [HttpPost("{id}/citizen-identity")]
+        [RoleAuthorize("Staff")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadCitizenIdForAnonymous(Guid id, [FromForm] IFormFile file)
+        { 
+            var citizenIdentity = await _userService.UploadCitizenIdAsync(id, file);
+            return Ok(citizenIdentity);
+        }
+
+        [HttpPost("{id}/driver-license")]
+        [RoleAuthorize("Staff")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadDriverLicenseForAnonymous(Guid id, [FromForm] IFormFile file)
+        {
+            var driverLisence = await _userService.UploadDriverLicenseAsync(id, file);
+            return Ok(driverLisence);
+        }
+        /*
+         * Status code
+         * 200 success
+         * 404 not found
+         */
+        [HttpGet("/phone/{phone}")]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> GetUserByPhone(string phone)
+        {
+            var user = await _userService.GetUserByPhoneAsync(phone);
+            return Ok(user);
+        }
+
+        /*
+         * Status code
+         * 200 success
+         */
+        [HttpGet()]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> GetAll ()
+        {
+            var users = await _userService.GetAllUsers();
+            return Ok(users);
+        }
+
     }
 }

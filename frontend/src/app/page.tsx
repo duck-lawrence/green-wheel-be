@@ -1,6 +1,5 @@
 "use client"
-import { ButtonStyled, Carousel, Footer } from "@/components"
-import Link from "next/link"
+import { Carousel, Footer } from "@/components"
 import React, { useEffect, useRef } from "react"
 import { slides } from "../../public/cars"
 import { useTranslation } from "react-i18next"
@@ -40,19 +39,19 @@ export default function HomePage() {
 
     return (
         <div>
-            <div className="mt-30 min-h-[80vh]">
-                <div className="flex flex-col items-center justify-center gap-4">
-                    <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
+            <div className="min-h-[80vh]">
+                <div className="bannerBackground min-h-[80vh] min-w-full flex flex-col items-start justify-center gap-4">
+                    {/* <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
                     <div className="text-gray-500">{t("home.description")}</div>
                     <ButtonStyled
                         as={Link}
-                        href="/self-drive"
+                        href="/vehicle-rental"
                         className="text-black h-13 transition-all duration-500
                                             hover:bg-primary hover:text-white hover:border-black"
                         variant="bordered"
                     >
                         {t("home.view_details")}
-                    </ButtonStyled>
+                    </ButtonStyled> */}
                 </div>
 
                 {/* Carousel */}

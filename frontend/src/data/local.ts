@@ -1,4 +1,4 @@
-interface LocalItem {
+type LocalItem = {
     key: string
     label: string
     description: string

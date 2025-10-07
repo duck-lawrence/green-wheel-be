@@ -8,8 +8,6 @@ public partial class Staff : SorfDeletedEntity
 {
     public Guid UserId { get; set; }
 
-    
-
     public Guid StationId { get; set; }
 
     public virtual ICollection<DispatchRequest> DispatchRequestApprovedAdmins { get; set; } = new List<DispatchRequest>();

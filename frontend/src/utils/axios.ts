@@ -1,5 +1,5 @@
-import { BACKEND_API_URL } from "@/constants/api"
-import { useToken } from "@/hooks"
+import { BACKEND_API_URL } from "@/constants/env"
+import { useTokenStore } from "@/hooks"
 import axios from "axios"
 
 const axiosInstance = axios.create({
@@ -16,7 +16,7 @@ const refreshInstance = axios.create({
 // request interceptors
 axiosInstance.interceptors.request.use(
     (config) => {
-        const token = useToken.getState().accessToken
+        const token = useTokenStore.getState().accessToken
         if (token) {
             config.headers = config.headers || {}
             config.headers["Authorization"] = `Bearer ${token}`
@@ -31,7 +31,7 @@ axiosInstance.interceptors.response.use(
     (res) => res,
     async (error) => {
         const originalRequest = error.config
-        // const hasToken = !!useToken.getState().accessToken
+        // const hasToken = !!useTokenStore.getState().accessToken
 
         if (
             error.response?.status === 401 &&
@@ -43,9 +43,9 @@ axiosInstance.interceptors.response.use(
         ) {
             originalRequest.sent = true
             try {
-                useToken.getState().removeAccessToken()
+                useTokenStore.getState().removeAccessToken()
                 const res = await refreshInstance.post("/users/refresh-token")
-                useToken.getState().setAccessToken(res.data.accessToken)
+                useTokenStore.getState().setAccessToken(res.data.accessToken)
 
                 originalRequest.headers = originalRequest.headers || {}
                 originalRequest.headers["Authorization"] = `Bearer ${res.data.accessToken}`

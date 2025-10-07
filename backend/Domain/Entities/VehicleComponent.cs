@@ -16,8 +16,6 @@ public partial class VehicleComponent : SorfDeletedEntity, IEntity
 
     public string Description { get; set; } = null!;
 
-    
-
     public virtual ICollection<ModelComponent> ModelComponents { get; set; } = new List<ModelComponent>();
 
     public virtual ICollection<VehicleChecklistItem> VehicleChecklistItems { get; set; } = new List<VehicleChecklistItem>();

@@ -3,20 +3,65 @@
 import React, { useCallback, useEffect } from "react"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@heroui/react"
-import Link from "next/link"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { DropdownStyle } from "@/components"
-import { useGetMe, useLogout, useProfileStore, useToken } from "@/hooks"
+import { useGetMe, useLogout, useProfileStore, useTokenStore } from "@/hooks"
 import { BackendError } from "@/models/common/response"
+import Link from "next/link"
+import { DEFAULT_AVATAR_URL } from "@/constants/constants"
+
+type MaybeRoleDetail = { name?: string | null } | null | undefined
+
+function normalizeRole(role?: unknown, roleDetail?: MaybeRoleDetail) {
+    if (typeof role === "string" && role.trim().length > 0) {
+        const normalized = role.trim().toLowerCase()
+        return normalized.replace(/^"+|"+$/g, "").replace(/^'+|'+$/g, "")
+    }
+    if (role && typeof role === "object") {
+        const roleName = (role as { name?: string | null }).name
+        if (typeof roleName === "string" && roleName.trim().length > 0) {
+            return roleName.trim().toLowerCase()
+        }
+    }
+    if (roleDetail && typeof roleDetail === "object" && typeof roleDetail.name === "string") {
+        return roleDetail.name.trim().toLowerCase()
+    }
+    return undefined
+}
+
+type DropdownLinkItem = {
+    key: string
+    href?: string
+    label: string
+    color?: "danger"
+}
 
 export function ProfileDropdown() {
-    const defaultAvatarUrl = "/images/avtFallback.jpg"
     const { t } = useTranslation()
-    const logoutMutation = useLogout({ onSuccess: undefined })
+    const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
     const user = useProfileStore((s) => s.user)
     const setUser = useProfileStore((s) => s.setUser)
-    const isLoggedIn = useToken((s) => !!s.accessToken)
+    const isLoggedIn = useTokenStore((s) => !!s.accessToken)
+
+    const roleDetail = (user as Partial<{ roleDetail?: MaybeRoleDetail }> | null | undefined)?.roleDetail
+    const isStaff = normalizeRole(user?.role, roleDetail) === "staff"
+
+    const baseItems: DropdownLinkItem[] = isStaff
+        ? [
+              { key: "staff_management", href: "/staff", label: t("navbar.staff_management") as string },
+              { key: "staff_profile", href: "/profile", label: t("navbar.staff_profile") as string },
+              { key: "staff_contracts", href: "/staff/contracts", label: t("navbar.staff_contracts") as string }
+          ]
+        : [
+              { key: "profile", href: "/profile", label: t("user.profile") as string },
+              { key: "rental_contracts", href: "/profile/rental-contracts", label: t("user.rental_contracts") as string }
+          ]
+
+    const dropdownItems: DropdownLinkItem[] = [
+        ...baseItems,
+        { key: "logout", label: t("navbar.logout") as string, color: "danger" }
+    ]
 
     const {
         data: userRes,
@@ -46,17 +91,17 @@ export function ProfileDropdown() {
         }
     }, [isGetMeError, getMeError, t])
 
-    if (isGetMeLoading) return <Spinner />
+    if (isGetMeLoading || isGetMeError) return <Spinner />
 
     return (
-        <div className="gap-4">
+        <div className="gap-4 flex items-center">
             <DropdownStyle>
                 <DropdownTrigger>
                     <User
                         as="button"
                         avatarProps={{
                             isBordered: true,
-                            src: user?.avatarUrl || defaultAvatarUrl
+                            src: user?.avatarUrl || DEFAULT_AVATAR_URL
                         }}
                         className="transition-transform"
                         name={user?.firstName.trim() || ""}
@@ -66,20 +111,22 @@ export function ProfileDropdown() {
                     />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User Actions" variant="flat">
-                    <DropdownItem key="profile" textValue={t("user.profile")}>
-                        <Link href="/profile">{t("user.profile")}</Link>
-                    </DropdownItem>
-                    <DropdownItem key="team_settings" textValue={t("user.booking_history")}>
-                        <Link href="/#">{t("user.booking_history")}</Link>
-                    </DropdownItem>
-                    <DropdownItem
-                        key="logout"
-                        textValue={t("navbar.logout")}
-                        color="danger"
-                        onPress={handleLogout}
-                    >
-                        {t("navbar.logout")}
-                    </DropdownItem>
+                    {dropdownItems.map((item) =>
+                        item.href ? (
+                            <DropdownItem key={item.key} as={Link} href={item.href} className="block">
+                                {item.label}
+                            </DropdownItem>
+                        ) : (
+                            <DropdownItem
+                                key={item.key}
+                                textValue={item.label}
+                                color={item.color}
+                                onPress={handleLogout}
+                            >
+                                {item.label}
+                            </DropdownItem>
+                        )
+                    )}
                 </DropdownMenu>
             </DropdownStyle>
         </div>

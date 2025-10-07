@@ -9,18 +9,24 @@ namespace Application.Constants
     public static class Message
     {
         //Register
-        public static class User
+        public static class UserMessage
         {
             //auth
             public const string MissingToken = "user.missing_token";
+
+            public const string UserIdIsRequired = "user.user_id_is_required";
+
             //otp
             public const string InvalidOTP = "user.invalid_otp";
+
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
             public const string OTPMustHave6Digits = "user.otp_must_have_6_digits";
             public const string RateLimitOtp = "user.rate_limit_otp";
             public const string AttemptOtp = "user.attemp_otp";
+
             //register
             public const string EmailAlreadyExists = "user.email_already_exists";
+
             public const string EmailIsRequired = "user.email_require";
             public const string InvalidEmail = "user.invalid_email";
             public const string PasswordTooShort = "user.password_too_short";
@@ -33,34 +39,49 @@ namespace Application.Constants
             public const string LastNameIsRequired = "user.last_name_is_required";
             public const string DateOfBirthIsRequired = "user.date_of_birth_require";
             public const string PhoneAlreadyExist = "user.phone_already_exist";
+
             //change password
             public const string DoNotHavePermission = "user.do_not_have_permission";
+
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
             public const string OldPasswordIsRequired = "user.old_password_is_required";
+
             //login
             public const string InvalidEmailOrPassword = "user.invalid_email_or_password";
+
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
             public const string UserNotFound = "user.user_not_found";
+
             //change avatar
             public const string NotFoundAvatar = "No avatar to delete";
 
+            //Citizen Identity
+            public const string NotHaveCitizenIdentity = "user.not_have_citizen_identity";
 
+            public const string NotHaveDriverLicense = "user.not_have_driver_license";
         }
 
         //Common error
-        public static class Common
+        public static class CommonMessage
         {
             public const string TooManyRequest = "common.too_many_request";
             public const string UnexpectedError = "common.unexpected_error";
+            public const string ValidationFailed = "common.validation_failed";
+            public const string NotFound = "common.not_found";
+            public const string BadRequest = "common.bad_request";
+            public const string Conflict = "common.conflict";
+            public const string Forbidden = "common.forbidden";
+            public const string DatabaseError = "common.database_error";
         }
 
-        public static class Vehicle
+        public static class VehicleMessage
         {
             public const string VehicleNotFound = "vehicle.vehicle_not_found";
             public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
         }
-        public static class VehicleModel
+
+        public static class VehicleModelMessage
         {
             public const string VehicleModelNotFound = "vehicle_model.vehicle_model_not_found";
             public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
@@ -81,48 +102,82 @@ namespace Application.Constants
             public const string BrandIdIsRequired = "vehicle_model.brand_id_is_required";
             public const string SegmentIdIsRequired = "vehicle_model.segment_id_is_required";
         }
+
         //change password
 
         //Cloudinary
-        public static class Cloudinary
+        public static class CloudinaryMessage
         {
-            public const string NotFoundObjectInFile = "File is emty";
-            public const string InvalidFileType = "Unsupported image type";
-            public const string UploadFailed = "Upload failed";
-            public const string DeleteSuccess = "Delete successful";
+            public const string NotFoundObjectInFile = "cloudinary.file_not_found";
+            public const string InvalidFileType = "cloudinary.invalid_file_type";
+            public const string UploadFailed = "cloudinary.upload_failed";
+            public const string DeleteFailed = "cloudinary.delete_failed";
+            public const string DeleteSuccess = "cloudinary.delete_success";
+            public const string FolderNotFound = "cloudinary.folder_not_found";
         }
 
         //Rental Contract
-        public static class RentalContract
+        public static class RentalContractMessage
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
+            public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
         }
 
         //Station
-        public static class Station
+        public static class StationMessage
         {
             public const string StationNotFound = "station.station_not_found";
         }
-        public static class Momo
+
+        public static class MomoMessage
         {
             public const string InvalidSignature = "momo.invalid_signature";
             public const string MissingAccessKeyPartnerCodeSecretKey = "momo.missing_access_key_partner_code_secret_key";
             public const string NotHavePermission = "momo.not_have_permission";
             public const string InvalidEndpoint = "momo.invalid_end_point";
             public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
-
         }
 
-        public static class Invoice
+        public static class InvoiceMessage
         {
             public const string InvoiceNotFound = "invoice.invoice_not_found";
             public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
         }
-        public static class Json
+
+        public static class JsonMessage
         {
             public const string ParsingFailed = "json.pasing_failed";
+        }
 
+        public static class VehicleSegmentMessage
+        {
+            public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
+        }
+
+        //Licenses
+        public static class LicensesMessage
+        {
+            public const string InvalidLicenseData = "licenses.invalid_license_data";
+            public const string LicenseNotFound = "licenses.not_found";
+        }
+
+        //VEHICLE IMAGE
+        public static class ModelImageMessage
+        {
+            public const string ModelImageNotFound = "model_image.not_found";
+            public const string InvalidModelId = "model_image.invalid_model_id";
+            public const string UploadFailed = "model_image.upload_failed";
+            public const string DeleteFailed = "model_image.delete_failed";
+            public const string NoFileChosen = "model_image.no_file_chosen";
+        }
+
+        //upload
+        public static class UploadMessage
+        {
+            public const string EmptyFile = "upload.empty_file";
+            public const string InvalidFile = "upload.invalid_file";
+            public const string Failed = "upload.failed";
         }
     }
 }

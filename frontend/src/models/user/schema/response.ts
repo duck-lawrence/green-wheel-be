@@ -1,5 +1,8 @@
+import { RoleViewRes } from "@/models/role/response"
+import { StationViewRes } from "@/models/station/schema/response"
+
 export type UserProfileViewRes = {
-    email: string
+    email?: string
     firstName: string
     lastName: string
     sex?: number
@@ -8,4 +11,6 @@ export type UserProfileViewRes = {
     phone?: string
     licenseUrl?: string
     citizenUrl?: string
+    role?: RoleViewRes
+    station?: StationViewRes
 }

@@ -231,6 +231,8 @@ CREATE TABLE [vehicle_models] (
     [battery_capacity] decimal(6,2) NOT NULL,
     [eco_range_km] decimal(6,1) NOT NULL,
     [sport_range_km] decimal(6,1) NOT NULL,
+	[image_url] nvarchar(500),
+    [image_public_id] nvarchar(255),
     [deleted_at] datetimeoffset,
     
     [brand_id] uniqueidentifier NOT NULL,
@@ -242,6 +244,22 @@ CREATE TABLE [vehicle_models] (
 GO
 CREATE INDEX idx_vehicle_models_brand_id ON vehicle_models (brand_id);
 CREATE INDEX idx_vehicle_models__segment_id ON vehicle_models (segment_id);
+GO
+
+CREATE TABLE [model_images] (
+    [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [url] nvarchar(500) NOT NULL UNIQUE,
+    [public_id] nvarchar(255) NOT NULL,
+    [deleted_at] datetimeoffset,
+
+    [model_id] uniqueidentifier NOT NULL,
+
+    CONSTRAINT fk_model_images_vehicle_models FOREIGN KEY ([model_id]) REFERENCES [vehicle_models]([id])
+);
+GO
+CREATE INDEX idx_model_images_model_id ON model_images (model_id);
 GO
 
 CREATE TABLE [vehicle_components] (
@@ -289,22 +307,6 @@ CREATE TABLE [vehicles] (
 GO
 CREATE INDEX idx_vehicles_model_id ON vehicles (model_id);
 CREATE INDEX idx_vehicles_vehicles ON vehicles (station_id);
-GO
-
-CREATE TABLE [vehicle_images] (
-    [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [url] nvarchar(500) NOT NULL UNIQUE,
-    [public_id] nvarchar(255) NOT NULL,
-    [deleted_at] datetimeoffset,
-
-    [vehicle_id] uniqueidentifier NOT NULL,
-
-    CONSTRAINT fk_vehicle_images_vehicles FOREIGN KEY ([vehicle_id]) REFERENCES [vehicles]([id])
-);
-GO
-CREATE INDEX idx_vehicle_images_vehicle_id ON vehicle_images (vehicle_id);
 GO
 
 CREATE TABLE [rental_contracts] (
@@ -371,6 +373,8 @@ CREATE TABLE [vehicle_checklist_items] (
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [notes] nvarchar(255),
     [status] int NOT NULL DEFAULT 0, -- Good, Minor, Moderate, Severe, Totaled
+    [image_url] nvarchar(500),
+    [image_public_id] nvarchar(255),
     [deleted_at] datetimeoffset,
 
     [component_id] uniqueidentifier NOT NULL,
@@ -380,6 +384,7 @@ CREATE TABLE [vehicle_checklist_items] (
     CONSTRAINT fk_vehicle_checklist_items_checklists FOREIGN KEY ([checklist_id]) REFERENCES [vehicle_checklists]([id])
 );
 GO
+CREATE UNIQUE INDEX idx_vehicle_checklist_items_image_url ON vehicle_checklist_items (image_url) WHERE image_url IS NOT NULL;
 CREATE INDEX idx_vehicle_checklist_items_component_id ON vehicle_checklist_items (component_id);
 CREATE INDEX idx_vehicle_checklist_items_checklist_id ON vehicle_checklist_items (checklist_id);
 GO

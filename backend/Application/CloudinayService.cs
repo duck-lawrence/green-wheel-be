@@ -1,77 +1,43 @@
 ﻿using Application.Abstractions;
-using Application.AppSettingConfigurations;
 using Application.Constants;
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
-using Domain.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Application.AppExceptions;
+using Application.Dtos.Common.Request;
+using Application.Repositories;
 
 namespace Application
 {
-    public class CloudinayService : IPhotoService
+    public class CloudinaryService : IPhotoService
     {
-        private readonly Cloudinary _cloudinary;
-        private readonly CloudinarySettings _settings;
-        private readonly ILogger<CloudinayService> _logger;
+        private readonly ICloudinaryRepository _cloudRepo;
 
-        // allowed type
-        private static readonly string[] _allowedType = new[] { "image/jpeg", "image/jpg", "image/png", "image/webp" };
-
-        public CloudinayService(
-            Cloudinary cloudinary,
-            IOptions<CloudinarySettings> options,
-            ILogger<CloudinayService> logger)
+        public CloudinaryService(ICloudinaryRepository cloudRepo)
         {
-            _cloudinary = cloudinary;
-            _settings = options.Value;
-            _logger = logger;
+            _cloudRepo = cloudRepo;
+        }
+
+        public async Task<PhotoUploadResult> UploadPhotoAsync(UploadImageReq file, string? folder = null)
+        {
+            if (file.File == null || file.File.Length == 0)
+                throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
+
+            folder ??= "uploads";
+
+            var result = await _cloudRepo.UploadAsync(file, folder);
+
+            if (result == null || string.IsNullOrEmpty(result.Url))
+                throw new BusinessException(Message.CloudinaryMessage.UploadFailed);
+
+            return result;
         }
 
         public async Task<bool> DeletePhotoAsync(string publicId)
         {
-            if (string.IsNullOrWhiteSpace(publicId)) return false;
-            var delParams = new DeletionParams(publicId);
-            var result = await _cloudinary.DestroyAsync(delParams);
+            if (string.IsNullOrWhiteSpace(publicId))
+                throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
-            var ok = string.Equals(result.Result, "ok", StringComparison.OrdinalIgnoreCase)
-                 || string.Equals(result.Result, "not_found", StringComparison.OrdinalIgnoreCase);
+            var deleted = await _cloudRepo.DeleteAsync(publicId);
 
-            if (!ok)
-                _logger.LogWarning($"Cloudinary delete returned: {result.Result} for {publicId}");
-
-            return ok;
-        }
-
-        public async Task<PhotoUploadResult> UploadPhotoAsync(IFormFile file, string? folder = null)
-        {
-            if (file == null || file.Length == 0)
-                throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
-
-            if (!_allowedType.Contains(file.ContentType))
-                throw new ArgumentException(Message.Cloudinary.InvalidFileType);
-
-            folder ??= _settings.ApiFolder;
-
-            using var stream = file.OpenReadStream();
-            var uploadParams = new ImageUploadParams
-            {
-                File = new FileDescription(file.FileName, stream),
-                Folder = folder,
-                Transformation = new Transformation().Crop("limit").FetchFormat("auto").Quality("auto")
-            };
-
-            var result = await _cloudinary.UploadAsync(uploadParams);
-
-            if (result.Error != null)
-                throw new InvalidOperationException(result.Error.Message);
-
-            return new PhotoUploadResult
-            {
-                Url = result.Url?.ToString() ?? "",
-                PublicID = result.PublicId
-            };
+            return deleted;
         }
     }
 }

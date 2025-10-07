@@ -29,6 +29,4 @@ public partial class Vehicle : SorfDeletedEntity, IEntity
     public virtual Station Station { get; set; } = null!;
 
     public virtual ICollection<VehicleChecklist> VehicleChecklists { get; set; } = new List<VehicleChecklist>();
-
-    public virtual ICollection<VehicleImage> VehicleImages { get; set; } = new List<VehicleImage>();
 }
