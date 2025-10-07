@@ -91,11 +91,11 @@ export function ProfileDropdown() {
                     >
                         {t("user.rental_contracts")}
                     </DropdownItem>
-                    {isStaff && (
-                        <DropdownItem key="staff_management" as={Link} href="/staff" className="block">
-                            {t("navbar.staff_management")}
-                        </DropdownItem>
-                    )}
+                    {isStaff ? (
+                    <DropdownItem key="staff_management" as={Link} href="/staff" className="block">
+                        {t("navbar.staff_management")}
+                    </DropdownItem>
+                    ) : null}
                     <DropdownItem
                         key="logout"
                         textValue={t("navbar.logout")}
