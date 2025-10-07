@@ -1,7 +1,7 @@
 import AccountSidebar from "@/components/shared/User/Sidebar"
 import React from "react"
 
-export default function UserLayout({ children }: { children: React.ReactNode }) {
+export default function ProfileLayout({ children }: { children: React.ReactNode }) {
     return (
         <div className="w-[1200] flex h-full justify-center">
             <AccountSidebar />

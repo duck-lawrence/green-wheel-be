@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { QUERY_KEYS } from "@/constants/queryKey"
 import { useTranslation } from "react-i18next"
 import toast from "react-hot-toast"
@@ -8,16 +8,15 @@ import { UserUpdateReq } from "@/models/user/schema/request"
 import { UserProfileViewRes } from "@/models/user/schema/response"
 import { useProfileStore } from "@/hooks"
 import { profileApi } from "@/services/profileApi"
-import { getQueryClient } from "@/utils/helpers/getQueryClient"
 
 export function useInvalidateMeQuery() {
-    const queryClient = getQueryClient()
+    const queryClient = useQueryClient()
 
     return () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ME })
 }
 
 export function useGetMeFromCache(): UserProfileViewRes | undefined {
-    const queryClient = getQueryClient()
+    const queryClient = useQueryClient()
     return queryClient.getQueryData<UserProfileViewRes>(QUERY_KEYS.ME)
 }
 
@@ -33,7 +32,7 @@ export const useGetMe = ({ enabled = true }: { enabled?: boolean } = {}) => {
 export const useUpdateMe = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const updateUser = useProfileStore((s) => s.updateUser)
-    const queryClient = getQueryClient()
+    const queryClient = useQueryClient()
 
     return useMutation({
         mutationFn: async (req: UserUpdateReq) => {
@@ -64,7 +63,7 @@ export const useUpdateMe = ({ onSuccess }: { onSuccess?: () => void }) => {
 
 export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const queryClient = getQueryClient()
+    const queryClient = useQueryClient()
     const updateUser = useProfileStore((s) => s.updateUser)
 
     return useMutation({
@@ -93,7 +92,7 @@ export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
 
 export const useDeleteAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const queryClient = getQueryClient()
+    const queryClient = useQueryClient()
     const updateUser = useProfileStore((s) => s.updateUser)
 
     return useMutation({

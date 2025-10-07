@@ -1,7 +1,7 @@
 "use client"
 import { Carousel } from "@/components"
 import React, { useEffect, useRef } from "react"
-import { slides } from "../../public/cars"
+import { slides } from "../../../public/cars"
 import { useTranslation } from "react-i18next"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import { useRouter, useSearchParams } from "next/navigation"

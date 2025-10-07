@@ -11,12 +11,7 @@ import { useBookingFilterStore, useDay, useGetAllStations, useGetAllVehicleSegme
 import { BackendError } from "@/models/common/response"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import toast from "react-hot-toast"
-import {
-    DEFAULT_DATE_TIME_FORMAT,
-    DEFAULT_TIMEZONE,
-    MAX_HOUR,
-    MIN_HOUR
-} from "@/constants/constants"
+import { DEFAULT_TIMEZONE, MAX_HOUR, MIN_HOUR } from "@/constants/constants"
 import dayjs from "dayjs"
 import { useGetAllVehicleModels } from "@/hooks/queries/useVehicleModel"
 
@@ -77,13 +72,9 @@ export function FilterVehicleRental() {
     }, [])
 
     useEffect(() => {
-        if (!startDate)
-            setStartDate(
-                dayjs(minStartDate.toDate(DEFAULT_TIMEZONE)).format(DEFAULT_DATE_TIME_FORMAT)
-            )
-        if (!endDate)
-            setEndDate(dayjs(minEndDate.toDate(DEFAULT_TIMEZONE)).format(DEFAULT_DATE_TIME_FORMAT))
-    }, [endDate, minEndDate, minStartDate, setEndDate, setStartDate, startDate])
+        if (!startDate) setStartDate(formatDateTime({ date: minStartDate }))
+        if (!endDate) setEndDate(formatDateTime({ date: minEndDate }))
+    }, [endDate, formatDateTime, minEndDate, minStartDate, setEndDate, setStartDate, startDate])
 
     // get models
     const { refetch: refetchVehicleModels } = useGetAllVehicleModels({
@@ -182,6 +173,15 @@ export function FilterVehicleRental() {
             }
         }
     }, [isGetVehicleSegmentsError, getVehicleSegmentsError, t])
+
+    // load filtered vehicle when enter page and if form is valid
+    useEffect(() => {
+        if (!formik.isValid) return
+        const run = async () => {
+            await handleSubmit()
+        }
+        run()
+    }, [formik.isValid, handleSubmit])
 
     if (
         isGetStationsLoading ||

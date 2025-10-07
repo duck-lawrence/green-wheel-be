@@ -6,7 +6,7 @@ import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 
-import { useGetMeFromCache, useTokenStore } from "@/hooks"
+import { useBookingFilterStore, useGetAllStations, useGetMeFromCache } from "@/hooks"
 import {
     ButtonStyled,
     InputStyled,
@@ -17,41 +17,62 @@ import {
 } from "@/components"
 import { PaymentMethod } from "@/constants/enum"
 import { PaymentMethodLabels } from "@/constants/labels"
+import { AutocompleteItem, Spinner } from "@heroui/react"
+import { formatCurrency } from "@/utils/helpers/currentcy"
+import { PHONE_REGEX } from "@/constants/regex"
+import { MapPinAreaIcon } from "@phosphor-icons/react"
+import toast from "react-hot-toast"
+import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import { BackendError } from "@/models/common/response"
 
 type FormValues = {
     fullName: string
     phone: string
     email: string
-    pickupLocation: string
+    stationId: string
     note: string
     paymentMethod: PaymentMethod
     agreeTerms: boolean
     agreeDataPolicy: boolean
 }
 
-export const RegisterReceiveForm = () => {
-    const { t } = useTranslation("common")
+export const CreateRentalContractForm = () => {
+    const { t } = useTranslation()
 
     const [mounted, setMounted] = useState(false)
     // const { user } = useProfileStore()
     const user = useGetMeFromCache()
-    const isLoggedIn = useTokenStore((s) => !!s.accessToken)
+
+    // load station to get name and address
+    const {
+        data: stations,
+        isLoading: isGetStationsLoading,
+        error: getStationsError,
+        isError: isGetStationsError
+    } = useGetAllStations()
+
+    // get vehicle
+
+    // get filter item
+    const stationId = useBookingFilterStore((s) => s.stationId)
+    const startDate = useBookingFilterStore((s) => s.startDate)
+    const endDate = useBookingFilterStore((s) => s.endDate)
 
     useEffect(() => {
-        setMounted(true)
-    }, [])
+        setMounted(!isGetStationsLoading && !isGetStationsError)
+    }, [isGetStationsError, isGetStationsLoading])
 
+    // init value
     // Fees (mock)
-    const listedFee = 590000
-    const deposit = 5000000
-    const totalPayment = listedFee + deposit
-    const formatCurrency = (n: number) => new Intl.NumberFormat("vi-VN").format(n) + "đ"
+    // const listedFee = 590000
+    // const deposit = 5000000
+    // const totalPayment = listedFee + deposit
 
     const initialValues: FormValues = {
-        fullName: isLoggedIn && user ? `${user.firstName} ${user.lastName}` : "",
-        phone: isLoggedIn && user && user.phone ? user.phone : "",
-        email: isLoggedIn && user ? user.email : "",
-        pickupLocation: "",
+        fullName: `${user?.lastName ?? ""} ${user?.firstName ?? ""}`,
+        phone: user?.phone ?? "",
+        email: user?.email ?? "",
+        stationId: stationId || "",
         note: "",
         paymentMethod: PaymentMethod.Cash,
         agreeTerms: false,
@@ -65,10 +86,11 @@ export const RegisterReceiveForm = () => {
         validationSchema: Yup.object().shape({
             fullName: Yup.string().required(t("user.full_name_require")),
             phone: Yup.string()
-                .matches(/^0\d{9}$/, t("user.invalid_phone"))
+                .matches(PHONE_REGEX, t("user.invalid_phone"))
                 .required(t("user.phone_require")),
             email: Yup.string().email(t("user.invalid_email")).required(t("user.email_require")),
-            pickupLocation: Yup.string().required(t("contral_form.pickup_location_require")),
+            // pickupLocation: Yup.string().required(t("contral_form.pickup_location_require")),
+            stationId: Yup.string().required(t("vehicle_model.pick_station")),
             note: Yup.string(),
             paymentMethod: Yup.mixed<PaymentMethod>()
                 .oneOf(Object.values(PaymentMethod) as PaymentMethod[])
@@ -88,15 +110,25 @@ export const RegisterReceiveForm = () => {
     const renterFilled = !!formik.values.fullName?.trim()
     const emailFilled = !!formik.values.email?.trim()
 
+    // Load station
+    useEffect(() => {
+        if (isGetStationsError && getStationsError) {
+            const error = getStationsError as BackendError
+            if (error.detail !== undefined) {
+                toast.error(translateWithFallback(t, error.detail))
+            }
+        }
+    }, [isGetStationsError, getStationsError, t])
+
     return (
-        <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 mt-[100px]">
+        <div className="min-h-screen px-4 sm:px-6 lg:px-8">
             {mounted ? (
                 <div className="mx-auto max-w-5xl bg-white rounded-lg ">
-                    <div className="flex items-center justify-between border-b border-gray-100 px-6 py-6">
+                    <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                         <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
                     </div>
 
-                    <form onSubmit={formik.handleSubmit} className="px-6 pb-8 pt-6" noValidate>
+                    <form onSubmit={formik.handleSubmit} className="px-6 py-4" noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Cột trái */}
                             <div>
@@ -118,7 +150,7 @@ export const RegisterReceiveForm = () => {
                                         }
                                         onBlur={() => formik.setFieldTouched("fullName", true)}
                                         isClearable={false}
-                                        readOnly={isLoggedIn}
+                                        readOnly={true}
                                         classNames={{
                                             inputWrapper: renterFilled
                                                 ? "bg-gray-100 border-gray-200"
@@ -168,7 +200,7 @@ export const RegisterReceiveForm = () => {
                                         }
                                         onBlur={() => formik.setFieldTouched("email", true)}
                                         isClearable={false}
-                                        readOnly={isLoggedIn}
+                                        readOnly={true}
                                         classNames={{
                                             inputWrapper: emailFilled
                                                 ? "bg-gray-100 border-gray-200"
@@ -182,28 +214,28 @@ export const RegisterReceiveForm = () => {
 
                                     {/* Pickup location */}
                                     <AutocompleteStyle
-                                        selectedKey={formik.values.pickupLocation || undefined}
-                                        onSelectionChange={(key) => {
-                                            const next =
-                                                typeof key === "string"
-                                                    ? key
-                                                    : key?.toString() ?? ""
-                                            formik.setFieldValue("pickupLocation", next)
-                                            formik.setFieldTouched("pickupLocation", true)
-                                        }}
-                                        inputValue={formik.values.pickupLocation}
-                                        onInputChange={(val) =>
-                                            formik.setFieldValue("pickupLocation", val ?? "")
-                                        }
+                                        label={t("vehicle_model.station")}
+                                        items={stations}
+                                        startContent={<MapPinAreaIcon className="text-xl" />}
+                                        selectedKey={formik.values.stationId}
+                                        errorMessage={formik.errors.stationId}
+                                        className="max-w-60 h-20 mr-0"
+                                        isClearable={false}
+                                        readOnly={true}
                                     >
-                                        {null}
+                                        {(stations ?? []).map((item) => (
+                                            <AutocompleteItem key={item.id}>
+                                                {item.name}
+                                            </AutocompleteItem>
+                                        ))}
                                     </AutocompleteStyle>
-                                    {formik.touched.pickupLocation &&
-                                        formik.errors.pickupLocation && (
-                                            <p className="text-red-500 text-sm mt-1">
-                                                {formik.errors.pickupLocation}
-                                            </p>
-                                        )}
+                                    <div className="text-sm mt-1 ml-4 truncate w-full min-h-fit">
+                                        {
+                                            stations?.find(
+                                                (station) => station.id === formik.values.stationId
+                                            )?.address
+                                        }
+                                    </div>
 
                                     {/* Note */}
                                     <TextareaStyled
@@ -302,11 +334,11 @@ export const RegisterReceiveForm = () => {
                                     <div className="flex items-center space-x-4">
                                         <div
                                             className="
-                        relative overflow-hidden rounded-md
-                        w-40 h-28
-                        sm:w-48 sm:h-32
-                        md:w-56 md:h-36
-                      "
+                                                relative overflow-hidden rounded-md
+                                                w-40 h-28
+                                                sm:w-48 sm:h-32
+                                                md:w-56 md:h-36
+                                            "
                                         >
                                             <ImageStyled
                                                 src="https://vinfastninhbinh.com.vn/wp-content/uploads/2024/06/vinfast-vf3-5.png"
@@ -397,7 +429,7 @@ export const RegisterReceiveForm = () => {
                     </form>
                 </div>
             ) : (
-                <div className="text-center text-gray-600">Loading...</div>
+                <Spinner />
             )}
         </div>
     )
