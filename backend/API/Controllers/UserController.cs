@@ -282,7 +282,6 @@ namespace API.Controllers
             var result = await _userService.UploadCitizenIdAsync(userId, file);
             return Ok(new
             {
-                message = "Citizen ID processed successfully",
                 citizen_identity = result
             });
         }
@@ -295,7 +294,7 @@ namespace API.Controllers
             var result = await _userService.GetMyCitizenIdentityAsync(userId);
 
             if (result == null)
-                return NotFound("Citizen identity not found for this user");
+                return NotFound(new { Message = Message.Licenses.LicenseNotFound });
 
             return Ok(result);
         }
@@ -310,7 +309,6 @@ namespace API.Controllers
             var result = await _userService.UploadDriverLicenseAsync(userId, file);
             return Ok(new
             {
-                message = "Driver license processed successfully",
                 driver_license = result
             });
         }
@@ -324,7 +322,7 @@ namespace API.Controllers
             var result = await _userService.GetMyDriverLicenseAsync(userId);
 
             if (result == null)
-                return NotFound("Driver license not found for this user");
+                return NotFound(new { Message = Message.Licenses.LicenseNotFound });
 
             return Ok(result);
         }

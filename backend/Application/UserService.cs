@@ -2,7 +2,9 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
+using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
@@ -31,7 +33,6 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private readonly IPhotoService _photoService;
-        private readonly ILogger<UserService> _logger;
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
 
@@ -46,7 +47,6 @@ namespace Application
              IMapper mapper,
              IMemoryCache cache,
              IPhotoService photoService,
-             ILogger<UserService> logger,
              ICitizenIdentityService citizenService,
              IDriverLicenseService driverService
             )
@@ -62,7 +62,6 @@ namespace Application
             _mapper = mapper;
             _cache = cache;
             _photoService = photoService;
-            _logger = logger;
             _citizenService = citizenService;
             _driverService = driverService;
         }
@@ -554,7 +553,7 @@ namespace Application
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Cannot delete old avatar {PublicId}", user.AvatarPublicId);
+                    throw new BadRequestException(ex.Message);
                 }
             }
 
@@ -595,18 +594,8 @@ namespace Application
             var uploadReq = new UploadImageReq { File = file };
             var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
 
-            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url);
-            return new
-            {
-                entity.Id,
-                entity.Number,
-                entity.FullName,
-                entity.Nationality,
-                entity.Sex,
-                entity.DateOfBirth,
-                entity.ExpiresAt,
-                entity.ImageUrl
-            };
+            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url) ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
+            return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
         public async Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file)
@@ -615,15 +604,7 @@ namespace Application
             var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
 
             var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploadResult.Url);
-            return new
-            {
-                entity.Id,
-                entity.Number,
-                entity.FullName,
-                entity.Class,
-                entity.ExpiresAt,
-                entity.ImageUrl
-            };
+            return _mapper.Map<DriverLicenseRes>(entity);
         }
 
         public async Task<object?> GetMyCitizenIdentityAsync(Guid userId)
@@ -631,18 +612,7 @@ namespace Application
             var entity = await _citizenService.GetByUserId(userId);
             if (entity == null) return null;
 
-            return new
-            {
-                id = entity.Id,
-                number = entity.Number,
-                full_name = entity.FullName,
-                nationality = entity.Nationality,
-                sex = entity.Sex == 0 ? "Nam" : "Nữ",
-                date_of_birth = entity.DateOfBirth.ToString("yyyy-MM-dd"),
-                expires_at = entity.ExpiresAt.ToString("yyyy-MM-dd"),
-                image_url = entity.ImageUrl,
-                user_id = entity.UserId
-            };
+            return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
         public async Task<object?> GetMyDriverLicenseAsync(Guid userId)
@@ -650,19 +620,7 @@ namespace Application
             var entity = await _driverService.GetByUserIdAsync(userId);
             if (entity == null) return null;
 
-            return new
-            {
-                id = entity.Id,
-                number = entity.Number,
-                full_name = entity.FullName,
-                nationality = entity.Nationality,
-                sex = entity.Sex == 0 ? "Nam" : "Nữ",
-                date_of_birth = entity.DateOfBirth.ToString("yyyy-MM-dd"),
-                expires_at = entity.ExpiresAt.ToString("yyyy-MM-dd"),
-                @class = entity.Class,
-                image_url = entity.ImageUrl,
-                user_id = entity.UserId
-            };
+            return _mapper.Map<DriverLicenseRes>(entity);
         }
     }
 }
