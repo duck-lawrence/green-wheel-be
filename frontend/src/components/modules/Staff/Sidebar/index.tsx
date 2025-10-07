@@ -22,15 +22,6 @@ export default function StaffSidebar({ selectedPath }: StaffSidebarProps) {
         () =>
             STAFF_MENU.map((item) => {
                 const label = t(item.translationKey ?? "", { defaultValue: item.label })
-                if (item.path === "/logout") {
-                    return {
-                        key: item.path,
-                        label,
-                        onSelect: async () => {
-                            await triggerLogout().catch(() => undefined)
-                        }
-                    }
-                }
                 return {
                     key: item.path,
                     label,
