@@ -189,5 +189,10 @@ namespace Application.Constants
         {
             public const string ComponentNotFound = "vehicle_component.not_found";
         }
+
+        public static class VehicleChecklistMessage
+        {
+            public const string VehicleChecklistNotFound = "vehicle_checklist.not_found";
+        }
     }
 }

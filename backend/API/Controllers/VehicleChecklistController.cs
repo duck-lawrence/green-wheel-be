@@ -19,11 +19,26 @@ namespace API.Controllers
 
         [HttpPost]
         [RoleAuthorize("Staff")]
-        public async Task<IActionResult> CreateVehicleCheckList(CreateVehicleChecklistReq req)
+        public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
             var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklistAsync(staff, req);
             return Ok(vehicleCheckList);
+        }
+        [HttpPut]
+        [RoleAuthorize("Staff")]
+        public async Task<IActionResult> UpdateVehicleChecklist([FromBody]UpdateVehicleChecklistReq req)
+        {
+            await _vehicleChecklistService.UpdateVehicleChecklistAsync(req);
+            return Ok();
+        }
+
+        [HttpGet("{id}")]
+        [RoleAuthorize("Staff")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var checklistViewRes = await _vehicleChecklistService.GetByIdAsync(id);
+            return Ok(checklistViewRes);
         }
     }
 }
