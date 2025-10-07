@@ -18,10 +18,25 @@ function normalizeRole(role?: unknown, roleDetail?: MaybeRoleDetail) {
         const normalized = role.trim().toLowerCase()
         return normalized.replace(/^"+|"+$/g, "").replace(/^'+|'+$/g, "")
     }
+
+    if (role && typeof role === "object") {
+        const roleName = (role as { name?: string | null }).name
+        if (typeof roleName === "string" && roleName.trim().length > 0) {
+            return roleName.trim().toLowerCase()
+        }
+    }
+
     if (roleDetail && typeof roleDetail === "object" && typeof roleDetail.name === "string") {
         return roleDetail.name.trim().toLowerCase()
     }
+
     return undefined
+}
+
+type DropdownLinkItem = {
+    key: string
+    href: string
+    label: string
 }
 
 export function ProfileDropdown() {
@@ -31,6 +46,36 @@ export function ProfileDropdown() {
     const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
     const isStaff = normalizeRole(user?.role, user?.roleDetail) === "staff"
+    const dropdownItems: DropdownLinkItem[] = isStaff
+        ? [
+              {
+                  key: "staff_management",
+                  href: "/staff",
+                  label: t<string>("navbar.staff_management")
+              },
+              {
+                  key: "staff_profile",
+                  href: "/staff/profile",
+                  label: t<string>("navbar.staff_profile")
+              },
+              {
+                  key: "staff_contracts",
+                  href: "/staff/contracts",
+                  label: t<string>("navbar.staff_contracts")
+              }
+          ]
+        : [
+              {
+                  key: "profile",
+                  href: "/profile",
+                  label: t<string>("user.profile")
+              },
+              {
+                  key: "rental_contracts",
+                  href: "/profile/rental-contracts",
+                  label: t<string>("user.rental_contracts")
+              }
+          ]
 
     const {
         data: userRes,
@@ -80,22 +125,11 @@ export function ProfileDropdown() {
                     />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User Actions" variant="flat">
-                    <DropdownItem key="profile" as={Link} href="/profile" className="block">
-                        {t("user.profile")}
-                    </DropdownItem>
-                    <DropdownItem
-                        key="rental_contracts"
-                        as={Link}
-                        href="/profile/rental-contracts"
-                        className="block"
-                    >
-                        {t("user.rental_contracts")}
-                    </DropdownItem>
-                    {isStaff ? (
-                    <DropdownItem key="staff_management" as={Link} href="/staff" className="block">
-                        {t("navbar.staff_management")}
-                    </DropdownItem>
-                    ) : null}
+                    {dropdownItems.map((item) => (
+                        <DropdownItem key={item.key} as={Link} href={item.href} className="block">
+                            {item.label}
+                        </DropdownItem>
+                    ))}
                     <DropdownItem
                         key="logout"
                         textValue={t("navbar.logout")}

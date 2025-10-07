@@ -10,7 +10,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
 
     return (
         <RoleGuard>
-            <div className="min-h-screen w-full bg-[#f4f4f4]">
+            <div className="min-h-screen w-full">
                 {/* note: global navbar handles top chrome; push content down for visual breathing room */}
                 <div className="max-w-6xl mx-auto mt-[120px] flex gap-8 px-6 pb-16">
                     <StaffSidebar selectedPath={pathname} />
