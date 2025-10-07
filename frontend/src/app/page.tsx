@@ -1,11 +1,12 @@
 "use client"
-import { Carousel, CriclesChart } from "@/components"
+import { Carousel, CriclesChart, Footer } from "@/components"
 import React, { useEffect, useRef } from "react"
 import { slides } from "../../public/cars"
 import { useTranslation } from "react-i18next"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
+import DashBoard from "@/components/shared/DashBoard"
 
 export default function HomePage() {
     const { t } = useTranslation()
@@ -62,6 +63,8 @@ export default function HomePage() {
             <Carousel slides={slides} />
             <Carousel slides={slides} />
             <CriclesChart />
+            <Footer />
+            <DashBoard />
         </div>
     )
 }
