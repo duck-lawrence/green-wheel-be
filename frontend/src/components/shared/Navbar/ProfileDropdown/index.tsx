@@ -11,12 +11,26 @@ import { BackendError } from "@/models/common/response"
 import Link from "next/link"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 
+type MaybeRoleDetail = { name?: string | null } | null | undefined
+
+function normalizeRole(role?: unknown, roleDetail?: MaybeRoleDetail) {
+    if (typeof role === "string" && role.trim().length > 0) {
+        const normalized = role.trim().toLowerCase()
+        return normalized.replace(/^"+|"+$/g, "").replace(/^'+|'+$/g, "")
+    }
+    if (roleDetail && typeof roleDetail === "object" && typeof roleDetail.name === "string") {
+        return roleDetail.name.trim().toLowerCase()
+    }
+    return undefined
+}
+
 export function ProfileDropdown() {
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
     const user = useProfileStore((s) => s.user)
     const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
+    const isStaff = normalizeRole(user?.role, user?.roleDetail) === "staff"
 
     const {
         data: userRes,
@@ -77,6 +91,11 @@ export function ProfileDropdown() {
                     >
                         {t("user.rental_contracts")}
                     </DropdownItem>
+                    {isStaff && (
+                        <DropdownItem key="staff_management" as={Link} href="/staff" className="block">
+                            {t("navbar.staff_management")}
+                        </DropdownItem>
+                    )}
                     <DropdownItem
                         key="logout"
                         textValue={t("navbar.logout")}

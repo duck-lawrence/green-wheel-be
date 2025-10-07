@@ -118,7 +118,8 @@
         "contact": "Contact",
         "login": "Login",
         "register": "Register",
-        "logout": "Logout"
+        "logout": "Logout",
+        "staff_management": "Staff Management"
     },
     "table": {
         "order": "Order",
