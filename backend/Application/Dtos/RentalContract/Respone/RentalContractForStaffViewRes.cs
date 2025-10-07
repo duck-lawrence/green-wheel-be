@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Invoice.Response;
+using Application.Dtos.User.Respone;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,7 @@ namespace Application.Dtos.RentalContract.Respone
 
         public Guid? VehicleId { get; set; }
 
-        public Guid CustomerId { get; set; }
+        public UserProfileViewRes Customer { get; set; }
 
         public Guid? HandoverStaffId { get; set; }
 

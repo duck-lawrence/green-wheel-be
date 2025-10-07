@@ -12,6 +12,6 @@ namespace Application.Repositories
     {
         Task<Vehicle> GetByLicensePlateAsync(string licensePlate);
         Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId);
-        
+        Task<IEnumerable<VehicleComponent>> GetVehicleComponentsAsync(Guid vehicleId);
     }
 }

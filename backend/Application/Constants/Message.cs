@@ -184,5 +184,10 @@ namespace Application.Constants
         {
             public const string CitizenIdentityNotFound = "citizen_identity.not_found";
         }
+
+        public static class VehicleComponentMessage
+        {
+            public const string ComponentNotFound = "vehicle_component.not_found";
+        }
     }
 }
