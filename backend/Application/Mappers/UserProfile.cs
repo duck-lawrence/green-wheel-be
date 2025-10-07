@@ -23,7 +23,9 @@ namespace Application.Mappers
                 .ForMember(dest => dest.DateOfBirth,
                     opt => opt.MapFrom(src => src.DateOfBirth.ToString("yyyy-MM-dd")))
                 .ForMember(dest => dest.ExpiresAt,
-                    opt => opt.MapFrom(src => src.ExpiresAt.ToString("yyyy-MM-dd")));
+                    opt => opt.MapFrom(src => src.ExpiresAt.ToString("yyyy-MM-dd")))
+                .ForMember(dest => dest.ImagePublicId,
+                    opt => opt.MapFrom(src => src.ImagePublicId));
 
             CreateMap<DriverLicense, DriverLicenseRes>()
                 .ForMember(dest => dest.Sex,
@@ -33,7 +35,9 @@ namespace Application.Mappers
                 .ForMember(dest => dest.DateOfBirth,
                     opt => opt.MapFrom(src => src.DateOfBirth.ToString("yyyy-MM-dd")))
                 .ForMember(dest => dest.ExpiresAt,
-                    opt => opt.MapFrom(src => src.ExpiresAt.ToString("yyyy-MM-dd")));
+                    opt => opt.MapFrom(src => src.ExpiresAt.ToString("yyyy-MM-dd")))
+                .ForMember(dest => dest.ImagePublicId,
+                    opt => opt.MapFrom(src => src.ImagePublicId));
         }
 
         private static string GetLicenseClassName(int cls) =>

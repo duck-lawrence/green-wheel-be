@@ -594,7 +594,7 @@ namespace Application
             var uploadReq = new UploadImageReq { File = file };
             var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
 
-            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url) ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
+            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url, uploadResult.PublicID) ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
             return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
@@ -603,7 +603,7 @@ namespace Application
             var uploadReq = new UploadImageReq { File = file };
             var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
 
-            var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploadResult.Url);
+            var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploadResult.Url, uploadResult.PublicID);
             return _mapper.Map<DriverLicenseRes>(entity);
         }
 

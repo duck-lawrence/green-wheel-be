@@ -9,6 +9,7 @@
         public string Sex { get; set; } = null!;
         public string DateOfBirth { get; set; } = null!;
         public string ExpiresAt { get; set; } = null!;
+        public string ImagePublicId { get; set; }
         public string ImageUrl { get; set; } = null!;
     }
 }
