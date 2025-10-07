@@ -1,20 +1,15 @@
 "use client"
 import { FilterVehicleRental, CardListVehicleRental } from "@/components"
-import { vehicleData } from "@/data/vehicleData"
-import { useBookingFilterStore, useNavbarItemStore } from "@/hooks"
+import { useNavbarItemStore } from "@/hooks"
 import React, { useEffect } from "react"
 
-export default function VehicleRental() {
+export default function VehicleRentalPage() {
     const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
-    const { setBookingFilter, setFilteredVehicleModels } = useBookingFilterStore()
     // const [vehicles, setVehicles] = useState<Vehicle[]>(vehicleData)
     useEffect(() => {
         setActiveMenuKey("vehicle-rental")
     }, [setActiveMenuKey])
 
-    useEffect(() => {
-        setFilteredVehicleModels(vehicleData)
-    }, [setFilteredVehicleModels])
     // useEffect(() => {
     //     if (!station || !start || !end) return
     //     const filtered = allVehicles.filter(
@@ -22,13 +17,14 @@ export default function VehicleRental() {
     //     )
     //     setFilteredVehicles(filtered)
     // }, [station, start, end, allVehicles, setFilteredVehicles])
-    const handleFilter = (station: string, start: string, end: string) => {
-        setBookingFilter(station, start, end)
-    }
+
+    // const handleFilter = (station: string, start: string, end: string) => {
+    //     setBookingFilter(station, start, end)
+    // }
     return (
-        <div className="h-30 mt-30 min-h-[80vh]">
-            <div className="mt-30">
-                <FilterVehicleRental onFilterChange={handleFilter} />
+        <div className="min-h-[80vh] h-fit p-4">
+            <div className="">
+                <FilterVehicleRental />
             </div>
 
             <div className="mt-10">

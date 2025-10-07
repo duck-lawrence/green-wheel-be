@@ -1,48 +1,48 @@
 "use client"
 import React from "react"
-import { Card, CardBody, CardFooter, Image } from "@heroui/react"
-import { BatteryChargingIcon, Couch, SuitcaseIcon, Users } from "@phosphor-icons/react"
-import { useRouter } from "next/navigation"
-import VehicleModel from "@/models/vehicle/vehicle"
+import { CardBody, CardFooter, Image } from "@heroui/react"
+import { BatteryChargingIcon, Couch, Users } from "@phosphor-icons/react"
 import { useTranslation } from "react-i18next"
 import { currency } from "@/utils/helpers/currentcy"
+import Link from "next/link"
+import { CardStyled } from "@/components"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { Icon } from "@iconify/react"
 
 // cắt chuỗi để chỉnh format cho đẹp =)
-function splitTitle(title: string) {
-    const parts = title.split(" ")
-    const brand = parts[0] || ""
-    const model = parts.slice(1).join(" ") || ""
-    return { brand, model }
-}
+// function splitTitle(title: string) {
+//     const parts = title.split(" ")
+//     const brand = parts[0] || ""
+//     const model = parts.slice(1).join(" ") || ""
+//     return { brand, model }
+// }
 
 // className="gap-8 grid grid-cols-2 sm:grid-cols-3 "
-export default function CardVehicalStyled({ car }: { car: VehicleModel }) {
+export default function CardVehicalStyled({ vehicleModel }: { vehicleModel: VehicleModelViewRes }) {
     const { t } = useTranslation()
-    const router = useRouter()
 
-    const { brand, model } = splitTitle(car.name)
     return (
-        <div>
-            <Card
+        <Link href={`/vehicle-rental/${vehicleModel.id}`}>
+            <CardStyled
                 isPressable
-                // key={car.id}
-                onPress={() => {
-                    router.prefetch(`/vehicle-rental/detail/${car.id}`)
-                    router.push(`/vehicle-rental/detail/${car.id}`)
-                }}
+                key={vehicleModel.id}
+                // onPress={() => {
+                //     router.prefetch(`/vehicle-rental/detail/${vehicleModel.id}`)
+                //     router.push(`/vehicle-rental/detail/${vehicleModel.id}`)
+                // }}
                 className="hover:shadow-xl hover:scale-[1.02] transition-transform duration-300 ease-in-out"
                 shadow="sm"
             >
                 <CardBody className="overflow-visible ">
                     <Image
-                        alt={car.name}
-                        className="max-w-[370px] w-full object-cover h-[280px] shadow-lg"
+                        alt={vehicleModel.name}
+                        className="w-[300px] object-cover h-[280px] shadow-lg"
                         radius="lg"
                         shadow="sm"
-                        src={car.images[0]}
+                        src={vehicleModel.imageUrl && vehicleModel.imageUrl}
                         width="100%"
                     />
-                    {car.quantity === 0 && (
+                    {vehicleModel.availableVehicleCount === 0 && (
                         <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 text-xs rounded z-10">
                             {t("vehicle_model.out_of_stock")}
                         </span>
@@ -54,14 +54,14 @@ export default function CardVehicalStyled({ car }: { car: VehicleModel }) {
                     <div className="flex justify-between items-center text-2xl mb-2">
                         {/* <b className="text-2xl">{brand}</b> <br />
                             <b className="text-2xl">{model}</b> */}
-                        <b>{car.name}</b>
+                        <b>{vehicleModel.name}</b>
                     </div>
                     {/* </div> */}
                     <hr className=" text-gray-300 border-1 w-full m-1" />
 
                     <div className=" flex items-center justify-center mt-2 mb-2    p-2 ">
                         <span className="text-2xl font-bold text-green-600 whitespace-nowrap">
-                            {currency(car.costPerDay)} &nbsp;
+                            {currency(vehicleModel.costPerDay)} &nbsp;
                         </span>
 
                         <span className="text-black">{"   " + t("vehicle_model.vnd_per_day")}</span>
@@ -72,30 +72,35 @@ export default function CardVehicalStyled({ car }: { car: VehicleModel }) {
                     <div className="grid grid-cols-2 gap-2 mt-2 mr-0 max-w-60 w-full">
                         <div className="flex gap-2 ">
                             <Couch className="flex w-6 h-6" />
-                            <span>{car.segment}</span>
+                            <span>{vehicleModel.segment.name}</span>
                         </div>
 
                         <div className="flex gap-2 justify-end">
                             <BatteryChargingIcon className="h-6 w-6" />
-                            <span>{car.ecoRangeKm} Km</span>
+                            <span>{vehicleModel.ecoRangeKm} Km</span>
                         </div>
 
                         <div className="flex gap-2">
                             <Users className="h-6 w-6" />
                             <span>
-                                {car.seatingCapacity} {t("vehicle_model.seats")}
+                                {vehicleModel.seatingCapacity} {t("vehicle_model.seats")}
                             </span>
                         </div>
 
                         <div className="flex gap-2 justify-end">
-                            <SuitcaseIcon className="h-6 w-6" />
+                            <Icon
+                                icon="mdi:airbag"
+                                width="20"
+                                height="20"
+                                className="text-gray-700"
+                            />
                             <span>
-                                {car.numberOfAirbags} {t("vehicle_model.airbag")}
+                                {vehicleModel.numberOfAirbags} {t("vehicle_model.airbag")}
                             </span>
                         </div>
                     </div>
                 </CardFooter>
-            </Card>
-        </div>
+            </CardStyled>
+        </Link>
     )
 }

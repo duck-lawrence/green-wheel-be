@@ -13,6 +13,7 @@ import {
 import dayjs from "dayjs"
 import { UserSetPasswordReq } from "@/models/auth/schema/request"
 import { NAME_REGEX, PASSWORD_REGEX } from "@/constants/regex"
+import { DEFAULT_TIMEZONE } from "@/constants/constants"
 
 export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
@@ -59,16 +60,7 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
     })
 
     return (
-        <form
-            onSubmit={(e) => {
-                if (formik.isSubmitting) {
-                    e.preventDefault()
-                    return
-                }
-                formik.handleSubmit(e)
-            }}
-            className="flex flex-col"
-        >
+        <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-auto mt-2 mb-2">
                 <div className="text-center">{t("auth.complete_register")}</div>
@@ -153,7 +145,7 @@ export function SetPasswordForm({ onSuccess }: { onSuccess?: () => void }) {
                         }
 
                         const dob = val
-                            ? dayjs(val.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
+                            ? dayjs(val.toDate(DEFAULT_TIMEZONE)).format("YYYY-MM-DD")
                             : ""
 
                         formik.setFieldValue("dateOfBirth", dob)

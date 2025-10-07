@@ -21,3 +21,9 @@ export const requestWrapper = async <T>(fn: () => Promise<T>): Promise<T> => {
         }
     }
 }
+
+export const buildQueryParams = (obj: Record<string, any>, ignoreFalsy = false) => {
+    return Object.fromEntries(
+        Object.entries(obj).filter(([, v]) => (ignoreFalsy ? Boolean(v) : v != null && v !== ""))
+    )
+}

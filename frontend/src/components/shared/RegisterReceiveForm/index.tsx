@@ -88,24 +88,14 @@ export const RegisterReceiveForm = () => {
     const emailFilled = !!formik.values.email?.trim()
 
     return (
-        <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8 mt-30">
+        <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 mt-[100px]">
             {mounted ? (
                 <div className="mx-auto max-w-5xl bg-white rounded-lg ">
                     <div className="flex items-center justify-between border-b border-gray-100 px-6 py-6">
                         <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
                     </div>
 
-                    <form
-                        onSubmit={(e) => {
-                            if (formik.isSubmitting) {
-                                e.preventDefault()
-                                return
-                            }
-                            formik.handleSubmit(e)
-                        }}
-                        className="px-6 pb-8 pt-6"
-                        noValidate
-                    >
+                    <form onSubmit={formik.handleSubmit} className="px-6 pb-8 pt-6" noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Cột trái */}
                             <div>

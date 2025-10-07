@@ -39,7 +39,7 @@ export default function HomePage() {
 
     return (
         <div>
-            <div className="mt-30 min-h-[80vh]">
+            <div className="min-h-[80vh]">
                 <div className="bannerBackground min-h-[80vh] min-w-full flex flex-col items-start justify-center gap-4">
                     {/* <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
                     <div className="text-gray-500">{t("home.description")}</div>

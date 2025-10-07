@@ -52,15 +52,7 @@ export default function ChangePasswordPage() {
     })
 
     return (
-        <form
-            onSubmit={(e) => {
-                if (formik.isSubmitting) {
-                    e.preventDefault()
-                    return
-                }
-                formik.handleSubmit(e)
-            }}
-        >
+        <form onSubmit={formik.handleSubmit}>
             {/* Title */}
             <div className="text-3xl mb-3 px-4 font-bold">
                 <p>{t("auth.change_password")}</p>

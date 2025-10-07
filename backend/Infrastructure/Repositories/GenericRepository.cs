@@ -18,14 +18,14 @@ namespace Infrastructure.Repositories
             _dbSet = _dbContext.Set<T>();
         }
 
-        public async Task<Guid> AddAsync(T entity)
+        public virtual async Task<Guid> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
             await _dbContext.SaveChangesAsync();
             return entity.Id;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public virtual async Task<bool> DeleteAsync(Guid id)
         {
             var entityFromDb = await GetByIdAsync(id)
         ?? throw new NotFoundException($"{typeof(T).Name} is not found");
@@ -44,7 +44,7 @@ namespace Infrastructure.Repositories
             return entityFromDb != null;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[]? includes = null)
+        public virtual async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, object>>[]? includes = null)
         {
             var query = _dbSet.AsQueryable();
 
@@ -66,7 +66,7 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<T?> GetByIdAsync(Guid id)
+        public virtual async Task<T?> GetByIdAsync(Guid id)
         {
             //return  await _dbSet.FirstOrDefault(t => t.Id == id && t.);
             var entityFromDb = await _dbSet.FindAsync(id);
@@ -81,7 +81,7 @@ namespace Infrastructure.Repositories
             return entityFromDb;
         }
 
-        public async Task<int> UpdateAsync(T entity)
+        public virtual async Task<int> UpdateAsync(T entity)
         {
             var entityFromDb = await GetByIdAsync(entity.Id);
             if (entityFromDb == null)
@@ -92,12 +92,12 @@ namespace Infrastructure.Repositories
             return await _dbContext.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+        public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.Where(predicate).ToListAsync();
         }
 
-        public void Remove(T entity)
+        public virtual void Remove(T entity)
         {
             _dbSet.Remove(entity);
         }

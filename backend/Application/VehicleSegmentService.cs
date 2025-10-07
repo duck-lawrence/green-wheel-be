@@ -26,7 +26,7 @@ namespace Application
             var vehicleSegments = await _vehicleSegmentRepository.GetAllAsync();
             if(vehicleSegments == null)
             {
-                throw new NotFoundException(Message.VehicleSegment.VehicleSegmentNotFound);
+                throw new NotFoundException(Message.VehicleSegmentMessage.VehicleSegmentNotFound);
             }
             return _mapper.Map<IEnumerable<VehicleSegmentViewRes>>(vehicleSegments);
         }

@@ -1,4 +1,4 @@
-import { BACKEND_API_URL } from "@/constants/api"
+import { BACKEND_API_URL } from "@/constants/env"
 import { useTokenStore } from "@/hooks"
 import axios from "axios"
 
