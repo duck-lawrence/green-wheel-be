@@ -1,6 +1,6 @@
 "use client"
-import { FilterVehicleRental, CardListVehicleRental } from "@/components"
-import { useNavbarItemStore } from "@/hooks"
+import { CardListVehicleRental, FilterVehicleRental } from "@/components"
+import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import React, { useEffect } from "react"
 
 export default function VehicleRentalPage() {

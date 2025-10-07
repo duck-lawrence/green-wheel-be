@@ -1,10 +1,8 @@
 "use client"
 import React, { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { BreadCrumbsStyled, ButtonStyled } from "@/components/styled"
-import { Field } from "@/components/styled/FieldStyled"
+import { BreadCrumbsStyled, ButtonStyled, Field } from "@/components/styled"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
-import Link from "next/link"
 import { currency } from "@/utils/helpers/currentcy"
 import { getDatesDiff } from "@/utils/helpers/mathDate"
 import { useParams } from "next/navigation"
@@ -13,6 +11,7 @@ import { useTranslation } from "react-i18next"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { Spinner } from "@heroui/react"
 import { useGetVehicleModelById } from "@/hooks/queries/useVehicleModel"
+import Link from "next/link"
 
 export default function DetailPage() {
     const { id } = useParams()
@@ -261,9 +260,7 @@ export default function DetailPage() {
                             <ButtonStyled
                                 isDisabled={isLoggedIn}
                                 className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            >
-                                <Link href={"/"}>{t("vehicle_model.rental_request")}</Link>
-                            </ButtonStyled>
+                            ></ButtonStyled>
                         </div>
                     </div>
                 </aside>
