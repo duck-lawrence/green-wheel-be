@@ -307,7 +307,7 @@ export default function Page() {
                                         return
                                     }
 
-                                    const dob = formatDateTime({ value })
+                                    const dob = formatDateTime({ date: value })
 
                                     updateMeFormik.setFieldValue("dateOfBirth", dob)
                                 }}

@@ -118,7 +118,10 @@
         "contact": "Contact",
         "login": "Login",
         "register": "Register",
-        "logout": "Logout"
+        "logout": "Logout",
+        "staff_management": "Staff Management",
+        "staff_profile": "Profile",
+        "staff_contracts": "Contracts"
     },
     "table": {
         "order": "Order",
@@ -263,7 +266,7 @@
         "invalid_file_type": "Invalid file type"
     },
     "staff":{
-        "sidebar_home":"Home",
+        "sidebar_dashboard":"Dash Board",
         "sidebar_handovers":"Handovers",
         "sidebar_contracts":"Contracts",
         "sidebar_verify_customer":"Customer Verification",
@@ -271,7 +274,7 @@
         "sidebar_fleet":"Fleet",
         "sidebar_notifications":"Notifications",
         "sidebar_reports":"Reports",
-        "sidebar_settings":"Settings",
+        "sidebar_profile":"Profile",
         "sidebar_logout":"Sign out",
         "sidebar_panel_title":"Staff Panel",
         "topbar_sign_out":"Sign out",
