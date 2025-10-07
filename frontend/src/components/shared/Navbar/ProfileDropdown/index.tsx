@@ -18,25 +18,23 @@ function normalizeRole(role?: unknown, roleDetail?: MaybeRoleDetail) {
         const normalized = role.trim().toLowerCase()
         return normalized.replace(/^"+|"+$/g, "").replace(/^'+|'+$/g, "")
     }
-
     if (role && typeof role === "object") {
         const roleName = (role as { name?: string | null }).name
         if (typeof roleName === "string" && roleName.trim().length > 0) {
             return roleName.trim().toLowerCase()
         }
     }
-
     if (roleDetail && typeof roleDetail === "object" && typeof roleDetail.name === "string") {
         return roleDetail.name.trim().toLowerCase()
     }
-
     return undefined
 }
 
 type DropdownLinkItem = {
     key: string
-    href: string
+    href?: string
     label: string
+    color?: "danger"
 }
 
 export function ProfileDropdown() {
@@ -45,37 +43,25 @@ export function ProfileDropdown() {
     const user = useProfileStore((s) => s.user)
     const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
-    const isStaff = normalizeRole(user?.role, user?.roleDetail) === "staff"
-    const dropdownItems: DropdownLinkItem[] = isStaff
+
+    const roleDetail = (user as Partial<{ roleDetail?: MaybeRoleDetail }> | null | undefined)?.roleDetail
+    const isStaff = normalizeRole(user?.role, roleDetail) === "staff"
+
+    const baseItems: DropdownLinkItem[] = isStaff
         ? [
-              {
-                  key: "staff_management",
-                  href: "/staff",
-                  label: t<string>("navbar.staff_management")
-              },
-              {
-                  key: "staff_profile",
-                  href: "/staff/profile",
-                  label: t<string>("navbar.staff_profile")
-              },
-              {
-                  key: "staff_contracts",
-                  href: "/staff/contracts",
-                  label: t<string>("navbar.staff_contracts")
-              }
+              { key: "staff_management", href: "/staff", label: t("navbar.staff_management") as string },
+              { key: "staff_profile", href: "/staff/profile", label: t("navbar.staff_profile") as string },
+              { key: "staff_contracts", href: "/staff/contracts", label: t("navbar.staff_contracts") as string }
           ]
         : [
-              {
-                  key: "profile",
-                  href: "/profile",
-                  label: t<string>("user.profile")
-              },
-              {
-                  key: "rental_contracts",
-                  href: "/profile/rental-contracts",
-                  label: t<string>("user.rental_contracts")
-              }
+              { key: "profile", href: "/profile", label: t("user.profile") as string },
+              { key: "rental_contracts", href: "/profile/rental-contracts", label: t("user.rental_contracts") as string }
           ]
+
+    const dropdownItems: DropdownLinkItem[] = [
+        ...baseItems,
+        { key: "logout", label: t("navbar.logout") as string, color: "danger" }
+    ]
 
     const {
         data: userRes,
@@ -125,19 +111,22 @@ export function ProfileDropdown() {
                     />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="User Actions" variant="flat">
-                    {dropdownItems.map((item) => (
-                        <DropdownItem key={item.key} as={Link} href={item.href} className="block">
-                            {item.label}
-                        </DropdownItem>
-                    ))}
-                    <DropdownItem
-                        key="logout"
-                        textValue={t("navbar.logout")}
-                        color="danger"
-                        onPress={handleLogout}
-                    >
-                        {t("navbar.logout")}
-                    </DropdownItem>
+                    {dropdownItems.map((item) =>
+                        item.href ? (
+                            <DropdownItem key={item.key} as={Link} href={item.href} className="block">
+                                {item.label}
+                            </DropdownItem>
+                        ) : (
+                            <DropdownItem
+                                key={item.key}
+                                textValue={item.label}
+                                color={item.color}
+                                onPress={handleLogout}
+                            >
+                                {item.label}
+                            </DropdownItem>
+                        )
+                    )}
                 </DropdownMenu>
             </DropdownStyle>
         </div>

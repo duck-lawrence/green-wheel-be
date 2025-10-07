@@ -49,7 +49,7 @@ export const RegisterReceiveForm = () => {
     const initialValues: FormValues = {
         fullName: isLoggedIn && user ? `${user.firstName} ${user.lastName}` : "",
         phone: isLoggedIn && user && user.phone ? user.phone : "",
-        email: isLoggedIn && user ? user.email : "",
+        email: isLoggedIn && user ? user.email: "",
         pickupLocation: "",
         note: "",
         paymentMethod: PaymentMethod.Cash,
