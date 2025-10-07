@@ -31,7 +31,15 @@ namespace Application
             => await _citizenRepo.GetByIdAsync(id);
 
         public async Task<CitizenIdentity?> GetByIdentityNumberAsync(string identityNumber)
-            => await _citizenRepo.GetIdNumberAsync(identityNumber);
+        {
+            var citizenIdentity = await _citizenRepo.GetByIdNumberAsync(identityNumber);
+            if(citizenIdentity == null)
+            {
+                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+            }
+            return citizenIdentity;
+        }
+           
 
         public async Task<CitizenIdentity?> GetByUserId(Guid userId)
             => await _citizenRepo.GetByUserIdAsync(userId);

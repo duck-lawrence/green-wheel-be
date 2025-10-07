@@ -1,13 +1,15 @@
-﻿using Application.Abstractions;
+﻿using API.Filters;
+using Application;
+using Application.Abstractions;
 using Application.Constants;
-using Application.Dtos.User.Request;
 using Application.Dtos.Common.Request;
+using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
+using AutoMapper;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
-using API.Filters;
-using Application;
 
 namespace API.Controllers
 {
@@ -17,13 +19,18 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IGoogleCredentialService _googleService;
-
+        private readonly ICitizenIdentityService _citizenIdentityService;
+        private readonly IDriverLicenseService _driverLicenseService;
         public UserController(IUserService service
-            , IGoogleCredentialService googleCredentialService
+            , IGoogleCredentialService googleCredentialService,
+            ICitizenIdentityService citizenIdentityService,
+            IDriverLicenseService driverLicenseService
             )
         {
             _userService = service;
             _googleService = googleCredentialService;
+            _citizenIdentityService = citizenIdentityService;
+            _driverLicenseService = driverLicenseService;
         }
 
         /*
@@ -71,7 +78,7 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
         {
-            await _userService.CheckDupEmail(email.Email);
+            await _userService.CheckDupEmailAsync(email.Email);
             await _userService.SendOTP(email.Email);
             return Ok();
         }
@@ -227,7 +234,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.SetPasswordToken, out var setPasswordToken))
             {
-                string accesstoken = await _userService.SetPassword(setPasswordToken, googleSetPasswordReqDto);
+                string accesstoken = await _userService.SetPasswordAsync(setPasswordToken, googleSetPasswordReqDto);
                 return Ok(new
                 {
                     AccessToken = accesstoken
@@ -241,7 +248,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetMe()
         {
             var userClaims = HttpContext.User;
-            var userProfileViewRes = await _userService.GetMe(userClaims);
+            var userProfileViewRes = await _userService.GetMeAsync(userClaims);
             return Ok(userProfileViewRes);
         }
 
@@ -250,7 +257,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateMe([FromBody] UserUpdateReq userUpdateReq)
         {
             var userClaims = HttpContext.User;
-            await _userService.UpdateMe(userClaims, userUpdateReq);
+            await _userService.UpdateMeAsync(userClaims, userUpdateReq);
             return Ok();
         }
 
@@ -274,7 +281,7 @@ namespace API.Controllers
             return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        [HttpPost("citizen-identities")]
+        [HttpPost("citizen-identity")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -289,7 +296,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("citizen-identities")]
+        [HttpGet("citizen-identity")]
         [Authorize]
         public async Task<IActionResult> GetMyCitizenIdentity()
         {
@@ -302,7 +309,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("driver-licenses")]
+        [HttpPost("driver-license")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -318,7 +325,7 @@ namespace API.Controllers
         }
 
         // Lấy bằng user trong token
-        [HttpGet("driver-licenses")]
+        [HttpGet("driver-license")]
         [Authorize]
         public async Task<IActionResult> GetMyDriverLicense()
         {
@@ -365,7 +372,7 @@ namespace API.Controllers
          * 200 success
          * 404 not found
          */
-        [HttpGet("/phone/{phone}")]
+        [HttpGet("phone/{phone}")]
         [RoleAuthorize("Staff", "Admin")]
         public async Task<IActionResult> GetUserByPhone(string phone)
         {
@@ -377,12 +384,28 @@ namespace API.Controllers
          * Status code
          * 200 success
          */
-        [HttpGet()]
+        [HttpGet]
         [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> GetAll ()
+        public async Task<IActionResult> GetAll()
         {
-            var users = await _userService.GetAllUsers();
+            var users = await _userService.GetAllUsersAsync();
             return Ok(users);
+        }
+
+        [HttpGet("citizen-identity/{idNumber}")]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
+        {
+            var userView = await _userService.GetByCitizenIdentityAsync(idNumber);
+            return Ok(userView);
+        }
+
+        [HttpGet("driver-license/{number}")]
+        [RoleAuthorize("Staff", "Admin")]
+        public async Task<IActionResult> getUserByDriverLisence(string number)
+        {
+            var userView = await _userService.GetByDriverLicenseAsync(number);
+            return Ok(userView);
         }
 
     }
