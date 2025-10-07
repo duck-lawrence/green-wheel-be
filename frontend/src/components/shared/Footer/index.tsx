@@ -20,10 +20,10 @@ export function Footer() {
                     </div>
 
                     <p className="text-sm">{t("footer.green_wheel_company_name")}</p>
-                    <p className="mt-2">
+                    {/* <p className="mt-2">
                         Địa chỉ: Văn phòng 02, Tầng 08, Tòa nhà Pearl Plaza, Số 561A Điện Biên Phủ,
                         Phường 25, Quận Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam.
-                    </p>
+                    </p> */}
                 </div>
 
                 {/* Introduction */}

@@ -38,6 +38,16 @@ const nextConfig: NextConfig = {
                 protocol: "https",
                 hostname: "marketplace.canva.com",
                 pathname: "/**"
+            },
+            {
+                protocol: "https",
+                hostname: "baovephapluat.vn",
+                pathname: "/**"
+            },
+            {
+                protocol: "https",
+                hostname: "sohanews.sohacdn.com",
+                pathname: "/**"
             }
         ]
     }
