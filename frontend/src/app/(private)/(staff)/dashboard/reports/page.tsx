@@ -83,7 +83,7 @@ export default function StaffReportsPage() {
     }
 
     return (
-        <div className="mx-auto w-full max-w-3xl rounded-2xl bg-white shadow-sm px-6 py-8">
+        <div className="rounded-2xl bg-white shadow-sm px-6 py-8  space-y-3">
             <div className="text-3xl mb-3 px-4 font-bold">
                 <p>{t("staff.report_page_title")}</p>
             </div>

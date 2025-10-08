@@ -29,7 +29,7 @@ export default function StaffDashboardPage() {
             <div className="mb-6">
                 <h1 className="text-3xl mb-3 px-4 font-bold text-gray-900">{t("staff.dashboard_title")}</h1>
             </div>
-            <div className="grid gap-5 md:grid-cols-3">
+            {/* <div className="grid gap-5 md:grid-cols-3">
                 {METRICS_CARDS.map((card) => {
                     const Icon = METRIC_ICON_MAP[card.key]
 
@@ -50,7 +50,7 @@ export default function StaffDashboardPage() {
                         </CardStyled>
                     )
                 })}
-            </div>
+            </div> */}
         </div>
     )
 }

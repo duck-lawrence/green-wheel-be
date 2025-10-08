@@ -1,7 +1,9 @@
 "use client"
-import React, { useMemo, useCallback } from "react"
-import { Tabs, Tab } from "@heroui/react"
+
+import React, { useMemo, useEffect, useState, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import { LayoutGroup, motion } from "framer-motion"
+import clsx from "clsx"
 import i18n from "@/lib/i18n"
 import { useProfileStore } from "@/hooks"
 
@@ -21,12 +23,14 @@ const DEFAULT_TABS: SidebarItem[] = [
 export type AccountSidebarProps = {
     items?: SidebarItem[]
     selectedKey?: string
+    widthClass?: string
 }
 
-export default function AccountSidebar({ items, selectedKey }: AccountSidebarProps = {}) {
+export default function AccountSidebar({ items, selectedKey, widthClass = "w-50" }: AccountSidebarProps = {}) {
     const pathname = usePathname()
     const router = useRouter()
     const user = useProfileStore((s) => s.user)
+    const [pendingKey, setPendingKey] = useState<string | null>(null)
 
     const normalizedRole = useMemo(() => {
         const roleName =
@@ -49,15 +53,35 @@ export default function AccountSidebar({ items, selectedKey }: AccountSidebarPro
     }, [items, normalizedRole])
 
     const resolvedSelectedKey = useMemo(() => {
-        const key = selectedKey ?? pathname
-        return tabs.find((tab) => tab.key === key) ? key : tabs[0]?.key
-    }, [selectedKey, pathname, tabs])
+        const candidates = [pendingKey, selectedKey, pathname]
+        for (const candidate of candidates) {
+            if (!candidate) continue
+            if (tabs.some((tab) => tab.key === candidate)) return candidate
+        }
+        return tabs[0]?.key
+    }, [pendingKey, selectedKey, pathname, tabs])
+
+    useEffect(() => {
+        if (!pendingKey) return
+        const matchKey = selectedKey ?? pathname
+        if (matchKey === pendingKey) {
+            setPendingKey(null)
+            return
+        }
+        if (!tabs.some((tab) => tab.key === pendingKey)) {
+            setPendingKey(null)
+        }
+    }, [pendingKey, selectedKey, pathname, tabs])
 
     const handleSelection = useCallback(
         async (key: string | number) => {
             const stringKey = String(key)
             const target = tabs.find((tab) => tab.key === stringKey)
             if (!target) return
+
+            if (stringKey !== resolvedSelectedKey) {
+                setPendingKey(stringKey)
+            }
 
             if (target.onSelect) {
                 await target.onSelect()
@@ -68,36 +92,56 @@ export default function AccountSidebar({ items, selectedKey }: AccountSidebarPro
                 router.push(target.href)
             }
         },
-        [tabs, pathname, router]
+        [tabs, pathname, router, resolvedSelectedKey]
     )
 
     return (
-        <div className="flex flex-col pr-4">
-            <Tabs
-                color="primary"
-                variant="bordered"
-                aria-label="Options"
-                placement="start"
-                selectedKey={resolvedSelectedKey}
-                isVertical
-                size="lg"
-                radius="none"
-                className="font-medium text-base w-50 rounded-2xl bg-[#ffffff] overflow-hidden"
-                classNames={{
-                    tabList: "p-0 w-full",
-                    tab: "p-0"
-                }}
-                items={tabs}
-                onSelectionChange={handleSelection}
-            >
-                {(item) => (
-                    <Tab
-                        key={item.key}
-                        title={<span className="block text-center text-xl font-medium w-full">{item.label}</span>}
-                        className="block text-xl gap-6 w-full"
-                    />
-                )}
-            </Tabs>
-        </div>
+        <LayoutGroup id="account-sidebar">
+            <div className="flex flex-col pr-4">
+                <div
+                    className={clsx(
+                        "relative flex flex-col gap-2 rounded-2xl bg-white p-3 shadow-lg shadow-slate-200/70",
+                        widthClass
+                    )}
+                >
+                    {tabs.map((item) => {
+                        const isActive = resolvedSelectedKey === item.key
+                        return (
+                            <motion.button
+                                key={item.key}
+                                type="button"
+                                onClick={() => {
+                                    void handleSelection(item.key)
+                                }}
+                                className={clsx(
+                                    "relative w-full overflow-hidden rounded-xl px-4 py-3 text-xl font-medium",
+                                    "flex items-center justify-center whitespace-nowrap transition-colors duration-150"
+                                )}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                {isActive && (
+                                    <motion.span
+                                        layoutId="account-sidebar-active"
+                                        className="absolute inset-0 rounded-xl bg-primary"
+                                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                                    />
+                                )}
+                                <motion.span
+                                    className="relative w-full text-center text-xl font-medium whitespace-nowrap"
+                                    animate={{
+                                        color: isActive ? "#ffffff" : "#475569",
+                                        scale: isActive ? 1 : 0.98
+                                    }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                                >
+                                    {item.label}
+                                </motion.span>
+                            </motion.button>
+                        )
+                    })}
+                </div>
+            </div>
+        </LayoutGroup>
     )
 }
