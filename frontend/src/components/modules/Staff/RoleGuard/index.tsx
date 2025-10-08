@@ -8,7 +8,6 @@ import { useGetMe } from "@/hooks/queries/useProfile"
 
 type MaybeRole = { name?: string | null } | string | null | undefined
 
-
 function normalizeRole(role: MaybeRole) {
     if (typeof role === "string" && role.trim().length > 0) {
         return role.trim().toLowerCase()
@@ -21,11 +20,14 @@ function normalizeRole(role: MaybeRole) {
     }
     return undefined
 }
-//Các trang dành cho staff  tự /chuyển “/” khi reload lại trang 
-//vì RoleGuard lập tức redirect mỗi khi useProfileStore vẫn chưa có role. 
-//Ở lần load đầu, store chỉ hydrate (khôi phục dữ liệu) sau khi đã redirect, 
+//Các trang dành cho staff  tự /chuyển “/” khi reload lại trang
+//vì RoleGuard lập tức redirect mỗi khi useProfileStore vẫn chưa có role.
+//Ở lần load đầu, store chỉ hydrate (khôi phục dữ liệu) sau khi đã redirect,
 // nên guard đánh nhầm một  staff hợp lệ là không có quyền. Gây bất lợi cho trải nghiệm
 export default function RoleGuard({ children }: { children: React.ReactNode }) {
+    // const { data, isLoading, isFetching } = useAuth()
+    // const user = useProfileStore((s) => s.user)
+    // const user = useGetMeFromCache()
     const router = useRouter()
     const user = useProfileStore((s) => s.user)
     const setUser = useProfileStore((s) => s.setUser)
@@ -34,7 +36,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
     const hydrateTokenStore = useTokenStore((s) => s.hydrate)
     const isTokenHydrated = useTokenStore((s) => s.isHydrated)
     //FIX: Guard hiện đợi hydrate token và hoàn tất gọi API /users/me rồi mới xác định role.
-    //  Khi dữ liệu trả về, nó cập nhật profile store, 
+    //  Khi dữ liệu trả về, nó cập nhật profile store,
     // và chỉ redirect nếu không có token, request thất bại, hoặc role không phải staff-admin.
     useEffect(() => {
         if (!isTokenHydrated) {

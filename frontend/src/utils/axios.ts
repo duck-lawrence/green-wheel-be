@@ -43,7 +43,6 @@ axiosInstance.interceptors.response.use(
         ) {
             originalRequest.sent = true
             try {
-                useTokenStore.getState().removeAccessToken()
                 const res = await refreshInstance.post("/users/refresh-token")
                 useTokenStore.getState().setAccessToken(res.data.accessToken)
 

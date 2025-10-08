@@ -14,10 +14,11 @@ namespace Application.Mappers
         public InvoiceProfile()
         {
             CreateMap<Invoice, InvoiceViewRes>()
-                .ForMember(dest => dest.Total,
-                otp => otp.MapFrom(src => src.Subtotal + src.Subtotal * src.Tax));
-                
-            
+            .ForMember(dest => dest.Total,
+                otp => otp.MapFrom(src =>
+                    src.Subtotal + src.Subtotal * src.Tax +
+                    (src.Deposit == null ? 0 : src.Deposit.Amount)
+                ));
         }
     }
 

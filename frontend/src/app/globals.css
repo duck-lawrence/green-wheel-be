@@ -10,20 +10,29 @@ button {
     cursor: pointer;
 }
 
-.hover-scale {
-    @apply transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95;
+/* --- COMPONENTS --- */
+@component interactive-scale {
+    transition: transform 0.3s ease-in-out;
+    &:hover {
+        transform: scale(1.05);
+    }
+    &:active {
+        transform: scale(0.95);
+    }
 }
 
-@layer utilities {
-    .asfaltBackground {
-        @apply bg-[url('/textures/asfalt-dark.png')];
-    }
+/* --- UTILITIES --- */
+@utility asfaltBackground {
+    background-image: url("/textures/asfalt-dark.png");
+}
 
-    .bannerBackground {
-        @apply bg-[url('/images/test-bg.png')] bg-contain bg-top bg-no-repeat;
-    }
+@utility bannerBackground {
+    background-image: url("/images/test-bg.png");
+    background-size: contain;
+    background-position: top;
+    background-repeat: no-repeat;
+}
 
-    .diamondBackground {
-        @apply bg-[url('/textures/diagmonds-light.png')];
-    }
+@utility diamondBackground {
+    background-image: url("/textures/diagmonds-light.png");
 }

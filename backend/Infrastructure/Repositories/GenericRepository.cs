@@ -101,5 +101,12 @@ namespace Infrastructure.Repositories
         {
             _dbSet.Remove(entity);
         }
+        public async Task AddRangeAsync(IEnumerable<T> entities)
+        {
+            if (entities == null || !entities.Any())
+                return;
+
+            await _dbSet.AddRangeAsync(entities);
+        }
     }
 }

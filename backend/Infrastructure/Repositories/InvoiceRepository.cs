@@ -4,6 +4,7 @@ using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
+using Application.Helpers;
 
 namespace Infrastructure.Repositories
 {
@@ -30,6 +31,21 @@ namespace Infrastructure.Repositories
                 query = query.Include(i => i.Deposit);
             }
             return await query.FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+        public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
+        {
+            var query = _dbContext.Invoices
+                .AsNoTracking()
+                .OrderByDescending(i => i.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .ApplyPagination(pagination)
+                .ToListAsync();
+
+            return new PageResult<Invoice>(items, pagination.PageNumber, pagination.PageSize, totalCount);
         }
     }
 }

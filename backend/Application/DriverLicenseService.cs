@@ -11,13 +11,16 @@ namespace Application
     {
         private readonly IGeminiService _geminiService;
         private readonly IDriverLicenseRepository _licenseRepo;
+        private readonly IPhotoService _photoService;
 
         public DriverLicenseService(
             IGeminiService geminiService,
-            IDriverLicenseRepository licenseRepo)
+            IDriverLicenseRepository licenseRepo,
+            IPhotoService photoService)
         {
             _geminiService = geminiService;
             _licenseRepo = licenseRepo;
+            _photoService = photoService;
         }
 
         public async Task<DriverLicense?> AddAsync(DriverLicense license)
@@ -35,15 +38,23 @@ namespace Application
             => await _licenseRepo.GetByUserId(userId);
 
         public async Task<DriverLicense?> GetByLicenseNumberAsync(string licenseNumber)
-            => await _licenseRepo.GetByLicenseNumber(licenseNumber);
+        {
+            var license = await _licenseRepo.GetByLicenseNumber(licenseNumber);
+            if (license == null)
+            {
+                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+            }
+            return license;
+        }
 
-        public async Task<bool> DeleteAsync(Guid userId)
+        public async Task<bool> DeleteAsync(Guid userId, string publicId)
         {
             var existing = await _licenseRepo.GetByUserId(userId);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             await _licenseRepo.DeleteAsync(existing.Id);
+            await _photoService.DeletePhotoAsync(publicId);
             return true;
         }
 
@@ -58,7 +69,7 @@ namespace Application
             return license;
         }
 
-        public async Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl)
+        public async Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl, string publicId)
         {
             var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
             if (dto == null)
@@ -73,12 +84,12 @@ namespace Application
                 Number = dto.Number ?? string.Empty,
                 FullName = dto.FullName ?? string.Empty,
                 Nationality = dto.Nationality ?? string.Empty,
-                Sex = dto.Sex?.ToLower().Contains("male") == true || dto.Sex?.ToLower().Contains("nam") == true ? 0 : 1,
+                Sex = dto.Sex,
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
-                ImagePublicId = string.Empty,
-                Class = ParseLicenseClass(dto.Class)
+                ImagePublicId = publicId,
+                Class = dto.Class
             };
 
             var existing = await _licenseRepo.GetByUserId(userId);

@@ -4,7 +4,7 @@ import { RegisterModal } from "./RegisterModal"
 import { SetPasswordModal } from "./SetPasswordModal"
 import { ForgotPasswordModal } from "./ForgotPasswordModal"
 
-export * from "./AvatarUploaderModal"
+export * from "./ImageUploaderModal"
 
 export const Modals = () => {
     return (
