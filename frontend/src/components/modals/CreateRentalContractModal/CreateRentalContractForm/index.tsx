@@ -1,28 +1,30 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 
-import { useBookingFilterStore, useGetAllStations, useGetMeFromCache } from "@/hooks"
+import {
+    useBookingFilterStore,
+    useGetAllStations,
+    useGetMe,
+    useCreateRentalContract
+} from "@/hooks"
 import {
     ButtonStyled,
     InputStyled,
     AutocompleteStyle,
-    EnumPicker,
     ImageStyled,
     TextareaStyled
 } from "@/components"
-import { PaymentMethod } from "@/constants/enum"
-import { PaymentMethodLabels } from "@/constants/labels"
 import { AutocompleteItem, Spinner } from "@heroui/react"
-import { PHONE_REGEX } from "@/constants/regex"
 import { MapPinAreaIcon } from "@phosphor-icons/react"
 import toast from "react-hot-toast"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { BackendError } from "@/models/common/response"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 
 type FormValues = {
     fullName: string
@@ -30,42 +32,53 @@ type FormValues = {
     email: string
     stationId: string
     note: string
-    paymentMethod: PaymentMethod
+    // paymentMethod: PaymentMethod
     agreeTerms: boolean
     agreeDataPolicy: boolean
 }
 
-export const CreateRentalContractForm = () => {
+export const CreateRentalContractForm = ({
+    onSuccess,
+    modelViewRes
+}: {
+    onSuccess?: () => void
+    modelViewRes: VehicleModelViewRes
+}) => {
     const { t } = useTranslation()
-
     const [mounted, setMounted] = useState(false)
-    // const { user } = useProfileStore()
-    const user = useGetMeFromCache()
-
-    // load station to get name and address
+    const createContract = useCreateRentalContract({ onSuccess })
+    const { data: user, isLoading: isUserLoading, error: userError } = useGetMe()
     const {
         data: stations,
-        isLoading: isGetStationsLoading,
-        error: getStationsError,
-        isError: isGetStationsError
+        isLoading: isStationsLoading,
+        error: stationsError
     } = useGetAllStations()
-
-    // get vehicle
-
-    // get filter item
     const stationId = useBookingFilterStore((s) => s.stationId)
-    // const startDate = useBookingFilterStore((s) => s.startDate)
-    // const endDate = useBookingFilterStore((s) => s.endDate)
+    const startDate = useBookingFilterStore((s) => s.startDate)
+    const endDate = useBookingFilterStore((s) => s.endDate)
+
+    const handleCreateContract = useCallback(async () => {
+        await createContract.mutateAsync({
+            customerId: undefined,
+            modelId: modelViewRes.id,
+            stationId: stationId!,
+            startDate: startDate!,
+            endDate: endDate!
+        })
+    }, [createContract, endDate, modelViewRes.id, startDate, stationId])
+
+    // handle moute
+    useEffect(() => {
+        setMounted(!isUserLoading && !isStationsLoading)
+    }, [isStationsLoading, isUserLoading])
 
     useEffect(() => {
-        setMounted(!isGetStationsLoading && !isGetStationsError)
-    }, [isGetStationsError, isGetStationsLoading])
-
-    // init value
-    // Fees (mock)
-    // const listedFee = 590000
-    // const deposit = 5000000
-    // const totalPayment = listedFee + deposit
+        if (userError || stationsError) {
+            const error = (userError as BackendError) || (stationsError as BackendError)
+            toast.error(translateWithFallback(t, error.detail))
+            onSuccess?.()
+        }
+    }, [onSuccess, stationsError, t, userError])
 
     const initialValues: FormValues = {
         fullName: `${user?.lastName ?? ""} ${user?.firstName ?? ""}`,
@@ -73,7 +86,7 @@ export const CreateRentalContractForm = () => {
         email: user?.email ?? "",
         stationId: stationId || "",
         note: "",
-        paymentMethod: PaymentMethod.Cash,
+        // paymentMethod: PaymentMethod.Cash,
         agreeTerms: false,
         agreeDataPolicy: false
     }
@@ -83,49 +96,36 @@ export const CreateRentalContractForm = () => {
         validateOnMount: true,
         initialValues,
         validationSchema: Yup.object().shape({
-            fullName: Yup.string().required(t("user.full_name_require")),
-            phone: Yup.string()
-                .matches(PHONE_REGEX, t("user.invalid_phone"))
-                .required(t("user.phone_require")),
-            email: Yup.string().email(t("user.invalid_email")).required(t("user.email_require")),
+            // fullName: Yup.string().required(t("user.full_name_require")),
+            // phone: Yup.string()
+            //     .matches(PHONE_REGEX, t("user.invalid_phone"))
+            //     .required(t("user.phone_require")),
+            // email: Yup.string().email(t("user.invalid_email")).required(t("user.email_require")),
             // pickupLocation: Yup.string().required(t("contral_form.pickup_location_require")),
-            stationId: Yup.string().required(t("vehicle_model.pick_station")),
+            // stationId: Yup.string().required(t("vehicle_model.pick_station")),
             note: Yup.string(),
-            paymentMethod: Yup.mixed<PaymentMethod>()
-                .oneOf(Object.values(PaymentMethod) as PaymentMethod[])
-                .required(t("contral_form.payment_method_require")),
+            // paymentMethod: Yup.mixed<PaymentMethod>()
+            //     .oneOf(Object.values(PaymentMethod) as PaymentMethod[])
+            //     .required(t("contral_form.payment_method_require")),
             agreeTerms: Yup.boolean().oneOf([true], t("contral_form.agree_terms_require")),
             agreeDataPolicy: Yup.boolean().oneOf(
                 [true],
                 t("contral_form.agree_data_policy_require")
             )
         }),
-        onSubmit: (values) => {
-            console.log("Form values:", values)
-            // TODO: call API submit
-        }
+        onSubmit: handleCreateContract
     })
 
-    const renterFilled = !!formik.values.fullName?.trim()
-    const emailFilled = !!formik.values.email?.trim()
-
-    // Load station
-    useEffect(() => {
-        if (isGetStationsError && getStationsError) {
-            const error = getStationsError as BackendError
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
-        }
-    }, [isGetStationsError, getStationsError, t])
+    // const renterFilled = !!formik.values.fullName?.trim()
+    // const emailFilled = !!formik.values.email?.trim()
 
     return (
         <div className="min-h-screen px-4 sm:px-6 lg:px-8">
             {mounted ? (
                 <div className="mx-auto max-w-5xl bg-white rounded-lg ">
-                    <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+                    {/* <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                         <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
-                    </div>
+                    </div> */}
 
                     <form onSubmit={formik.handleSubmit} className="px-6 py-4" noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -138,27 +138,27 @@ export const CreateRentalContractForm = () => {
                                         label={t("car_rental.renter_name")}
                                         placeholder={t("car_rental.renter_name_placeholder")}
                                         value={formik.values.fullName}
-                                        onValueChange={(v) => formik.setFieldValue("fullName", v)}
-                                        isInvalid={
-                                            !!(formik.touched.fullName && formik.errors.fullName)
-                                        }
-                                        errorMessage={
-                                            formik.touched.fullName
-                                                ? formik.errors.fullName
-                                                : undefined
-                                        }
-                                        onBlur={() => formik.setFieldTouched("fullName", true)}
-                                        isClearable={false}
                                         readOnly={true}
-                                        classNames={{
-                                            inputWrapper: renterFilled
-                                                ? "bg-gray-100 border-gray-200"
-                                                : undefined,
-                                            input: renterFilled
-                                                ? "text-gray-600 placeholder:text-gray-400"
-                                                : undefined,
-                                            label: renterFilled ? "text-gray-500" : undefined
-                                        }}
+                                        // onValueChange={(v) => formik.setFieldValue("fullName", v)}
+                                        // isInvalid={
+                                        //     !!(formik.touched.fullName && formik.errors.fullName)
+                                        // }
+                                        // errorMessage={
+                                        //     formik.touched.fullName
+                                        //         ? formik.errors.fullName
+                                        //         : undefined
+                                        // }
+                                        // onBlur={() => formik.setFieldTouched("fullName", true)}
+                                        // isClearable={false}
+                                        // classNames={{
+                                        //     inputWrapper: renterFilled
+                                        //         ? "bg-gray-100 border-gray-200"
+                                        //         : undefined,
+                                        //     input: renterFilled
+                                        //         ? "text-gray-600 placeholder:text-gray-400"
+                                        //         : undefined,
+                                        //     label: renterFilled ? "text-gray-500" : undefined
+                                        // }}
                                     />
 
                                     {/* Phone */}
@@ -169,20 +169,21 @@ export const CreateRentalContractForm = () => {
                                         type="tel"
                                         inputMode="numeric"
                                         value={formik.values.phone}
-                                        onValueChange={(v) => formik.setFieldValue("phone", v)}
-                                        isInvalid={!!(formik.touched.phone && formik.errors.phone)}
-                                        errorMessage={
-                                            formik.touched.phone ? formik.errors.phone : undefined
-                                        }
-                                        onBlur={() => {
-                                            formik.setFieldTouched("phone", true)
-                                            formik.setFieldValue(
-                                                "phone",
-                                                formik.values.phone.trim(),
-                                                true
-                                            )
-                                        }}
-                                        onClear={() => formik.setFieldValue("phone", "")}
+                                        readOnly={true}
+                                        // onValueChange={(v) => formik.setFieldValue("phone", v)}
+                                        // isInvalid={!!(formik.touched.phone && formik.errors.phone)}
+                                        // errorMessage={
+                                        //     formik.touched.phone ? formik.errors.phone : undefined
+                                        // }
+                                        // onBlur={() => {
+                                        //     formik.setFieldTouched("phone", true)
+                                        //     formik.setFieldValue(
+                                        //         "phone",
+                                        //         formik.values.phone.trim(),
+                                        //         true
+                                        //     )
+                                        // }}
+                                        // onClear={() => formik.setFieldValue("phone", "")}
                                     />
 
                                     {/* Email */}
@@ -192,35 +193,35 @@ export const CreateRentalContractForm = () => {
                                         placeholder={t("car_rental.email_placeholder")}
                                         type="email"
                                         value={formik.values.email}
-                                        onValueChange={(v) => formik.setFieldValue("email", v)}
-                                        isInvalid={!!(formik.touched.email && formik.errors.email)}
-                                        errorMessage={
-                                            formik.touched.email ? formik.errors.email : undefined
-                                        }
-                                        onBlur={() => formik.setFieldTouched("email", true)}
-                                        isClearable={false}
                                         readOnly={true}
-                                        classNames={{
-                                            inputWrapper: emailFilled
-                                                ? "bg-gray-100 border-gray-200"
-                                                : undefined,
-                                            input: emailFilled
-                                                ? "text-gray-600 placeholder:text-gray-400"
-                                                : undefined,
-                                            label: emailFilled ? "text-gray-500" : undefined
-                                        }}
+                                        // onValueChange={(v) => formik.setFieldValue("email", v)}
+                                        // isInvalid={!!(formik.touched.email && formik.errors.email)}
+                                        // errorMessage={
+                                        //     formik.touched.email ? formik.errors.email : undefined
+                                        // }
+                                        // onBlur={() => formik.setFieldTouched("email", true)}
+                                        // isClearable={false}
+                                        // classNames={{
+                                        //     inputWrapper: emailFilled
+                                        //         ? "bg-gray-100 border-gray-200"
+                                        //         : undefined,
+                                        //     input: emailFilled
+                                        //         ? "text-gray-600 placeholder:text-gray-400"
+                                        //         : undefined,
+                                        //     label: emailFilled ? "text-gray-500" : undefined
+                                        // }}
                                     />
 
                                     {/* Pickup location */}
                                     <AutocompleteStyle
                                         label={t("vehicle_model.station")}
                                         items={stations}
+                                        className="max-w-60 h-20 mr-0"
                                         startContent={<MapPinAreaIcon className="text-xl" />}
                                         selectedKey={formik.values.stationId}
-                                        errorMessage={formik.errors.stationId}
-                                        className="max-w-60 h-20 mr-0"
-                                        isClearable={false}
                                         readOnly={true}
+                                        // errorMessage={formik.errors.stationId}
+                                        // isClearable={false}
                                     >
                                         {(stations ?? []).map((item) => (
                                             <AutocompleteItem key={item.id}>
@@ -251,7 +252,7 @@ export const CreateRentalContractForm = () => {
                                     />
 
                                     {/* Payment Method */}
-                                    <EnumPicker<PaymentMethod>
+                                    {/* <EnumPicker<PaymentMethod>
                                         value={formik.values.paymentMethod}
                                         onChange={(v) => {
                                             formik.setFieldValue("paymentMethod", v)
@@ -265,10 +266,10 @@ export const CreateRentalContractForm = () => {
                                             <p className="text-red-500 text-sm mt-1">
                                                 {formik.errors.paymentMethod as string}
                                             </p>
-                                        )}
+                                        )} */}
                                 </div>
 
-                                {/* Điều khoản */}
+                                {/* Policy */}
                                 <div className="mt-6 space-y-3">
                                     <div className="flex items-start">
                                         <input
@@ -376,7 +377,7 @@ export const CreateRentalContractForm = () => {
                                             {t("car_rental.detail_table")}
                                         </h4>
                                         <div className="mt-2 space-y-2">
-                                            {/* <div className="flex justify-between">
+                                            <div className="flex justify-between">
                                                 <span>{t("car_rental.listed_fee")}</span>
                                                 <span>{formatCurrency(listedFee)}</span>
                                             </div>
@@ -387,7 +388,7 @@ export const CreateRentalContractForm = () => {
                                             <div className="flex justify-between">
                                                 <span>{t("car_rental.deposit")}</span>
                                                 <span>{formatCurrency(deposit)}</span>
-                                            </div> */}
+                                            </div>
                                         </div>
                                     </div>
 

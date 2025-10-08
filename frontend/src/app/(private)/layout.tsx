@@ -14,8 +14,8 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
     useEffect(() => {
         if (!isLogined) {
             toast.dismiss()
+            router.push("/")
             toast.error(t("login.please_login"))
-            router.replace("/")
         }
     }, [isLogined, router, t])
 

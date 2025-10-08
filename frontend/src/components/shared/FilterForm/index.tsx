@@ -158,9 +158,7 @@ export function FilterVehicleRental() {
     useEffect(() => {
         if (isGetStationsError && getStationsError) {
             const error = getStationsError as BackendError
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     }, [isGetStationsError, getStationsError, t])
 
@@ -168,9 +166,7 @@ export function FilterVehicleRental() {
     useEffect(() => {
         if (isGetVehicleSegmentsError && getVehicleSegmentsError) {
             const error = getVehicleSegmentsError as BackendError
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     }, [isGetVehicleSegmentsError, getVehicleSegmentsError, t])
 

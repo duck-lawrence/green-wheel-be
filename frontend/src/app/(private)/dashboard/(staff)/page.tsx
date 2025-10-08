@@ -3,7 +3,6 @@
 import React from "react"
 import { useTranslation } from "react-i18next"
 import { KeyRound, Car, ReceiptText } from "lucide-react"
-import { CardStyled } from "@/components/styled/CardStyled"
 
 const METRICS_CARDS = [
     { key: "pickup_today", title: "Pickup Today", value: 18 },
@@ -27,7 +26,9 @@ export default function StaffDashboardPage() {
     return (
         <div className="rounded-2xl bg-white shadow p-6">
             <div className="mb-6">
-                <h1 className="text-3xl mb-3 px-4 font-bold text-gray-900">{t("staff.dashboard_title")}</h1>
+                <h1 className="text-3xl mb-3 px-4 font-bold text-gray-900">
+                    {t("staff.dashboard_title")}
+                </h1>
             </div>
             {/* <div className="grid gap-5 md:grid-cols-3">
                 {METRICS_CARDS.map((card) => {

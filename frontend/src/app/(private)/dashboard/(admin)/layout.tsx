@@ -1,32 +1,32 @@
 "use client"
 
-import { ROLE_CUSTOMER } from "@/constants/constants"
+import { ROLE_ADMIN } from "@/constants/constants"
 import { useGetMe } from "@/hooks"
-
 import { Spinner } from "@heroui/react"
 import { useRouter } from "next/navigation"
 import React, { useEffect, useMemo } from "react"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 
-export default function CustomerLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter()
     const { t } = useTranslation()
-    const { data: user } = useGetMe()
+    const { data: user, isLoading, isError } = useGetMe({ enabled: true })
 
-    const isCustomer = useMemo(() => {
-        return user?.role?.name === ROLE_CUSTOMER
+    const isAdmin = useMemo(() => {
+        return user?.role?.name === ROLE_ADMIN
     }, [user])
 
     useEffect(() => {
-        if (!isCustomer) {
+        if (isLoading) return
+        if (isError || !isAdmin) {
             toast.dismiss()
             toast.error(t("user.unauthorized"))
             router.replace("/")
         }
-    }, [isCustomer, router, t])
+    }, [isError, isLoading, isAdmin, router, t])
 
-    if (!isCustomer) return <Spinner />
+    if (isLoading) return <Spinner />
 
     return <>{children}</>
 }
