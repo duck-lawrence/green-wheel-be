@@ -28,31 +28,31 @@ namespace Application
             _momoPaymentLinkRepositorys = momoPaymentLinkRepositorys;
             _invoiceRepository = invoiceRepository;
         }
-        public async Task<string> CreatePaymentAsync(CreateMomoPaymentReq req)
+        public async Task<string> CreatePaymentAsync(decimal amount, Guid invoiceId, string description)
         {
-            var paymentLink = await _momoPaymentLinkRepositorys.GetPaymentLinkAsync(req.InvoiceId.ToString());
+            var paymentLink = await _momoPaymentLinkRepositorys.GetPaymentLinkAsync(invoiceId.ToString());
             if(!string.IsNullOrEmpty(paymentLink))
             {
                 return paymentLink;
             }
-            var invoice = await _invoiceRepository.GetByIdAsync(req.InvoiceId);
+            var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
             if(invoice == null)
             {
-                throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
             if (invoice.Status == (int)InvoiceStatus.Paid || invoice.Status == (int)InvoiceStatus.Cancelled)
             {
-                throw new BadRequestException(Message.Invoice.ThisInvoiceWasPaidOrCancel);
+                throw new BadRequestException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             }
             var requestId = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
             
             var rawData =
                     $"accessKey={_momoSettings.AccessKey}" +
-                    $"&amount={req.Amount.ToString("0", CultureInfo.InvariantCulture)}" +
+                    $"&amount={amount.ToString("0", CultureInfo.InvariantCulture)}" +
                     $"&extraData={""}" +
                     $"&ipnUrl={_momoSettings.IpnUrl}" +
-                    $"&orderId={req.InvoiceId}" +
-                    $"&orderInfo={req.InvoiceDescription}" +
+                    $"&orderId={invoiceId}" +
+                    $"&orderInfo={description}(Invoice ID: {invoiceId})" +
                     $"&partnerCode={_momoSettings.PartnerCode}" +
                     $"&redirectUrl={_momoSettings.RedirectUrl}" +
                     $"&requestId={requestId}" +
@@ -67,9 +67,9 @@ namespace Application
             {
                 PartnerCode = _momoSettings.PartnerCode,
                 RequestId = requestId,
-                Amount = req.Amount.ToString("0"),
-                OrderId = req.InvoiceId.ToString(),
-                OrderInfo = req.InvoiceDescription,
+                Amount = amount.ToString("0"),
+                OrderId = invoiceId.ToString(),
+                OrderInfo = $"{description}(Invoice ID: {invoiceId})",
                 RedirectUrl = _momoSettings.RedirectUrl,
                 IpnUrl = _momoSettings.IpnUrl,
                 RequestType = _momoSettings.RequestType,
@@ -85,19 +85,19 @@ namespace Application
             {
                 if((int)response.StatusCode == 400)
                 {
-                    throw new BadRequestException(Message.Momo.InvalidSignature);
+                    throw new BadRequestException(Message.MomoMessage.InvalidSignature);
                 }
                 if ((int)response.StatusCode == 401)
                 {
-                    throw new UnauthorizedAccessException(Message.Momo.MissingAccessKeyPartnerCodeSecretKey);
+                    throw new UnauthorizedAccessException(Message.MomoMessage.MissingAccessKeyPartnerCodeSecretKey);
                 }
                 if ((int)response.StatusCode == 403)
                 {
-                    throw new BadRequestException(Message.Momo.NotHavePermission);
+                    throw new BadRequestException(Message.MomoMessage.NotHavePermission);
                 }
                 if ((int)response.StatusCode == 404)
                 {
-                    throw new BadRequestException(Message.Momo.InvalidEndpoint);
+                    throw new BadRequestException(Message.MomoMessage.InvalidEndpoint);
                 }
 
             }
@@ -108,15 +108,15 @@ namespace Application
             
             if (momoResponse == null)
             {
-                throw new Exception(Message.Json.ParsingFailed);
+                throw new Exception(Message.JsonMessage.ParsingFailed);
             }
 
             if (momoResponse.ResultCode != 0)
             {
-                throw new Exception(Message.Momo.FailedToCreateMomoPayment);
+                throw new Exception(Message.MomoMessage.FailedToCreateMomoPayment);
             }
             //save to redis
-            await _momoPaymentLinkRepositorys.SavePaymentLinkPAsyns(req.InvoiceId.ToString(), momoResponse.ShortLink);
+            await _momoPaymentLinkRepositorys.SavePaymentLinkPAsyns(invoiceId.ToString(), momoResponse.ShortLink);
             return momoResponse.ShortLink;
         }
 

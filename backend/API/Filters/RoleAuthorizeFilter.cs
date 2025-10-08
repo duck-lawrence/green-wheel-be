@@ -26,13 +26,14 @@ namespace API.Filters
             //check user login or not?
             if (!user.Identity?.IsAuthenticated ?? true)
             {
-                throw new UnauthorizedAccessException(Message.User.Unauthorized);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+                
             }
             //take userId
             var userId = user.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             if (userId == null)
             {
-                throw new UnauthorizedAccessException(Message.User.Unauthorized);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             var userService = context.HttpContext.RequestServices.GetService<IUserService>();
             if (userService == null)
@@ -45,7 +46,7 @@ namespace API.Filters
 
             if (userRole == null || !_roles.Contains(userRole))
             {
-                throw new ForbidenException(Message.User.DoNotHavePermission);
+                throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
             }
         }
     }

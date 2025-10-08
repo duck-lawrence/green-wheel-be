@@ -15,12 +15,12 @@ namespace Application.Validators.User
         public VerifyOTPReqValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage(Message.User.EmailIsRequired)
-                .EmailAddress().WithMessage(Message.User.InvalidEmail);
+                .NotEmpty().WithMessage(Message.UserMessage.EmailIsRequired)
+                .EmailAddress().WithMessage(Message.UserMessage.InvalidEmail);
 
             RuleFor(x => x.OTP)
-                .NotEmpty().WithMessage(Message.User.OTPCanNotEmpty)
-                .Length(6).WithMessage(Message.User.OTPMustHave6Digits);
+                .NotEmpty().WithMessage(Message.UserMessage.OTPCanNotEmpty)
+                .Length(6).WithMessage(Message.UserMessage.OTPMustHave6Digits);
         }
     }
 }

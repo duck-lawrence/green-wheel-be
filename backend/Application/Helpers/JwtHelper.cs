@@ -93,7 +93,7 @@ namespace Application.Helpers
                     var typeClaim = principal.FindFirst("type"); // hoặc "token_type" tùy bạn set khi tạo
                     if (typeClaim == null || !typeClaim.Value.Equals(type, StringComparison.OrdinalIgnoreCase))
                     {
-                        throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                        throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
                     }
                 }
 
@@ -101,7 +101,7 @@ namespace Application.Helpers
             }
             catch
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken); // token không hợp lệ hoặc đã hết hạn
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken); // token không hợp lệ hoặc đã hết hạn
             }
         }
     }

@@ -36,7 +36,7 @@ namespace API.Extentions
                             if (hasAuthorize)
                             {
 
-                                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
                             }
 
 
@@ -44,7 +44,7 @@ namespace API.Extentions
                         },
                         OnChallenge = context =>
                         {
-                            throw new UnauthorizedAccessException(Message.User.MissingToken);
+                            throw new UnauthorizedAccessException(Message.UserMessage.MissingToken);
                         }, 
                     };
                 }

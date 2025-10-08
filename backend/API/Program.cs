@@ -81,10 +81,12 @@ namespace API
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
             builder.Services.AddScoped<IModelImageRepository, ModelImageRepository>();
             builder.Services.AddScoped<IVehicleSegmentRepository, VehicleSegmentRepository>();
-            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();
+            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();            
             builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
-
+            builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
+            builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             //Add Services
+            builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
             builder.Services.AddScoped<IInvoiceService, InvoiceService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -107,6 +109,8 @@ namespace API
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             builder.Services.AddScoped<IInvoiceUow, InvoiceUow>();
             builder.Services.AddScoped<IMediaUow, MediaUow>();
+            builder.Services.AddScoped<IModelImageUow, ModelImageUow>();
+            builder.Services.AddScoped<IVehicleChecklistUow, VehicleChecklistUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
