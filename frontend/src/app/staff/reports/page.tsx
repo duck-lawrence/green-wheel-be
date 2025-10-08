@@ -8,12 +8,7 @@ import { useTranslation } from "react-i18next"
 import { ButtonStyled, InputStyled, TextareaStyled, FormStyled } from "@/components"
 import { EnumPicker } from "@/components/modules/EnumPicker"
 import { useProfileStore } from "@/hooks"
-
-enum StaffReportType {
-    Technical = 1,
-    Payment = 2,
-    Other = 3
-}
+import { StaffReportType } from "@/constants/enum"
 
 const REPORT_TYPE_VALUES = Object.values(StaffReportType).filter(
     (value): value is StaffReportType => typeof value === "number"
@@ -52,8 +47,8 @@ export default function StaffReportsPage() {
     const reportTypeLabels = useMemo(
         () =>
             ({
-                [StaffReportType.Technical]: t("staff.report_form_type_options_technical"),
-                [StaffReportType.Payment]: t("staff.report_form_type_options_payment"),
+                [StaffReportType.Internal]: t("staff.report_form_type_options_technical"),
+                [StaffReportType.RelatedToSupport]: t("staff.report_form_type_options_payment"),
                 [StaffReportType.Other]: t("staff.report_form_type_options_other")
             }) satisfies Record<StaffReportType, string>,
         [t]
