@@ -3,24 +3,9 @@
 ## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
 Green Wheel is a self-drive vehicle rental platform that connects a customer-facing booking experience with an internal staff workspace. The monorepo houses a Next.js 15 front end and an ASP.NET Core 8 back end, built around layered architecture, rich domain modelling, and integrations for identity verification, payments, and cloud media.
 
-## Repository Overview
+## Project Information
 
-- `backend/` - ASP.NET Core 8 Web API (API / Application / Domain / Infrastructure layers)
-- `frontend/` - Next.js 15 (App Router) customer & staff portals
-- `init-db/` - SQL Server schema & seed scripts for local development
-
-## Project Highlights
-
-- **Dual-portals:** Contemporary customer site plus an internal staff console sharing a common design language.
-- **Automated identity checks:** Driver licence and citizen ID extraction powered by Google Gemini with Cloudinary asset storage.
-- **End-to-end rental lifecycle:** Vehicle catalogue, rental contracts, checklists, invoicing, payments, and customer support.
-- **Payment-ready:** Integrated MoMo gateway, invoice flows, and Redis-backed caching for short-lived artefacts.
-- **Secure authentication:** JWT access/refresh tokens, OTP flows, Google OAuth sign-in, and global error handling middleware.
-- **Localization-first:** English and Vietnamese translations via `i18next`, with middleware-guarded routes and persistent stores.
-
-
-
-## 💻 Tech Stack
+### 💻 Tech Stack
 
 #### 🖥️ Frontend
 
@@ -75,6 +60,23 @@ Green Wheel is a self-drive vehicle rental platform that connects a customer-fac
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
 ![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+
+
+
+## Repository Overview
+
+- `backend/` - ASP.NET Core 8 Web API (API / Application / Domain / Infrastructure layers)
+- `frontend/` - Next.js 15 (App Router) customer & staff portals
+- `init-db/` - SQL Server schema & seed scripts for local development
+
+## Project Highlights
+
+- **Dual-portals:** Contemporary customer site plus an internal staff console sharing a common design language.
+- **Automated identity checks:** Driver licence and citizen ID extraction powered by Google Gemini with Cloudinary asset storage.
+- **End-to-end rental lifecycle:** Vehicle catalogue, rental contracts, checklists, invoicing, payments, and customer support.
+- **Payment-ready:** Integrated MoMo gateway, invoice flows, and Redis-backed caching for short-lived artefacts.
+- **Secure authentication:** JWT access/refresh tokens, OTP flows, Google OAuth sign-in, and global error handling middleware.
+- **Localization-first:** English and Vietnamese translations via `i18next`, with middleware-guarded routes and persistent stores.
 
 
 
