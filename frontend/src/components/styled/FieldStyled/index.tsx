@@ -1,5 +1,5 @@
 import React from "react"
-export function Field({
+export function FieldStyled({
     label,
     value,
     icon

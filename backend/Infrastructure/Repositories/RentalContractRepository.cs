@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,9 +24,26 @@ namespace Infrastructure.Repositories
             return await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId).ToListAsync();
         }
 
-        public async Task<IEnumerable<RentalContract>> GetByStatus(int status)
+        public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null)
         {
-            return await _dbContext.RentalContracts.Where(rc => rc.Status == status).ToArrayAsync();
+            var rentalContracts = await _dbContext.RentalContracts
+                .Include(x => x.Invoices)
+                .Include(x => x.Customer)
+                    .ThenInclude(u => u.CitizenIdentity)
+                .Include(x => x.Customer)
+                    .ThenInclude(u => u.DriverLicense)
+                .ToListAsync();
+            if (!string.IsNullOrEmpty(phone) && status != null)
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Status == status && rc.Customer.Phone == phone).ToList();
+            }else if (!string.IsNullOrEmpty(phone))
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.Phone == phone).ToList();
+            }else if(status != null)
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Status == status).ToList();
+            }
+            return rentalContracts;
         }
 
         public async Task<bool> HasActiveContractAsync(Guid customerId)

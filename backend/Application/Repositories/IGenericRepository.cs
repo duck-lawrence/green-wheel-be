@@ -16,7 +16,7 @@ namespace Application.Repositories
         Task<T?> GetByIdAsync(Guid id);
 
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
-
+        Task AddRangeAsync(IEnumerable<T> entities);
         void Remove(T entity);
     }
 }

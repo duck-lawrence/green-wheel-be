@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Application.Dtos.Invoice.Response;
+using Application.Dtos.User.Respone;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +28,7 @@ namespace Application.Dtos.RentalContract.Respone
 
         public DateTimeOffset? ActualEndDate { get; set; }
 
+        public IEnumerable<InvoiceViewRes> Invoices { get; set; }
         public bool IsSignedByStaff { get; set; }
 
         public bool IsSignedByCustomer { get; set; }
@@ -34,7 +37,7 @@ namespace Application.Dtos.RentalContract.Respone
 
         public Guid? VehicleId { get; set; }
 
-        public Guid CustomerId { get; set; }
+        public UserProfileViewRes Customer { get; set; }
 
         public Guid? HandoverStaffId { get; set; }
 

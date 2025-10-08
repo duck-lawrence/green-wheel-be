@@ -65,7 +65,9 @@ export const VehicleStatusLabels: Record<VehicleStatus, string> = {
     [VehicleStatus.Available]: i18n.t("enum.available"),
     [VehicleStatus.Unavailable]: i18n.t("enum.unavailable"),
     [VehicleStatus.Rented]: i18n.t("enum.rented"),
-    [VehicleStatus.Maintenance]: i18n.t("enum.maintenance")
+    [VehicleStatus.Maintenance]: i18n.t("enum.maintenance"),
+    [VehicleStatus.MissingNoReason]: i18n.t("enum.missing_no_token"),
+    [VehicleStatus.LateReturn]: i18n.t("enum.late_return")
 }
 
 export const InvoiceItemTypeLabels: Record<InvoiceItemType, string> = {

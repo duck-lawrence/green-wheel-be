@@ -1,4 +1,4 @@
-import { BACKEND_API_URL } from "@/constants/api"
+import { BACKEND_API_URL } from "@/constants/env"
 import { useTokenStore } from "@/hooks"
 import axios from "axios"
 
@@ -43,7 +43,6 @@ axiosInstance.interceptors.response.use(
         ) {
             originalRequest.sent = true
             try {
-                useTokenStore.getState().removeAccessToken()
                 const res = await refreshInstance.post("/users/refresh-token")
                 useTokenStore.getState().setAccessToken(res.data.accessToken)
 

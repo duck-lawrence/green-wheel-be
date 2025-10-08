@@ -1,4 +1,6 @@
-﻿using Domain.Entities;
+﻿using Application.Dtos.Brand.Respone;
+using Application.Dtos.VehicleSegment.Respone;
+using Domain.Entities;
 
 namespace Application.Dtos.VehicleModel.Respone
 {
@@ -24,10 +26,10 @@ namespace Application.Dtos.VehicleModel.Respone
         public decimal EcoRangeKm { get; set; }
 
         public decimal SportRangeKm { get; set; }
-
-        public Brand Brand { get; set; } = null!;
-
-        public Domain.Entities.VehicleSegment Segment { get; set; } = null!;
+        public string? ImageUrl { get; set; }
+        public BrandViewRes Brand { get; set; } = null!;
+        public IEnumerable<string> ImageUrls { get; set; } = [];
+        public VehicleSegmentViewRes Segment { get; set; } = null!;
         public int AvailableVehicleCount { get; set; }
     }
 }

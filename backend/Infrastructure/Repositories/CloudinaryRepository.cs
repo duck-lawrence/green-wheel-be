@@ -31,10 +31,10 @@ namespace Infrastructure.Repositories
         public async Task<PhotoUploadResult> UploadAsync(UploadImageReq file, string folder)
         {
             if (file == null || file.File == null)
-                throw new ArgumentException(Message.Cloudinary.NotFoundObjectInFile);
+                throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             if (!_allowedTypes.Contains(file.File.ContentType))
-                throw new ArgumentException(Message.Cloudinary.InvalidFileType);
+                throw new ArgumentException(Message.CloudinaryMessage.InvalidFileType);
 
             using var stream = file.File.OpenReadStream();
             var uploadParams = new ImageUploadParams

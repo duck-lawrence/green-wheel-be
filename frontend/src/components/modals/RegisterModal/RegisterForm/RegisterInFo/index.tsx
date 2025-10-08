@@ -9,12 +9,11 @@ import {
     InputStyled
 } from "@/components/styled"
 import { useTranslation } from "react-i18next"
-import { useRegisterComplete } from "@/hooks"
+import { useDay, useRegisterComplete } from "@/hooks"
 import { UserRegisterCompleteReq } from "@/models/auth/schema/request"
 import { Sex } from "@/constants/enum"
 import { EnumPicker } from "@/components/modules/EnumPicker"
 import { SexLabels } from "@/constants/labels"
-import dayjs from "dayjs"
 import { NAME_REGEX, PASSWORD_REGEX, PHONE_REGEX } from "@/constants/regex"
 
 interface RegisterInfoProps {
@@ -24,6 +23,7 @@ interface RegisterInfoProps {
 
 export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
     const { t } = useTranslation()
+    const { formatDateTime } = useDay({})
     const registerMutation = useRegisterComplete({ onSuccess })
 
     const [isVisible, setIsVisible] = useState(false)
@@ -72,16 +72,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
     })
 
     return (
-        <form
-            onSubmit={(e) => {
-                if (formik.isSubmitting) {
-                    e.preventDefault()
-                    return
-                }
-                formik.handleSubmit(e)
-            }}
-            className="flex flex-col"
-        >
+        <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-auto mt-2 mb-2">
                 <div className="text-center">{t("auth.complete_register")}</div>
@@ -185,15 +176,13 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                     label={t("user.date_of_birth")}
                     isInvalid={!!(formik.touched.dateOfBirth && formik.errors.dateOfBirth)}
                     errorMessage={formik.errors.dateOfBirth}
-                    onChange={(val) => {
-                        if (!val) {
+                    onChange={(value) => {
+                        if (!value) {
                             formik.setFieldValue("dateOfBirth", null)
                             return
                         }
 
-                        const dob = val
-                            ? dayjs(val.toDate("Asia/Ho_Chi_Minh")).format("YYYY-MM-DD")
-                            : ""
+                        const dob = formatDateTime({ date: value })
 
                         formik.setFieldValue("dateOfBirth", dob)
                     }}

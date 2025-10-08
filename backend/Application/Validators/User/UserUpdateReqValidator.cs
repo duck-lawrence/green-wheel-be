@@ -16,7 +16,7 @@ namespace Application.Validators.User
             RuleFor(x => x.Phone)
                 .Matches(@"^(?:\+84|0)(?:3\d|5[6-9]|7\d|8[1-9]|9\d)\d{7}$")
                 .When(x => !string.IsNullOrEmpty(x.Phone))
-                .WithMessage(Message.User.InvalidPhone);
+                .WithMessage(Message.UserMessage.InvalidPhone);
 
             RuleFor(x => x.DateOfBirth)
                 .Must(dob =>
@@ -31,7 +31,7 @@ namespace Application.Validators.User
                     return age >= 21;
                 })
                 .When(x => x.DateOfBirth.HasValue)
-                .WithMessage(Message.User.InvalidUserAge);
+                .WithMessage(Message.UserMessage.InvalidUserAge);
 
 
         }

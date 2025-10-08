@@ -31,7 +31,15 @@ namespace Application
             => await _citizenRepo.GetByIdAsync(id);
 
         public async Task<CitizenIdentity?> GetByIdentityNumberAsync(string identityNumber)
-            => await _citizenRepo.GetIdNumberAsync(identityNumber);
+        {
+            var citizenIdentity = await _citizenRepo.GetByIdNumberAsync(identityNumber);
+            if(citizenIdentity == null)
+            {
+                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+            }
+            return citizenIdentity;
+        }
+           
 
         public async Task<CitizenIdentity?> GetByUserId(Guid userId)
             => await _citizenRepo.GetByUserIdAsync(userId);
@@ -40,7 +48,7 @@ namespace Application
         {
             var dto = await _geminiService.ExtractCitizenIdAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.Licenses.InvalidLicenseData);
+                throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
@@ -76,7 +84,7 @@ namespace Application
         {
             var existing = await _citizenRepo.GetByUserIdAsync(userId);
             if (existing == null)
-                throw new NotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             await _citizenRepo.DeleteAsync(existing.Id);
             return true;
@@ -86,7 +94,7 @@ namespace Application
         {
             var existing = await _citizenRepo.GetByIdAsync(identity.Id);
             if (existing == null)
-                throw new NotFoundException(Message.User.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             identity.UpdatedAt = DateTimeOffset.UtcNow;
             await _citizenRepo.UpdateAsync(identity);

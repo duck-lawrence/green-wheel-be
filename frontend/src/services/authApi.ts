@@ -5,7 +5,7 @@ import {
 } from "@/models/auth/schema/request"
 import { LoginGoogleRes, TokenRes } from "@/models/auth/schema/response"
 import axiosInstance from "@/utils/axios"
-import { requestWrapper } from "@/utils/helpers/handleAxiosError"
+import { requestWrapper } from "@/utils/helpers/axiosHelper"
 
 export const authApi = {
     login: ({ email, password }: { email: string; password: string }) =>
