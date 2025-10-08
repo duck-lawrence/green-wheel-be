@@ -1,13 +1,10 @@
 "use client"
 
-import React, { useCallback, useEffect } from "react"
-import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import React, { useCallback } from "react"
 import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@heroui/react"
-import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { DropdownStyled } from "@/components"
 import { useGetMe, useLogout, useTokenStore } from "@/hooks"
-import { BackendError } from "@/models/common/response"
 import Link from "next/link"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 import { useRouter } from "next/navigation"
@@ -47,7 +44,6 @@ export function ProfileDropdown() {
     const {
         data: user,
         isLoading: isGetMeLoading,
-        error: getMeError,
         isError: isGetMeError
     } = useGetMe({ enabled: isLoggedIn })
 
@@ -92,13 +88,6 @@ export function ProfileDropdown() {
     }, [logoutMutation])
 
     // handle get me error
-    useEffect(() => {
-        if (isGetMeError && getMeError) {
-            const error = getMeError as BackendError
-            toast.error(translateWithFallback(t, error.detail))
-        }
-    }, [isGetMeError, getMeError, t])
-
     if (isGetMeLoading || isGetMeError) return <Spinner />
 
     return (

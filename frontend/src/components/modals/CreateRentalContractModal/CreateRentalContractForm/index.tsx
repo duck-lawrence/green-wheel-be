@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
@@ -10,21 +10,18 @@ import {
     useBookingFilterStore,
     useGetAllStations,
     useGetMe,
-    useCreateRentalContract
+    useCreateRentalContract,
+    useDay
 } from "@/hooks"
-import {
-    ButtonStyled,
-    InputStyled,
-    AutocompleteStyle,
-    ImageStyled,
-    TextareaStyled
-} from "@/components"
-import { AutocompleteItem, Spinner } from "@heroui/react"
-import { MapPinAreaIcon } from "@phosphor-icons/react"
+import { ButtonStyled, InputStyled, ImageStyled, TextareaStyled } from "@/components"
+import { Spinner } from "@heroui/react"
 import toast from "react-hot-toast"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { BackendError } from "@/models/common/response"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { StationViewRes } from "@/models/station/schema/response"
+import { formatCurrency } from "@/utils/helpers/currentcy"
+import { CheckboxStyled } from "@/components/styled/CheckboxStyled"
 
 type FormValues = {
     fullName: string
@@ -39,12 +36,17 @@ type FormValues = {
 
 export const CreateRentalContractForm = ({
     onSuccess,
+    totalDays,
+    totalPrice,
     modelViewRes
 }: {
     onSuccess?: () => void
+    totalDays: number
+    totalPrice: number
     modelViewRes: VehicleModelViewRes
 }) => {
     const { t } = useTranslation()
+    const { formatDateTime } = useDay({ defaultFormat: "DD-MM-YYYY HH:mm" })
     const [mounted, setMounted] = useState(false)
     const createContract = useCreateRentalContract({ onSuccess })
     const { data: user, isLoading: isUserLoading, error: userError } = useGetMe()
@@ -56,6 +58,14 @@ export const CreateRentalContractForm = ({
     const stationId = useBookingFilterStore((s) => s.stationId)
     const startDate = useBookingFilterStore((s) => s.startDate)
     const endDate = useBookingFilterStore((s) => s.endDate)
+
+    const stationMap = useMemo(() => {
+        const map = new Map<string, StationViewRes>()
+        stations?.forEach((s) => map.set(s.id, s))
+        return map
+    }, [stations])
+
+    const station = stationMap.get(stationId!)
 
     const handleCreateContract = useCallback(async () => {
         await createContract.mutateAsync({
@@ -103,7 +113,7 @@ export const CreateRentalContractForm = ({
             // email: Yup.string().email(t("user.invalid_email")).required(t("user.email_require")),
             // pickupLocation: Yup.string().required(t("contral_form.pickup_location_require")),
             // stationId: Yup.string().required(t("vehicle_model.pick_station")),
-            note: Yup.string(),
+            // note: Yup.string(),
             // paymentMethod: Yup.mixed<PaymentMethod>()
             //     .oneOf(Object.values(PaymentMethod) as PaymentMethod[])
             //     .required(t("contral_form.payment_method_require")),
@@ -120,121 +130,58 @@ export const CreateRentalContractForm = ({
     // const emailFilled = !!formik.values.email?.trim()
 
     return (
-        <div className="min-h-screen px-4 sm:px-6 lg:px-8">
+        <div className="max-h-[95vh] px-4 sm:px-6 lg:px-8">
             {mounted ? (
                 <div className="mx-auto max-w-5xl bg-white rounded-lg ">
-                    {/* <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+                    <div className="text-center border-gray-100">
                         <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
-                    </div> */}
+                    </div>
 
                     <form onSubmit={formik.handleSubmit} className="px-6 py-4" noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Cột trái */}
                             <div>
                                 <div className="space-y-4">
-                                    {/* Họ tên */}
-                                    <InputStyled
-                                        variant="bordered"
-                                        label={t("car_rental.renter_name")}
-                                        placeholder={t("car_rental.renter_name_placeholder")}
-                                        value={formik.values.fullName}
-                                        readOnly={true}
-                                        // onValueChange={(v) => formik.setFieldValue("fullName", v)}
-                                        // isInvalid={
-                                        //     !!(formik.touched.fullName && formik.errors.fullName)
-                                        // }
-                                        // errorMessage={
-                                        //     formik.touched.fullName
-                                        //         ? formik.errors.fullName
-                                        //         : undefined
-                                        // }
-                                        // onBlur={() => formik.setFieldTouched("fullName", true)}
-                                        // isClearable={false}
-                                        // classNames={{
-                                        //     inputWrapper: renterFilled
-                                        //         ? "bg-gray-100 border-gray-200"
-                                        //         : undefined,
-                                        //     input: renterFilled
-                                        //         ? "text-gray-600 placeholder:text-gray-400"
-                                        //         : undefined,
-                                        //     label: renterFilled ? "text-gray-500" : undefined
-                                        // }}
-                                    />
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {/* Họ tên */}
+                                        <InputStyled
+                                            variant="bordered"
+                                            label={t("car_rental.renter_name")}
+                                            placeholder={t("car_rental.renter_name_placeholder")}
+                                            value={formik.values.fullName}
+                                            readOnly={true}
+                                        />
 
-                                    {/* Phone */}
-                                    <InputStyled
-                                        variant="bordered"
-                                        label={t("car_rental.phone")}
-                                        placeholder={t("car_rental.phone_placeholder")}
-                                        type="tel"
-                                        inputMode="numeric"
-                                        value={formik.values.phone}
-                                        readOnly={true}
-                                        // onValueChange={(v) => formik.setFieldValue("phone", v)}
-                                        // isInvalid={!!(formik.touched.phone && formik.errors.phone)}
-                                        // errorMessage={
-                                        //     formik.touched.phone ? formik.errors.phone : undefined
-                                        // }
-                                        // onBlur={() => {
-                                        //     formik.setFieldTouched("phone", true)
-                                        //     formik.setFieldValue(
-                                        //         "phone",
-                                        //         formik.values.phone.trim(),
-                                        //         true
-                                        //     )
-                                        // }}
-                                        // onClear={() => formik.setFieldValue("phone", "")}
-                                    />
+                                        {/* Phone */}
+                                        <InputStyled
+                                            variant="bordered"
+                                            label={t("car_rental.phone")}
+                                            placeholder={t("car_rental.phone_placeholder")}
+                                            type="tel"
+                                            inputMode="numeric"
+                                            value={formik.values.phone}
+                                            readOnly={true}
+                                        />
 
-                                    {/* Email */}
-                                    <InputStyled
-                                        variant="bordered"
-                                        label={t("car_rental.email")}
-                                        placeholder={t("car_rental.email_placeholder")}
-                                        type="email"
-                                        value={formik.values.email}
-                                        readOnly={true}
-                                        // onValueChange={(v) => formik.setFieldValue("email", v)}
-                                        // isInvalid={!!(formik.touched.email && formik.errors.email)}
-                                        // errorMessage={
-                                        //     formik.touched.email ? formik.errors.email : undefined
-                                        // }
-                                        // onBlur={() => formik.setFieldTouched("email", true)}
-                                        // isClearable={false}
-                                        // classNames={{
-                                        //     inputWrapper: emailFilled
-                                        //         ? "bg-gray-100 border-gray-200"
-                                        //         : undefined,
-                                        //     input: emailFilled
-                                        //         ? "text-gray-600 placeholder:text-gray-400"
-                                        //         : undefined,
-                                        //     label: emailFilled ? "text-gray-500" : undefined
-                                        // }}
-                                    />
+                                        {/* Pickup location */}
+                                        <InputStyled
+                                            variant="bordered"
+                                            label={t("car_rental.pickup_location")}
+                                            value={`${station?.name || ""} - ${
+                                                station?.address || ""
+                                            }`}
+                                            readOnly={true}
+                                        />
 
-                                    {/* Pickup location */}
-                                    <AutocompleteStyle
-                                        label={t("vehicle_model.station")}
-                                        items={stations}
-                                        className="max-w-60 h-20 mr-0"
-                                        startContent={<MapPinAreaIcon className="text-xl" />}
-                                        selectedKey={formik.values.stationId}
-                                        readOnly={true}
-                                        // errorMessage={formik.errors.stationId}
-                                        // isClearable={false}
-                                    >
-                                        {(stations ?? []).map((item) => (
-                                            <AutocompleteItem key={item.id}>
-                                                {item.name}
-                                            </AutocompleteItem>
-                                        ))}
-                                    </AutocompleteStyle>
-                                    <div className="text-sm mt-1 ml-4 truncate w-full min-h-fit">
-                                        {
-                                            stations?.find(
-                                                (station) => station.id === formik.values.stationId
-                                            )?.address
-                                        }
+                                        {/* Email */}
+                                        <InputStyled
+                                            variant="bordered"
+                                            label={t("car_rental.email")}
+                                            placeholder={t("car_rental.email_placeholder")}
+                                            type="email"
+                                            value={formik.values.email}
+                                            readOnly={true}
+                                        />
                                     </div>
 
                                     {/* Note */}
@@ -270,61 +217,48 @@ export const CreateRentalContractForm = ({
                                 </div>
 
                                 {/* Policy */}
-                                <div className="mt-6 space-y-3">
-                                    <div className="flex items-start">
-                                        <input
-                                            type="checkbox"
-                                            id="agreeTerms"
-                                            name="agreeTerms"
-                                            checked={formik.values.agreeTerms}
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            className="mt-1"
-                                        />
-                                        <label htmlFor="agreeTerms" className="ml-2 text-sm">
-                                            {t("car_rental.agree_terms")}{" "}
-                                            <Link
-                                                href="#"
-                                                className="text-blue-600 hover:underline"
-                                            >
-                                                {t("car_rental.payment_terms")}
-                                            </Link>{" "}
-                                            {t("car_rental.of_green_wheel")}
-                                        </label>
-                                    </div>
-                                    {formik.touched.agreeTerms && formik.errors.agreeTerms && (
-                                        <div className="text-red-500 text-sm">
-                                            {t("contral_form.agree_terms_require")}
-                                        </div>
-                                    )}
+                                <div className="mt-6 space-y-4">
+                                    <CheckboxStyled
+                                        id="agreeTerms"
+                                        name="agreeTerms"
+                                        checked={formik.values.agreeTerms}
+                                        isInvalid={
+                                            !!(
+                                                formik.touched.agreeTerms &&
+                                                formik.errors.agreeTerms
+                                            )
+                                        }
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                        className="mt-1"
+                                    >
+                                        {t("car_rental.agree_terms")}{" "}
+                                        <Link href="#" className="text-blue-600 hover:underline">
+                                            {t("car_rental.payment_terms")}
+                                        </Link>{" "}
+                                        {t("car_rental.of_green_wheel")}
+                                    </CheckboxStyled>
 
-                                    <div className="flex items-start">
-                                        <input
-                                            type="checkbox"
-                                            id="agreeDataPolicy"
-                                            name="agreeDataPolicy"
-                                            checked={formik.values.agreeDataPolicy}
-                                            onChange={formik.handleChange}
-                                            onBlur={formik.handleBlur}
-                                            className="mt-1"
-                                        />
-                                        <label htmlFor="agreeDataPolicy" className="ml-2 text-sm">
-                                            {t("car_rental.agree_data_policy")}{" "}
-                                            <Link
-                                                href="#"
-                                                className="text-blue-600 hover:underline"
-                                            >
-                                                {t("car_rental.data_sharing_terms")}
-                                            </Link>{" "}
-                                            {t("car_rental.of_green_wheel")}
-                                        </label>
-                                    </div>
-                                    {formik.touched.agreeDataPolicy &&
-                                        formik.errors.agreeDataPolicy && (
-                                            <div className="text-red-500 text-sm">
-                                                {t("contral_form.agree_data_policy_require")}
-                                            </div>
-                                        )}
+                                    <CheckboxStyled
+                                        id="agreeDataPolicy"
+                                        name="agreeDataPolicy"
+                                        checked={formik.values.agreeDataPolicy}
+                                        isInvalid={
+                                            !!(
+                                                formik.touched.agreeDataPolicy &&
+                                                formik.errors.agreeDataPolicy
+                                            )
+                                        }
+                                        // aria-errormessage={formik.errors.agreeDataPolicy}
+                                        onChange={formik.handleChange}
+                                        onBlur={formik.handleBlur}
+                                    >
+                                        {t("car_rental.agree_data_policy")}{" "}
+                                        <Link href="#" className="text-blue-600 hover:underline">
+                                            {t("car_rental.data_sharing_terms")}
+                                        </Link>{" "}
+                                        {t("car_rental.of_green_wheel")}
+                                    </CheckboxStyled>
                                 </div>
                             </div>
 
@@ -341,7 +275,7 @@ export const CreateRentalContractForm = ({
                                             "
                                         >
                                             <ImageStyled
-                                                src="https://vinfastninhbinh.com.vn/wp-content/uploads/2024/06/vinfast-vf3-5.png"
+                                                src={modelViewRes.imageUrl || ""}
                                                 alt={t("car_rental.vehicle")}
                                                 className="absolute inset-0 w-full h-full object-contain"
                                                 width={800}
@@ -350,49 +284,79 @@ export const CreateRentalContractForm = ({
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-medium">
-                                                {t("car_rental.vehicle")}
+                                                {modelViewRes.name}
                                             </h3>
                                         </div>
                                     </div>
 
                                     <div className="mt-4 bg-blue-50 p-4 rounded-lg">
                                         <div className="flex justify-between items-center">
-                                            <h4 className="font-medium">Hà Nội</h4>
-                                            <button type="button" className="text-blue-600" />
+                                            <h4 className="font-medium">{station?.name}</h4>
+                                            <div>{station?.address}</div>
                                         </div>
                                         <div className="mt-2 flex items-center">
                                             <span>
-                                                1 ngày • 16:50 24/09/2025 → 16:50 25/09/2025
+                                                {`${totalDays} ${t(
+                                                    "car_rental.days"
+                                                )} • ${formatDateTime({
+                                                    date: startDate!
+                                                })} → ${formatDateTime({ date: endDate! })}`}
                                             </span>
                                         </div>
-                                        <div className="mt-1">
+                                        {/* <div className="mt-1">
                                             <span className="text-sm">
                                                 Hình thức thuê: Theo ngày
                                             </span>
-                                        </div>
+                                        </div> */}
                                     </div>
 
                                     <div className="mt-4">
-                                        <h4 className="font-medium">
+                                        <h4 className="font-medium text-center">
                                             {t("car_rental.detail_table")}
                                         </h4>
-                                        <div className="mt-2 space-y-2">
+                                        {/* <div className="mt-2 space-y-2">
                                             <div className="flex justify-between">
                                                 <span>{t("car_rental.listed_fee")}</span>
-                                                <span>{formatCurrency(listedFee)}</span>
+                                                <span>{formatCurrency(1)}</span>
                                             </div>
                                             <div className="border-t pt-2 flex justify-between font-medium">
                                                 <span>{t("car_rental.total")}</span>
-                                                <span>{formatCurrency(listedFee)}</span>
+                                                <span>{formatCurrency(1)}</span>
                                             </div>
                                             <div className="flex justify-between">
                                                 <span>{t("car_rental.deposit")}</span>
-                                                <span>{formatCurrency(deposit)}</span>
+                                                <span>{formatCurrency(1)}</span>
+                                            </div>
+                                        </div> */}
+                                        <div className="rounded-xl bg-neutral-50 p-4">
+                                            <div className="flex items-center justify-between text-sm">
+                                                <span>{t("vehicle_model.unit_price")}</span>
+                                                <span className="font-medium">
+                                                    {formatCurrency(modelViewRes.costPerDay)}
+                                                </span>
+                                            </div>
+                                            <div className="mt-2 flex items-center justify-between text-sm">
+                                                <span>{t("vehicle_model.number_of_days")}</span>
+                                                <span className="font-medium">{totalDays}</span>
+                                            </div>
+                                            <div className="mt-2 flex items-center justify-between text-sm">
+                                                <span>{t("vehicle_model.deposit_fee")}</span>
+                                                <span className="font-medium">
+                                                    {formatCurrency(modelViewRes.depositFee)}
+                                                </span>
+                                            </div>
+
+                                            <div className="mt-3 h-px bg-neutral-200" />
+                                            <div className="mt-3 flex items-center justify-between text-base font-semibold">
+                                                <span>{t("vehicle_model.temporary_total")}</span>
+                                                <span className="text-emerald-700">
+                                                    {formatCurrency(totalPrice)}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="mt-6 border-t pt-4">
+                                    {/* <div className="mt-6 border-t pt-4">
                                         <div className="flex justify-between items-center">
                                             <div>
                                                 <span className="font-medium">
@@ -403,10 +367,10 @@ export const CreateRentalContractForm = ({
                                                 </span>
                                             </div>
                                             <span className="text-2xl font-bold text-green-500">
-                                                {/* {formatCurrency(totalPayment)} */}
+                                                {formatCurrency(totalPayment)}
                                             </span>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>
@@ -423,7 +387,7 @@ export const CreateRentalContractForm = ({
                                 variant={!formik.isValid || formik.isSubmitting ? "flat" : "solid"}
                                 className="px-8 py-2 rounded-md"
                             >
-                                {t("car_rental.pay")}
+                                {t("vehicle_model.create_rental_request")}
                             </ButtonStyled>
                         </div>
                     </form>
