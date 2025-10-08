@@ -9,15 +9,10 @@ import { UserProfileViewRes } from "@/models/user/schema/response"
 import { useProfileStore } from "@/hooks"
 import { profileApi } from "@/services/profileApi"
 
-export function useInvalidateMeQuery() {
+export const useInvalidateMeQuery = () => {
     const queryClient = useQueryClient()
 
     return () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ME })
-}
-
-export function useGetMeFromCache(): UserProfileViewRes | undefined {
-    const queryClient = useQueryClient()
-    return queryClient.getQueryData<UserProfileViewRes>(QUERY_KEYS.ME)
 }
 
 export const useGetMe = ({ enabled = true }: { enabled?: boolean } = {}) => {

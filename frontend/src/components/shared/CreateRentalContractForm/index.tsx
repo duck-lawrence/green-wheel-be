@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
 import Link from "next/link"
 
-import { useBookingFilterStore, useGetAllStations, useGetMeFromCache } from "@/hooks"
+import { useBookingFilterStore, useGetMe } from "@/hooks"
 import {
     ButtonStyled,
     InputStyled,
@@ -23,6 +23,9 @@ import { MapPinAreaIcon } from "@phosphor-icons/react"
 import toast from "react-hot-toast"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { BackendError } from "@/models/common/response"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { CreateRentalContractReq } from "@/models/rental-contract/schema/request"
+import { useCreateRentalContract } from "@/hooks/queries/useRentalContract"
 
 type FormValues = {
     fullName: string
@@ -35,30 +38,42 @@ type FormValues = {
     agreeDataPolicy: boolean
 }
 
-export const CreateRentalContractForm = () => {
-    const { t } = useTranslation()
+export type CreateRentalContractFormProps = {
+    onSuccess?: () => void
+    modelViewRes: VehicleModelViewRes
+}
 
+export const CreateRentalContractForm = ({
+    onSuccess,
+    modelViewRes
+}: CreateRentalContractFormProps) => {
+    const { t } = useTranslation()
     const [mounted, setMounted] = useState(false)
-    // const { user } = useProfileStore()
-    const user = useGetMeFromCache()
+    const createContract = useCreateRentalContract({ onSuccess })
+    const { data: user } = useGetMe()
+    const stationId = useBookingFilterStore((s) => s.stationId)
+    const startDate = useBookingFilterStore((s) => s.startDate)
+    const endDate = useBookingFilterStore((s) => s.endDate)
+
+    const handleCreateContract = useCallback(async () => {
+        await createContract.mutateAsync({
+            customerId: undefined,
+            modelId: modelViewRes.id,
+            stationId: stationId!,
+            startDate: startDate!,
+            endDate: endDate!
+        })
+    }, [createContract, endDate, modelViewRes.id, startDate, stationId])
 
     // load station to get name and address
-    const {
-        data: stations,
-        isLoading: isGetStationsLoading,
-        error: getStationsError,
-        isError: isGetStationsError
-    } = useGetAllStations()
+    const stations = useGetAllStationsFromCache()
 
     // get vehicle
 
     // get filter item
-    const stationId = useBookingFilterStore((s) => s.stationId)
-    // const startDate = useBookingFilterStore((s) => s.startDate)
-    // const endDate = useBookingFilterStore((s) => s.endDate)
 
     useEffect(() => {
-        setMounted(!isGetStationsLoading && !isGetStationsError)
+        setMounted(stations?.length > 0)
     }, [isGetStationsError, isGetStationsLoading])
 
     // init value
@@ -123,9 +138,9 @@ export const CreateRentalContractForm = () => {
         <div className="min-h-screen px-4 sm:px-6 lg:px-8">
             {mounted ? (
                 <div className="mx-auto max-w-5xl bg-white rounded-lg ">
-                    <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+                    {/* <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                         <h2 className="text-3xl font-bold">{t("car_rental.register_title")}</h2>
-                    </div>
+                    </div> */}
 
                     <form onSubmit={formik.handleSubmit} className="px-6 py-4" noValidate>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -376,7 +391,7 @@ export const CreateRentalContractForm = () => {
                                             {t("car_rental.detail_table")}
                                         </h4>
                                         <div className="mt-2 space-y-2">
-                                            {/* <div className="flex justify-between">
+                                            <div className="flex justify-between">
                                                 <span>{t("car_rental.listed_fee")}</span>
                                                 <span>{formatCurrency(listedFee)}</span>
                                             </div>
@@ -387,7 +402,7 @@ export const CreateRentalContractForm = () => {
                                             <div className="flex justify-between">
                                                 <span>{t("car_rental.deposit")}</span>
                                                 <span>{formatCurrency(deposit)}</span>
-                                            </div> */}
+                                            </div>
                                         </div>
                                     </div>
 

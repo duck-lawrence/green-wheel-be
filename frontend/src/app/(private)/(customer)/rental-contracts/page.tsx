@@ -8,6 +8,6 @@ import { CreateRentalContractForm } from "@/components"
 //   { ssr: false }
 // )
 
-export default function RegisterCarPage() {
+export default function CreateRentalContractPage() {
     return <CreateRentalContractForm />
 }

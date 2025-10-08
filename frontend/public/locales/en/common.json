@@ -66,6 +66,7 @@
         "phone_require": "Phone is required",
         "invalid_phone": "Phone must be 10 digits and start with 0",
         "phone_already_exist": "This phone already exists",
+        "enter_phone_to_booking": "Please enter your phone in profile to continue booking",
         "first_name": "First name",
         "first_name_require": "First name is required",
         "invalid_first_name": "First name only contains letters",
@@ -135,7 +136,8 @@
         "payment_method_require": "Please select a payment method",
         "pickup_location_require": "Please select pickup location",
         "agree_terms_require": "You must agree to the payment terms",
-        "agree_data_policy_require": "You must agree to the data sharing terms"
+        "agree_data_policy_require": "You must agree to the data sharing terms",
+        "wait_for_confirm": "Your order is being processed. Please wait for the confirmation email before making a payment."
     },
     "vehicle_model": {
         "station": "Station",
@@ -315,8 +317,6 @@
         "report_form_validation_title_max": "Title must be 100 characters or less.",
         "report_form_validation_description_required": "Description is required.",
         "report_form_validation_description_max": "Description must be 1000 characters or less."
-      
-        
     },
     "footer": {
         "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",

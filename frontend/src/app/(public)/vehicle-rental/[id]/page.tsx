@@ -1,23 +1,29 @@
 "use client"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import { BreadCrumbsStyled, ButtonStyled, FieldStyled } from "@/components"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
-import Link from "next/link"
 import { formatCurrency } from "@/utils/helpers/currentcy"
 import { getDatesDiff } from "@/utils/helpers/mathDate"
-import { useParams } from "next/navigation"
-import { useBookingFilterStore, useTokenStore, useGetVehicleModelById } from "@/hooks"
+import { useParams, useRouter } from "next/navigation"
+import { useBookingFilterStore, useGetVehicleModelById, useGetMe } from "@/hooks"
 import { useTranslation } from "react-i18next"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { Spinner } from "@heroui/react"
+import { ROLE_CUSTOMER } from "@/constants/constants"
+import toast from "react-hot-toast"
 
 export default function VehicleDetailPage() {
     const { id } = useParams()
     const modelId = id?.toString()
+    const router = useRouter()
 
     const { t } = useTranslation()
-    const isLoggedIn = useTokenStore((s) => !!s.accessToken)
+    const { data: user } = useGetMe()
+    const isCustomer = useMemo(() => {
+        return user?.role?.name === ROLE_CUSTOMER
+    }, [user])
+
     const [vehicle, setVehicle] = useState<VehicleModelViewRes | null>(null)
     // handle render picture
     const [active, setActive] = useState(0)
@@ -58,6 +64,14 @@ export default function VehicleDetailPage() {
     //     .filter((v) => v.id !== id)
     //     .sort(() => Math.random() - 0.5)
     //     .slice(0, 3)
+
+    const handleClickBooking = useCallback(() => {
+        if (!user?.phone) {
+            toast.error(t("user.enter_phone_to_booking"))
+        } else {
+            router.replace("/rental-contracts")
+        }
+    }, [router, t, user?.phone])
 
     function mapSpecs(vehicle: VehicleModelViewRes) {
         return [
@@ -256,7 +270,7 @@ export default function VehicleDetailPage() {
                             </div>
 
                             <ButtonStyled
-                                isDisabled={isLoggedIn}
+                                isDisabled={!isCustomer}
                                 className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             ></ButtonStyled>
                         </div>

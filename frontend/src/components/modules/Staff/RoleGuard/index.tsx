@@ -29,7 +29,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
     // const user = useProfileStore((s) => s.user)
     // const user = useGetMeFromCache()
     const router = useRouter()
-    const user = useProfileStore((s) => s.user)
+    const { data: user } = useGetMe()
     const setUser = useProfileStore((s) => s.setUser)
     const removeUser = useProfileStore((s) => s.removeUser)
     const accessToken = useTokenStore((s) => s.accessToken)

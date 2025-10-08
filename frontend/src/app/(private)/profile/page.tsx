@@ -1,6 +1,5 @@
 "use client"
 import {
-    AvatarUploader,
     AvaterStyled,
     ButtonStyled,
     DatePickerStyled,
@@ -93,8 +92,6 @@ export default function Page() {
         <div>
             {/* Title */}
             <div className="text-3xl mb-4 px-4 pb-4 font-bold">{t("user.account_information")}</div>
-
-            <AvatarUploader />
 
             {/* Avatar Upload Modal */}
             <ImageUploaderModal

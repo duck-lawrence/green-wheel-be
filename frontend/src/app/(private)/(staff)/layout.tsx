@@ -2,7 +2,7 @@
 
 import { StaffSidebar, STAFF_MENU } from "@/components"
 import { ROLE_STAFF } from "@/constants/constants"
-import { useGetMe, useGetMeFromCache } from "@/hooks"
+import { useGetMe } from "@/hooks"
 import { Spinner } from "@heroui/react"
 import { usePathname, useRouter } from "next/navigation"
 import React, { useEffect, useMemo } from "react"
@@ -13,14 +13,7 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
     const router = useRouter()
     const pathname = usePathname()
     const { t } = useTranslation()
-    const cachedUser = useGetMeFromCache()
-    const {
-        data: profile,
-        isLoading,
-        isError
-    } = useGetMe({ enabled: true })
-
-    const user = useMemo(() => profile ?? cachedUser, [profile, cachedUser])
+    const { data: user, isLoading, isError } = useGetMe({ enabled: true })
 
     const isStaff = useMemo(() => {
         return user?.role?.name === ROLE_STAFF

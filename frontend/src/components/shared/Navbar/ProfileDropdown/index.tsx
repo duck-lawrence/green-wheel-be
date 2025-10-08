@@ -41,22 +41,44 @@ export function ProfileDropdown() {
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
     // const user = useProfileStore((s) => s.user)
-    const user = useGetMeFromCache()
-    const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
-    const roleDetail = (user as Partial<{ roleDetail?: MaybeRoleDetail }> | null | undefined)?.roleDetail
+    const {
+        data: user,
+        isLoading: isGetMeLoading,
+        error: getMeError,
+        isError: isGetMeError
+    } = useGetMe({ enabled: isLoggedIn })
+
+    const roleDetail = (user as Partial<{ roleDetail?: MaybeRoleDetail }> | null | undefined)
+        ?.roleDetail
     const isStaff = normalizeRole(user?.role, roleDetail) === "staff"
 
     const baseItems: DropdownLinkItem[] = isStaff
         ? [
-              { key: "staff_management", href: "/dashboard", label: t("navbar.staff_management") as string },
-              { key: "staff_profile", href: "/profile", label: t("navbar.staff_profile") as string },
-              { key: "staff_contracts", href: "/dashboard/contracts", label: t("navbar.staff_contracts") as string }
+              {
+                  key: "staff_management",
+                  href: "/dashboard",
+                  label: t("navbar.staff_management") as string
+              },
+              {
+                  key: "staff_profile",
+                  href: "/profile",
+                  label: t("navbar.staff_profile") as string
+              },
+              {
+                  key: "staff_contracts",
+                  href: "/dashboard/contracts",
+                  label: t("navbar.staff_contracts") as string
+              }
           ]
         : [
               { key: "profile", href: "/profile", label: t("user.profile") as string },
-              { key: "rental_contracts", href: "/profile/rental-contracts", label: t("user.rental_contracts") as string }
+              {
+                  key: "rental_contracts",
+                  href: "/profile/rental-contracts",
+                  label: t("user.rental_contracts") as string
+              }
           ]
 
     const dropdownItems: DropdownLinkItem[] = [
@@ -64,23 +86,9 @@ export function ProfileDropdown() {
         { key: "logout", label: t("navbar.logout") as string, color: "danger" }
     ]
 
-    const {
-        data: userRes,
-        isLoading: isGetMeLoading,
-        error: getMeError,
-        isError: isGetMeError
-    } = useGetMe({ enabled: isLoggedIn })
-
     const handleLogout = useCallback(async () => {
         await logoutMutation.mutateAsync()
     }, [logoutMutation])
-
-    // handle get me success
-    useEffect(() => {
-        if (userRes) {
-            setUser(userRes)
-        }
-    }, [userRes, setUser])
 
     // handle get me error
     useEffect(() => {
@@ -114,7 +122,12 @@ export function ProfileDropdown() {
                 <DropdownMenu aria-label="User Actions" variant="flat">
                     {dropdownItems.map((item) =>
                         item.href ? (
-                            <DropdownItem key={item.key} as={Link} href={item.href} className="block">
+                            <DropdownItem
+                                key={item.key}
+                                as={Link}
+                                href={item.href}
+                                className="block"
+                            >
                                 {item.label}
                             </DropdownItem>
                         ) : (
