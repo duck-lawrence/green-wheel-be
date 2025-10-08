@@ -1,14 +1,10 @@
 ﻿using API.Filters;
-using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.RentalContract.Request;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.WebSockets;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -44,18 +40,6 @@ namespace API.Controllers
                 rentalContractViewRes
             );
         }
-        /*
-         status code
-         200 success
-         */
-        [HttpGet]
-        [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> GetByStatus([FromQuery] int status)
-        {
-            var rcList = await _rentalContractService.GetByStatus(status);
-            return Ok(rcList);
-        }
-
         /*
          status code
          404 rental contract not found
@@ -98,6 +82,18 @@ namespace API.Controllers
             } 
             var rentalContractViewRes = await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
             return Ok(rentalContractViewRes);
+        }
+
+        /*
+        * status code
+        * 404: rentalContract not found
+        * 200: success
+        */
+        [HttpGet]
+        public async Task<IActionResult> GetByCusPhoneAndContractId([FromQuery] string? phone, [FromQuery] int? status)
+        {
+            var contractViews = await _rentalContractService.GetByCustomerPhoneAndContractStatus(status, phone);
+            return Ok(contractViews);
         }
     }
 }

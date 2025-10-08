@@ -35,7 +35,15 @@ namespace Application
             => await _licenseRepo.GetByUserId(userId);
 
         public async Task<DriverLicense?> GetByLicenseNumberAsync(string licenseNumber)
-            => await _licenseRepo.GetByLicenseNumber(licenseNumber);
+        {
+            var license = await _licenseRepo.GetByLicenseNumber(licenseNumber);
+            if(license == null)
+            {
+                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+            }
+            return license;
+        }
+            
 
         public async Task<bool> DeleteAsync(Guid userId)
         {

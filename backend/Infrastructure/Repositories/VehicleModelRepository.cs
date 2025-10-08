@@ -1,6 +1,9 @@
 ﻿using Application.Constants;
+using Application.Dtos.Brand.Respone;
 using Application.Dtos.VehicleModel.Respone;
+using Application.Dtos.VehicleSegment.Respone;
 using Application.Repositories;
+using AutoMapper;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +17,10 @@ namespace Infrastructure.Repositories
 {
     public class VehicleModelRepository : GenericRepository<VehicleModel>, IVehicleModelRepository
     {
-        public VehicleModelRepository(IGreenWheelDbContext dbContext) : base(dbContext)
+        private IMapper _mapper;
+        public VehicleModelRepository(IGreenWheelDbContext dbContext, IMapper mapper) : base(dbContext)
         {
-
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<VehicleModelViewRes>> FilterVehicleModelsAsync(
@@ -29,7 +33,6 @@ namespace Infrastructure.Repositories
                 throw new ArgumentException(Message.VehicleModelMessage.RentTimeIsNotAvailable);
 
             var query = _dbContext.VehicleModels.Where(vm => vm.DeletedAt == null)
-                .Include(vm => vm.ModelImages)
                 .Include(vm => vm.Vehicles)
                     .ThenInclude(v => v.RentalContracts)
                 .AsQueryable();
@@ -56,23 +59,21 @@ namespace Infrastructure.Repositories
                     BatteryCapacity = vm.BatteryCapacity,
                     EcoRangeKm = vm.EcoRangeKm,
                     SportRangeKm = vm.SportRangeKm,
-                    Brand = vm.Brand,
-                    Segment = vm.Segment,
+                    Brand = _mapper.Map<BrandViewRes>(vm.Brand),
+                    Segment = _mapper.Map<VehicleSegmentViewRes>(vm.Segment),
                     ImageUrl = vm.ImageUrl,
                     AvailableVehicleCount = vm.Vehicles.Count(v =>
-                        v.StationId == stationId &&
+                    v.StationId == stationId &&
+                    (
+                        v.Status == (int)VehicleStatus.Available ||
                         (
-                            v.Status == (int)VehicleStatus.Available // Available
-                            ||
-                            (v.Status == (int)VehicleStatus.Unavaible && endDate < v.RentalContracts.Min(rc => rc.StartDate).AddDays(-10)) // Unavailable
-                                                                                                                                           //nếu có người thuê rồi thì 
-                                                                                                                                           //ngày kết thúc phải sớm hơn 10 ngày
-                            ||
-                            (v.Status == (int)VehicleStatus.Rented && startDate > v.RentalContracts.Max(rc => rc.EndDate).AddDays(10)) // Rented
-                                                                                                                                       //nếu có người đang thuê thì 
-                                                                                                                                       //ngày bắt đầu phải muộn hơn ngày kết thúc của người trước 10 ngày
+                            (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
+                            !v.RentalContracts.Any(rc =>
+                                endDate.AddDays(10) > rc.StartDate && startDate.AddDays(-10) < rc.EndDate
+                            )
                         )
                     )
+                )
                 })
                 .ToListAsync();
             return result;
@@ -101,24 +102,22 @@ namespace Infrastructure.Repositories
                     BatteryCapacity = vm.BatteryCapacity,
                     EcoRangeKm = vm.EcoRangeKm,
                     SportRangeKm = vm.SportRangeKm,
-                    Brand = vm.Brand,
-                    Segment = vm.Segment,
+                    Brand = _mapper.Map<BrandViewRes>(vm.Brand),
+                    Segment = _mapper.Map<VehicleSegmentViewRes>(vm.Segment),
                     ImageUrl = vm.ImageUrl,
                     ImageUrls = vm.ModelImages.Select(x => x.Url),
                     AvailableVehicleCount = vm.Vehicles.Count(v =>
-                        v.StationId == stationId &&
+                    v.StationId == stationId &&
+                    (
+                        v.Status == (int)VehicleStatus.Available ||
                         (
-                            v.Status == (int)VehicleStatus.Available // Available
-                            ||
-                            (v.Status == (int)VehicleStatus.Unavaible && endDate < v.RentalContracts.Min(rc => rc.StartDate).AddDays(-10)) // Unavailable
-                                                                                                                                           //nếu có người thuê rồi thì 
-                                                                                                                                           //ngày kết thúc phải sớm hơn 10 ngày
-                            ||
-                            (v.Status == (int)VehicleStatus.Rented && startDate > v.RentalContracts.Max(rc => rc.EndDate).AddDays(10)) // Rented
-                                                                                                                                       //nếu có người đang thuê thì 
-                                                                                                                                       //ngày bắt đầu phải muộn hơn ngày kết thúc của người trước 10 ngày
+                            (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
+                            !v.RentalContracts.Any(rc =>
+                                endDate.AddDays(10) > rc.StartDate && startDate.AddDays(-10) < rc.EndDate
+                            )
                         )
                     )
+                )
                 })
                 .FirstOrDefaultAsync();
             return result;

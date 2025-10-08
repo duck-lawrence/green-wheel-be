@@ -5,8 +5,8 @@ import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@heroui/react"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
-import { DropdownStyle } from "@/components"
-import { useGetMe, useLogout, useProfileStore, useTokenStore } from "@/hooks"
+import { DropdownStyled } from "@/components"
+import { useGetMe, useGetMeFromCache, useLogout, useProfileStore, useTokenStore } from "@/hooks"
 import { BackendError } from "@/models/common/response"
 import Link from "next/link"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
@@ -40,7 +40,8 @@ type DropdownLinkItem = {
 export function ProfileDropdown() {
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
-    const user = useProfileStore((s) => s.user)
+    // const user = useProfileStore((s) => s.user)
+    const user = useGetMeFromCache()
     const setUser = useProfileStore((s) => s.setUser)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
@@ -95,7 +96,7 @@ export function ProfileDropdown() {
 
     return (
         <div className="gap-4 flex items-center">
-            <DropdownStyle>
+            <DropdownStyled>
                 <DropdownTrigger>
                     <User
                         as="button"
@@ -128,7 +129,7 @@ export function ProfileDropdown() {
                         )
                     )}
                 </DropdownMenu>
-            </DropdownStyle>
+            </DropdownStyled>
         </div>
     )
 }

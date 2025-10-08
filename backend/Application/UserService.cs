@@ -35,6 +35,8 @@ namespace Application
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
         private readonly IRentalContractRepository _rentalContractRepository;
+        private readonly ICitizenIdentityRepository _citizenIdentityRepository;
+        private readonly IDriverLicenseRepository _driverLicenseRepository;
 
         public UserService(IUserRepository repository,
             IOptions<JwtSettings> jwtSettings,
@@ -50,7 +52,9 @@ namespace Application
              ILogger<UserService> logger,
              ICitizenIdentityService citizenService,
              IDriverLicenseService driverService,
-             IRentalContractRepository rentalContractRepository
+             IRentalContractRepository rentalContractRepository,
+             ICitizenIdentityRepository citizenIdentityRepository,
+             IDriverLicenseRepository driverLicenseRepository
             )
         {
             _userRepository = repository;
@@ -68,6 +72,8 @@ namespace Application
             _citizenService = citizenService;
             _driverService = driverService;
             _rentalContractRepository = rentalContractRepository;
+            _citizenIdentityRepository = citizenIdentityRepository;
+            _driverLicenseRepository = driverLicenseRepository;
         }
 
         /*
@@ -451,7 +457,7 @@ namespace Application
             };
         }
 
-        public async Task<string> SetPassword(string setPasswordToken, GoogleSetPasswordReq req)
+        public async Task<string> SetPasswordAsync(string setPasswordToken, GoogleSetPasswordReq req)
         {
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
@@ -493,7 +499,7 @@ namespace Application
             return GenerateAccessToken(id);
         }
 
-        public async Task<UserProfileViewRes> GetMe(ClaimsPrincipal userClaims)
+        public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
              //User userFromDb = await _userRepository.GetByIdAsync(userID);
@@ -508,7 +514,7 @@ namespace Application
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
 
-        public async Task UpdateMe(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
+        public async Task UpdateMeAsync(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
             if (!string.IsNullOrEmpty(userUpdateReq.Phone))
             {
@@ -589,7 +595,7 @@ namespace Application
             await _userRepository.UpdateAsync(user);
         }
 
-        public async Task CheckDupEmail(string email)
+        public async Task CheckDupEmailAsync(string email)
         {
             if (await _userRepository.GetByEmailAsync(email) != null)
             {
@@ -695,20 +701,43 @@ namespace Application
             return userId;
         }
 
-        public async Task<User> GetUserByPhoneAsync(string phone)
+        public async Task<UserProfileViewRes> GetUserByPhoneAsync(string phone)
         {
             var user = await _userRepository.GetByPhoneAsync(phone);
             if(user == null)
             {
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
             }
-            return user;
+            var userViewRes = _mapper.Map<UserProfileViewRes>(user);
+            return userViewRes;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllAsync();
             return users;
+        }
+
+        public async Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber)
+        {
+            var citizenIdentity = await _citizenIdentityRepository.GetByIdNumberAsync(idNumber);
+            if (citizenIdentity == null)
+            {
+                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+            }
+            var userView = _mapper.Map<UserProfileViewRes>(citizenIdentity.User);
+            return userView;
+        }
+
+        public async Task<UserProfileViewRes> GetByDriverLicenseAsync(string number)
+        {
+            var driverLicense = await _driverLicenseRepository.GetByLicenseNumber(number);
+            if (driverLicense == null)
+            {
+                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+            }
+            var userView = _mapper.Map<UserProfileViewRes>(driverLicense.User);
+            return userView;
         }
     }
 }
