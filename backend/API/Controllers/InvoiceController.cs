@@ -59,17 +59,17 @@ namespace API.Controllers
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            
+
             string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
             return link == null ? Ok() : Ok(link);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
         {
             var result = await _invoiceService.GetAllInvoicesAsync(pagination);
             return Ok(result);
         }
-        }
     }
+    
 }
