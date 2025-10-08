@@ -1,4 +1,5 @@
-﻿using Application.Abstractions;
+﻿using API.Filters;
+using Application.Abstractions;
 using Application.Dtos.Common.Request;
 using Application.Dtos.UserSupport.Request;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +20,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize("Customer")]
+        [RoleAuthorize("Customer")]
         public async Task<IActionResult> Create([FromBody] CreateSupportReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -28,7 +29,7 @@ namespace API.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize(Roles = "Customer")]
+        [RoleAuthorize("Customer")]
         public async Task<IActionResult> GetMyRequests()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -37,7 +38,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Staff,Admin")]
+        [RoleAuthorize(["Staff", "Admin"])]
         public async Task<IActionResult> GetAll([FromQuery] PaginationParams pagination)
         {
             var data = await _service.GetAllAsync(pagination);
@@ -45,7 +46,7 @@ namespace API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [Authorize(Roles = "Staff,Admin")]
+        [RoleAuthorize(["Staff", "Admin"])]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSupportReq req)
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
