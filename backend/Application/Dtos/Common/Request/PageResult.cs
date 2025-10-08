@@ -6,7 +6,10 @@
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public int TotalCount { get; set; }
-        public int TotaPage => (int)Math.Ceiling(TotalCount / (double)PageSize);
+
+        public int TotalPage => (int)Math.Ceiling(TotalCount / (double)PageSize);
+        public bool HasPrevious => PageNumber > 1;
+        public bool HasNext => PageNumber < TotalPage;
 
         public PageResult(IEnumerable<T> items, int pageNumber, int pageSize, int totalCount)
         {

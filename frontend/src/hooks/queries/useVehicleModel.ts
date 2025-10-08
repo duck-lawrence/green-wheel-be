@@ -1,6 +1,7 @@
 import { QUERY_KEYS } from "@/constants/queryKey"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { vehicleModelApi } from "@/services/vehicleModelApi"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useGetAllVehicleModels = ({
     query,
@@ -30,9 +31,17 @@ export const useGetVehicleModelById = ({
     query: { stationId: string; startDate: string; endDate: string }
     enabled?: boolean
 }) => {
+    const queryClient = useQueryClient()
     return useQuery({
-        queryKey: QUERY_KEYS.VEHICLE_MODEL(modelId),
-        queryFn: async () => await vehicleModelApi.getById({ modelId, query }),
+        queryKey: [...QUERY_KEYS.VEHICLE_MODEL(modelId), query],
+        queryFn: () => vehicleModelApi.getById({ modelId, query }),
+        initialData: () => {
+            const cachedList = queryClient.getQueryData<VehicleModelViewRes[]>([
+                QUERY_KEYS.VEHICLE_MODELS,
+                query
+            ])
+            return cachedList?.find((v) => v.id === modelId)
+        },
         enabled
     })
 }

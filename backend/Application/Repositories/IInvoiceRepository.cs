@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Dtos.Common.Request;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace Application.Repositories
     public interface IInvoiceRepository : IGenericRepository<Invoice>
     {
         Task<IEnumerable<Invoice>> GetByContractAsync(Guid ContractId);
+
         Task<Invoice?> GetByIdOptionAsync(Guid id, bool includeItems = false, bool includeDeposit = false);
+
+        Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination);
     }
 }

@@ -13,7 +13,7 @@ namespace Application.Dtos.Invoice.Response
     {
         public Guid Id { get; set; }
         public IEnumerable<InvoiceItemViewRes> InvoiceItems { get; set; }
-        public DepositViewRespone Deposit { get; set; }
+        public DepositViewRes Deposit { get; set; }
         public decimal Subtotal { get; set; }
         public decimal Tax { get; set; }
         public decimal Total { get; set; }

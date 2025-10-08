@@ -13,7 +13,7 @@ namespace Application.Mappers
     {
         public DepositProfile()
         {
-            CreateMap<Deposit, DepositViewRespone>();
+            CreateMap<Deposit, DepositViewRes>();
         }
     }
 }

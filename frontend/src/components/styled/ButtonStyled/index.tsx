@@ -2,18 +2,16 @@
 import React from "react"
 import { Button, ButtonProps, cn, Spinner } from "@heroui/react"
 
-export function ButtonStyled(props: ButtonProps) {
+export function ButtonStyled({ className, color = "secondary", isLoading, ...rest }: ButtonProps) {
+    if (isLoading) {
+        return <Spinner />
+    }
+
     return (
-        <>
-            {props.isLoading ? (
-                <Spinner />
-            ) : (
-                <Button
-                    color="secondary"
-                    {...props}
-                    className={cn("font-medium text-base", props.className)}
-                />
-            )}
-        </>
+        <Button
+            color={color}
+            {...rest}
+            className={cn("font-medium text-base", className)}
+        />
     )
 }

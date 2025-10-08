@@ -14,17 +14,17 @@ namespace API.Filters
     {
         private readonly string[] _roles;
 
-        public RoleAuthorizeAttribute(params string[] roles )
+        public RoleAuthorizeAttribute(params string[] roles)
         {
             _roles = roles;
-            
         }
+
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var _cache = context.HttpContext.RequestServices.GetService<IMemoryCache>();
             var user = context.HttpContext.User;
             //check user login or not?
-            if(!user.Identity?.IsAuthenticated ?? true)
+            if (!user.Identity?.IsAuthenticated ?? true)
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
                 

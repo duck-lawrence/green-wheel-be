@@ -5,7 +5,7 @@
 // import { Field } from "@/components/styled/FieldStyled"
 // import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 // import Link from "next/link"
-// import { currency } from "@/utils/helpers/currentcy"
+// import { formatCurrency } from "@/utils/helpers/currentcy"
 // import { useTokenStore } from "@/hooks"
 // import { MathDate } from "@/utils/helpers/mathDate"
 // import { BreadCrumbsStyled } from "../../styled"
@@ -127,7 +127,7 @@
 //                     {/*  font-extrabold*/}
 //                     <div className="text-right">
 //                         <p className="text-2xl sm:text-3xl font-semibold text-emerald-600">
-//                             {currency(vehicle.costPerDay)}
+//                             {formatCurrency(vehicle.costPerDay)}
 //                             <span className="text-base font-normal text-neutral-500">
 //                                 {" "}
 //                                 VND/Ngày
@@ -235,7 +235,7 @@
 //                                 <div className="flex items-center justify-between text-sm">
 //                                     <span>Đơn giá</span>
 //                                     <span className="font-medium">
-//                                         {currency(vehicle.costPerDay)}
+//                                         {formatCurrency(vehicle.costPerDay)}
 //                                     </span>
 //                                 </div>
 //                                 <div className="mt-2 flex items-center justify-between text-sm">
@@ -245,14 +245,14 @@
 //                                 <div className="mt-2 flex items-center justify-between text-sm">
 //                                     <span>Tiền cọc</span>
 //                                     <span className="font-medium">
-//                                         {currency(vehicle.depositFee)}
+//                                         {formatCurrency(vehicle.depositFee)}
 //                                     </span>
 //                                 </div>
 
 //                                 <div className="mt-3 h-px bg-neutral-200" />
 //                                 <div className="mt-3 flex items-center justify-between text-base font-semibold">
 //                                     <span>Tạm tính</span>
-//                                     <span className="text-emerald-700">{currency(total)} đ</span>
+//                                     <span className="text-emerald-700">{formatCurrency(total)} đ</span>
 //                                 </div>
 //                             </div>
 
@@ -301,7 +301,7 @@
 //                                     </p>
 //                                 </div>
 //                                 <p className="text-emerald-600 font-semibold text-base whitespace-nowrap">
-//                                     {currency(i.costPerDay)}{" "}
+//                                     {formatCurrency(i.costPerDay)}{" "}
 //                                     <span className="text-sm text-neutral-500">VND/Ngày</span>
 //                                 </p>
 //                             </div>
