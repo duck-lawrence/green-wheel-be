@@ -81,7 +81,8 @@ namespace API
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
             builder.Services.AddScoped<IModelImageRepository, ModelImageRepository>();
             builder.Services.AddScoped<IVehicleSegmentRepository, VehicleSegmentRepository>();
-            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();
+            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();            
+            builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
             builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             //Add Services
@@ -98,6 +99,7 @@ namespace API
             builder.Services.AddScoped<IDriverLicenseService, DriverLicenseService>();
             builder.Services.AddScoped<IModelImageService, ModelImageService>();
             builder.Services.AddScoped<IPhotoService, CloudinaryService>();
+            builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
