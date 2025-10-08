@@ -510,12 +510,12 @@ namespace Application
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-             //User userFromDb = await _userRepository.GetByIdAsync(userID);
+            //User userFromDb = await _userRepository.GetByIdAsync(userID);
             // Lấy hồ sơ người dùng KÈM theo thông tin Role (Phúc thêm)
             // Mục đích: khi trả về UserProfileViewRes cần có tên/quyền của vai trò (vd: "Customer", "Staff")
             // Lý do: tránh phải query thêm để lấy Role, đồng thời đảm bảo mapping có đủ dữ liệu quyền hạn
             // added: include role data when retrieving staff profile
-            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
+            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role,
             // giúp useAuth ở frontend biết chắc user có role “staff”.
             User? userFromDb = await _userRepository.GetByIdWithFullInfoAsync(userID)
                 ?? throw new NotFoundException(Message.UserMessage.UserNotFound);
@@ -560,19 +560,16 @@ namespace Application
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
             if (string.IsNullOrEmpty(uploaded.Url))
-                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
             // 2. Lấy user và nhớ avatar cũ
             var user = await _mediaUow.Users.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException(Message.User.UserNotFound);
+                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
             var oldPublicId = user.AvatarPublicId;
             var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
 
             if (string.IsNullOrEmpty(result.Url))
                 throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
-
-            var user = await _userRepository.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
 
             // 3. Transaction DB
             await using var trx = await _mediaUow.BeginTransactionAsync();
@@ -631,7 +628,7 @@ namespace Application
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
             if (string.IsNullOrEmpty(uploaded.Url))
-                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
             // Lấy bản ghi cũ (nếu có)
             var old = await _mediaUow.CitizenIdentities.GetByUserIdAsync(userId);
@@ -640,7 +637,7 @@ namespace Application
             try
             {
                 var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -666,7 +663,7 @@ namespace Application
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
             if (string.IsNullOrEmpty(uploaded.Url))
-                throw new InvalidOperationException(Message.Cloudinary.UploadFailed);
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
             var old = await _mediaUow.DriverLicenses.GetByUserId(userId);
 
@@ -674,7 +671,7 @@ namespace Application
             try
             {
                 var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.Licenses.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -716,7 +713,7 @@ namespace Application
             if (user != null)
             {
                 var rentalContract = _rentalContractRepository.GetByCustomerAsync(user.Id);
-                if(rentalContract != null)
+                if (rentalContract != null)
                 {
                     throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
                 }
@@ -727,7 +724,7 @@ namespace Application
             do
             {
                 userId = Guid.NewGuid();
-            }while (await _userRepository.GetByIdAsync(userId) != null);
+            } while (await _userRepository.GetByIdAsync(userId) != null);
             user.Id = userId;
             await _userRepository.AddAsync(user);
             return userId;
@@ -736,7 +733,7 @@ namespace Application
         public async Task<UserProfileViewRes> GetUserByPhoneAsync(string phone)
         {
             var user = await _userRepository.GetByPhoneAsync(phone);
-            if(user == null)
+            if (user == null)
             {
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
             }
