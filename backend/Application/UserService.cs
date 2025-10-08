@@ -2,16 +2,21 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
+using Application.Dtos.DriverLicense.Response;
+using Application.Dtos.UserSupport.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
+using Application.Dtos.UserSupport.Request;
+
 using Application.Helpers;
 using Application.Repositories;
+using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Security.Claims;
@@ -31,9 +36,10 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private readonly IPhotoService _photoService;
-        private readonly ILogger<UserService> _logger;
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
+        private readonly IMediaUow _mediaUow;
+        private readonly ISupportRequestRepository _supportRepo;
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ICitizenIdentityRepository _citizenIdentityRepository;
         private readonly IDriverLicenseRepository _driverLicenseRepository;
@@ -49,9 +55,10 @@ namespace Application
              IMapper mapper,
              IMemoryCache cache,
              IPhotoService photoService,
-             ILogger<UserService> logger,
              ICitizenIdentityService citizenService,
              IDriverLicenseService driverService,
+             IMediaUow mediaUow,
+             ISupportRequestRepository supportRepo,
              IRentalContractRepository rentalContractRepository,
              ICitizenIdentityRepository citizenIdentityRepository,
              IDriverLicenseRepository driverLicenseRepository
@@ -68,9 +75,10 @@ namespace Application
             _mapper = mapper;
             _cache = cache;
             _photoService = photoService;
-            _logger = logger;
             _citizenService = citizenService;
             _driverService = driverService;
+            _mediaUow = mediaUow;
+            _supportRepo = supportRepo;
             _rentalContractRepository = rentalContractRepository;
             _citizenIdentityRepository = citizenIdentityRepository;
             _driverLicenseRepository = driverLicenseRepository;
@@ -502,12 +510,12 @@ namespace Application
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-             //User userFromDb = await _userRepository.GetByIdAsync(userID);
+            //User userFromDb = await _userRepository.GetByIdAsync(userID);
             // Lấy hồ sơ người dùng KÈM theo thông tin Role (Phúc thêm)
             // Mục đích: khi trả về UserProfileViewRes cần có tên/quyền của vai trò (vd: "Customer", "Staff")
             // Lý do: tránh phải query thêm để lấy Role, đồng thời đảm bảo mapping có đủ dữ liệu quyền hạn
             // added: include role data when retrieving staff profile
-            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
+            // Mục đích:  response /api/users/me trả về đầy đủ thông tin role,
             // giúp useAuth ở frontend biết chắc user có role “staff”.
             User? userFromDb = await _userRepository.GetByIdWithFullInfoAsync(userID)
                 ?? throw new NotFoundException(Message.UserMessage.UserNotFound);
@@ -548,34 +556,46 @@ namespace Application
             if (file == null || file.Length == 0)
                 throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
-            // Upload file lên Cloudinary
+            // 1. Upload ảnh mới
             var uploadReq = new UploadImageReq { File = file };
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
+            if (string.IsNullOrEmpty(uploaded.Url))
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
+
+            // 2. Lấy user và nhớ avatar cũ
+            var user = await _mediaUow.Users.GetByIdAsync(userId)
+                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
+            var oldPublicId = user.AvatarPublicId;
             var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
 
             if (string.IsNullOrEmpty(result.Url))
                 throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
-            var user = await _userRepository.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
-
-            // Nếu có avatar cũ thì xoá
-            if (!string.IsNullOrEmpty(user.AvatarPublicId))
+            // 3. Transaction DB
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
             {
-                try
-                {
-                    await _photoService.DeletePhotoAsync(user.AvatarPublicId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Cannot delete old avatar {PublicId}", user.AvatarPublicId);
-                }
+                user.AvatarUrl = uploaded.Url;
+                user.AvatarPublicId = uploaded.PublicID;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                await _mediaUow.Users.UpdateAsync(user);
+                await _mediaUow.SaveChangesAsync();
+                await trx.CommitAsync();
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                // rollback cloud nếu DB lỗi
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
             }
 
-            user.AvatarUrl = result.Url;
-            user.AvatarPublicId = result.PublicID;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            await _userRepository.UpdateAsync(user);
+            // 4. Sau commit: xóa ảnh cũ (best-effort)
+            if (!string.IsNullOrEmpty(oldPublicId))
+            {
+                try { await _photoService.DeletePhotoAsync(oldPublicId); } catch { }
+            }
 
             return user.AvatarUrl!;
         }
@@ -606,37 +626,69 @@ namespace Application
         public async Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
-            var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
+            if (string.IsNullOrEmpty(uploaded.Url))
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
-            var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploadResult.Url);
-            return new
+            // Lấy bản ghi cũ (nếu có)
+            var old = await _mediaUow.CitizenIdentities.GetByUserIdAsync(userId);
+
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
             {
-                entity.Id,
-                entity.Number,
-                entity.FullName,
-                entity.Nationality,
-                entity.Sex,
-                entity.DateOfBirth,
-                entity.ExpiresAt,
-                entity.ImageUrl
-            };
+                var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
+                    ?? throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
+
+                await _mediaUow.SaveChangesAsync();
+                await trx.CommitAsync();
+
+                // Sau commit: xóa ảnh cũ
+                if (!string.IsNullOrEmpty(old?.ImagePublicId))
+                {
+                    try { await _photoService.DeletePhotoAsync(old.ImagePublicId); } catch { }
+                }
+
+                return _mapper.Map<CitizenIdentityRes>(entity);
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
+            }
         }
 
         public async Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
-            var uploadResult = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
+            if (string.IsNullOrEmpty(uploaded.Url))
+                throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
-            var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploadResult.Url);
-            return new
+            var old = await _mediaUow.DriverLicenses.GetByUserId(userId);
+
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
             {
-                entity.Id,
-                entity.Number,
-                entity.FullName,
-                entity.Class,
-                entity.ExpiresAt,
-                entity.ImageUrl
-            };
+                var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploaded.Url, uploaded.PublicID)
+                    ?? throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
+
+                await _mediaUow.SaveChangesAsync();
+                await trx.CommitAsync();
+
+                if (!string.IsNullOrEmpty(old?.ImagePublicId))
+                {
+                    try { await _photoService.DeletePhotoAsync(old.ImagePublicId); } catch { }
+                }
+
+                return _mapper.Map<DriverLicenseRes>(entity);
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
+            }
         }
 
         public async Task<object?> GetMyCitizenIdentityAsync(Guid userId)
@@ -644,18 +696,7 @@ namespace Application
             var entity = await _citizenService.GetByUserId(userId);
             if (entity == null) return null;
 
-            return new
-            {
-                id = entity.Id,
-                number = entity.Number,
-                full_name = entity.FullName,
-                nationality = entity.Nationality,
-                sex = entity.Sex == 0 ? "Nam" : "Nữ",
-                date_of_birth = entity.DateOfBirth.ToString("yyyy-MM-dd"),
-                expires_at = entity.ExpiresAt.ToString("yyyy-MM-dd"),
-                image_url = entity.ImageUrl,
-                user_id = entity.UserId
-            };
+            return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
         public async Task<object?> GetMyDriverLicenseAsync(Guid userId)
@@ -663,19 +704,7 @@ namespace Application
             var entity = await _driverService.GetByUserIdAsync(userId);
             if (entity == null) return null;
 
-            return new
-            {
-                id = entity.Id,
-                number = entity.Number,
-                full_name = entity.FullName,
-                nationality = entity.Nationality,
-                sex = entity.Sex == 0 ? "Nam" : "Nữ",
-                date_of_birth = entity.DateOfBirth.ToString("yyyy-MM-dd"),
-                expires_at = entity.ExpiresAt.ToString("yyyy-MM-dd"),
-                @class = entity.Class,
-                image_url = entity.ImageUrl,
-                user_id = entity.UserId
-            };
+            return _mapper.Map<DriverLicenseRes>(entity);
         }
 
         public async Task<Guid> CreateAnounymousAccount(CreateUserReq req)
@@ -684,7 +713,7 @@ namespace Application
             if (user != null)
             {
                 var rentalContract = _rentalContractRepository.GetByCustomerAsync(user.Id);
-                if(rentalContract != null)
+                if (rentalContract != null)
                 {
                     throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
                 }
@@ -695,7 +724,7 @@ namespace Application
             do
             {
                 userId = Guid.NewGuid();
-            }while (await _userRepository.GetByIdAsync(userId) != null);
+            } while (await _userRepository.GetByIdAsync(userId) != null);
             user.Id = userId;
             await _userRepository.AddAsync(user);
             return userId;
@@ -704,7 +733,7 @@ namespace Application
         public async Task<UserProfileViewRes> GetUserByPhoneAsync(string phone)
         {
             var user = await _userRepository.GetByPhoneAsync(phone);
-            if(user == null)
+            if (user == null)
             {
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
             }

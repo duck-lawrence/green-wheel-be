@@ -1,7 +1,10 @@
 ﻿using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
+using Application.Dtos.UserSupport.Request;
+using Application.Dtos.UserSupport.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;

@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Abstractions;
+using Application.Dtos.Common.Request;
 using Application.Constants;
 using Application.Dtos.Momo.Request;
 using Application.Dtos.Payment.Request;
@@ -16,9 +17,8 @@ namespace API.Controllers
     {
         private readonly IMomoService _momoService;
         private readonly IInvoiceService _invoiceService;
-        
 
-        public InvoiceController(IMomoService momoService, 
+        public InvoiceController(IMomoService momoService,
             IInvoiceService invoiceItemService
             )
         {
@@ -28,10 +28,11 @@ namespace API.Controllers
 
         /*
          * status code
-         * 400 invalid signature 
+         * 400 invalid signature
          * 200 success
          * 404 not found
          */
+
         [HttpPost("process-update")]
         public async Task<IActionResult> ProcessUpdateInvoice([FromBody] MomoIpnReq req)
         {
@@ -45,7 +46,7 @@ namespace API.Controllers
          * 200 success
          * 404 invoice not found
          */
-        
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetInvoiceById(Guid id)
         {
@@ -53,21 +54,28 @@ namespace API.Controllers
             return Ok(invoice);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
+        {
+            var result = await _invoiceService.GetAllInvoicesAsync(pagination);
+            return Ok(result);
+        }
+
         [HttpPut("{id}/payment")]
-        public async Task<IActionResult> ProcessPayment(Guid id, [FromBody]PaymentReq paymentReq)
+        public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
             var invoice = await _invoiceService.GetInvoiceById(id);
-            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
+            if (paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
             {
                 await _invoiceService.CashPayment(invoice);
-            }else if(paymentReq.PaymentMethod == (int)PaymentMethod.MomoWallet)
+            }
+            else if (paymentReq.PaymentMethod == (int)PaymentMethod.MomoWallet)
             {
                 var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax;
                 var link = await _momoService.CreatePaymentAsync(amount, id, invoice.Notes);
                 return Ok(link);
             }
             return Ok();
-
         }
     }
 }
