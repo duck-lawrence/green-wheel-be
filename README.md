@@ -1,5 +1,7 @@
 # [Green Wheel](https://www.greenwheel.vn/)
 
+[![backend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml) [![frontend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml)
+
 ## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
 Green Wheel is a self-drive vehicle rental platform that connects a customer-facing booking experience with an internal staff workspace. The monorepo houses a Next.js 15 front end and an ASP.NET Core 8 back end, built around layered architecture, rich domain modelling, and integrations for identity verification, payments, and cloud media.
 
