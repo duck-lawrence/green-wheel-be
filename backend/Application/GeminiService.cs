@@ -27,7 +27,7 @@ namespace Application
         }
 
         //CCCD
-        public async Task<CitizenIdentityDto?> ExtractCitizenIdAsync(string imageUrl)
+        public async Task<CreateCitizenIdentityReq?> ExtractCitizenIdAsync(string imageUrl)
         {
             var prompt = """
             You are an OCR assistant.
@@ -44,7 +44,7 @@ namespace Application
 
             try
             {
-                return JsonSerializer.Deserialize<CitizenIdentityDto>(text);
+                return JsonSerializer.Deserialize<CreateCitizenIdentityReq>(text);
             }
             catch (Exception ex)
             {
@@ -54,7 +54,7 @@ namespace Application
         }
 
         //  Bằng lái xe
-        public async Task<DriverLicenseDto?> ExtractDriverLicenseAsync(string imageUrl)
+        public async Task<CreateDriverLicenseReq?> ExtractDriverLicenseAsync(string imageUrl)
         {
             var prompt = """
                 You are an OCR assistant.
@@ -71,7 +71,7 @@ namespace Application
 
             try
             {
-                return JsonSerializer.Deserialize<DriverLicenseDto>(text);
+                return JsonSerializer.Deserialize<CreateDriverLicenseReq>(text);
             }
             catch (Exception ex)
             {

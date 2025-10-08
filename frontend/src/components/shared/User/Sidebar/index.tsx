@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useEffect, useState, useCallback } from "react"
+import React, { useEffect, useMemo, useCallback, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutGroup, motion } from "framer-motion"
 import clsx from "clsx"
@@ -65,35 +65,27 @@ export default function AccountSidebar({
     }, [items, normalizedRole])
 
     const resolvedSelectedKey = useMemo(() => {
-        const candidates = [pendingKey, selectedKey, pathname]
-        for (const candidate of candidates) {
-            if (!candidate) continue
-            if (tabs.some((tab) => tab.key === candidate)) return candidate
+        const candidate = selectedKey ?? pathname
+        if (candidate && tabs.some((tab) => tab.key === candidate)) {
+            return candidate
         }
         return tabs[0]?.key
-    }, [pendingKey, selectedKey, pathname, tabs])
+    }, [selectedKey, pathname, tabs])
+
+    const [activeKey, setActiveKey] = useState<string | undefined>(resolvedSelectedKey)
 
     useEffect(() => {
-        if (!pendingKey) return
-        const matchKey = selectedKey ?? pathname
-        if (matchKey === pendingKey) {
-            setPendingKey(null)
-            return
+        if (selectedKey !== undefined) {
+            console.debug("AccountSidebar:selectedKey", selectedKey, "pathname", pathname)
         }
-        if (!tabs.some((tab) => tab.key === pendingKey)) {
-            setPendingKey(null)
-        }
-    }, [pendingKey, selectedKey, pathname, tabs])
+        setActiveKey(resolvedSelectedKey)
+    }, [resolvedSelectedKey])
 
     const handleSelection = useCallback(
         async (key: string | number) => {
             const stringKey = String(key)
             const target = tabs.find((tab) => tab.key === stringKey)
             if (!target) return
-
-            if (stringKey !== resolvedSelectedKey) {
-                setPendingKey(stringKey)
-            }
 
             if (target.onSelect) {
                 await target.onSelect()
@@ -117,7 +109,7 @@ export default function AccountSidebar({
                     )}
                 >
                     {tabs.map((item) => {
-                        const isActive = resolvedSelectedKey === item.key
+                        const isActive = activeKey === item.key
                         return (
                             <motion.button
                                 key={item.key}

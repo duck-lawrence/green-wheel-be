@@ -272,6 +272,7 @@
         "sidebar_dashboard": "Dash Board",
         "sidebar_handovers": "Handovers",
         "sidebar_contracts": "Contracts",
+        "sidebar_test": "Test",
         "sidebar_verify_customer": "Customer Verification",
         "sidebar_payments": "On-site Payments",
         "sidebar_fleet": "Fleet",
@@ -298,7 +299,7 @@
         "handovers_table_range_separator": "to",
         "dashboard_title": "Staff dashboard",
         "dashboard_subtitle": "Select a module from the sidebar to get started.",
-        "report_page_title": "Submit report",
+        "report_page_title": "Report",
         "report_page_description": "Share operational issues or feedback with the management team.",
         "report_form_staff_name_label": "Staff name",
         "report_form_report_type_label": "Report type",
@@ -340,5 +341,8 @@
         "email": "Email",
         "send_message": "Send Message",
         "sub": "Our team will get back to you as soon as possible. For urgent matters, please call our hotline."
+    },
+    "aboutUs": {
+        "": ""
     }
 }

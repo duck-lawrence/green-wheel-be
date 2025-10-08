@@ -1,11 +1,13 @@
 "use client"
-import { Carousel, Footer } from "@/components"
+import { Carousel, CriclesChart, Footer, KpiStat } from "@/components"
 import React, { useEffect, useRef } from "react"
 import { slides } from "../../../public/cars"
 import { useTranslation } from "react-i18next"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
+import DashBoard from "@/components/shared/DashBoard"
+import ScrollToTopButton from "@/components/modules/ScrollToTopButton"
 
 export default function HomePage() {
     const { t } = useTranslation()
@@ -38,7 +40,7 @@ export default function HomePage() {
     }, [params, t, router])
 
     return (
-        <div>
+        <>
             <div className="min-h-[80vh]">
                 <div className="bannerBackground min-h-[80vh] min-w-full flex flex-col items-start justify-center gap-4">
                     {/* <div className="font-bold text-2xl ">Green Rides. Brighter Future.</div>
@@ -61,7 +63,10 @@ export default function HomePage() {
             <Carousel slides={slides} />
             <Carousel slides={slides} />
             <Carousel slides={slides} />
+            <CriclesChart />
             <Footer />
-        </div>
+            <KpiStat />
+            <ScrollToTopButton />
+        </>
     )
 }

@@ -49,6 +49,16 @@ namespace Infrastructure.Repositories
             return vehicles;
         }
 
-       
+        public async Task<Vehicle?> GetByIdOptionAsync(Guid id, bool includeModel = false)
+        {
+            IQueryable<Vehicle> query = _dbContext.Vehicles.AsQueryable();
+            if (includeModel)
+            {
+                query = query.Include(i => i.Model);
+            }
+            return await query.FirstOrDefaultAsync(i => i.Id == id);
+        }
+
+
     }
 }

@@ -388,7 +388,7 @@ namespace API.Controllers
          */
 
         [HttpGet]
-        [RoleAuthorize("Staff", "Admin")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllUsersAsync();
