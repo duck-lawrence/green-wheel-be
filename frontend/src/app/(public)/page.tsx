@@ -1,13 +1,11 @@
 "use client"
-import { Carousel, CriclesChart, Footer, KpiStat } from "@/components"
+import { Carousel, CriclesChart, Footer, KpiStat, ScrollToTopButton } from "@/components"
 import React, { useEffect, useRef } from "react"
-import { slides } from "../../../public/cars"
+import { slides } from "@/../public/cars"
 import { useTranslation } from "react-i18next"
 import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 import { useRouter, useSearchParams } from "next/navigation"
 import toast from "react-hot-toast"
-import DashBoard from "@/components/shared/DashBoard"
-import ScrollToTopButton from "@/components/modules/ScrollToTopButton"
 
 export default function HomePage() {
     const { t } = useTranslation()

@@ -37,15 +37,13 @@ type FormValues = {
     agreeDataPolicy: boolean
 }
 
-export type CreateRentalContractFormProps = {
-    onSuccess?: () => void
-    modelViewRes: VehicleModelViewRes
-}
-
 export const CreateRentalContractForm = ({
     onSuccess,
     modelViewRes
-}: CreateRentalContractFormProps) => {
+}: {
+    onSuccess?: () => void
+    modelViewRes: VehicleModelViewRes
+}) => {
     const { t } = useTranslation()
     const [mounted, setMounted] = useState(false)
     const createContract = useCreateRentalContract({ onSuccess })

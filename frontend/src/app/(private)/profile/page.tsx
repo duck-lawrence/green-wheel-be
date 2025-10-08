@@ -30,7 +30,7 @@ import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 import { DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react"
 import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 
-export default function Page() {
+export default function ProfilePage() {
     const { t } = useTranslation()
     const { formatDateTime } = useDay({})
     const { data: user } = useGetMe()

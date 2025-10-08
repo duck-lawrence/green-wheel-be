@@ -194,7 +194,7 @@
         "unavailable": "Unavailable",
         "rented": "Rented",
         "maintenance": "Maintenance",
-        "missing_no_token": "Missing no token",
+        "missing_no_reason": "Missing no reason",
         "late_return": "Late Return",
         "base_rental": "Base Rental",
         "damage": "Damage",

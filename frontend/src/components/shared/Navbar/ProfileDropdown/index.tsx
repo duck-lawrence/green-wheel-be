@@ -10,6 +10,7 @@ import { useGetMe, useLogout, useTokenStore } from "@/hooks"
 import { BackendError } from "@/models/common/response"
 import Link from "next/link"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
+import { useRouter } from "next/navigation"
 
 type MaybeRoleDetail = { name?: string | null } | null | undefined
 
@@ -39,7 +40,8 @@ type DropdownLinkItem = {
 
 export function ProfileDropdown() {
     const { t } = useTranslation()
-    const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
+    const router = useRouter()
+    const logoutMutation = useLogout({ onSuccess: () => router.replace("/") })
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
     const {

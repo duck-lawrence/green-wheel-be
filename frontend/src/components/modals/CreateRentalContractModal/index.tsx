@@ -1,16 +1,18 @@
-import { CreateRentalContractForm, CreateRentalContractFormProps, ModalStyled } from "@/components/"
+import { ModalStyled } from "@/components/"
 import { ModalBody, ModalContent, ModalHeader } from "@heroui/react"
 import React from "react"
 import { useTranslation } from "react-i18next"
+import { CreateRentalContractForm } from "./CreateRentalContractForm"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 
 export function CreateRentalContractModal({
     isOpen,
     onClose,
-    props
+    modelViewRes
 }: {
     isOpen: boolean
     onClose: () => void
-    props: CreateRentalContractFormProps
+    modelViewRes: VehicleModelViewRes
 }) {
     const { t } = useTranslation()
 
@@ -19,7 +21,7 @@ export function CreateRentalContractModal({
             <ModalContent className="min-w-fit px-3 py-2">
                 <ModalHeader className=" self-center">{t("car_rental.register_title")}</ModalHeader>
                 <ModalBody>
-                    <CreateRentalContractForm {...props} />
+                    <CreateRentalContractForm modelViewRes={modelViewRes} onSuccess={onClose} />
                 </ModalBody>
             </ModalContent>
         </ModalStyled>

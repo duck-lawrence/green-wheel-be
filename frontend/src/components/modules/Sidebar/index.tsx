@@ -1,11 +1,10 @@
 "use client"
 
-import React, { useEffect, useMemo, useCallback, useState } from "react"
+import React, { useMemo, useCallback } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { LayoutGroup, motion } from "framer-motion"
-import clsx from "clsx"
-import i18n from "@/lib/i18n"
-import { useGetMe } from "@/hooks"
+import { cn } from "@heroui/react"
+import { ROLE_ADMIN, ROLE_CUSTOMER, ROLE_STAFF } from "@/constants/constants"
 
 export type SidebarItem = {
     key: string
@@ -14,72 +13,45 @@ export type SidebarItem = {
     onSelect?: () => void | Promise<void>
 }
 
-const DEFAULT_TABS: SidebarItem[] = [
-    { key: "/profile", label: i18n.t("user.my_profile"), href: "/profile" },
-    {
-        key: "/profile/rental-contracts",
-        label: i18n.t("user.rental_contracts"),
-        href: "/profile/rental-contracts"
-    },
-    {
-        key: "/profile/change-password",
-        label: i18n.t("auth.change_password"),
-        href: "/profile/change-password"
-    }
-]
-
-export type AccountSidebarProps = {
-    items?: SidebarItem[]
+export type SidebarProps = {
+    tabs: SidebarItem[]
     selectedKey?: string
-    widthClass?: string
+    className?: string
 }
 
-export default function AccountSidebar({
-    items,
-    selectedKey,
-    widthClass = "w-50"
-}: AccountSidebarProps = {}) {
+export const buildTabs = ({
+    roleName,
+    defaultTabs,
+    customerTabs = [],
+    staffTabs = [],
+    adminTabs = []
+}: {
+    roleName?: string
+    defaultTabs: SidebarItem[]
+    customerTabs?: SidebarItem[]
+    staffTabs?: SidebarItem[]
+    adminTabs?: SidebarItem[]
+}) => {
+    const roleTabsMap: Record<string, SidebarItem[]> = {
+        [ROLE_CUSTOMER]: customerTabs,
+        [ROLE_STAFF]: staffTabs,
+        [ROLE_ADMIN]: adminTabs
+    }
+
+    return [...defaultTabs, ...(roleTabsMap[roleName ?? ""] ?? [])]
+}
+
+export function Sidebar({ tabs, selectedKey, className = "w-50" }: SidebarProps) {
     const pathname = usePathname()
     const router = useRouter()
-    const { data: user } = useGetMe()
-    const [pendingKey, setPendingKey] = useState<string | null>(null)
 
-    const normalizedRole = useMemo(() => {
-        const roleName =
-            typeof user?.role === "object" && user?.role !== null
-                ? user.role.name
-                : typeof user?.role === "string"
-                ? user.role
-                : undefined
-        if (typeof roleName !== "string") return undefined
-        const trimmed = roleName.trim()
-        return trimmed.length > 0 ? trimmed.toLowerCase() : undefined
-    }, [user?.role])
-
-    const tabs = useMemo(() => {
-        if (items) return items
-        if (normalizedRole && normalizedRole !== "customer") {
-            return DEFAULT_TABS.filter((tab) => tab.key !== "/profile/rental-contracts")
-        }
-        return DEFAULT_TABS
-    }, [items, normalizedRole])
-
-    const resolvedSelectedKey = useMemo(() => {
+    const activeKey = useMemo(() => {
         const candidate = selectedKey ?? pathname
         if (candidate && tabs.some((tab) => tab.key === candidate)) {
             return candidate
         }
         return tabs[0]?.key
     }, [selectedKey, pathname, tabs])
-
-    const [activeKey, setActiveKey] = useState<string | undefined>(resolvedSelectedKey)
-
-    useEffect(() => {
-        if (selectedKey !== undefined) {
-            console.debug("AccountSidebar:selectedKey", selectedKey, "pathname", pathname)
-        }
-        setActiveKey(resolvedSelectedKey)
-    }, [resolvedSelectedKey])
 
     const handleSelection = useCallback(
         async (key: string | number) => {
@@ -96,16 +68,16 @@ export default function AccountSidebar({
                 router.push(target.href)
             }
         },
-        [tabs, pathname, router, resolvedSelectedKey]
+        [tabs, pathname, router]
     )
 
     return (
         <LayoutGroup id="account-sidebar">
             <div className="flex flex-col pr-4">
                 <div
-                    className={clsx(
+                    className={cn(
                         "relative flex flex-col gap-2 rounded-2xl bg-white p-3 shadow-lg shadow-slate-200/70",
-                        widthClass
+                        className
                     )}
                 >
                     {tabs.map((item) => {
@@ -117,7 +89,7 @@ export default function AccountSidebar({
                                 onClick={() => {
                                     void handleSelection(item.key)
                                 }}
-                                className={clsx(
+                                className={cn(
                                     "relative w-full overflow-hidden rounded-xl px-4 py-3 text-xl font-medium",
                                     "flex items-center justify-center whitespace-nowrap transition-colors duration-150"
                                 )}
