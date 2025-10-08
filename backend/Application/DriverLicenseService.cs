@@ -40,13 +40,12 @@ namespace Application
         public async Task<DriverLicense?> GetByLicenseNumberAsync(string licenseNumber)
         {
             var license = await _licenseRepo.GetByLicenseNumber(licenseNumber);
-            if(license == null)
+            if (license == null)
             {
                 throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
             }
             return license;
         }
-            
 
         public async Task<bool> DeleteAsync(Guid userId, string publicId)
         {
@@ -85,12 +84,12 @@ namespace Application
                 Number = dto.Number ?? string.Empty,
                 FullName = dto.FullName ?? string.Empty,
                 Nationality = dto.Nationality ?? string.Empty,
-                Sex = dto.Sex?.ToLower().Contains("male") == true || dto.Sex?.ToLower().Contains("nam") == true ? 0 : 1,
+                Sex = dto.Sex,
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
                 ImagePublicId = publicId,
-                Class = ParseLicenseClass(dto.Class)
+                Class = dto.Class
             };
 
             var existing = await _licenseRepo.GetByUserId(userId);
