@@ -23,6 +23,7 @@ namespace Infrastructure.Repositories
         public async Task<DriverLicense?> GetByLicenseNumber(string licenseNumber)
         {
             return await _context.DriverLicenses
+                .Include(u => u.User)
                 .FirstOrDefaultAsync(x => x.Number == licenseNumber && x.DeletedAt == null);
         }
     }

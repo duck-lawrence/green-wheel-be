@@ -19,6 +19,16 @@ namespace Infrastructure.Repositories
             return await _dbContext.Vehicles.FirstOrDefaultAsync(x => x.LicensePlate == licensePlate);
         }
 
+        public async Task<IEnumerable<VehicleComponent>> GetVehicleComponentsAsync(Guid vehicleId)
+        {
+            var components = await _dbContext.Vehicles
+                .Where(v => v.Id == vehicleId)
+                .SelectMany(v => v.Model.ModelComponents.Select(mc => mc.Component))
+                .ToListAsync();
+            //lấy ra list linh kiện của xe
+            return components;
+        }
+
         public async Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId)
         {
             // Query lọc trực tiếp từ DB (không ToList trước)

@@ -15,7 +15,6 @@ export function AutocompleteStyle(props: AutocompleteProps) {
     return (
         <Autocomplete
             // defaultItems={locals}
-            placeholder="Search"
             variant="bordered"
             // className="max-w-55 h-14 mr-0"
             // selectedKey={value ?? undefined}

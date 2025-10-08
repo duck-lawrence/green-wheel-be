@@ -8,8 +8,8 @@ namespace Application.Validators.User
         public SendEmailReqValidator()
         {
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage(Message.User.EmailIsRequired)
-                .EmailAddress().WithMessage(Message.User.InvalidEmail);
+                .NotEmpty().WithMessage(Message.UserMessage.EmailIsRequired)
+                .EmailAddress().WithMessage(Message.UserMessage.InvalidEmail);
 
             
         }

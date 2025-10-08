@@ -10,10 +10,10 @@ namespace Application
 {
     public class ModelImageService : IModelImageService
     {
-        private readonly IRentalContractUow _uow;
+        private readonly IModelImageUow _uow;
         private readonly IPhotoService _photoService;
 
-        public ModelImageService(IRentalContractUow uow, IPhotoService photoService)
+        public ModelImageService(IModelImageUow uow, IPhotoService photoService)
         {
             _uow = uow;
             _photoService = photoService;
@@ -22,11 +22,11 @@ namespace Application
         public async Task<List<ModelImage>> UploadModelImagesAsync(Guid modelId, List<IFormFile> files)
         {
             if (files == null || files.Count == 0)
-                throw new BadRequestException(Message.Cloudinary.NotFoundObjectInFile);
+                throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
-            var model = await _uow.VehicleModels.GetByIdAsync(modelId);
+            var model = await _uow.VehicleModelRepository.GetByIdAsync(modelId);
             if (model == null)
-                throw new NotFoundException(Message.VehicleModel.VehicleModelNotFound);
+                throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
 
             var uploadedImages = new List<ModelImage>();
 
@@ -36,7 +36,7 @@ namespace Application
                 var result = await _photoService.UploadPhotoAsync(uploadReq, $"models/{modelId}");
 
                 if (string.IsNullOrEmpty(result.Url))
-                    throw new BusinessException(Message.Cloudinary.UploadFailed);
+                    throw new BusinessException(Message.CloudinaryMessage.UploadFailed);
 
                 var image = new ModelImage
                 {
@@ -48,7 +48,7 @@ namespace Application
                     UpdatedAt = DateTimeOffset.UtcNow
                 };
 
-                await _uow.ModelImages.AddAsync(image);
+                await _uow.ModelImageRepository.AddAsync(image);
                 uploadedImages.Add(image);
             }
 
@@ -59,20 +59,20 @@ namespace Application
         public async Task DeleteModelImagesAsync(Guid modelId, List<Guid> imageIds)
         {
             if (imageIds == null || imageIds.Count == 0)
-                throw new BadRequestException(Message.Common.UnexpectedError);
+                throw new BadRequestException(Message.CommonMessage.UnexpectedError);
 
-            var images = await _uow.ModelImages.FindAsync(x =>
+            var images = await _uow.ModelImageRepository.FindAsync(x =>
                 imageIds.Contains(x.Id) && x.ModelId == modelId);
 
             if (!images.Any())
-                throw new NotFoundException(Message.Cloudinary.NotFoundObjectInFile);
+                throw new NotFoundException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             foreach (var image in images)
             {
                 // Không throw nếu Cloudinary không tìm thấy file
                 await _photoService.DeletePhotoAsync(image.PublicId);
 
-                _uow.ModelImages.Remove(image);
+                _uow.ModelImageRepository.Remove(image);
             }
 
             await _uow.SaveChangesAsync();

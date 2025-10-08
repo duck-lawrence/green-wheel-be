@@ -8,6 +8,7 @@ namespace Application.Dtos.RentalContract.Request
 {
     public  class CreateRentalContractReq
     {
+        public Guid? customerId { get; set; } = null;
         public Guid ModelId { get; set; }
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }

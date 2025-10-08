@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from "react"
 import { useLoginGoogle, useSetPasswordDiscloresureSingleton } from "@/hooks"
-import { GOOGLE_CLIENT_ID } from "@/constants/api"
+import { GOOGLE_CLIENT_ID } from "@/constants/env"
 import { GoogleCredentialResponse } from "@/types/google"
 
 export function GoogleLoginButton({
@@ -44,7 +44,7 @@ export function GoogleLoginButton({
     return (
         <div
             id="google-signin-button"
-            className="overflow-hidden border-primary border-2 rounded-[12px] hover-scale
+            className="overflow-hidden border-primary border-2 rounded-[12px] interactive-scale
                     transform transition-transform duration-150 active:scale-95 ease-in-out"
         ></div>
     )

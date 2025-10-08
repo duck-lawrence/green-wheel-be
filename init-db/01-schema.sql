@@ -231,6 +231,8 @@ CREATE TABLE [vehicle_models] (
     [battery_capacity] decimal(6,2) NOT NULL,
     [eco_range_km] decimal(6,1) NOT NULL,
     [sport_range_km] decimal(6,1) NOT NULL,
+	[image_url] nvarchar(500),
+    [image_public_id] nvarchar(255),
     [deleted_at] datetimeoffset,
     
     [brand_id] uniqueidentifier NOT NULL,

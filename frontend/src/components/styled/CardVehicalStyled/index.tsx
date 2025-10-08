@@ -2,7 +2,7 @@
 import React from "react"
 import { Card, CardBody, CardFooter, Image } from "@heroui/react"
 import { BatteryChargingIcon, Couch, SuitcaseIcon, Users } from "@phosphor-icons/react"
-import Vehicle from "@/models/vehicle/vehicle"
+import Vehicle from "@/models/user/type/vehicle"
 import { useRouter } from "next/navigation"
 
 // cắt chuỗi để chỉnh format cho đẹp =)
@@ -14,15 +14,14 @@ function splitTitle(title: string) {
 }
 
 // className="gap-8 grid grid-cols-2 sm:grid-cols-3 "
-export default function CardVehicalStyled({ car }: { car: Vehicle }) {
+export function CardVehicalStyled({ car }: { car: Vehicle }) {
     const router = useRouter()
     // const isOutOfStock = car.quantity === 0
 
-    // const handleClick = () => {
-    //     router.prefetch(`/vehicle-rental/detail/${car.id}`) // preload trước trang detail
-    //     router.push(`/vehicle-rental/detail/${car.id}`)
-    // }
-
+    const handleClick = () => {
+        router.prefetch(`/vehicle-rental/detail/${car.id}`) // preload trước trang detail
+        router.push(`/vehicle-rental/detail/${car.id}`)
+    }
     const { brand, model } = splitTitle(car.name)
     return (
         <div>
