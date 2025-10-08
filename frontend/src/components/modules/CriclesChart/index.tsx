@@ -52,7 +52,7 @@ const data: CircleChartProps[] = [
 ]
 
 export function CriclesChart() {
-    const [selectedRanges, setSelectedRanges] = useState<Record<string, string>>()
+    const [selectedRanges, setSelectedRanges] = useState<Record<string, string>>({})
 
     const handleChartChange = useCallback((title: string, value: string) => {
         setSelectedRanges((prev) => ({ ...prev, [title]: value }))

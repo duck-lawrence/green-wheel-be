@@ -1,26 +1,24 @@
 "use client"
-import React, { useEffect, useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { motion } from "framer-motion"
 import { useTranslation } from "react-i18next"
 import { MapPin, Phone, EnvelopeSimple, PaperPlaneTilt } from "@phosphor-icons/react"
 import { ButtonStyled, InputStyled, TextareaStyled } from "@/components"
-import { useNavbarItemStore } from "@/hooks/singleton/store/useNavbarItemStore"
 
 export default function Contact() {
     const { t } = useTranslation()
-    const setActiveMenuKey = useNavbarItemStore((s) => s.setActiveMenuKey)
 
-    useEffect(() => {
-        setActiveMenuKey("contact")
-    }, [setActiveMenuKey])
-
-    const initialValues = useMemo(() => ({ name: "", email: "", message: "" }), [])
+    const initialValues = useMemo(
+        () => ({ lastName: "", firstName: "", email: "", message: "" }),
+        []
+    )
 
     const validationSchema = useMemo(() => {
         return Yup.object({
-            name: Yup.string().required(t("user.full_name_require")),
+            lastName: Yup.string().required(t("user.last_name")),
+            firstName: Yup.string().required(t("user.first_name")),
             email: Yup.string()
                 .required(t("user.email_require"))
                 .matches(/^[\w.-]+@[\w.-]+\.[a-zA-Z]{2,}$/, t("user.invalid_email")),
@@ -28,16 +26,21 @@ export default function Contact() {
         })
     }, [t])
 
+    const handlesubmit = useCallback(
+        async (values: { lastName: string; firstName: string; email: string; message: string }) => {
+            await console.log(values)
+        },
+        []
+    )
+
     const formik = useFormik({
         initialValues,
         validationSchema,
-        onSubmit: (value) => {
-            console.log(value)
-        }
+        onSubmit: handlesubmit
     })
 
     return (
-        <div className="min-h-screen flex items-center justify-center py-20 px-4">
+        <div className="min-h-screen flex items-center justify-center py-20  px-4 mt-[-6rem]">
             <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -62,15 +65,26 @@ export default function Contact() {
                         transition={{ duration: 0.6, delay: 0.2 }}
                         className="flex-1 space-y-6"
                     >
-                        <InputStyled
-                            variant="bordered"
-                            label={t("user.full_name")}
-                            value={formik.values.name}
-                            onValueChange={(value) => formik.setFieldValue("name", value)}
-                            onBlur={() => formik.setFieldTouched("name")}
-                            isInvalid={!!(formik.touched.name && formik.errors.name)}
-                            errorMessage={formik.errors.name}
-                        />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <InputStyled
+                                variant="bordered"
+                                label={t("user.last_name")}
+                                value={formik.values.lastName}
+                                onValueChange={(value) => formik.setFieldValue("lastName", value)}
+                                onBlur={() => formik.setFieldTouched("lastName")}
+                                isInvalid={!!(formik.touched.lastName && formik.errors.lastName)}
+                                errorMessage={formik.errors.lastName}
+                            />
+                            <InputStyled
+                                variant="bordered"
+                                label={t("user.first_name")}
+                                value={formik.values.firstName}
+                                onValueChange={(value) => formik.setFieldValue("firstName", value)}
+                                onBlur={() => formik.setFieldTouched("firstName")}
+                                isInvalid={!!(formik.touched.firstName && formik.errors.firstName)}
+                                errorMessage={formik.errors.firstName}
+                            />
+                        </div>
                         <InputStyled
                             variant="bordered"
                             label={t("auth.email")}
