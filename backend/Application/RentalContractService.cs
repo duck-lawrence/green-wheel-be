@@ -11,7 +11,9 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Expressions;
@@ -189,7 +191,7 @@ namespace Application
             };
             
             await _uow.DepositRepository.AddAsync(deposit);
-            invoice.Subtotal = items.Quantity * items.UnitPrice + deposit.Amount;
+            invoice.Subtotal = items.Quantity * items.UnitPrice;
 
 
             await _uow.SaveChangesAsync();
@@ -197,12 +199,20 @@ namespace Application
             return rentalContractViewRespone;
         }
 
-        public async Task<IEnumerable<RentalContractForStaffViewRes>> GetByStatus(int status)
+        public async Task<IEnumerable<RentalContractForStaffViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null)
         {
-            var RcList = await _uow.RentalContractRepository.GetByStatus(status);
-            var RcForStaffViewRes = _mapper.Map<IEnumerable<RentalContractForStaffViewRes>>(RcList);
-            return RcForStaffViewRes;
+            var contracts = await _uow.RentalContractRepository.GetAllAsync(status, phone);
+            if (contracts == null)
+            {
+            throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+
+            }
+            var contractViewRes = _mapper.Map<IEnumerable<RentalContractForStaffViewRes>>(contracts);
+            return contractViewRes;
+
         }
+
+
 
         public async Task UpdateStatus(RentalContract rentalContract, int status)
         {

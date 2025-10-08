@@ -1,5 +1,5 @@
 "use client"
-import { Carousel } from "@/components"
+import { Carousel, Footer } from "@/components"
 import React, { useEffect, useRef } from "react"
 import { slides } from "../../../public/cars"
 import { useTranslation } from "react-i18next"
@@ -61,7 +61,7 @@ export default function HomePage() {
             <Carousel slides={slides} />
             <Carousel slides={slides} />
             <Carousel slides={slides} />
-            <Carousel slides={slides} />
+            <Footer />
         </div>
     )
 }

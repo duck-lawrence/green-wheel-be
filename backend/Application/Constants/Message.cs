@@ -179,5 +179,20 @@ namespace Application.Constants
             public const string InvalidFile = "upload.invalid_file";
             public const string Failed = "upload.failed";
         }
+
+        public static class CitizenIdentityMessage
+        {
+            public const string CitizenIdentityNotFound = "citizen_identity.not_found";
+        }
+
+        public static class VehicleComponentMessage
+        {
+            public const string ComponentNotFound = "vehicle_component.not_found";
+        }
+
+        public static class VehicleChecklistMessage
+        {
+            public const string VehicleChecklistNotFound = "vehicle_checklist.not_found";
+        }
     }
 }

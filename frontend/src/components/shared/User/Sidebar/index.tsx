@@ -3,6 +3,7 @@ import React, { useMemo, useCallback } from "react"
 import { Tabs, Tab } from "@heroui/react"
 import { usePathname, useRouter } from "next/navigation"
 import i18n from "@/lib/i18n"
+import { useProfileStore } from "@/hooks"
 
 export type SidebarItem = {
     key: string
@@ -25,7 +26,27 @@ export type AccountSidebarProps = {
 export default function AccountSidebar({ items, selectedKey }: AccountSidebarProps = {}) {
     const pathname = usePathname()
     const router = useRouter()
-    const tabs = items ?? DEFAULT_TABS
+    const user = useProfileStore((s) => s.user)
+
+    const normalizedRole = useMemo(() => {
+        const roleName =
+            typeof user?.role === "object" && user?.role !== null
+                ? user.role.name
+                : typeof user?.role === "string"
+                ? user.role
+                : undefined
+        if (typeof roleName !== "string") return undefined
+        const trimmed = roleName.trim()
+        return trimmed.length > 0 ? trimmed.toLowerCase() : undefined
+    }, [user?.role])
+
+    const tabs = useMemo(() => {
+        if (items) return items
+        if (normalizedRole && normalizedRole !== "customer") {
+            return DEFAULT_TABS.filter((tab) => tab.key !== "/profile/rental-contracts")
+        }
+        return DEFAULT_TABS
+    }, [items, normalizedRole])
 
     const resolvedSelectedKey = useMemo(() => {
         const key = selectedKey ?? pathname

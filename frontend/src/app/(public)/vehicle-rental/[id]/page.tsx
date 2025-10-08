@@ -258,9 +258,7 @@ export default function VehicleDetailPage() {
                             <ButtonStyled
                                 isDisabled={isLoggedIn}
                                 className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            >
-                                <Link href={"/"}>{t("vehicle_model.rental_request")}</Link>
-                            </ButtonStyled>
+                            ></ButtonStyled>
                         </div>
                     </div>
                 </aside>

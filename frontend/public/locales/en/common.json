@@ -118,7 +118,10 @@
         "contact": "Contact",
         "login": "Login",
         "register": "Register",
-        "logout": "Logout"
+        "logout": "Logout",
+        "staff_management": "Staff Management",
+        "staff_profile": "Profile",
+        "staff_contracts": "Contracts"
     },
     "table": {
         "order": "Order",
@@ -264,7 +267,7 @@
         "invalid_file_type": "Invalid file type"
     },
     "staff": {
-        "sidebar_home": "Home",
+        "sidebar_dashboard": "Dash Board",
         "sidebar_handovers": "Handovers",
         "sidebar_contracts": "Contracts",
         "sidebar_verify_customer": "Customer Verification",
@@ -272,7 +275,7 @@
         "sidebar_fleet": "Fleet",
         "sidebar_notifications": "Notifications",
         "sidebar_reports": "Reports",
-        "sidebar_settings": "Settings",
+        "sidebar_profile": "Profile",
         "sidebar_logout": "Sign out",
         "sidebar_panel_title": "Staff Panel",
         "topbar_sign_out": "Sign out",
@@ -293,5 +296,28 @@
         "handovers_table_range_separator": "to",
         "dashboard_title": "Staff dashboard",
         "dashboard_subtitle": "Select a module from the sidebar to get started."
+    },
+    "footer": {
+        "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",
+        "introduction": "Introduction",
+        "about_us": "About us",
+        "services": "Services",
+        "policy": "Policy",
+        "policy_and_regulations": "Policy and regulations",
+        "operating_regulations": "Operating regulations",
+        "information_security": "Information security",
+        "dispute_resolution": "Dispute resolution",
+        "contact": "Contact",
+        "hotline": "Hotline",
+        "copyright_notice": "© 2025 Green Wheel Corp. All rights reserved."
+    },
+    "contact": {
+        "title": "Contact Us",
+        "des": "We will love to hear from you! Fill out the form or reach us via the information below.",
+        "address": "Address",
+        "phone": "Phone",
+        "email": "Email",
+        "send_message": "Send Message",
+        "sub": "Our team will get back to you as soon as possible. For urgent matters, please call our hotline."
     }
 }
