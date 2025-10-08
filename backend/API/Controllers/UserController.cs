@@ -385,7 +385,7 @@ namespace API.Controllers
          * 200 success
          */
         [HttpGet]
-        [RoleAuthorize("Staff", "Admin")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllUsersAsync();
@@ -407,6 +407,5 @@ namespace API.Controllers
             var userView = await _userService.GetByDriverLicenseAsync(number);
             return Ok(userView);
         }
-
     }
 }

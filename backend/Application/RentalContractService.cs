@@ -18,6 +18,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net.WebSockets;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
@@ -113,6 +114,7 @@ namespace Application
                 Status = (int)RentalContractStatus.RequestPeding,
                 VehicleId = vehicle.Id,
                 CustomerId = userID,
+                StationId = station.Id,
                 HandoverStaffId = null,
                 ReturnStaffId = null,
                 CreatedAt = DateTimeOffset.UtcNow,
@@ -195,6 +197,9 @@ namespace Application
 
 
             await _uow.SaveChangesAsync();
+            //lấy vehicle có join bảng model để in ra view res
+            vehicle = await _uow.VehicleRepository.GetByIdOptionAsync(vehicle.Id, true);
+            contract.Vehicle = vehicle;
             var rentalContractViewRespone = _mapper.Map<RentalContractViewRes>(contract);
             return rentalContractViewRespone;
         }
@@ -212,7 +217,47 @@ namespace Application
 
         }
 
-
+        public async Task HandoverRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
+        {
+            var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
+            if (contract == null)
+            {
+                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            }
+            var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId);
+            if (vehicle == null)
+            {
+                throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            }
+            var invoice = (await _uow.InvoiceRepository.GetByContractAsync(id)).FirstOrDefault();
+            if(invoice == null)
+            {
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+            }
+            
+            if(contract.Status == (int)RentalContractStatus.Active && invoice.Status == (int)InvoiceStatus.Paid)
+            {
+                vehicle.Status = (int)VehicleStatus.Rented;
+                await _uow.VehicleRepository.UpdateAsync(vehicle);
+                //lụm xe đi chơi đi bạn
+            }
+            else
+            {
+                invoice.PaidAmount = req.Amount;
+                invoice.PaidAt = DateTimeOffset.UtcNow;
+                invoice.Status = (int)InvoiceStatus.Paid;
+                vehicle.Status = (int)VehicleStatus.Rented;
+                await _uow.VehicleRepository.UpdateAsync(vehicle);
+                await _uow.InvoiceRepository.UpdateAsync(invoice);
+            }
+            contract.IsSignedByStaff = req.IsSignByStaff;
+            contract.IsSignedByCustomer = req.IsSignByCustomer;
+            contract.ActualStartDate = DateTimeOffset.UtcNow;
+            contract.HandoverStaffId = Guid.Parse(staffId);
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+            await _uow.SaveChangesAsync();
+        }
 
         public async Task UpdateStatus(RentalContract rentalContract, int status)
         {

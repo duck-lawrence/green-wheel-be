@@ -1,5 +1,6 @@
 ﻿using API.Filters;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.Vehicle.Request;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace API.Controllers
          403: not have permission
          200: success
          */
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize(RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateVehicle(CreateVehicleReq createVehicleReq)
         {
@@ -35,7 +36,7 @@ namespace API.Controllers
         200: success
         404: vehicle does not exist
         */
-        [RoleAuthorize("Staff", "Admin")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         [HttpPatch("{Id}")]
         public async Task<IActionResult> UpdateVehicle([FromRoute] Guid id, UpdateVehicleReq updateVehicleReq)
         {
@@ -56,12 +57,5 @@ namespace API.Controllers
             return Ok();
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetVehicle(Guid stationId, Guid modelId, 
-        //    DateTimeOffset startDate, DateTimeOffset endDate)
-        //{
-        //   var vehicle =  await _vehicleService.GetVehicle(stationId, modelId, startDate, endDate);
-        //    return Ok(vehicle);
-        //}
     }
 }

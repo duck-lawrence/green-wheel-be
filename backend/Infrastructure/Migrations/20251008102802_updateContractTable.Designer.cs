@@ -4,6 +4,7 @@ using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    partial class GreenWheelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251008102802_updateContractTable")]
+    partial class updateContractTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1771,7 +1774,7 @@ namespace Infrastructure.Migrations
                         .HasConstraintName("fk_rental_contracts_return_staffs");
 
                     b.HasOne("Domain.Entities.Station", "Station")
-                        .WithMany("RentalContracts")
+                        .WithMany()
                         .HasForeignKey("StationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -2031,8 +2034,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("DispatchRequestFromStations");
 
                     b.Navigation("DispatchRequestToStations");
-
-                    b.Navigation("RentalContracts");
 
                     b.Navigation("Staff");
 

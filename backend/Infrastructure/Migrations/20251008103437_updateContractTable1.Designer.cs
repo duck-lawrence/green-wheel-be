@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251006151814_UpdateVehicleModel")]
-    partial class UpdateVehicleModel
+    [Migration("20251008103437_updateContractTable1")]
+    partial class updateContractTable1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -795,6 +795,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("start_date");
 
+                    b.Property<Guid>("StationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("station_id");
+
                     b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasColumnName("status");
@@ -811,6 +815,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__rental_c__3213E83F817349DC");
+
+                    b.HasIndex("StationId");
 
                     b.HasIndex(new[] { "CustomerId" }, "idx_rental_contracts_customer_id");
 
@@ -1767,6 +1773,12 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("ReturnStaffId")
                         .HasConstraintName("fk_rental_contracts_return_staffs");
 
+                    b.HasOne("Domain.Entities.Station", "Station")
+                        .WithMany("RentalContracts")
+                        .HasForeignKey("StationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.Vehicle", "Vehicle")
                         .WithMany("RentalContracts")
                         .HasForeignKey("VehicleId")
@@ -1777,6 +1789,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("HandoverStaff");
 
                     b.Navigation("ReturnStaff");
+
+                    b.Navigation("Station");
 
                     b.Navigation("Vehicle");
                 });
@@ -2020,6 +2034,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("DispatchRequestFromStations");
 
                     b.Navigation("DispatchRequestToStations");
+
+                    b.Navigation("RentalContracts");
 
                     b.Navigation("Staff");
 

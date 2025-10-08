@@ -1,4 +1,5 @@
-﻿using Application;
+﻿using API.Filters;
+using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.Momo.Request;
@@ -49,24 +50,17 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetInvoiceById(Guid id)
         {
-            var invoice = await _invoiceService.GetInvoiceById(id, true, true);
-            return Ok(invoice);
+            var invoiceView = await _invoiceService.GetInvoiceById(id, true, true);
+            return Ok(invoiceView);
         }
 
+        [RoleAuthorize(RoleName.Customer)]
         [HttpPut("{id}/payment")]
-        public async Task<IActionResult> ProcessPayment(Guid id, [FromBody]PaymentReq paymentReq)
+        public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            var invoice = await _invoiceService.GetInvoiceById(id);
-            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
-            {
-                await _invoiceService.CashPayment(invoice);
-            }else if(paymentReq.PaymentMethod == (int)PaymentMethod.MomoWallet)
-            {
-                var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax;
-                var link = await _momoService.CreatePaymentAsync(amount, id, invoice.Notes);
-                return Ok(link);
-            }
-            return Ok();
+            
+            string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
+            return link == null ? Ok() : Ok(link);
 
         }
     }
