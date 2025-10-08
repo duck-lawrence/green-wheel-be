@@ -1,5 +1,6 @@
 "use client"
 import {
+    AvatarUploader,
     AvaterStyled,
     ButtonStyled,
     DatePickerStyled,
@@ -93,6 +94,8 @@ export default function Page() {
             {/* Title */}
             <div className="text-3xl mb-4 px-4 pb-4 font-bold">{t("user.account_information")}</div>
 
+            <AvatarUploader />
+
             {/* Avatar Upload Modal */}
             <ImageUploaderModal
                 isOpen={isOpen}
@@ -103,6 +106,7 @@ export default function Page() {
                 uploadFn={uploadAvatar.mutateAsync}
                 aspect={1}
                 cropShape="round"
+                cropSize={{ width: 300, height: 300 }}
                 label={t("user.upload_avatar")}
             />
 

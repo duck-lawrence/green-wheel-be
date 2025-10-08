@@ -15,6 +15,7 @@ type ImageUploaderModalProps = {
     setImgSrc: (src: string | null) => void
     aspect?: number
     cropShape?: "rect" | "round"
+    cropSize: { width: number; height: number }
     label?: string
     uploadFn: (formData: FormData) => Promise<any>
 }
@@ -28,6 +29,7 @@ export function ImageUploaderModal({
     uploadFn,
     aspect = 1,
     cropShape = "rect",
+    cropSize,
     label
 }: ImageUploaderModalProps) {
     const { t } = useTranslation()
@@ -59,8 +61,8 @@ export function ImageUploaderModal({
             }}
             isDismissable={!isUploading}
         >
-            <ModalContent className="w-full min-w-fit">
-                <ModalHeader>{label}</ModalHeader>
+            <ModalContent className="w-full min-w-fit p-4">
+                <ModalHeader className="px-3 py-2 self-center">{label}</ModalHeader>
                 <ModalBody>
                     {imgSrc && (
                         <div className="flex flex-col items-center gap-4">
@@ -69,7 +71,7 @@ export function ImageUploaderModal({
                                 onCropComplete={setCroppedAreaPixels}
                                 aspect={aspect}
                                 cropShape={cropShape}
-                                cropSize={{ width: 300, height: 300 }}
+                                cropSize={cropSize}
                             />
                             <div className="flex gap-3">
                                 <ButtonStyled

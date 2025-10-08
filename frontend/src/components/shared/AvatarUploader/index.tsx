@@ -17,14 +17,15 @@ export function AvatarUploader() {
         <>
             <ImageUploadButton label={t("user.upload_avatar")} onFileSelect={onFileSelect} />
             <ImageUploaderModal
+                imgSrc={imgSrc}
+                setImgSrc={setImgSrc}
                 isOpen={isOpen}
                 onOpenChange={onOpenChange}
                 onClose={onClose}
-                imgSrc={imgSrc}
-                setImgSrc={setImgSrc}
                 uploadFn={uploadAvatar.mutateAsync}
                 aspect={1}
-                cropShape="round"
+                cropShape="rect"
+                cropSize={{ width: 700, height: 400 }}
                 label={t("user.upload_avatar")}
             />
         </>
