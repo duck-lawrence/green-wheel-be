@@ -182,7 +182,7 @@ export function RegisterInFo({ onSuccess }: RegisterInfoProps) {
                             return
                         }
 
-                        const dob = formatDateTime({ value })
+                        const dob = formatDateTime({ date: value })
 
                         formik.setFieldValue("dateOfBirth", dob)
                     }}

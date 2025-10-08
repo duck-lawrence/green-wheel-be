@@ -1,19 +1,18 @@
 "use client"
 import React, { useEffect, useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { BreadCrumbsStyled, ButtonStyled, Field } from "@/components/styled"
+import { BreadCrumbsStyled, ButtonStyled, FieldStyled } from "@/components"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
-import { currency } from "@/utils/helpers/currentcy"
+import Link from "next/link"
+import { formatCurrency } from "@/utils/helpers/currentcy"
 import { getDatesDiff } from "@/utils/helpers/mathDate"
 import { useParams } from "next/navigation"
-import { useBookingFilterStore, useTokenStore } from "@/hooks"
+import { useBookingFilterStore, useTokenStore, useGetVehicleModelById } from "@/hooks"
 import { useTranslation } from "react-i18next"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 import { Spinner } from "@heroui/react"
-import { useGetVehicleModelById } from "@/hooks/queries/useVehicleModel"
-import Link from "next/link"
 
-export default function DetailPage() {
+export default function VehicleDetailPage() {
     const { id } = useParams()
     const modelId = id?.toString()
 
@@ -22,9 +21,6 @@ export default function DetailPage() {
     const [vehicle, setVehicle] = useState<VehicleModelViewRes | null>(null)
     // handle render picture
     const [active, setActive] = useState(0)
-
-    // handle count date
-    // const [dates, setDates] = useState({ startDate: "2025-10-02", endDate: "2025-10-06" })
 
     const stationId = useBookingFilterStore((s) => s.stationId)
     const startDate = useBookingFilterStore((s) => s.startDate)
@@ -90,7 +86,7 @@ export default function DetailPage() {
     if (!vehicle || isModelLoading || isModelError) return <Spinner />
 
     return (
-        <div className="min-h-dvh bg-neutral-50 text-neutral-900 mt-20 rounded">
+        <div className="min-h-dvh bg-neutral-50 text-neutral-900 rounded">
             {/* Breadcrumb */}
             <div className="p-4">
                 <BreadCrumbsStyled
@@ -124,7 +120,7 @@ export default function DetailPage() {
                     {/*  font-extrabold*/}
                     <div className="text-right">
                         <p className="text-2xl sm:text-3xl font-semibold text-emerald-600">
-                            {currency(vehicle.costPerDay)} &nbsp;
+                            {formatCurrency(vehicle.costPerDay)} &nbsp;
                             <span className="text-base font-normal text-neutral-500">
                                 {t("vehicle_model.vnd_per_day")}
                             </span>
@@ -137,7 +133,7 @@ export default function DetailPage() {
             <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Gallery */}
                 <section className="lg:col-span-8">
-                    {/* Picture */}
+                    {/* Images */}
                     <div className="grid grid-rows-4 gap-3">
                         <div className="row-span-3 aspect-[16/10] overflow-hidden rounded-2xl bg-neutral-200">
                             <motion.img
@@ -202,29 +198,29 @@ export default function DetailPage() {
                 {/* ========================================================= */}
                 {/* Booking Card (sticky on desktop) */}
                 {/* lỗi nên chưa làm en chỗ này */}
-                <aside className="lg:col-span-4 lg:sticky lg:top-10 space-y-6 ">
+                <aside className="self-start lg:col-span-4 lg:sticky lg:top-32 space-y-6">
                     <div className="rounded-2xl bg-white p-5 shadow-sm border border-neutral-100">
                         <h2 className="text-lg font-semibold">
                             {t("vehicle_model.vehicle_information")}
                         </h2>
                         <div className="mt-4 grid gap-4">
                             <div className="grid grid-cols-2 gap-3">
-                                <Field
+                                <FieldStyled
                                     label="Nhiên liệu"
                                     value="Điện"
                                     icon={<GasPump size={18} weight="duotone" />}
                                 />
-                                <Field
+                                <FieldStyled
                                     label="Số chỗ"
                                     value={`${vehicle.seatingCapacity}`}
                                     icon={<UsersFour size={18} />}
                                 />
-                                <Field
+                                <FieldStyled
                                     label="Hộp số"
                                     value="Tự động"
                                     icon={<SteeringWheel size={18} />}
                                 />
-                                <Field
+                                <FieldStyled
                                     label="Quãng đường"
                                     value={`~${vehicle.ecoRangeKm} km`}
                                     icon={<RoadHorizon size={18} />}
@@ -236,7 +232,7 @@ export default function DetailPage() {
                                 <div className="flex items-center justify-between text-sm">
                                     <span>{t("vehicle_model.unit_price")}</span>
                                     <span className="font-medium">
-                                        {currency(vehicle.costPerDay)}
+                                        {formatCurrency(vehicle.costPerDay)}
                                     </span>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between text-sm">
@@ -246,14 +242,16 @@ export default function DetailPage() {
                                 <div className="mt-2 flex items-center justify-between text-sm">
                                     <span>{t("vehicle_model.deposit_fee")}</span>
                                     <span className="font-medium">
-                                        {currency(vehicle.depositFee)}
+                                        {formatCurrency(vehicle.depositFee)}
                                     </span>
                                 </div>
 
                                 <div className="mt-3 h-px bg-neutral-200" />
                                 <div className="mt-3 flex items-center justify-between text-base font-semibold">
                                     <span>{t("vehicle_model.temporary_total")}</span>
-                                    <span className="text-emerald-700">{currency(total)} đ</span>
+                                    <span className="text-emerald-700">
+                                        {formatCurrency(total)} đ
+                                    </span>
                                 </div>
                             </div>
 
@@ -266,7 +264,7 @@ export default function DetailPage() {
                 </aside>
             </main>
 
-            <section className="w-300 ml-10 flex flex-col pb-10">
+            {/* <section className="w-300 ml-10 flex flex-col pb-10">
                 <div className="flex items-end gap-250">
                     <h2 className="text-2xl font-semibold">
                         {t("vehicle_model.similar_vehicles")}
@@ -278,8 +276,7 @@ export default function DetailPage() {
                         {t("vehicle_model.view_all")}
                     </Link>
                 </div>
-                {/* chưa làm en */}
-                {/* <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {similarVehicles.map((i) => (
                         <Link
                             key={i.id}
@@ -302,14 +299,14 @@ export default function DetailPage() {
                                     </p>
                                 </div>
                                 <p className="text-emerald-600 font-semibold text-base whitespace-nowrap">
-                                    {currency(i.costPerDay)}{" "}
+                                    {formatCurrency(i.costPerDay)}{" "}
                                     <span className="text-sm text-neutral-500">VND/Ngày</span>
                                 </p>
                             </div>
                         </Link>
                     ))}
-                </div> */}
-            </section>
+                </div>
+            </section> */}
         </div>
     )
 }
