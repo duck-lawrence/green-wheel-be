@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Deposit.Respone
 {
-    public class DepositViewRespone
+    public class DepositViewRes
     {
-        public decimal Amount { get; set; }
+        public Guid Id { get; set; }
         public string? Description { get; set; }
+        public decimal Amount { get; set; }
+        public DateTimeOffset? RefundedAt { get; set; }
+        public int Status { get; set; }
     }
 }

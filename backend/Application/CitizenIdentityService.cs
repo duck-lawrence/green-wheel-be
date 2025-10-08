@@ -36,13 +36,12 @@ namespace Application
         public async Task<CitizenIdentity?> GetByIdentityNumberAsync(string identityNumber)
         {
             var citizenIdentity = await _citizenRepo.GetByIdNumberAsync(identityNumber);
-            if(citizenIdentity == null)
+            if (citizenIdentity == null)
             {
                 throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
             }
             return citizenIdentity;
         }
-           
 
         public async Task<CitizenIdentity?> GetByUserId(Guid userId)
             => await _citizenRepo.GetByUserIdAsync(userId);
@@ -62,7 +61,7 @@ namespace Application
                 Number = dto.IdNumber ?? string.Empty,
                 FullName = dto.FullName ?? string.Empty,
                 Nationality = dto.Nationality ?? string.Empty,
-                Sex = dto.Sex?.ToLower().Contains("male") == true || dto.Sex?.ToLower().Contains("nam") == true ? 0 : 1,
+                Sex = dto.Sex,
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
