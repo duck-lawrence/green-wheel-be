@@ -6,8 +6,8 @@ namespace Application.Abstractions
 {
     public interface IGeminiService
     {
-        Task<CitizenIdentityDto?> ExtractCitizenIdAsync(string imageUrl);
+        Task<CreateCitizenIdentityReq?> ExtractCitizenIdAsync(string imageUrl);
 
-        Task<DriverLicenseDto?> ExtractDriverLicenseAsync(string imageUrl);
+        Task<CreateDriverLicenseReq?> ExtractDriverLicenseAsync(string imageUrl);
     }
 }
