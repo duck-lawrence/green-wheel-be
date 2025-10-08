@@ -1,31 +1,55 @@
 "use client"
 
+import { StaffSidebar, STAFF_MENU } from "@/components"
 import { ROLE_STAFF } from "@/constants/constants"
-import { useGetMeFromCache } from "@/hooks"
+import { useGetMe, useGetMeFromCache } from "@/hooks"
 import { Spinner } from "@heroui/react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import React, { useEffect, useMemo } from "react"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 
 export default function StaffLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter()
+    const pathname = usePathname()
     const { t } = useTranslation()
-    const user = useGetMeFromCache()
+    const cachedUser = useGetMeFromCache()
+    const {
+        data: profile,
+        isLoading,
+        isError
+    } = useGetMe({ enabled: true })
+
+    const user = useMemo(() => profile ?? cachedUser, [profile, cachedUser])
 
     const isStaff = useMemo(() => {
         return user?.role?.name === ROLE_STAFF
     }, [user])
 
+    const selectedPath = useMemo(() => {
+        if (!pathname) return STAFF_MENU[0]?.path ?? "/dashboard"
+        const matched = STAFF_MENU.find(
+            (item) => pathname === item.path || pathname.startsWith(`${item.path}/`)
+        )
+        return matched?.path ?? STAFF_MENU[0]?.path ?? pathname
+    }, [pathname])
+
     useEffect(() => {
-        if (!isStaff) {
+        if (isLoading) return
+        if (isError || !isStaff) {
             toast.dismiss()
             toast.error(t("user.unauthorized"))
             router.replace("/")
         }
-    }, [isStaff, router, t])
+    }, [isError, isLoading, isStaff, router, t])
 
+    if (isLoading) return <Spinner />
     if (!isStaff) return <Spinner />
 
-    return <>{children}</>
+    return (
+        <div className="flex w-full max-w-6xl flex-col gap-6 md:flex-row">
+            <StaffSidebar selectedPath={selectedPath} />
+            <div className="flex-1">{children}</div>
+        </div>
+    )
 }
