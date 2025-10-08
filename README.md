@@ -168,7 +168,7 @@ Copy `.env.example` files to `.env` and update values based on your environment.
 | Variable | Description | Example |
 | --- | --- | --- |
 | `NEXT_PUBLIC_BACKEND_API_URL` | Base URL for REST calls (must include `/api/`) | `http://localhost:5160/api/` |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google OAuth client ID surfaced to the browser | `617684376840-e90f14r0gchfni0rhokrql21i18lst1v.apps.googleusercontent.com` |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Google OAuth client ID surfaced to the browser | `Your Token` |
 
 ## Run the Project
 
