@@ -340,5 +340,8 @@
         "email": "Email",
         "send_message": "Send Message",
         "sub": "Our team will get back to you as soon as possible. For urgent matters, please call our hotline."
+    },
+    "aboutUs": {
+        "": ""
     }
 }
