@@ -50,9 +50,9 @@ export function ProfileDropdown() {
 
     const baseItems: DropdownLinkItem[] = isStaff
         ? [
-              { key: "staff_management", href: "/staff", label: t("navbar.staff_management") as string },
+              { key: "staff_management", href: "/dashboard", label: t("navbar.staff_management") as string },
               { key: "staff_profile", href: "/profile", label: t("navbar.staff_profile") as string },
-              { key: "staff_contracts", href: "/staff/contracts", label: t("navbar.staff_contracts") as string }
+              { key: "staff_contracts", href: "/dashboard/contracts", label: t("navbar.staff_contracts") as string }
           ]
         : [
               { key: "profile", href: "/profile", label: t("user.profile") as string },

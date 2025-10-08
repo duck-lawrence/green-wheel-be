@@ -17,9 +17,8 @@ namespace API.Controllers
     {
         private readonly IMomoService _momoService;
         private readonly IInvoiceService _invoiceService;
-        
 
-        public InvoiceController(IMomoService momoService, 
+        public InvoiceController(IMomoService momoService,
             IInvoiceService invoiceItemService
             )
         {
@@ -58,25 +57,25 @@ namespace API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
         {
-            var result = await _invoiceItemService.GetAllInvoicesAsync(pagination);
+            var result = await _invoiceService.GetAllInvoicesAsync(pagination);
             return Ok(result);
         }
-        
+
         [HttpPut("{id}/payment")]
-        public async Task<IActionResult> ProcessPayment(Guid id, [FromBody]PaymentReq paymentReq)
+        public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
             var invoice = await _invoiceService.GetInvoiceById(id);
-            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
+            if (paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
             {
                 await _invoiceService.CashPayment(invoice);
-            }else if(paymentReq.PaymentMethod == (int)PaymentMethod.MomoWallet)
+            }
+            else if (paymentReq.PaymentMethod == (int)PaymentMethod.MomoWallet)
             {
                 var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax;
                 var link = await _momoService.CreatePaymentAsync(amount, id, invoice.Notes);
                 return Ok(link);
             }
             return Ok();
-
         }
     }
 }

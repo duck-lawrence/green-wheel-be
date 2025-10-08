@@ -20,7 +20,7 @@ export default function StaffContractsPage() {
 
     return (
         <div className="rounded-2xl bg-white shadow-sm px-6 py-6">
-            <div className="text-3xl font-bold mb-4">
+            <div className="text-3xl mb-3 px-4 font-bold">
                 <p>{t("staff.sidebar_contracts")}</p>
             </div>
 

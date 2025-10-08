@@ -25,14 +25,12 @@ namespace Application
 
         public async Task CashPayment(Invoice invoice)
         {
-            var invoice = await _uow.InvoiceRepository.GetByIdAsync(id);
-            if (invoice == null)
             var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
-            if(contract == null)
+            if (contract == null)
             {
                 throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             }
-            if(contract.Status != (int)RentalContractStatus.PaymentPending)
+            if (contract.Status != (int)RentalContractStatus.PaymentPending)
             {
                 throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
             }
@@ -46,7 +44,7 @@ namespace Application
         public async Task<Invoice> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
         {
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
-            if(invoice == null)
+            if (invoice == null)
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
@@ -79,27 +77,14 @@ namespace Application
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
+        public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
         {
             var invoices = await _uow.InvoiceRepository.GetAllInvoicesAsync(pagination);
 
             if (invoices == null || !invoices.Items.Any())
-                throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
 
             return invoices;
         }
-
     }
 }

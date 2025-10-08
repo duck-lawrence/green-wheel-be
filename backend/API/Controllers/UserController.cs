@@ -5,6 +5,7 @@ using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
+using Application.Dtos.UserSupport.Request;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,7 @@ namespace API.Controllers
         private readonly IGoogleCredentialService _googleService;
         private readonly ICitizenIdentityService _citizenIdentityService;
         private readonly IDriverLicenseService _driverLicenseService;
+
         public UserController(IUserService service
             , IGoogleCredentialService googleCredentialService,
             ICitizenIdentityService citizenIdentityService,
@@ -303,7 +305,7 @@ namespace API.Controllers
             var result = await _userService.GetMyCitizenIdentityAsync(userId);
 
             if (result == null)
-                return NotFound(new { Message = Message.Licenses.LicenseNotFound });
+                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
 
             return Ok(result);
         }
@@ -331,7 +333,7 @@ namespace API.Controllers
             var result = await _userService.GetMyDriverLicenseAsync(userId);
 
             if (result == null)
-                return NotFound(new { Message = Message.Licenses.LicenseNotFound });
+                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
 
             return Ok(result);
         }
@@ -351,7 +353,7 @@ namespace API.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadCitizenIdForAnonymous(Guid id, [FromForm] IFormFile file)
-        { 
+        {
             var citizenIdentity = await _userService.UploadCitizenIdAsync(id, file);
             return Ok(citizenIdentity);
         }
@@ -365,11 +367,13 @@ namespace API.Controllers
             var driverLisence = await _userService.UploadDriverLicenseAsync(id, file);
             return Ok(driverLisence);
         }
+
         /*
          * Status code
          * 200 success
          * 404 not found
          */
+
         [HttpGet("phone/{phone}")]
         [RoleAuthorize("Staff", "Admin")]
         public async Task<IActionResult> GetUserByPhone(string phone)
@@ -382,6 +386,7 @@ namespace API.Controllers
          * Status code
          * 200 success
          */
+
         [HttpGet]
         [RoleAuthorize("Staff", "Admin")]
         public async Task<IActionResult> GetAll()
@@ -405,6 +410,5 @@ namespace API.Controllers
             var userView = await _userService.GetByDriverLicenseAsync(number);
             return Ok(userView);
         }
-
     }
 }

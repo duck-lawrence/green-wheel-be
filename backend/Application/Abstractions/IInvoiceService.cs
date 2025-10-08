@@ -8,11 +8,12 @@ namespace Application.Abstractions
     {
         Task ProcessUpdateInvoice(MomoIpnReq momoIpnReq, Guid invoiceId);
 
-        Task<Invoice> GetInvoiceById(Guid id);
-
         Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination);
+
         Task<Invoice> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
+
         Task CashPayment(Invoice invoice);
+
         //Task<IEnumerable<Invoice>> GetByContractId(Guid contractId);
     }
 }
