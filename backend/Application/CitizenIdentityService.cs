@@ -10,13 +10,16 @@ namespace Application
     {
         private readonly IGeminiService _geminiService;
         private readonly ICitizenIdentityRepository _citizenRepo;
+        private readonly IPhotoService _photoService;
 
         public CitizenIdentityService(
             IGeminiService geminiService,
-            ICitizenIdentityRepository citizenRepo)
+            ICitizenIdentityRepository citizenRepo,
+            IPhotoService photoService)
         {
             _geminiService = geminiService;
             _citizenRepo = citizenRepo;
+            _photoService = photoService;
         }
 
         public async Task<CitizenIdentity> AddAsync(CitizenIdentity identity)
@@ -44,7 +47,7 @@ namespace Application
         public async Task<CitizenIdentity?> GetByUserId(Guid userId)
             => await _citizenRepo.GetByUserIdAsync(userId);
 
-        public async Task<CitizenIdentity?> ProcessCitizenIdentityAsync(Guid userId, string imageUrl)
+        public async Task<CitizenIdentity?> ProcessCitizenIdentityAsync(Guid userId, string imageUrl, string publicId)
         {
             var dto = await _geminiService.ExtractCitizenIdAsync(imageUrl);
             if (dto == null)
@@ -63,7 +66,7 @@ namespace Application
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
-                ImagePublicId = string.Empty
+                ImagePublicId = publicId
             };
 
             var existing = await _citizenRepo.GetByUserIdAsync(userId);
@@ -80,13 +83,14 @@ namespace Application
             return entity;
         }
 
-        public async Task<bool> RemoveAsync(Guid userId)
+        public async Task<bool> RemoveAsync(Guid userId, string publicId)
         {
             var existing = await _citizenRepo.GetByUserIdAsync(userId);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             await _citizenRepo.DeleteAsync(existing.Id);
+            await _photoService.DeletePhotoAsync(publicId);
             return true;
         }
 

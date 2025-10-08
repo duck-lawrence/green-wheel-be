@@ -1,3 +1,5 @@
+using Application.Dtos.CitizenIdentity.Response;
+using Application.Dtos.DriverLicense.Response;
 using System;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
@@ -23,7 +25,14 @@ namespace Application.Mappers
                 .ForMember(dest => dest.Password,
                            opt => opt.MapFrom(src => PasswordHelper.HashPassword(src.Password)));
 
+            CreateMap<User, UserProfileViewRes>();
+            
             CreateMap<CreateUserReq, User>();
+            
+            CreateMap<CitizenIdentity, CitizenIdentityRes>();
+
+            CreateMap<DriverLicense, DriverLicenseRes>();
+        
         }
     }
 }

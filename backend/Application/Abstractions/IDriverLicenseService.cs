@@ -4,13 +4,13 @@ namespace Application.Abstractions
 {
     public interface IDriverLicenseService
     {
-        Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl);
+        Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl, string publicId);
 
         Task<DriverLicense?> AddAsync(DriverLicense license);
 
         Task<DriverLicense?> UpdateAsync(DriverLicense license);
 
-        Task<bool> DeleteAsync(Guid userId);
+        Task<bool> DeleteAsync(Guid userId, string publicId);
 
         Task<DriverLicense?> GetByUserIdAsync(Guid userId);
 

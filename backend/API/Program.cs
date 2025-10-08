@@ -106,6 +106,7 @@ namespace API
             //UOW
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             builder.Services.AddScoped<IInvoiceUow, InvoiceUow>();
+            builder.Services.AddScoped<IMediaUow, MediaUow>();
             builder.Services.AddScoped<IModelImageUow, ModelImageUow>();
             builder.Services.AddScoped<IVehicleChecklistUow, VehicleChecklistUow>();
             //Mapper
