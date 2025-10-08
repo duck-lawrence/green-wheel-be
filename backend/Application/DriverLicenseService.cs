@@ -11,13 +11,16 @@ namespace Application
     {
         private readonly IGeminiService _geminiService;
         private readonly IDriverLicenseRepository _licenseRepo;
+        private readonly IPhotoService _photoService;
 
         public DriverLicenseService(
             IGeminiService geminiService,
-            IDriverLicenseRepository licenseRepo)
+            IDriverLicenseRepository licenseRepo,
+            IPhotoService photoService)
         {
             _geminiService = geminiService;
             _licenseRepo = licenseRepo;
+            _photoService = photoService;
         }
 
         public async Task<DriverLicense?> AddAsync(DriverLicense license)
@@ -45,13 +48,14 @@ namespace Application
         }
             
 
-        public async Task<bool> DeleteAsync(Guid userId)
+        public async Task<bool> DeleteAsync(Guid userId, string publicId)
         {
             var existing = await _licenseRepo.GetByUserId(userId);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
 
             await _licenseRepo.DeleteAsync(existing.Id);
+            await _photoService.DeletePhotoAsync(publicId);
             return true;
         }
 
@@ -66,7 +70,7 @@ namespace Application
             return license;
         }
 
-        public async Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl)
+        public async Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl, string publicId)
         {
             var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
             if (dto == null)
@@ -85,7 +89,7 @@ namespace Application
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
-                ImagePublicId = string.Empty,
+                ImagePublicId = publicId,
                 Class = ParseLicenseClass(dto.Class)
             };
 

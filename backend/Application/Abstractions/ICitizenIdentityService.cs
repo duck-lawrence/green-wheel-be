@@ -4,11 +4,11 @@ namespace Application.Abstractions
 {
     public interface ICitizenIdentityService
     {
-        Task<CitizenIdentity?> ProcessCitizenIdentityAsync(Guid userId, string imageUrl);
+        Task<CitizenIdentity?> ProcessCitizenIdentityAsync(Guid userId, string imageUrl, string publicId);
 
         Task<CitizenIdentity> AddAsync(CitizenIdentity identity);
 
-        Task<bool> RemoveAsync(Guid userId);
+        Task<bool> RemoveAsync(Guid userId, string publicId);
 
         Task<CitizenIdentity?> UpdateAsync(CitizenIdentity identity);
 
