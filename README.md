@@ -1,5 +1,6 @@
 # Green Wheel
 
+## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
 Green Wheel is a self-drive vehicle rental platform that connects a customer-facing booking experience with an internal staff workspace. The monorepo houses a Next.js 15 front end and an ASP.NET Core 8 back end, built around layered architecture, rich domain modelling, and integrations for identity verification, payments, and cloud media.
 
 ## Repository Overview
@@ -17,7 +18,7 @@ Green Wheel is a self-drive vehicle rental platform that connects a customer-fac
 - **Secure authentication:** JWT access/refresh tokens, OTP flows, Google OAuth sign-in, and global error handling middleware.
 - **Localization-first:** English and Vietnamese translations via `i18next`, with middleware-guarded routes and persistent stores.
 
-## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
+
 
 ## 💻 Tech Stack
 
@@ -25,15 +26,14 @@ Green Wheel is a self-drive vehicle rental platform that connects a customer-fac
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![npm](https://img.shields.io/badge/npm-9%2B-CB3837?style=for-the-badge&logo=npm&logoColor=white)
+![ESLint 9](https://img.shields.io/badge/ESLint-9-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white)
+![Prettier Config](https://img.shields.io/badge/Prettier-Config-F7B93E?style=for-the-badge&logo=prettier&logoColor=black)
+![TypeScript%20ESLint](https://img.shields.io/badge/TypeScript-ESLint-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 
-- Next.js 15 (App Router, Turbopack), React 19, TypeScript 5
-- HeroUI component system with Tailwind CSS 4 & Styled Components 6 for theming
-- State & data: Zustand stores, TanStack React Query, axios with refresh-token interceptors
-- Forms & UX: Formik, Yup, React Hot Toast, React Easy Crop, Framer Motion, Recharts, Iconify/Lucide/Phosphor icon packs
-- Internationalisation via i18next, react-i18next, and custom middleware
 
 #### 🧠 Backend
 
@@ -43,18 +43,40 @@ Green Wheel is a self-drive vehicle rental platform that connects a customer-fac
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
-- ASP.NET Core 8 Web API with Clean Architecture (API -> Application -> Domain -> Infrastructure)
-- Entity Framework Core 8 (SQL Server), AutoMapper, FluentValidation, custom ValidationFilter
-- Authentication & security: JWT bearer auth, BCrypt password hashing, refresh token & blacklist repositories
-- Integrations: CloudinaryDotNet, Google Auth client, Gemini API service, MoMo payment gateway, SMTP email helper
-- Caching & messaging: StackExchange.Redis, Microsoft.Extensions.Caching.Memory, custom interceptors, DotNetEnv
 
-### Data, Infrastructure & Tooling
+#### 🛢️ Database & Cache
 
-- Microsoft SQL Server 2022, Redis 7, Cloudinary media storage
-- Docker & Docker Compose (backend service, MSSQL, Redis)
-- Node.js/npm toolchain, ESLint 9, Tailwind CLI, Prettier config, TypeScript ESLint
-- MIT-licensed project owned by Duck Lawrence (2025)
+![Microsoft SQL Server 2022](https://img.shields.io/badge/Microsoft%20SQL%20Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Cloudinary Media Storage](https://img.shields.io/badge/Cloudinary-Media%20Storage-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
+
+
+#### ☁️ Infrastructure & Cloud Services
+
+
+![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
+![Mailgun](https://img.shields.io/badge/Mailgun-EA4335?style=for-the-badge&logo=mailgun&logoColor=white)
+![Gemini AI API](https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Momo Gateway](https://img.shields.io/badge/MoMo_Payment-DD0A73?style=for-the-badge)
+
+#### 🚀 DevOps / Monitoring / CI-CD
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Docker Compose](https://img.shields.io/badge/Docker_Compose-1488C6?style=for-the-badge&logo=docker&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![DockerHub](https://img.shields.io/badge/DockerHub-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+
+#### ⚙️ Dev Tools
+
+![Visual Studio](https://img.shields.io/badge/Visual_Studio-5C2D91?style=for-the-badge&logo=visualstudio&logoColor=white)
+![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)
+![GitHub Desktop](https://img.shields.io/badge/GitHub_Desktop-FFFFFF?style=for-the-badge&logo=github&logoColor=blue)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
+![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
+
+
 
 ## Architecture Overview
 
@@ -201,6 +223,8 @@ Design artefacts (system architecture, CI/CD workflow, and ERD diagrams) accompa
 
 ## Project Credits
 
+<div align="center">
+
 | No | Student ID | Name | GitHub URL |
 | --- | --- | --- | --- |
 | 1 | SE192160 | Trang Thuận Đức | [ducklawrence05](https://github.com/ducklawrence05) |
@@ -209,13 +233,22 @@ Design artefacts (system architecture, CI/CD workflow, and ERD diagrams) accompa
 | 4 | SE194177 | Nguyễn Quang Huy | [WuagHy](https://github.com/WuagHy) |
 | 5 | QE190133 | Phạm Hồng Phúc | [PhucPhamHong-dev](https://github.com/PhucPhamHong-dev) |
 
-## Contributing
 
-1. Fork the repository and create a feature branch.
-2. Keep frontend (`frontend/`) and backend (`backend/`) changes isolated and lint/build before pushing.
-3. Follow existing naming patterns for DTOs, services, validators, and Zustand stores.
-4. Submit a pull request explaining scope, risks, and any manual test coverage.
+## </div>
 
-## License
+<div align="center">
 
-Green Wheel is released under the [MIT License](LICENSE).
+### 🙏 Thank You for Being Part of Green Wheel!
+
+</div>
+
+We appreciate your contributions and dedication to the Green Wheel project.
+
+- For questions or suggestions, please communicate within the project team or use the repository's [issue tracker](../../issues).
+- **Note:** External contributions are not accepted, as this is a closed group project.
+
+<div align="center">
+
+Let's build something great together! 🚀
+
+</div>
