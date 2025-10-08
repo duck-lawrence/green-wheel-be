@@ -75,7 +75,7 @@ namespace API.Controllers
         [HttpPost("offline")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
-            var userId = req.customerId;
+            var userId = req.CustomerId;
             if(userId == null)
             {
                 return BadRequest(Message.UserMessage.UserIdIsRequired);
