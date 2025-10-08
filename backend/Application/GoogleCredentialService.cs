@@ -26,7 +26,7 @@ namespace Application
                 
             }catch(Exception ex)
             {
-                throw new UnauthorizedAccessException(Message.User.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
             }
         }
     }

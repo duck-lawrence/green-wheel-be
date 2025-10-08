@@ -23,12 +23,32 @@ namespace Application
             _uow = uow;
         }
 
-        public async Task<Invoice> GetInvoiceById(Guid id)
+        public async Task CashPayment(Invoice invoice)
         {
             var invoice = await _uow.InvoiceRepository.GetByIdAsync(id);
             if (invoice == null)
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
+            if(contract == null)
             {
-                throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            }
+            if(contract.Status != (int)RentalContractStatus.PaymentPending)
+            {
+                throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
+            }
+            contract.Status = (int)RentalContractStatus.Active;
+            invoice.PaymentMethod = (int)PaymentMethod.Cash;
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+            await _uow.InvoiceRepository.UpdateAsync(invoice);
+            await _uow.SaveChangesAsync();
+        }
+
+        public async Task<Invoice> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
+            if(invoice == null)
+            {
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
             return invoice;
         }
@@ -40,12 +60,12 @@ namespace Application
                 var invoice = await _uow.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoice == null)
                 {
-                    throw new NotFoundException(Message.Invoice.InvoiceNotFound);
+                    throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
                 }
                 var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
                 if (rentalContract == null)
                 {
-                    throw new NotFoundException(Message.RentalContract.RentalContractNotFound);
+                    throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
                 }
                 rentalContract.Status = (int)RentalContractStatus.Active;
                 invoice.Status = (int)InvoiceStatus.Paid;
@@ -59,7 +79,19 @@ namespace Application
             }
         }
 
-        public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
+
+
+
+
+
+
+
+
+
+
+
+
+public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
         {
             var invoices = await _uow.InvoiceRepository.GetAllInvoicesAsync(pagination);
 
@@ -68,5 +100,6 @@ namespace Application
 
             return invoices;
         }
+
     }
 }

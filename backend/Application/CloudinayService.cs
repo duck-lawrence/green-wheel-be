@@ -18,14 +18,14 @@ namespace Application
         public async Task<PhotoUploadResult> UploadPhotoAsync(UploadImageReq file, string? folder = null)
         {
             if (file.File == null || file.File.Length == 0)
-                throw new BadRequestException(Message.Cloudinary.NotFoundObjectInFile);
+                throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             folder ??= "uploads";
 
             var result = await _cloudRepo.UploadAsync(file, folder);
 
             if (result == null || string.IsNullOrEmpty(result.Url))
-                throw new BusinessException(Message.Cloudinary.UploadFailed);
+                throw new BusinessException(Message.CloudinaryMessage.UploadFailed);
 
             return result;
         }
@@ -33,7 +33,7 @@ namespace Application
         public async Task<bool> DeletePhotoAsync(string publicId)
         {
             if (string.IsNullOrWhiteSpace(publicId))
-                throw new BadRequestException(Message.Cloudinary.NotFoundObjectInFile);
+                throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             var deleted = await _cloudRepo.DeleteAsync(publicId);
 

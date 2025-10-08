@@ -14,16 +14,16 @@ namespace Infrastructure.UnitOfWorks
     {
         private readonly IGreenWheelDbContext _context;
 
-        public IVehicleRepository Vehicles { get; }
-        public IRentalContractRepository RentalContracts { get; }
-        public IUserRepository Users { get; }
-        public IStationRepository Stations { get; }
-        public IVehicleModelRepository VehicleModels { get; }
-        public IInvoiceRepository Invoices { get; }
-        public IInvoiceItemRepository InvoiceItems { get; }
-        public IDepositRepository Deposits { get; }
-        public IModelImageRepository ModelImages { get; }
-
+        public IVehicleRepository VehicleRepository { get; }
+        public IRentalContractRepository RentalContractRepository { get; }
+        public IUserRepository UserRepository { get; }
+        public IStationRepository StationRepository { get; }
+        public IVehicleModelRepository VehicleModelRepository { get; }
+        public IInvoiceRepository InvoiceRepository { get; }
+        public IInvoiceItemRepository InvoiceItemRepository { get; }
+        public IDepositRepository DepositRepository { get; }
+        public ICitizenIdentityRepository CitizenIdentityRepository { get; }
+        public IDriverLicenseRepository DriverLicenseRepository { get; }
         public RentalContractUow(
         IGreenWheelDbContext context,
         IVehicleRepository vehicleRepository,
@@ -34,18 +34,20 @@ namespace Infrastructure.UnitOfWorks
         IInvoiceItemRepository invoiceItemRepository,
         IDepositRepository depositRepository,
         IStationRepository stationRepository,
-        IModelImageRepository modelImageRepository)
-        {
+        ICitizenIdentityRepository citizenIdentityRepository,
+        IDriverLicenseRepository driverLicenseRepository)
+        { 
             _context = context;
-            Vehicles = vehicleRepository;
-            RentalContracts = rentalContractRepository;
-            Users = userRepository;
-            VehicleModels = vehicleModelRepository;
-            Invoices = invoiceRepository;
-            Deposits = depositRepository;
-            Stations = stationRepository;
-            InvoiceItems = invoiceItemRepository;
-            ModelImages = modelImageRepository;
+            VehicleRepository = vehicleRepository;
+            RentalContractRepository = rentalContractRepository;
+            UserRepository = userRepository;
+            VehicleModelRepository = vehicleModelRepository;
+            InvoiceRepository = invoiceRepository;
+            DepositRepository = depositRepository;
+            StationRepository = stationRepository;
+            InvoiceItemRepository = invoiceItemRepository;
+            CitizenIdentityRepository = citizenIdentityRepository;
+            DriverLicenseRepository = driverLicenseRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

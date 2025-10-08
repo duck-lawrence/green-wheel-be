@@ -39,16 +39,7 @@ export function RegisterOTP({ email, onBack, onSuccess }: RegisterOTPProps) {
     })
 
     return (
-        <form
-            onSubmit={(e) => {
-                if (formik.isSubmitting) {
-                    e.preventDefault()
-                    return
-                }
-                formik.handleSubmit(e)
-            }}
-            className="flex flex-col"
-        >
+        <form onSubmit={formik.handleSubmit} className="flex flex-col">
             {/* Title */}
             <div className="mx-12 mt-2 mb-2">
                 <div className="text-center">{t("auth.verify_identity")}</div>

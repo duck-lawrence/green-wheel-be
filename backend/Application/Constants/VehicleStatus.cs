@@ -11,6 +11,8 @@ namespace Application.Constants
         Available = 0,
         Unavaible = 1,
         Rented = 2,
-        Maintenance = 3
+        Maintenance = 3,
+        MissingNoReason = 4,
+        LateReturn = 5
     }
 }
