@@ -2,8 +2,6 @@ import { InvoiceItemType, InvoiceStatus, PaymentMethod } from "@/constants/enum"
 
 export type InvoiceViewRes = {
     id: string
-    invoiceItems: InvoiceItemViewRes[]
-    deposit: DepositViewRes
     subtotal: number
     tax: number
     total: number
@@ -13,6 +11,8 @@ export type InvoiceViewRes = {
     status: InvoiceStatus
     paidAt?: string
     checkListId?: string
+    items: InvoiceItemViewRes[]
+    deposit: DepositViewRes
 }
 
 export type DepositViewRes = {

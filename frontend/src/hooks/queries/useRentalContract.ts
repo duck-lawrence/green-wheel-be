@@ -42,9 +42,7 @@ export const useCreateRentalContract = ({ onSuccess }: { onSuccess?: () => void 
             })
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }

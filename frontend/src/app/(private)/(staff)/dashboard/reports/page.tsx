@@ -5,9 +5,8 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
-import { ButtonStyled, InputStyled, TextareaStyled, FormStyled } from "@/components"
-import { EnumPicker } from "@/components/modules/EnumPicker"
-import { useProfileStore } from "@/hooks"
+import { ButtonStyled, InputStyled, TextareaStyled, FormStyled, EnumPicker } from "@/components"
+import { useGetMe } from "@/hooks"
 import { StaffReportType } from "@/constants/enum"
 
 const REPORT_TYPE_VALUES = Object.values(StaffReportType).filter(
@@ -16,7 +15,7 @@ const REPORT_TYPE_VALUES = Object.values(StaffReportType).filter(
 
 export default function StaffReportsPage() {
     const { t } = useTranslation()
-    const user = useProfileStore((state) => state.user)
+    const { data: user } = useGetMe()
 
     const staffName = useMemo(() => {
         if (!user) return ""
@@ -50,7 +49,7 @@ export default function StaffReportsPage() {
                 [StaffReportType.Internal]: t("staff.report_form_type_options_technical"),
                 [StaffReportType.RelatedToSupport]: t("staff.report_form_type_options_payment"),
                 [StaffReportType.Other]: t("staff.report_form_type_options_other")
-            }) satisfies Record<StaffReportType, string>,
+            } satisfies Record<StaffReportType, string>),
         [t]
     )
 

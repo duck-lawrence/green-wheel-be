@@ -6,7 +6,7 @@ import { DropdownTrigger, DropdownMenu, DropdownItem, User, Spinner } from "@her
 import toast from "react-hot-toast"
 import { useTranslation } from "react-i18next"
 import { DropdownStyled } from "@/components"
-import { useGetMe, useGetMeFromCache, useLogout, useProfileStore, useTokenStore } from "@/hooks"
+import { useGetMe, useLogout, useTokenStore } from "@/hooks"
 import { BackendError } from "@/models/common/response"
 import Link from "next/link"
 import { DEFAULT_AVATAR_URL } from "@/constants/constants"
@@ -40,7 +40,6 @@ type DropdownLinkItem = {
 export function ProfileDropdown() {
     const { t } = useTranslation()
     const logoutMutation = useLogout({ onSuccess: () => window.location.replace("/") })
-    // const user = useProfileStore((s) => s.user)
     const isLoggedIn = useTokenStore((s) => !!s.accessToken)
 
     const {
@@ -94,9 +93,7 @@ export function ProfileDropdown() {
     useEffect(() => {
         if (isGetMeError && getMeError) {
             const error = getMeError as BackendError
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     }, [isGetMeError, getMeError, t])
 

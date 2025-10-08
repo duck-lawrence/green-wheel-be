@@ -27,5 +27,16 @@ export const useDay = ({
         return dateJs.format(defaultFormat)
     }
 
-    return { toCalenderDateTime, formatDateTime }
+    const diffDaysCeil = ({
+        start,
+        end
+    }: {
+        start: string | Date | dayjs.Dayjs
+        end: string | Date | dayjs.Dayjs
+    }) => {
+        if (!start || !end) return -1
+        return Math.ceil(dayjs(end).diff(dayjs(start), "day", true))
+    }
+
+    return { toCalenderDateTime, formatDateTime, diffDaysCeil }
 }

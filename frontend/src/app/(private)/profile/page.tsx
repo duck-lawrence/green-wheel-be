@@ -13,8 +13,8 @@ import { parseDate } from "@internationalized/date"
 import {
     useDay,
     useDeleteAvatar,
+    useGetMe,
     useImageUploadModal,
-    useProfileStore,
     useUpdateMe,
     useUploadAvatar
 } from "@/hooks"
@@ -33,7 +33,7 @@ import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 export default function Page() {
     const { t } = useTranslation()
     const { formatDateTime } = useDay({})
-    const user = useProfileStore((s) => s.user)
+    const { data: user } = useGetMe()
     const updateMeMutation = useUpdateMe({ onSuccess: undefined })
     const deleteAvatarMutation = useDeleteAvatar({ onSuccess: undefined })
     const [showChange, setShowChange] = useState(true)

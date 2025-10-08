@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { LayoutGroup, motion } from "framer-motion"
 import clsx from "clsx"
 import i18n from "@/lib/i18n"
-import { useProfileStore } from "@/hooks"
+import { useGetMe } from "@/hooks"
 
 export type SidebarItem = {
     key: string
@@ -16,8 +16,16 @@ export type SidebarItem = {
 
 const DEFAULT_TABS: SidebarItem[] = [
     { key: "/profile", label: i18n.t("user.my_profile"), href: "/profile" },
-    { key: "/profile/rental-contracts", label: i18n.t("user.rental_contracts"), href: "/profile/rental-contracts" },
-    { key: "/profile/change-password", label: i18n.t("auth.change_password"), href: "/profile/change-password" }
+    {
+        key: "/profile/rental-contracts",
+        label: i18n.t("user.rental_contracts"),
+        href: "/profile/rental-contracts"
+    },
+    {
+        key: "/profile/change-password",
+        label: i18n.t("auth.change_password"),
+        href: "/profile/change-password"
+    }
 ]
 
 export type AccountSidebarProps = {
@@ -26,10 +34,14 @@ export type AccountSidebarProps = {
     widthClass?: string
 }
 
-export default function AccountSidebar({ items, selectedKey, widthClass = "w-50" }: AccountSidebarProps = {}) {
+export default function AccountSidebar({
+    items,
+    selectedKey,
+    widthClass = "w-50"
+}: AccountSidebarProps = {}) {
     const pathname = usePathname()
     const router = useRouter()
-    const user = useProfileStore((s) => s.user)
+    const { data: user } = useGetMe()
     const [pendingKey, setPendingKey] = useState<string | null>(null)
 
     const normalizedRole = useMemo(() => {
