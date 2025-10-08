@@ -28,10 +28,17 @@ export default function StaffLayout({ children }: { children: React.ReactNode })
 
     const selectedPath = useMemo(() => {
         if (!pathname) return STAFF_MENU[0]?.path ?? "/dashboard"
-        const matched = STAFF_MENU.find(
-            (item) => pathname === item.path || pathname.startsWith(`${item.path}/`)
-        )
-        return matched?.path ?? STAFF_MENU[0]?.path ?? pathname
+
+        const matched = STAFF_MENU.reduce<string | undefined>((current, item) => {
+            if (pathname === item.path || pathname.startsWith(`${item.path}/`)) {
+                if (!current || item.path.length > current.length) {
+                    return item.path
+                }
+            }
+            return current
+        }, undefined)
+
+        return matched ?? STAFF_MENU[0]?.path ?? pathname
     }, [pathname])
 
     useEffect(() => {
