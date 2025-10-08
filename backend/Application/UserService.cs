@@ -5,8 +5,11 @@ using Application.Constants;
 using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Response;
+using Application.Dtos.UserSupport.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
+using Application.Dtos.UserSupport.Request;
+
 using Application.Helpers;
 using Application.Repositories;
 using Application.UnitOfWorks;
@@ -36,6 +39,7 @@ namespace Application
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
         private readonly IMediaUow _mediaUow;
+        private readonly ISupportRequestRepository _supportRepo;
 
         public UserService(IUserRepository repository,
             IOptions<JwtSettings> jwtSettings,
@@ -50,7 +54,8 @@ namespace Application
              IPhotoService photoService,
              ICitizenIdentityService citizenService,
              IDriverLicenseService driverService,
-             IMediaUow mediaUow
+             IMediaUow mediaUow,
+             ISupportRequestRepository supportRepo
             )
         {
             _userRepository = repository;
@@ -67,6 +72,7 @@ namespace Application
             _citizenService = citizenService;
             _driverService = driverService;
             _mediaUow = mediaUow;
+            _supportRepo = supportRepo;
         }
 
         /*
