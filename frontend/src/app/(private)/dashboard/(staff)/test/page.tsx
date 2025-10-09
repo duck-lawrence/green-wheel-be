@@ -16,7 +16,7 @@ type PagedResult<T> = {
 }
 
 /** ====== HARD-CODE DATA ====== */
-const TOTAL_COUNT = 101              // TotalCount (cứng)
+const TOTAL_COUNT = 32              // TotalCount (cứng)
 const DEFAULT_PAGE_SIZE = 10          // PageSize (cứng 10 như yêu cầu)
 const ALL_ITEMS: StaffItem[] = Array.from({ length: TOTAL_COUNT }, (_, i) => ({
   id: i + 1,
@@ -136,7 +136,7 @@ export default function StaffTestPage() {
 
       <section className="space-y-4">
         <h2 className="text-xl font-semibold text-gray-900">Vehicle Card Demo</h2>
-        <div className="max-w-5xl">
+        <div className="max-w-7xl">
           <VehicleHorizontalCard vehicleModel={mockVehicleModel} />
         </div>
       </section>
