@@ -3,6 +3,7 @@ using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.VehicleModel.Request;
 using Application.Dtos.VehicleModel.Respone;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -14,13 +15,16 @@ namespace API.Controllers
     {
         private readonly IModelImageService _modelImageService;
         private readonly IVehicleModelService _vehicleModelService;
+        private readonly IMapper _mapper;
 
         public ModelImagesController(
             IModelImageService modelImageService,
-            IVehicleModelService vehicleModelService)
+            IVehicleModelService vehicleModelService,
+            IMapper mapper)
         {
             _modelImageService = modelImageService;
             _vehicleModelService = vehicleModelService;
+            _mapper = mapper;
         }
 
         // ----------------- GALLERY IMAGES -----------------
@@ -31,12 +35,7 @@ namespace API.Controllers
         {
             var images = await _modelImageService.UploadModelImagesAsync(modelId, req.Files);
 
-            var res = images.Select(x => new VehicleModelImageRes
-            {
-                ModelId = x.ModelId,
-                ImageUrl = x.Url,
-                ImagePublicId = x.PublicId
-            });
+            var res = _mapper.Map<IEnumerable<VehicleModelImageRes>>(images);
 
             return Ok(new
             {

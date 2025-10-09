@@ -2,11 +2,6 @@
 using Application.Dtos.VehicleModel.Respone;
 using AutoMapper;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Mappers
 {
@@ -16,7 +11,11 @@ namespace Application.Mappers
         {
             CreateMap<CreateVehicleModelReq, VehicleModel>();
             CreateMap<VehicleModel, VehicleModelViewRes>();
-            CreateMap<UpdateVehicleModelReq, VehicleModel>().ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<VehicleModel, VehicleModelViewRes>()
+                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand))
+                .ForMember(dest => dest.Segment, opt => opt.MapFrom(src => src.Segment))
+                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)))
+                .ForMember(dest => dest.AvailableVehicleCount, opt => opt.Ignore());
         }
     }
 }
