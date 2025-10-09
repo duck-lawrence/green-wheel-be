@@ -5,3 +5,9 @@ export type CreateRentalContractReq = {
     endDate: string
     stationId: string
 }
+
+export type HandoverContractReq = {
+    isSignedByStaff: boolean
+    isSignedByCustomer: boolean
+    amount?: number
+}

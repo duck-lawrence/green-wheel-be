@@ -12,11 +12,17 @@ export type VehicleModelViewRes = {
     batteryCapacity: number
     ecoRangeKm: number
     sportRangeKm: number
+    imageUrl?: string
+    imageUrls: string[]
+
     brand: BrandViewRes
     segment: VehicleSegmentViewRes
-    imageUrl?: string
-    imageUrls?: string[]
     availableVehicleCount: number
+}
+
+export type VehicleModelImageRes = {
+    modelId: string
+    imageUrl: string
 }
 
 export type VehicleComponentViewRes = {
@@ -29,4 +35,11 @@ export type VehicleSegmentViewRes = {
     id: string
     name: string
     description: string
+}
+
+export type VehicleViewRes = {
+    id: string
+    licensePlate: string
+    stationId: string
+    model: VehicleModelViewRes
 }

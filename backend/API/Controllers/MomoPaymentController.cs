@@ -30,7 +30,7 @@ namespace API.Controllers
         public async Task<IActionResult> CreateMomoPayment(CreateMomoPaymentReq req)
         {
             var res = await _momoService.CreatePaymentAsync(req.Amount, req.InvoiceId, req.Description);
-            return Ok(res);
+            return Ok(new { res });
         }
 
 
