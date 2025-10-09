@@ -114,3 +114,11 @@ export enum OrderStatus {
     Completed = 7,
     Cancelled = 8
 }
+
+// Enum cho invoice
+export enum InvoiceType {
+    BookingPayment = 0,
+    ReturnPayment = 1,
+    DepositRefund = 2,
+    DamageSupport = 3
+}

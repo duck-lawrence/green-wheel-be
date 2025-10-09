@@ -2,13 +2,7 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import {
-    AccordionStyled,
-    AccoredionSyled,
-    ButtonStyled,
-    InputStyled,
-    TextareaStyled
-} from "@/components"
+import { AccordionStyled, ButtonStyled, InputStyled, TextareaStyled } from "@/components"
 import {
     Car,
     IdentificationBadge,
@@ -19,34 +13,30 @@ import {
     FileText,
     Invoice
 } from "@phosphor-icons/react"
+import InvoiceForm from "@/components/shared/InvoiceByType/InvoiceForm"
 
 export default function RentalContractPage() {
-    const accordion = [
+    const invoiceAccordion = [
         {
             key: "1",
-            ariaLabel: "Accordion 1",
-            title: "Accordion 1",
-            value: "content 1 "
+            ariaLabel: "Tiền cọc",
+            title: "Hóa đơn tiền cọc",
+            content: <InvoiceForm typeLabel="Tiền cọc" code="INV-DEP-001" />
         },
         {
             key: "2",
-            ariaLabel: "Accordion 2",
-            title: "Accordion 2",
-            value: "content 2 "
+            ariaLabel: "Thanh toán đợt 1",
+            title: "Hóa đơn thanh toán đợt 1",
+            content: <InvoiceForm typeLabel="Thanh toán đợt 1" code="INV-PAY-001" />
         },
         {
             key: "3",
-            ariaLabel: "Accordion3",
-            title: "Accordion 3",
-            value: "content 3 "
-        },
-        {
-            key: "4",
-            ariaLabel: "Accordion 4",
-            title: "Accordion 4",
-            value: "content 4 "
+            ariaLabel: "Thanh toán hoàn tất",
+            title: "Hóa đơn thanh toán cuối cùng",
+            content: <InvoiceForm typeLabel="Hoàn tất" code="INV-FIN-001" />
         }
     ]
+
     return (
         <div className="min-h-screen flex items-center justify-center dark:bg-gray-950 py-16 px-4">
             <motion.div
@@ -62,7 +52,6 @@ export default function RentalContractPage() {
                         Thông tin chi tiết về hợp đồng thuê xe điện của khách hàng.
                     </p>
                 </div>
-
                 {/* Group 1 - Vehicle Info */}
                 <Section title="Thông tin xe">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -227,13 +216,38 @@ export default function RentalContractPage() {
                         Xác nhận hợp đồng
                     </ButtonStyled>
                 </div>
+
+                {/* Invoice payment */}
+                <div>{/* <AccordionStyled items={} /> */}</div>
+
+                <p>=================</p>
+
+                {/* Các section thông tin hợp đồng */}
+                {/* ... phần Section của bạn giữ nguyên ... */}
+
+                {/* Invoice Accordion */}
+                <Section title="Danh sách hóa đơn thanh toán">
+                    <AccordionStyled items={invoiceAccordion} />
+                </Section>
+
+                {/* Nút hành động */}
+                <div className="mt-12 flex justify-center">
+                    <ButtonStyled
+                        size="lg"
+                        color="primary"
+                        className="px-12 py-3 font-semibold text-white rounded-xl 
+              bg-gradient-to-r from-primary to-teal-400 
+              hover:from-teal-500 hover:to-green-400 
+              shadow-md transition-all duration-300"
+                    >
+                        Xác nhận hợp đồng
+                    </ButtonStyled>
+                </div>
             </motion.div>
-            <AccordionStyled items={accordion} />
         </div>
     )
 }
 
-/* ===== Subcomponent: Section Wrapper ===== */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="mb-10">
