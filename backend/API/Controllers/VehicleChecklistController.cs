@@ -1,7 +1,9 @@
 ﻿using API.Filters;
+using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.VehicleChecklist.Request;
+using Application.Dtos.VehicleModel.Respone;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,9 +28,10 @@ namespace API.Controllers
             var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklistAsync(staff, req);
             return Ok(vehicleCheckList);
         }
+
         [HttpPut]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> UpdateVehicleChecklist([FromBody]UpdateVehicleChecklistReq req)
+        public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req)
         {
             await _vehicleChecklistService.UpdateVehicleChecklistAsync(req);
             return Ok();
@@ -41,5 +44,16 @@ namespace API.Controllers
             var checklistViewRes = await _vehicleChecklistService.GetByIdAsync(id);
             return Ok(checklistViewRes);
         }
+
+        //[HttpPost("image")]
+        //[Consumes("multipart/form-data")]
+        //public async Task<IActionResult> UploadImage(Guid modelId, IFormFile file)
+        //{
+        //}
+
+        //[HttpDelete("image")]
+        //public async Task<IActionResult> DeleteImage(Guid modelId)
+        //{
+        //}
     }
 }

@@ -26,7 +26,6 @@ namespace Application
 
             if (result == null || string.IsNullOrEmpty(result.Url))
                 throw new BusinessException(Message.CloudinaryMessage.UploadFailed);
-
             return result;
         }
 
