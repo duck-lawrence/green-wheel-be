@@ -1,17 +1,14 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.VehicleModel.Request;
 using Application.Dtos.VehicleModel.Respone;
 using Application.Repositories;
+using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace Application
 {
@@ -19,12 +16,17 @@ namespace Application
     {
         private readonly IVehicleModelRepository _vehicleModelRepository;
         private readonly IMapper _mapper;
+        private readonly IMediaUow _uow;
+        private readonly IPhotoService _photoService;
 
-        public VehicleModelService(IVehicleModelRepository vehicleModelRepository, IMapper mapper)
+        public VehicleModelService(IVehicleModelRepository vehicleModelRepository, IMapper mapper, IMediaUow uow, IPhotoService photoService)
         {
             _vehicleModelRepository = vehicleModelRepository;
             _mapper = mapper;
+            _uow = uow;
+            _photoService = photoService;
         }
+
         public async Task<Guid> CreateVehicleModelAsync(CreateVehicleModelReq createVehicleModelReq)
         {
             Guid id;
@@ -48,73 +50,81 @@ namespace Application
             return await _vehicleModelRepository.FilterVehicleModelsAsync(vehicleFilterReq.StationId, vehicleFilterReq.StartDate, vehicleFilterReq.EndDate, vehicleFilterReq.SegmentId);
         }
 
-        public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId ,DateTimeOffset startDate, DateTimeOffset endDate)
+        public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate);
-            if(vehicleModelViewRes == null)
+            if (vehicleModelViewRes == null)
             {
                 throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
             }
             return vehicleModelViewRes;
         }
 
-        public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq updateVehicleModelReq)
+        public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq req)
         {
-            var vehicleModelFromDB = await _vehicleModelRepository.GetByIdAsync(Id);
-            if(vehicleModelFromDB == null)
+            var model = await _vehicleModelRepository.GetByIdAsync(Id) ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+
+            _mapper.Map(req, model);
+            model.UpdatedAt = DateTimeOffset.UtcNow;
+
+            return await _vehicleModelRepository.UpdateAsync(model);
+        }
+
+        public async Task<string> UploadMainImageAsync(Guid modelId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
+
+            var model = await _uow.VehicleModels.GetByIdAsync(modelId)
+                ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+
+            var oldPublicId = model.ImagePublicId;
+
+            var uploadReq = new UploadImageReq { File = file };
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, $"models/{modelId}/main");
+
+            await using var trx = await _uow.BeginTransactionAsync();
+            try
             {
-                throw new NotFoundException(Message.VehicleModelMessage.VehicelModelNotFound);
+                model.ImageUrl = uploaded.Url;
+                model.ImagePublicId = uploaded.PublicID;
+                model.UpdatedAt = DateTimeOffset.UtcNow;
+
+                await _uow.VehicleModels.UpdateAsync(model);
+                await _uow.SaveChangesAsync();
+                await trx.CommitAsync();
             }
-            if(updateVehicleModelReq.Name != null)
+            catch
             {
-                vehicleModelFromDB.Name = updateVehicleModelReq.Name;   
-            }
-            if(updateVehicleModelReq.Description != null)
-            {
-                vehicleModelFromDB.Description = updateVehicleModelReq.Description;
-            }
-            if (updateVehicleModelReq.CostPerDay != null)
-            {
-                vehicleModelFromDB.CostPerDay = (decimal)updateVehicleModelReq.CostPerDay;
-            }
-            if (updateVehicleModelReq.DepositFee != null)
-            {
-                vehicleModelFromDB.DepositFee = (decimal)updateVehicleModelReq.DepositFee;
-            }
-            if (updateVehicleModelReq.SeatingCapacity != null)
-            {
-                vehicleModelFromDB.SeatingCapacity = (int)updateVehicleModelReq.SeatingCapacity;
-            }
-            if (updateVehicleModelReq.NumberOfAirbags != null)
-            {
-                vehicleModelFromDB.SeatingCapacity = (int)updateVehicleModelReq.SeatingCapacity;
-            }
-            if (updateVehicleModelReq.MotorPower != null)
-            {
-                vehicleModelFromDB.MotorPower = (decimal)updateVehicleModelReq.MotorPower;
-            }
-            if (updateVehicleModelReq.BatteryCapacity != null)
-            {
-                vehicleModelFromDB.BatteryCapacity = (decimal)updateVehicleModelReq.BatteryCapacity;
-            }
-            if (updateVehicleModelReq.EcoRangeKm != null)
-            {
-                vehicleModelFromDB.EcoRangeKm = (decimal)updateVehicleModelReq.EcoRangeKm;
-            }
-            if (updateVehicleModelReq.SportRangeKm != null)
-            {
-                vehicleModelFromDB.SportRangeKm = (decimal)updateVehicleModelReq.SportRangeKm;
-            }
-            if (updateVehicleModelReq.BrandId != null)
-            {
-                vehicleModelFromDB.BrandId = (Guid)updateVehicleModelReq.BrandId;
-            }
-            if (updateVehicleModelReq.SegmentId != null)
-            {
-                vehicleModelFromDB.SegmentId = (Guid)updateVehicleModelReq.SegmentId;
+                await trx.RollbackAsync();
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
             }
 
-            return await _vehicleModelRepository.UpdateAsync(vehicleModelFromDB);
+            if (!string.IsNullOrEmpty(oldPublicId))
+            {
+                try { await _photoService.DeletePhotoAsync(oldPublicId); } catch { }
+            }
+
+            return model.ImageUrl!;
+        }
+
+        public async Task DeleteMainImageAsync(Guid modelId)
+        {
+            var model = await _uow.VehicleModels.GetByIdAsync(modelId)
+                ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+
+            if (string.IsNullOrEmpty(model.ImagePublicId))
+                throw new BadRequestException("Model does not have a main image to delete.");
+
+            await _photoService.DeletePhotoAsync(model.ImagePublicId);
+
+            model.ImageUrl = null;
+            model.ImagePublicId = null;
+            model.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _uow.VehicleModels.UpdateAsync(model);
+            await _uow.SaveChangesAsync();
         }
     }
 }
