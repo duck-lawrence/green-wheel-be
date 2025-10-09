@@ -34,7 +34,18 @@ export function DashboardSidebar({ className }: { className?: string }) {
         }
     ]
 
-    const adminTabs: SidebarItem[] = []
+    const adminTabs: SidebarItem[] = [
+        {
+            key: "/dashboard",
+            label: t("staff.sidebar_dashboard"),
+            href: "/dashboard"
+        },
+        {
+            key: "/dashboard/fleet",
+            label: t("admin.sidebar_fleet", "Fleet"),
+            href: "/dashboard/fleet"
+        }
+    ]
 
     const tabs = buildTabs({
         roleName: user?.role?.name,

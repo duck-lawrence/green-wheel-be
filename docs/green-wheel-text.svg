@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="120" viewBox="0 0 600 120" role="img" aria-label="Green Wheel">
+  <style>
+    .t{font:700 64px/1.1 "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; fill:#00A63E;}
+  </style>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="t">Green Wheel</text>
+</svg>

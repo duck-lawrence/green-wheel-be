@@ -8,5 +8,7 @@ namespace Application.Abstractions
         Task<List<ModelImage>> UploadModelImagesAsync(Guid modelId, List<IFormFile> files);
 
         Task DeleteModelImagesAsync(Guid modelId, List<Guid> imageIds);
+
+        Task<(string mainImageUrl, List<ModelImage> galleyImages)> UploadAllModelImagesAsync(Guid modelId, List<IFormFile> files);
     }
 }

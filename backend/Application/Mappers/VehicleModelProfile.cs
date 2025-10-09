@@ -16,6 +16,7 @@ namespace Application.Mappers
         {
             CreateMap<CreateVehicleModelReq, VehicleModel>();
             CreateMap<VehicleModel, VehicleModelViewRes>();
+            CreateMap<UpdateVehicleModelReq, VehicleModel>().ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

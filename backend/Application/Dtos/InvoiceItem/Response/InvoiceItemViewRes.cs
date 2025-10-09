@@ -13,7 +13,6 @@ namespace Application.Dtos.InvoiceItem.Response
         public Guid Id { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
-        public string Notes { get; set; }
         public decimal SubTotal { get; set; }
         public int Type { get; set; } = (int)InvoiceItemType.BaseRental;
         public VehicleChecklistItemViewRes? ChecklistItem { get; set; } = null;

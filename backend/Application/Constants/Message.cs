@@ -114,6 +114,7 @@ namespace Application.Constants
             public const string DeleteFailed = "cloudinary.delete_failed";
             public const string DeleteSuccess = "cloudinary.delete_success";
             public const string FolderNotFound = "cloudinary.folder_not_found";
+            public const string UploadSuccess = "cloudinary.upload_success";
         }
 
         //Rental Contract

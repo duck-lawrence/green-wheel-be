@@ -187,9 +187,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
             entity.Property(e => e.RefundedAt).HasColumnName("refunded_at");
             entity.Property(e => e.Status).HasColumnName("status");
@@ -381,14 +378,10 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.HasIndex(e => e.ContractId, "idx_invoices_contract_id");
 
-            entity.HasIndex(e => e.ChecklistId, "uq_invoices_checklist_id")
-                .IsUnique()
-                .HasFilter("([checklist_id] IS NOT NULL)");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
-            entity.Property(e => e.ChecklistId).HasColumnName("checklist_id");
             entity.Property(e => e.ContractId).HasColumnName("contract_id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
@@ -409,9 +402,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnName("tax");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
 
-            entity.HasOne(d => d.Checklist).WithOne(p => p.Invoice)
-                .HasForeignKey<Invoice>(d => d.ChecklistId)
-                .HasConstraintName("fk_invoices_checklists");
+          
 
             entity.HasOne(d => d.Contract).WithMany(p => p.Invoices)
                 .HasForeignKey(d => d.ContractId)
@@ -440,9 +431,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.InvoiceId).HasColumnName("invoice_id");
-            entity.Property(e => e.Notes)
-                .HasMaxLength(255)
-                .HasColumnName("notes");
             entity.Property(e => e.Quantity)
                 .HasDefaultValue(1)
                 .HasColumnName("quantity");
@@ -934,9 +922,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.CustomerId).HasColumnName("customer_id");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .HasColumnName("description");
             entity.Property(e => e.IsSignedByCustomer).HasColumnName("is_signed_by_customer");
             entity.Property(e => e.IsSignedByStaff).HasColumnName("is_signed_by_staff");
             entity.Property(e => e.StaffId).HasColumnName("staff_id");
