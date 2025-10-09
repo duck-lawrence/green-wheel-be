@@ -1,4 +1,4 @@
-# [Green Wheel](https://www.greenwheel.vn/)
+# ![Green Wheel](docs/green-wheel-text.svg)
 
 <!-- [![backend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml) [![frontend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml) -->
 
