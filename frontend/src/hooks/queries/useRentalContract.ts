@@ -38,7 +38,9 @@ export const useCreateRentalContract = ({ onSuccess }: { onSuccess?: () => void 
         onSuccess: () => {
             onSuccess?.()
             toast.success(t("contral_form.wait_for_confirm"), {
-                position: "top-center"
+                className: "!max-w-[410px]",
+                position: "top-center",
+                duration: 5000
             })
         },
         onError: (error: BackendError) => {
