@@ -11,14 +11,12 @@ export type InvoiceViewRes = {
     notes: string
     status: InvoiceStatus
     paidAt?: string
-    checkListId?: string
     items: InvoiceItemViewRes[]
     deposit?: DepositViewRes
 }
 
 export type DepositViewRes = {
     id: string
-    description?: string
     amount: number
     refundedAt?: string
     status: DepositStatus
@@ -28,7 +26,6 @@ export type InvoiceItemViewRes = {
     id: string
     quantity: number
     unitPrice: number
-    notes: string
     subTotal: number
     type: InvoiceItemType
     checkListItem?: VehicleChecklistItemViewRes

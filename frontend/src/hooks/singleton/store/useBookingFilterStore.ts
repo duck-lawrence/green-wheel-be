@@ -1,4 +1,4 @@
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 

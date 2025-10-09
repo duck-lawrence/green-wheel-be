@@ -1,5 +1,5 @@
 import { QUERY_KEYS } from "@/constants/queryKey"
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 import { vehicleModelApi } from "@/services/vehicleModelApi"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 
