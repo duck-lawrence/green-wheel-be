@@ -1,5 +1,6 @@
-# [Green Wheel]
-
+<p align="center">
+  <img src="docs/green-wheel-text.svg" alt="Green Wheel" >
+</p>
 <!-- [![backend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml) [![frontend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml) -->
 
 ## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)

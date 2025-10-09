@@ -39,6 +39,11 @@ export function DashboardSidebar({ className }: { className?: string }) {
             key: "/dashboard",
             label: t("staff.sidebar_dashboard"),
             href: "/dashboard"
+        },
+        {
+            key: "/dashboard/fleet",
+            label: t("admin.sidebar_fleet", "Fleet"),
+            href: "/dashboard/fleet"
         }
     ]
 
