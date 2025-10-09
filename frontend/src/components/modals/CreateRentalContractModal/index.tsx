@@ -2,7 +2,7 @@ import { ModalStyled } from "@/components/"
 import { ModalBody, ModalContent } from "@heroui/react"
 import React, { useCallback } from "react"
 import { CreateRentalContractForm } from "./CreateRentalContractForm"
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 import { useRouter } from "next/navigation"
 
 export function CreateRentalContractModal({

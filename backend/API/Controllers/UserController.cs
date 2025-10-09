@@ -1,13 +1,9 @@
 ﻿using API.Filters;
-using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
-using AutoMapper;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,19 +16,13 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IGoogleCredentialService _googleService;
-        private readonly ICitizenIdentityService _citizenIdentityService;
-        private readonly IDriverLicenseService _driverLicenseService;
 
         public UserController(IUserService service
-            , IGoogleCredentialService googleCredentialService,
-            ICitizenIdentityService citizenIdentityService,
-            IDriverLicenseService driverLicenseService
+            , IGoogleCredentialService googleCredentialService
             )
         {
             _userService = service;
             _googleService = googleCredentialService;
-            _citizenIdentityService = citizenIdentityService;
-            _driverLicenseService = driverLicenseService;
         }
 
         /*
