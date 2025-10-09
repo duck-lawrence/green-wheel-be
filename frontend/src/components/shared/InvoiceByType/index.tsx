@@ -1,9 +1,10 @@
+
 import { InvoiceType } from "@/constants/enum"
-import { InvoiceViewRes } from "@/models/invoice/schema/response"
+import { InvoiceItemViewRes, InvoiceViewRes } from "@/models/invoice/schema/response"
 import React from "react"
 
-export default function InvoidByType(invoice: InvoiceViewRes) {
-    switch (invoice.InvoiceType){
+export default function InvoidByType(invoice: InvoiceItemViewRes) {
+    switch (invoice.type){
         case InvoiceType.BookingPayment:
             return(
                 <>

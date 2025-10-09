@@ -1,6 +1,6 @@
 "use client"
 import React from "react"
-import { InputStyled, TextareaStyled } from "@/components"
+import { ButtonStyled, InputStyled, TextareaStyled } from "@/components"
 import { Money, CalendarBlank, ClipboardText } from "@phosphor-icons/react"
 
 export default function InvoiceForm({ typeLabel, code }: { typeLabel: string; code: string }) {
@@ -36,6 +36,18 @@ export default function InvoiceForm({ typeLabel, code }: { typeLabel: string; co
                 variant="bordered"
                 className="sm:col-span-2"
             />
+            <div className="mt-12 flex justify-center">
+                <ButtonStyled
+                    size="lg"
+                    color="primary"
+                    className="px-12 py-3 font-semibold text-white rounded-xl 
+                          bg-gradient-to-r from-primary to-teal-400 
+                          hover:from-teal-500 hover:to-green-400 
+                          shadow-md transition-all duration-300"
+                >
+                    Xác nhận hợp đồng
+                </ButtonStyled>
+            </div>
         </div>
     )
 }
