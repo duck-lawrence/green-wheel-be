@@ -18,15 +18,17 @@ namespace API.Controllers
         {
             _vehicleModelService = vehicleModelService;
         }
+
         /*
          401: unauthorized
          403: not have permission
          --400: invalid type
          200: success
          */
+
         [RoleAuthorize("Admin")]
         [HttpPost]
-        public async Task<IActionResult> CreateVehicleModel([FromBody]CreateVehicleModelReq createVehicleModelReq)
+        public async Task<IActionResult> CreateVehicleModel([FromBody] CreateVehicleModelReq createVehicleModelReq)
         {
             var id = await _vehicleModelService.CreateVehicleModelAsync(createVehicleModelReq);
             return Ok(new
@@ -34,6 +36,7 @@ namespace API.Controllers
                 Id = id
             });
         }
+
         /*
          401: unauthorized
          403: not have permission
@@ -41,6 +44,7 @@ namespace API.Controllers
          --400: invalid type
          404: not found
          */
+
         [RoleAuthorize("Admin")]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicleModel([FromRoute] Guid id, UpdateVehicleModelReq updateVehicleModelReq)
@@ -52,16 +56,19 @@ namespace API.Controllers
         /*
          200: success
          */
+
         [HttpGet]
-        public async Task<IActionResult> GetAllVehicleModel([FromQuery]VehicleFilterReq vehicleFilterReq)
+        public async Task<IActionResult> GetAllVehicleModel([FromQuery] VehicleFilterReq vehicleFilterReq)
         {
             var verhicelModelView = await _vehicleModelService.GetAllVehicleModels(vehicleFilterReq);
             return Ok(verhicelModelView);
         }
+
         /*
          200: success
          404: not found
          */
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVehicelModelById([FromRoute] Guid id, Guid stationId,
                                                  DateTimeOffset startDate, DateTimeOffset endDate)
@@ -69,12 +76,14 @@ namespace API.Controllers
             var verhicelModelView = await _vehicleModelService.GetByIdAsync(id, stationId, startDate, endDate);
             return Ok(verhicelModelView);
         }
+
         /*
          401: unauthorized
          403: not have permission
          404: vehicle model not found
          200: success
          */
+
         [RoleAuthorize("Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicleModel([FromRoute] Guid id)
@@ -82,7 +91,5 @@ namespace API.Controllers
             await _vehicleModelService.DeleteVehicleModleAsync(id);
             return Ok();
         }
-
-        
     }
 }
