@@ -13,13 +13,13 @@ namespace Application.Dtos.Invoice.Response
     {
         public Guid Id { get; set; }
         public IEnumerable<InvoiceItemViewRes> InvoiceItems { get; set; }
-        public DepositViewRes Deposit { get; set; }
+        public DepositViewRes? Deposit { get; set; }
         public decimal Subtotal { get; set; }
         public decimal Tax { get; set; }
         public decimal Total { get; set; }
-        public decimal PayAmount { get; set; } = 0;
-        public PaymentMethod? PaymentMentod { get; set; } = null;
-        public string Notes { get; set; }
+        public decimal PaidAmount { get; set; }
+        public int? PaymentMethod { get; set; } = null;
+        public string? Notes { get; set; }
         public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
         public DateTimeOffset? PaidAt { get; set; } = null;
         public Guid? CheckListId { get; set; } = null;

@@ -24,7 +24,9 @@ namespace Infrastructure.Repositories
             IQueryable<Invoice> query = _dbContext.Invoices.AsQueryable();
             if (includeItems)
             {
-                query = query.Include(i => i.InvoiceItems);
+                query = query.Include(i => i.InvoiceItems)
+                    .ThenInclude(i => i.ChecklistItem)
+                        .ThenInclude(cli => cli.Component);
             }
             if (includeDeposit)
             {

@@ -21,16 +21,7 @@ export function CardVehicalStyled({ vehicleModel }: { vehicleModel: VehicleModel
     const { t } = useTranslation()
 
     return (
-        <CardStyled
-            // isPressable
-            // key={vehicleModel.id}
-            // onPress={() => {
-            //     router.prefetch(`/vehicle-rental/detail/${vehicleModel.id}`)
-            //     router.push(`/vehicle-rental/detail/${vehicleModel.id}`)
-            // }}
-            className="hover:shadow-xl interactive-scale"
-            shadow="sm"
-        >
+        <CardStyled className="hover:shadow-xl interactive-scale" shadow="sm">
             <CardBody className="overflow-visible ">
                 <Image
                     alt={vehicleModel.name}
@@ -48,10 +39,7 @@ export function CardVehicalStyled({ vehicleModel }: { vehicleModel: VehicleModel
             </CardBody>
 
             <CardFooter className="flex flex-col text-small justify-between">
-                {/* <div className="flex flex-col  w-full"> */}
                 <div className="flex justify-between items-center text-2xl mb-2">
-                    {/* <b className="text-2xl">{brand}</b> <br />
-                            <b className="text-2xl">{model}</b> */}
                     <b>{vehicleModel.name}</b>
                 </div>
                 {/* </div> */}
@@ -64,8 +52,6 @@ export function CardVehicalStyled({ vehicleModel }: { vehicleModel: VehicleModel
 
                     <span className="text-black">{"   " + t("vehicle_model.vnd_per_day")}</span>
                 </div>
-                {/* <hr className="bg-gray-300 border w-full m-1" /> */}
-                {/* <hr className=" text-gray-300 border-1 w-full m-1" /> */}
                 {/* segmentName */}
                 <div className="grid grid-cols-2 gap-2 mt-2 mr-0 max-w-60 w-full">
                     <div className="flex gap-2 ">

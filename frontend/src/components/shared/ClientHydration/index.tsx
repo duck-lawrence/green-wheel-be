@@ -12,6 +12,11 @@ export function ClientHydration({ children }: { children: React.ReactNode }) {
         hydrate()
     }, [hydrate])
 
-    if (!isHydrated) return <Spinner />
+    if (!isHydrated)
+        return (
+            <div className="text-center">
+                <Spinner />
+            </div>
+        )
     return <>{children}</>
 }

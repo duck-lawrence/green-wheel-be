@@ -25,4 +25,5 @@ public partial class Station : SorfDeletedEntity, IEntity
     public virtual ICollection<StationFeedback> StationFeedbacks { get; set; } = new List<StationFeedback>();
 
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
+    public virtual ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();
 }

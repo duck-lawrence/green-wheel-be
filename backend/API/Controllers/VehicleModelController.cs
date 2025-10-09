@@ -1,6 +1,7 @@
 ﻿using API.Filters;
 using Application;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.VehicleModel.Request;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -25,8 +26,7 @@ namespace API.Controllers
          --400: invalid type
          200: success
          */
-
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize(RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateVehicleModel([FromBody] CreateVehicleModelReq createVehicleModelReq)
         {
@@ -44,8 +44,7 @@ namespace API.Controllers
          --400: invalid type
          404: not found
          */
-
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize(RoleName.Admin)]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicleModel([FromRoute] Guid id, UpdateVehicleModelReq updateVehicleModelReq)
         {
@@ -83,8 +82,7 @@ namespace API.Controllers
          404: vehicle model not found
          200: success
          */
-
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize(RoleName.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicleModel([FromRoute] Guid id)
         {
