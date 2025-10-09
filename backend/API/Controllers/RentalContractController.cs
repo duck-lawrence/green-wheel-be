@@ -113,5 +113,21 @@ namespace API.Controllers
             return Ok();
 
         }
+
+        /*
+         * Status code
+         * 404 contract not found
+         * 200 success
+         */
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPut("{id}/return")]
+        public async Task<IActionResult> ReturnRentalContract(Guid id)
+        {
+            var staff = HttpContext.User;
+            var invoiceView = await _rentalContractService.ReturnRentalContractAsync(staff, id);
+            return invoiceView == null ? Ok() : Ok(invoiceView);
+        }
+
+        
     }
 }

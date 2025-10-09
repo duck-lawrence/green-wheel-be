@@ -1,4 +1,5 @@
 ﻿using API.Filters;
+using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.VehicleChecklist.Request;
@@ -17,15 +18,20 @@ namespace API.Controllers
         {
             _vehicleChecklistService = vehicleChecklistService;
         }
-
+        /* 
+         * status code
+         * 200 success
+         * 
+         */
         [HttpPost]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
-            var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklistAsync(staff, req);
+            var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklist(staff, req);
             return Ok(vehicleCheckList);
         }
+
         [HttpPut]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> UpdateVehicleChecklist([FromBody]UpdateVehicleChecklistReq req)
@@ -41,5 +47,6 @@ namespace API.Controllers
             var checklistViewRes = await _vehicleChecklistService.GetByIdAsync(id);
             return Ok(checklistViewRes);
         }
+
     }
 }

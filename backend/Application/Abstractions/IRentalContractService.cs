@@ -1,4 +1,5 @@
-﻿using Application.Dtos.RentalContract.Request;
+﻿using Application.Dtos.Invoice.Response;
+using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Domain.Entities;
 using System;
@@ -17,5 +18,6 @@ namespace Application.Abstractions
         Task UpdateStatus(RentalContract rentalContract, int status);
         Task<IEnumerable<RentalContractForStaffViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null);
         Task HandoverRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
+        Task<InvoiceViewRes?> ReturnRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
     }
 }
