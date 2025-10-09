@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251008102802_updateContractTable")]
-    partial class updateContractTable
+    [Migration("20251009144336_refactorDb")]
+    partial class refactorDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -183,11 +183,6 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("description");
 
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier")
@@ -463,10 +458,6 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("(newid())");
 
-                    b.Property<Guid?>("ChecklistId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("checklist_id");
-
                     b.Property<Guid>("ContractId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("contract_id");
@@ -517,10 +508,6 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex(new[] { "ContractId" }, "idx_invoices_contract_id");
 
-                    b.HasIndex(new[] { "ChecklistId" }, "uq_invoices_checklist_id")
-                        .IsUnique()
-                        .HasFilter("([checklist_id] IS NOT NULL)");
-
                     b.ToTable("invoices", (string)null);
                 });
 
@@ -549,11 +536,6 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("invoice_id");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("notes");
 
                     b.Property<int>("Quantity")
                         .ValueGeneratedOnAdd()
@@ -1289,10 +1271,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("description");
+                    b.Property<Guid?>("InvoiceId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("invoice_id");
 
                     b.Property<bool>("IsSignedByCustomer")
                         .HasColumnType("bit")
@@ -1318,6 +1299,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__vehicle___3213E83F5B95E7CD");
+
+                    b.HasIndex("InvoiceId");
 
                     b.HasIndex(new[] { "ContractId" }, "idx_vehicle_checklists_contract_id");
 
@@ -1680,18 +1663,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Invoice", b =>
                 {
-                    b.HasOne("Domain.Entities.VehicleChecklist", "Checklist")
-                        .WithOne("Invoice")
-                        .HasForeignKey("Domain.Entities.Invoice", "ChecklistId")
-                        .HasConstraintName("fk_invoices_checklists");
-
                     b.HasOne("Domain.Entities.RentalContract", "Contract")
                         .WithMany("Invoices")
                         .HasForeignKey("ContractId")
                         .IsRequired()
                         .HasConstraintName("fk_invoices_contracts");
-
-                    b.Navigation("Checklist");
 
                     b.Navigation("Contract");
                 });
@@ -1774,7 +1750,7 @@ namespace Infrastructure.Migrations
                         .HasConstraintName("fk_rental_contracts_return_staffs");
 
                     b.HasOne("Domain.Entities.Station", "Station")
-                        .WithMany()
+                        .WithMany("RentalContracts")
                         .HasForeignKey("StationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1918,6 +1894,10 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CustomerId")
                         .HasConstraintName("fk_vehicle_checklists_users");
 
+                    b.HasOne("Domain.Entities.Invoice", "Invoice")
+                        .WithMany()
+                        .HasForeignKey("InvoiceId");
+
                     b.HasOne("Domain.Entities.Staff", "Staff")
                         .WithMany("VehicleChecklists")
                         .HasForeignKey("StaffId")
@@ -1933,6 +1913,8 @@ namespace Infrastructure.Migrations
                     b.Navigation("Contract");
 
                     b.Navigation("Customer");
+
+                    b.Navigation("Invoice");
 
                     b.Navigation("Staff");
 
@@ -2035,6 +2017,8 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("DispatchRequestToStations");
 
+                    b.Navigation("RentalContracts");
+
                     b.Navigation("Staff");
 
                     b.Navigation("StationFeedbacks");
@@ -2077,8 +2061,6 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.VehicleChecklist", b =>
                 {
-                    b.Navigation("Invoice");
-
                     b.Navigation("VehicleChecklistItems");
                 });
 

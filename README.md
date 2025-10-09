@@ -1,5 +1,6 @@
-# [Green Wheel]
-
+<p align="center">
+  <img src="docs/green-wheel-text.svg" alt="Green Wheel" >
+</p>
 <!-- [![backend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml) [![frontend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml) -->
 
 ## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
@@ -184,20 +185,6 @@ When using the manual approach, ensure SQL Server and Redis are running locally 
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\01-schema.sql
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\02-seeding.sql
 ```
-
-## Development Workflow
-
-- **Linting:** `npm run lint` (Next.js + ESLint + TypeScript rules)
-- **Frontend build:** `npm run build` / `npm run start`
-- **Backend build:** `dotnet build` or `dotnet publish -c Release`
-- **Environment loading:** `DotNetEnv` hydrates configuration from `.env`; secrets can be promoted to production vaults.
-- **Error handling:** `GlobalErrorHandlerMiddleware` wraps HTTP responses and logs; validation errors bubble via `ValidationFilter`.
-- **Caching:** Roles and OTP flows use Redis/in-memory caches. Clear Redis when changing critical auth data in dev.
-- **Tests:** Automated tests are not yet defined. Add unit/integration test projects under `backend/` and jest/vitest suites for the frontend as the next improvement.
-
-## Documentation & Assets
-
-Design artefacts (system architecture, CI/CD workflow, and ERD diagrams) accompany the project documentation package shared with the repository. Place them under a `docs/` directory (e.g., `docs/system-architecture.png`) to surface them in the README if you need in-repo previews.
 
 ## Project Credits
 

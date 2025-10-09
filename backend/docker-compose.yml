@@ -28,8 +28,10 @@ services:
             - greenwheel_redis_data:/data
 
     mssql:
+        build:
+            context: .
+            dockerfile: mssql.Dockerfile
         container_name: greenwheel-mssql
-        image: mcr.microsoft.com/mssql/server:2022-latest
         ports:
             - "${MSSQL_PORT}:1433"
         environment:
@@ -37,6 +39,7 @@ services:
             MSSQL_SA_PASSWORD: ${MSSQL_PASSWORD}
         volumes:
             - greenwheel_mssql_data:/var/opt/mssql
+            - ../init-db:/init-db
 
 volumes:
     greenwheel_redis_data:

@@ -167,8 +167,7 @@ namespace Application
                 Type = (int)InvoiceItemType.BaseRental,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow,
-                DeletedAt = null,
-                Notes = InvoiceItemNote
+                DeletedAt = null
 
             };
             await _uow.InvoiceItemRepository.AddRangeAsync([items]);
@@ -188,8 +187,7 @@ namespace Application
                 Status = (int)DepositStatus.Pending,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow,
-                DeletedAt = null,
-                Description = $"Refundable deposit for vehicle model {model.Name}"
+                DeletedAt = null
             };
             
             await _uow.DepositRepository.AddAsync(deposit);

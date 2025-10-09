@@ -1,5 +1,5 @@
 import { DamageStatus } from "@/constants/enum"
-import { VehicleComponentViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleComponentViewRes } from "@/models/vehicle/schema/response"
 
 export type VehicleChecklistViewRes = {
     id: string
