@@ -1,4 +1,5 @@
 ﻿using Application.Constants;
+using Application.Dtos.VehicleChecklistItem.Respone;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,6 @@ namespace Application.Dtos.InvoiceItem.Response
         public string Notes { get; set; }
         public decimal SubTotal { get; set; }
         public int Type { get; set; } = (int)InvoiceItemType.BaseRental;
-        public Guid? CheckListItemId { get; set; } = null;
+        public VehicleChecklistItemViewRes? ChecklistItem { get; set; } = null;
     }
 }

@@ -67,7 +67,7 @@ namespace API.Controllers
                 await _userService.Logout(refreshToken);
                 return Ok();
             }
-            return Unauthorized(Message.UserMessage.Unauthorized);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -118,10 +118,7 @@ namespace API.Controllers
                     AccessToken = accessToken
                 });
             }
-            else
-            {
-                return Unauthorized(Message.UserMessage.InvalidToken);
-            }
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -187,7 +184,7 @@ namespace API.Controllers
                 await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
                 return Ok();
             }
-            return Unauthorized(Message.UserMessage.InvalidToken);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -208,7 +205,7 @@ namespace API.Controllers
                     AccessToken = accessToken
                 });
             }
-            return Unauthorized(Message.UserMessage.Unauthorized);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         [HttpPost("login-google")]
@@ -242,7 +239,7 @@ namespace API.Controllers
                     AccessToken = accesstoken
                 });
             }
-            return BadRequest();
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         [HttpGet("me")]

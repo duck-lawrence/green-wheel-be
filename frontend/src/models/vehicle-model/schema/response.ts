@@ -1,5 +1,5 @@
-import { Brand } from "@/models/brand/brand"
-import VehicleSegment from "@/models/vehicle-segment/vehicle-segment"
+import { BrandViewRes } from "@/models/brand/schema/response"
+import { VehicleSegmentViewRes } from "@/models/vehicle-segment/schema/response"
 
 export type VehicleModelViewRes = {
     id: string
@@ -13,9 +13,15 @@ export type VehicleModelViewRes = {
     batteryCapacity: number
     ecoRangeKm: number
     sportRangeKm: number
-    brand: Brand
-    segment: VehicleSegment
+    brand: BrandViewRes
+    segment: VehicleSegmentViewRes
     imageUrl?: string
     imageUrls?: string[]
     availableVehicleCount: number
+}
+
+export type VehicleComponentViewRes = {
+    id: string
+    name: string
+    description: string
 }
