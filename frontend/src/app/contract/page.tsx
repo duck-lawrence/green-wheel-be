@@ -2,7 +2,13 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import { ButtonStyled, InputStyled, TextareaStyled } from "@/components"
+import {
+    AccordionStyled,
+    AccoredionSyled,
+    ButtonStyled,
+    InputStyled,
+    TextareaStyled
+} from "@/components"
 import {
     Car,
     IdentificationBadge,
@@ -15,6 +21,32 @@ import {
 } from "@phosphor-icons/react"
 
 export default function RentalContractPage() {
+    const accordion = [
+        {
+            key: "1",
+            ariaLabel: "Accordion 1",
+            title: "Accordion 1",
+            value: "content 1 "
+        },
+        {
+            key: "2",
+            ariaLabel: "Accordion 2",
+            title: "Accordion 2",
+            value: "content 2 "
+        },
+        {
+            key: "3",
+            ariaLabel: "Accordion3",
+            title: "Accordion 3",
+            value: "content 3 "
+        },
+        {
+            key: "4",
+            ariaLabel: "Accordion 4",
+            title: "Accordion 4",
+            value: "content 4 "
+        }
+    ]
     return (
         <div className="min-h-screen flex items-center justify-center dark:bg-gray-950 py-16 px-4">
             <motion.div
@@ -196,6 +228,7 @@ export default function RentalContractPage() {
                     </ButtonStyled>
                 </div>
             </motion.div>
+            <AccordionStyled items={accordion} />
         </div>
     )
 }

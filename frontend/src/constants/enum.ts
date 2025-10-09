@@ -54,7 +54,7 @@ export enum InvoiceItemType {
     Damage = 1,
     LateReturn = 2,
     Cleaning = 3,
-    Penalty = 4,
+    Penalty = 4, //PHẠT NGUỘI
     Other = 5
 }
 
