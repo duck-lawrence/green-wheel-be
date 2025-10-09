@@ -14,7 +14,7 @@ namespace Application.Mappers
         public StationFeedbackProfile()
         {
             CreateMap<StationFeedback, StationFeedbackRes>().ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.FirstName));
-            CreateMap<StationFeedback, Sta>
+            CreateMap<StationFeedbackCreateReq, StationFeedback>();
         }
     }
 }
