@@ -1,26 +1,43 @@
 "use client"
 import { Checkbox, Divider, Link } from "@heroui/react"
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useTranslation } from "react-i18next"
+import { usePathname, useRouter } from "next/navigation"
 import { ButtonStyled, ButtonToggleVisibility, InputStyled, LogoStyle } from "@/components"
 import {
+    useGetMe,
+    useTokenStore,
     useForgotPasswordDiscloresureSingleton,
     useLogin,
     useLoginDiscloresureSingleton,
     useRegisterDiscloresureSingleton
 } from "@/hooks"
 import { GoogleLoginButton } from "./GoogleLoginButton"
+import { ROLE_ADMIN, ROLE_STAFF } from "@/constants/constants"
 
 export function LoginForm({ onSuccess }: { onSuccess?: () => void }) {
     const { t } = useTranslation()
+    const router = useRouter()
+    const pathname = usePathname()
     const [isVisible, setIsVisible] = useState(false)
     const [rememberMe, setRememberMe] = useState(true)
     const loginMutation = useLogin({ rememberMe, onSuccess })
+    const accessToken = useTokenStore((s) => s.accessToken)
+    const { data: currentUser } = useGetMe({ enabled: Boolean(accessToken) })
     const { onClose: onCloseLogin } = useLoginDiscloresureSingleton()
     const { onOpen: onOpenRegister } = useRegisterDiscloresureSingleton()
     const { onOpen: onOpenForgot } = useForgotPasswordDiscloresureSingleton()
+
+    useEffect(() => {
+        if (!currentUser) return
+        const roleName = currentUser.role?.name
+        const isStaffOrAdmin = roleName === ROLE_ADMIN || roleName === ROLE_STAFF
+        if (!isStaffOrAdmin) return
+        if (pathname.startsWith("/dashboard")) return
+        router.replace("/dashboard")
+    }, [currentUser, pathname, router])
 
     // function
     const toggleVisibility = () => setIsVisible(!isVisible)
