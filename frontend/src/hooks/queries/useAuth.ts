@@ -4,7 +4,7 @@ import { authApi } from "@/services/authApi"
 import { useMutation } from "@tanstack/react-query"
 import { BackendError } from "@/models/common/response"
 // import { UserProfileViewRes } from "@/models/user/schema/response"
-import { useInvalidateMeQuery, useProfileStore, useTokenStore } from "@/hooks"
+import { useInvalidateMeQuery, useTokenStore } from "@/hooks"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 
 // ===== Login and logout =====
@@ -28,9 +28,7 @@ export const useLogin = ({
             toast.success(t("success.login"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -38,7 +36,6 @@ export const useLogin = ({
 export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
-    const removeUser = useProfileStore((s) => s.removeUser)
     const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
@@ -46,14 +43,11 @@ export const useLogout = ({ onSuccess }: { onSuccess?: () => void }) => {
         onSuccess: () => {
             onSuccess?.()
             removeAccessToken()
-            removeUser()
             invalidateAuthQuery()
             toast.success(t("success.logout"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -69,7 +63,6 @@ export const useLoginGoogle = ({
 }) => {
     const { t } = useTranslation()
     const setAccessToken = useTokenStore((s) => s.setAccessToken)
-    const setUser = useProfileStore((s) => s.setUser)
     const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
@@ -80,19 +73,12 @@ export const useLoginGoogle = ({
                 invalidateAuthQuery()
                 toast.success(t("success.login"))
             } else {
-                setUser({
-                    email: "",
-                    firstName: data.firstName || "",
-                    lastName: data.lastName || ""
-                })
                 onNeedSetPassword()
             }
             onSuccess?.()
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -111,9 +97,7 @@ export const useSetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
             toast.success(t("success.login"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -126,9 +110,7 @@ export const useRegister = ({ onSuccess }: { onSuccess?: () => void }) => {
         mutationFn: authApi.register,
         onSuccess: onSuccess,
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -140,9 +122,7 @@ export const useRegisterVerify = ({ onSuccess }: { onSuccess?: () => void }) => 
         mutationFn: authApi.registerVerify,
         onSuccess: onSuccess,
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -161,9 +141,7 @@ export const useRegisterComplete = ({ onSuccess }: { onSuccess?: () => void }) =
             toast.success(t("success.register"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -176,9 +154,7 @@ export const useForgotPassword = ({ onSuccess }: { onSuccess?: () => void }) => 
         mutationFn: authApi.forgotPassword,
         onSuccess: onSuccess,
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -190,9 +166,7 @@ export const useForgotPasswordVerify = ({ onSuccess }: { onSuccess?: () => void 
         mutationFn: authApi.forgotPasswordVerify,
         onSuccess: onSuccess,
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -207,9 +181,7 @@ export const useResetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
             toast.success(t("success.reset_password"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -217,64 +189,18 @@ export const useResetPassword = ({ onSuccess }: { onSuccess?: () => void }) => {
 export const useChangePassword = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const removeAccessToken = useTokenStore((s) => s.removeAccessToken)
-    const removeUser = useProfileStore((s) => s.removeUser)
     const invalidateAuthQuery = useInvalidateMeQuery()
 
     return useMutation({
         mutationFn: authApi.changePassword,
         onSuccess: () => {
             removeAccessToken()
-            removeUser()
             invalidateAuthQuery()
             onSuccess?.()
             toast.success(t("success.change_password"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
-
-// export const useAuth = () => {
-//     return useQuery({
-//         queryKey: [QUERY_KEY.AUTH],
-//         queryFn: async () => {
-//             try {
-//                 const profile = await profileApi.getMe()
-//                 const roleFromObject =
-//                     typeof (profile as { role?: unknown }).role === "object"
-//                         ? (profile as { role?: { name?: string } }).role?.name
-//                         : undefined
-
-//                 let normalizedRole =
-//                     profile.role ?? roleFromObject ?? profile.roleDetail?.name ?? profile.roleId
-
-//                 return {
-//                     ...profile,
-//                     role: typeof normalizedRole === "string" ? normalizedRole : undefined,
-//                     roleId:
-//                         typeof normalizedRole === "string"
-//                             ? normalizedRole
-//                             : typeof profile.roleId === "string"
-//                             ? profile.roleId
-//                             : undefined,
-//                     roleDetail:
-//                         profile.roleDetail ??
-//                         (typeof profile.role === "object" && profile.role !== null
-//                             ? (profile.role as { id?: string; name?: string; description?: string })
-//                             : undefined)
-//                 }
-//             } catch (error) {
-//                 const backendError = error as BackendError
-//                 if (backendError?.status === 401) {
-//                     return undefined
-//                 }
-//                 throw error
-//             }
-//         },
-//         retry: false,
-//         staleTime: Infinity
-//     })
-// }

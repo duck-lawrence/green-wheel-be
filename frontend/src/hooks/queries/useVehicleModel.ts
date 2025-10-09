@@ -33,11 +33,12 @@ export const useGetVehicleModelById = ({
 }) => {
     const queryClient = useQueryClient()
     return useQuery({
-        queryKey: [...QUERY_KEYS.VEHICLE_MODEL(modelId), query],
+        queryKey: [...QUERY_KEYS.VEHICLE_MODELS, modelId, query],
         queryFn: () => vehicleModelApi.getById({ modelId, query }),
         initialData: () => {
             const cachedList = queryClient.getQueryData<VehicleModelViewRes[]>([
-                QUERY_KEYS.VEHICLE_MODELS,
+                ...QUERY_KEYS.VEHICLE_MODELS,
+                modelId,
                 query
             ])
             return cachedList?.find((v) => v.id === modelId)

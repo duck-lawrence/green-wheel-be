@@ -67,6 +67,7 @@ export function Navbar() {
         "data-[active=true]:after:rounded-[2px]",
         "data-[active=true]:after:bg-primary"
     ]
+
     const menus = [
         { key: "home", label: t("navbar.home") },
         { key: "vehicle-rental", label: t("navbar.vehicle_rental") },
@@ -85,7 +86,7 @@ export function Navbar() {
             if (y >= 0 && y < 10) {
                 nextScrollState = "default"
                 // nextHidden = false
-            } else if (y >= 10 && y < 600) {
+            } else if (y >= 10 && y < 70) {
                 nextScrollState = "top"
                 // nextHidden = false
             } else {
@@ -98,7 +99,7 @@ export function Navbar() {
             //     prev === nextHidden ? prev : nextHidden
             // )
 
-            if (y < 600) {
+            if (y < 70) {
                 setIsHiddenNavbar(false)
             } else {
                 if (y > lastScrollY) {

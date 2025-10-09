@@ -6,7 +6,8 @@ export const useGetAllStations = ({ enabled = true }: { enabled?: boolean } = {}
     const query = useQuery({
         queryKey: QUERY_KEYS.STATIONS,
         queryFn: stationApi.getAll,
-        enabled
+        enabled,
+        refetchOnWindowFocus: false
     })
     return query
 }
