@@ -281,7 +281,7 @@ namespace Application
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(token))
             {
-                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             //------------------------
             var user = _mapper.Map<User>(userRegisterReq); //map từ một RegisterUserDto sang user
@@ -366,7 +366,7 @@ namespace Application
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(forgotPasswordToken))
             {
-                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             //------------------------
             var claims = JwtHelper.VerifyToken(forgotPasswordToken, _jwtSettings.ForgotPasswordTokenSecret,
@@ -377,7 +377,7 @@ namespace Application
             var userFromDB = await _userRepository.GetByEmailAsync(email);
             if (userFromDB == null)
             {
-                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             await _refreshTokenRepository.RevokeRefreshTokenByUserID(userFromDB.Id.ToString());
             userFromDB.Password = PasswordHelper.HashPassword(password);
@@ -423,7 +423,7 @@ namespace Application
                 RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
                 if (refreshTokenFromDB == null)
                 {
-                    throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+                    throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
                 }
                 string newAccessToken = GenerateAccessToken(refreshTokenFromDB.UserId);
                 string newRefreshToken = await GenerateRefreshToken(refreshTokenFromDB.UserId, claims);
@@ -432,7 +432,7 @@ namespace Application
                 return newAccessToken;
             }
 
-            throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         public async Task<Dictionary<string, string>> LoginWithGoogle(string email)
@@ -470,7 +470,7 @@ namespace Application
             //----check in black list
             if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
             {
-                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
             //------------------------
             var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),

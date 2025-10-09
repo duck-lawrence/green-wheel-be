@@ -1,5 +1,6 @@
 ﻿using API.Filters;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.VehicleChecklist.Request;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
@@ -26,7 +27,7 @@ namespace API.Controllers
             return Ok(vehicleCheckList);
         }
         [HttpPut]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> UpdateVehicleChecklist([FromBody]UpdateVehicleChecklistReq req)
         {
             await _vehicleChecklistService.UpdateVehicleChecklistAsync(req);
@@ -34,7 +35,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> GetById(Guid id)
         {
             var checklistViewRes = await _vehicleChecklistService.GetByIdAsync(id);

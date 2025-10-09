@@ -51,7 +51,6 @@ axiosInstance.interceptors.response.use(
 
                 return axiosInstance(originalRequest)
             } catch (refreshError) {
-                // toast.error(i18n.t("login.please_login"))
                 return Promise.reject(refreshError)
             }
         }

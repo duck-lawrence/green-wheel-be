@@ -328,17 +328,20 @@ CREATE TABLE [rental_contracts] (
     [customer_id] uniqueidentifier NOT NULL,
     [handover_staff_id] uniqueidentifier,
     [return_staff_id] uniqueidentifier,
+    [station_id] uniqueidentifier NOT NULL,
 
     CONSTRAINT fk_rental_contracts_vehicles FOREIGN KEY ([vehicle_id]) REFERENCES [vehicles]([id]),
     CONSTRAINT fk_rental_contracts_customers FOREIGN KEY ([customer_id]) REFERENCES [users]([id]),
     CONSTRAINT fk_rental_contracts_handover_staffs FOREIGN KEY ([handover_staff_id]) REFERENCES [staffs]([user_id]),
-    CONSTRAINT fk_rental_contracts_return_staffs FOREIGN KEY ([return_staff_id]) REFERENCES [staffs]([user_id])
+    CONSTRAINT fk_rental_contracts_return_staffs FOREIGN KEY ([return_staff_id]) REFERENCES [staffs]([user_id]),
+    CONSTRAINT fk_rental_contracts_stations FOREIGN KEY ([station_id]) REFERENCES [stations]([id])
 );
 GO
 CREATE INDEX idx_rental_contracts_vehicle_id ON rental_contracts (vehicle_id);
 CREATE INDEX idx_rental_contracts_customer_id ON rental_contracts (customer_id);
 CREATE INDEX idx_rental_contracts_handover_staff_id ON rental_contracts (handover_staff_id);
 CREATE INDEX idx_rental_contracts_return_staff_id ON rental_contracts (return_staff_id);
+CREATE INDEX idx_rental_contracts_station_id ON rental_contracts (station_id);
 GO
 
 CREATE TABLE [vehicle_checklists] (
