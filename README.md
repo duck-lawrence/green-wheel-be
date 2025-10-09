@@ -186,20 +186,6 @@ sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\01-schem
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\02-seeding.sql
 ```
 
-## Development Workflow
-
-- **Linting:** `npm run lint` (Next.js + ESLint + TypeScript rules)
-- **Frontend build:** `npm run build` / `npm run start`
-- **Backend build:** `dotnet build` or `dotnet publish -c Release`
-- **Environment loading:** `DotNetEnv` hydrates configuration from `.env`; secrets can be promoted to production vaults.
-- **Error handling:** `GlobalErrorHandlerMiddleware` wraps HTTP responses and logs; validation errors bubble via `ValidationFilter`.
-- **Caching:** Roles and OTP flows use Redis/in-memory caches. Clear Redis when changing critical auth data in dev.
-- **Tests:** Automated tests are not yet defined. Add unit/integration test projects under `backend/` and jest/vitest suites for the frontend as the next improvement.
-
-## Documentation & Assets
-
-Design artefacts (system architecture, CI/CD workflow, and ERD diagrams) accompany the project documentation package shared with the repository. Place them under a `docs/` directory (e.g., `docs/system-architecture.png`) to surface them in the README if you need in-repo previews.
-
 ## Project Credits
 
 <div align="center">
