@@ -16,8 +16,6 @@ public partial class InvoiceItem : SorfDeletedEntity, IEntity
 
     public decimal UnitPrice { get; set; }
 
-    public string? Notes { get; set; }
-
     public int Type { get; set; }
 
     public Guid InvoiceId { get; set; }

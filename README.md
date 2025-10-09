@@ -1,5 +1,6 @@
-# [Green Wheel](https://www.greenwheel.vn/)
-
+<p align="center">
+  <img src="docs/green-wheel-text.svg" alt="Green Wheel" >
+</p>
 <!-- [![backend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml) [![frontend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml) -->
 
 ## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
@@ -12,58 +13,32 @@ Green Wheel is a self-drive vehicle rental platform that connects a customer-fac
 #### 🖥️ Frontend
 
 ![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![npm](https://img.shields.io/badge/npm-9%2B-CB3837?style=for-the-badge&logo=npm&logoColor=white)
-![ESLint 9](https://img.shields.io/badge/ESLint-9-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white)
-![Prettier Config](https://img.shields.io/badge/Prettier-Config-F7B93E?style=for-the-badge&logo=prettier&logoColor=black)
-![TypeScript%20ESLint](https://img.shields.io/badge/TypeScript-ESLint-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-
 
 #### 🧠 Backend
 
 ![.NET 8](https://img.shields.io/badge/.NET-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
-![Entity Framework Core](https://img.shields.io/badge/Entity%20Framework%20Core-68217A?style=for-the-badge&logo=efcore&logoColor=white)
-![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
-
+![EF Core](https://img.shields.io/badge/Entity%20Framework%20Core-68217A?style=for-the-badge&logo=efcore&logoColor=white)
 
 #### 🛢️ Database & Cache
 
-![Microsoft SQL Server 2022](https://img.shields.io/badge/Microsoft%20SQL%20Server-2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
+![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-![Cloudinary Media Storage](https://img.shields.io/badge/Cloudinary-Media%20Storage-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 
+#### ☁️ Infrastructure & External Services
 
-#### ☁️ Infrastructure & Cloud Services
-
-
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
-![Mailgun](https://img.shields.io/badge/Mailgun-EA4335?style=for-the-badge&logo=mailgun&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Google One Tap](https://img.shields.io/badge/Google_One_Tap-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![SMTP](https://img.shields.io/badge/SMTP_Email-0078D4?style=for-the-badge&logo=gmail&logoColor=white)
+![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)
 ![Gemini AI API](https://img.shields.io/badge/Gemini_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Momo Gateway](https://img.shields.io/badge/MoMo_Payment-DD0A73?style=for-the-badge)
 
-#### 🚀 DevOps / Monitoring / CI-CD
-
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Docker Compose](https://img.shields.io/badge/Docker_Compose-1488C6?style=for-the-badge&logo=docker&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
-![DockerHub](https://img.shields.io/badge/DockerHub-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
-
 #### ⚙️ Dev Tools
 
-![Visual Studio](https://img.shields.io/badge/Visual_Studio-5C2D91?style=for-the-badge&logo=visualstudio&logoColor=white)
-![VS Code](https://img.shields.io/badge/VS_Code-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white)
-![GitHub Desktop](https://img.shields.io/badge/GitHub_Desktop-FFFFFF?style=for-the-badge&logo=github&logoColor=blue)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)
-![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)
-
-
 
 ## Repository Overview
 
@@ -210,20 +185,6 @@ When using the manual approach, ensure SQL Server and Redis are running locally 
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\01-schema.sql
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\02-seeding.sql
 ```
-
-## Development Workflow
-
-- **Linting:** `npm run lint` (Next.js + ESLint + TypeScript rules)
-- **Frontend build:** `npm run build` / `npm run start`
-- **Backend build:** `dotnet build` or `dotnet publish -c Release`
-- **Environment loading:** `DotNetEnv` hydrates configuration from `.env`; secrets can be promoted to production vaults.
-- **Error handling:** `GlobalErrorHandlerMiddleware` wraps HTTP responses and logs; validation errors bubble via `ValidationFilter`.
-- **Caching:** Roles and OTP flows use Redis/in-memory caches. Clear Redis when changing critical auth data in dev.
-- **Tests:** Automated tests are not yet defined. Add unit/integration test projects under `backend/` and jest/vitest suites for the frontend as the next improvement.
-
-## Documentation & Assets
-
-Design artefacts (system architecture, CI/CD workflow, and ERD diagrams) accompany the project documentation package shared with the repository. Place them under a `docs/` directory (e.g., `docs/system-architecture.png`) to surface them in the README if you need in-repo previews.
 
 ## Project Credits
 
