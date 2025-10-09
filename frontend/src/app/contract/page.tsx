@@ -2,38 +2,51 @@
 
 import React from "react"
 import { motion } from "framer-motion"
-import { AccordionStyled, ButtonStyled, InputStyled, TextareaStyled } from "@/components"
+import { AccordionStyled, InputStyled, TextareaStyled } from "@/components"
 import {
     Car,
     IdentificationBadge,
-    User,
-    CalendarBlank,
     ClipboardText,
     ArrowsLeftRight,
     FileText,
     Invoice
 } from "@phosphor-icons/react"
-import InvoiceForm from "@/components/shared/InvoiceByType/InvoiceForm"
+import InvoiceRentalStartForm from "@/components/shared/InvoiceByType/InvoiceForm/InvoiceRentalStartForm"
+import InvoiceRentalEndForm from "@/components/shared/InvoiceByType/InvoiceForm/InvoiceRentalEndForm"
+import InvoiceDepositRefundForm from "@/components/shared/InvoiceByType/InvoiceForm/InvoiceDepositRefundForm"
+import InvoiceSupportDamageForm from "@/components/shared/InvoiceByType/InvoiceForm/InvoiceSupportDamageForm"
+import { InvoiceStatus } from "@/constants/enum"
+import { DatePicker } from "@heroui/react"
 
 export default function RentalContractPage() {
     const invoiceAccordion = [
         {
             key: "1",
-            ariaLabel: "Tiền cọc",
-            title: "Hóa đơn tiền cọc",
-            content: <InvoiceForm typeLabel="Tiền cọc" code="INV-DEP-001" />
+            ariaLabel: "Thanh toán khi nhận xe",
+            title: "Hóa đơn thanh toán khi nhận xe",
+            status: InvoiceStatus.Paid,
+            content: <InvoiceRentalStartForm />
         },
         {
             key: "2",
-            ariaLabel: "Thanh toán đợt 1",
-            title: "Hóa đơn thanh toán đợt 1",
-            content: <InvoiceForm typeLabel="Thanh toán đợt 1" code="INV-PAY-001" />
+            ariaLabel: "Thanh toán khi trả xe",
+            title: "Hóa đơn thanh toán khi trả xe",
+            status: InvoiceStatus.Pending,
+            content: <InvoiceRentalEndForm />
         },
         {
             key: "3",
-            ariaLabel: "Thanh toán hoàn tất",
-            title: "Hóa đơn thanh toán cuối cùng",
-            content: <InvoiceForm typeLabel="Hoàn tất" code="INV-FIN-001" />
+            ariaLabel: "Hoàn trả tiền cọc",
+            title: "Hóa đơn hoàn trả tiền cọc",
+            status: InvoiceStatus.Cancelled,
+            content: <InvoiceDepositRefundForm />
+        },
+        {
+            key: "4",
+            ariaLabel: "Chi phí hỗ trợ / hư hỏng",
+            title: "Hóa đơn hỗ trợ phát sinh khi xe gặp sự cố",
+            status: InvoiceStatus.Cancelled,
+            content: <InvoiceSupportDamageForm />
         }
     ]
 
@@ -53,9 +66,34 @@ export default function RentalContractPage() {
                     </p>
                 </div>
                 {/* Group 1 - Vehicle Info */}
-                <Section title="Thông tin xe">
+                <Section title="Thông tin hợp đồng thuê xe">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <InputStyled
+                            isReadOnly
+                            label="Mã hợp đồng"
+                            placeholder="INV-2025-0012"
+                            startContent={
+                                <Invoice size={22} className="text-primary" weight="duotone" />
+                            }
+                            variant="bordered"
+                            // className="sm:col-span-2"
+                        />
+                        <InputStyled
+                            isReadOnly
+                            label="Trạng thái hợp đồng"
+                            placeholder="Đang hoạt động / Hoàn thành / Hủy"
+                            startContent={
+                                <ClipboardText
+                                    size={22}
+                                    className="text-primary"
+                                    weight="duotone"
+                                />
+                            }
+                            variant="bordered"
+                        />
+
+                        <InputStyled
+                            isReadOnly
                             label="Tên xe"
                             placeholder="VinFast VF8"
                             startContent={
@@ -64,6 +102,7 @@ export default function RentalContractPage() {
                             variant="bordered"
                         />
                         <InputStyled
+                            isReadOnly
                             label="Biển số"
                             placeholder="51H-123.45"
                             startContent={
@@ -76,8 +115,9 @@ export default function RentalContractPage() {
                             variant="bordered"
                         />
                         <TextareaStyled
-                            label="Mô tả xe"
-                            placeholder="Xe mới, màu trắng, giao tại chi nhánh Quận 7..."
+                            isReadOnly
+                            label="Mô tả hợp đồng"
+                            placeholder=". . . "
                             variant="bordered"
                             className="sm:col-span-2"
                         />
@@ -85,7 +125,7 @@ export default function RentalContractPage() {
                 </Section>
 
                 {/* Group 2 - Customer Info */}
-                <Section title="Thông tin khách hàng">
+                {/* <Section title="Thông tin khách hàng">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <InputStyled
                             label="Tên khách hàng"
@@ -108,12 +148,17 @@ export default function RentalContractPage() {
                             variant="bordered"
                         />
                     </div>
-                </Section>
+                </Section> */}
 
                 {/* Group 3 - Rental Dates */}
                 <Section title="Thời gian thuê">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <InputStyled
+                        <DatePicker label="Ngày bắt đầu" isReadOnly />
+                        <DatePicker label="Ngày thực tế bắt đầu" isReadOnly />
+                        <DatePicker label="Ngày kết thúc" isReadOnly />
+                        <DatePicker label="Ngày thực tế kết thúc" isReadOnly />
+
+                        {/* <InputStyled
                             label="Ngày bắt đầu"
                             type="date"
                             startContent={
@@ -160,7 +205,7 @@ export default function RentalContractPage() {
                                 />
                             }
                             variant="bordered"
-                        />
+                        /> */}
                     </div>
                 </Section>
 
@@ -168,8 +213,10 @@ export default function RentalContractPage() {
                 <Section title="Nhân viên xử lý & Hóa đơn">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <InputStyled
+                            isReadOnly
                             label="Nhân viên bàn giao xe"
-                            placeholder="Trần Văn B"
+                            value="Gia Huy"
+                            placeholder="Nhân viên A"
                             startContent={
                                 <ArrowsLeftRight
                                     size={22}
@@ -180,8 +227,10 @@ export default function RentalContractPage() {
                             variant="bordered"
                         />
                         <InputStyled
+                            isReadOnly
                             label="Nhân viên nhận xe"
-                            placeholder="Lê Thị C"
+                            value="Gia Huy"
+                            placeholder="Nhân viên B"
                             startContent={
                                 <ArrowsLeftRight
                                     size={22}
@@ -191,7 +240,7 @@ export default function RentalContractPage() {
                             }
                             variant="bordered"
                         />
-                        <InputStyled
+                        {/* <InputStyled
                             label="Mã hóa đơn"
                             placeholder="INV-2025-0012"
                             startContent={
@@ -199,28 +248,11 @@ export default function RentalContractPage() {
                             }
                             variant="bordered"
                             className="sm:col-span-2"
-                        />
+                        /> */}
                     </div>
                 </Section>
 
                 {/* Action */}
-                <div className="mt-12 flex justify-center">
-                    <ButtonStyled
-                        size="lg"
-                        color="primary"
-                        className="px-12 py-3 font-semibold text-white rounded-xl 
-                       bg-gradient-to-r from-primary to-teal-400 
-                       hover:from-teal-500 hover:to-green-400 
-                       shadow-md transition-all duration-300"
-                    >
-                        Xác nhận hợp đồng
-                    </ButtonStyled>
-                </div>
-
-                {/* Invoice payment */}
-                <div>{/* <AccordionStyled items={} /> */}</div>
-
-                <p>=================</p>
 
                 {/* Các section thông tin hợp đồng */}
                 {/* ... phần Section của bạn giữ nguyên ... */}
@@ -231,7 +263,7 @@ export default function RentalContractPage() {
                 </Section>
 
                 {/* Nút hành động */}
-                <div className="mt-12 flex justify-center">
+                {/* <div className="mt-12 flex justify-center">
                     <ButtonStyled
                         size="lg"
                         color="primary"
@@ -242,7 +274,7 @@ export default function RentalContractPage() {
                     >
                         Xác nhận hợp đồng
                     </ButtonStyled>
-                </div>
+                </div> */}
             </motion.div>
         </div>
     )
