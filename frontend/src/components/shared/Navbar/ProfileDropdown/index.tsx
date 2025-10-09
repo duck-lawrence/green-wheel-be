@@ -50,8 +50,29 @@ export function ProfileDropdown() {
     const roleDetail = (user as Partial<{ roleDetail?: MaybeRoleDetail }> | null | undefined)
         ?.roleDetail
     const isStaff = normalizeRole(user?.role, roleDetail) === "staff"
+    const isAdmin = normalizeRole(user?.role, roleDetail) === "admin"
 
-    const baseItems: DropdownLinkItem[] = isStaff
+    const adminItems: DropdownLinkItem[] = isAdmin
+        ?[
+            {
+                key: "admin_management",
+                href: "/dashboard",
+                label: t("admin.dropdown_management") as string
+            },
+             {
+                  key: "staff_profile",
+                  href: "/profile",
+                  label: t("navbar.staff_profile") as string
+              }
+        ]    : [
+              { key: "profile", href: "/profile", label: t("user.profile") as string },
+              {
+                  key: "rental_contracts",
+                  href: "/profile/rental-contracts",
+                  label: t("user.rental_contracts") as string
+              }
+          ]
+    const staffItems: DropdownLinkItem[] = isStaff
         ? [
               {
                   key: "staff_management",
@@ -62,11 +83,6 @@ export function ProfileDropdown() {
                   key: "staff_profile",
                   href: "/profile",
                   label: t("navbar.staff_profile") as string
-              },
-              {
-                  key: "staff_contracts",
-                  href: "/dashboard/contracts",
-                  label: t("navbar.staff_contracts") as string
               }
           ]
         : [
@@ -79,10 +95,10 @@ export function ProfileDropdown() {
           ]
 
     const dropdownItems: DropdownLinkItem[] = [
-        ...baseItems,
+        ...(isAdmin ? adminItems : staffItems),
         { key: "logout", label: t("navbar.logout") as string, color: "danger" }
     ]
-
+    
     const handleLogout = useCallback(async () => {
         await logoutMutation.mutateAsync()
     }, [logoutMutation])

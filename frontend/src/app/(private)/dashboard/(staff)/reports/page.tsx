@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next"
 import { ButtonStyled, InputStyled, TextareaStyled, FormStyled, EnumPicker } from "@/components"
 import { useGetMe } from "@/hooks"
 import { StaffReportType } from "@/constants/enum"
+import { PaperPlaneTilt } from "@phosphor-icons/react"
 
 const REPORT_TYPE_VALUES = Object.values(StaffReportType).filter(
     (value): value is StaffReportType => typeof value === "number"
@@ -88,8 +89,8 @@ export default function StaffReportsPage() {
             </div>
             <p className="px-4 text-sm text-gray-500 mb-6">{t("staff.report_page_description")}</p>
 
-            <FormStyled onSubmit={formik.handleSubmit} className="space-y-6 items-center">
-                <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+            <FormStyled onSubmit={formik.handleSubmit} className="space-y-6 w-full">
+                <div className="grid w-full gap-4 md:grid-cols-[2fr_1fr]">
                     <InputStyled
                         className="w-full"
                         label={t("staff.report_form_staff_name_label")}
@@ -141,17 +142,18 @@ export default function StaffReportsPage() {
                             minRows={6}
                         />
                     </div>
-                </div>
-
-                <div className="flex justify-center">
-                    <ButtonStyled
-                        type="submit"
-                        color="primary"
-                        className="flex min-w-30 items-center justify-center px-6 py-3 text-white"
-                        isDisabled={!formik.isValid || formik.isSubmitting}
-                    >
-                        {t("staff.report_form_submit")}
-                    </ButtonStyled>
+                    <div className="md:col-span-2">
+                        <ButtonStyled
+                            className="w-full px-6 text-white font-semibold py-3 rounded-lg bg-gradient-to-r 
+                            from-primary to-teal-400 hover:from-teal-500 hover:to-green-400 transition-all duration-300 
+                            flex justify-center items-center gap-2"
+                            type="submit"
+                            isDisabled={!formik.isValid || formik.isSubmitting}
+                        >
+                            {t("staff.report_form_submit")}
+                            <PaperPlaneTilt size={22} weight="fill" className="animate-pulse" />
+                        </ButtonStyled>
+                    </div>
                 </div>
             </FormStyled>
         </div>

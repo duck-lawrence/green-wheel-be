@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useMemo, useState } from "react"
-import { useTranslation } from "react-i18next"
 import { PaginationStyled } from "@/components"
+import VehicleHorizontalCard from "@/components/modules/VehicleHorizontalCard"
+import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 /** ====== Giả lập kiểu dữ liệu backend ====== */
 type StaffItem = { id: number; name: string; email: string }
 
@@ -15,13 +16,45 @@ type PagedResult<T> = {
 }
 
 /** ====== HARD-CODE DATA ====== */
-const TOTAL_COUNT = 101              // TotalCount (cứng)
+const TOTAL_COUNT = 32              // TotalCount (cứng)
 const DEFAULT_PAGE_SIZE = 10          // PageSize (cứng 10 như yêu cầu)
 const ALL_ITEMS: StaffItem[] = Array.from({ length: TOTAL_COUNT }, (_, i) => ({
   id: i + 1,
   name: `User ${i + 1}`,
   email: `user${i + 1}@example.com`,
 }))
+
+const mockVehicleModel: VehicleModelViewRes = {
+  id: "demo-model-1",
+  name: "VinFast VF7",
+  description: "Premium electric sedan with outstanding range and technology.",
+  costPerDay: 1500000,
+  depositFee: 5000000,
+  seatingCapacity: 5,
+  numberOfAirbags: 10,
+  motorPower: 670,
+  batteryCapacity: 100,
+  ecoRangeKm: 650,
+  sportRangeKm: 520,
+  brand: {
+    id: "brand-1",
+    name: "VinFast",
+    description: "Leading innovator in electric vehicles.",
+    country: "Viet Nam",
+    foundedYear: 2003,
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
+  },
+  segment: {
+    id: "segment-1",
+    name: "SUV",
+    description: "High-end sedans with premium comfort and performance.",
+    createdAt: "2024-01-01T00:00:00.000Z",
+    updatedAt: "2024-01-01T00:00:00.000Z",
+  },
+  imageUrl: "https://res.cloudinary.com/dryp7ecsf/image/upload/v1759983843/shopping_p30zvg.webp",
+  availableVehicleCount: 3,
+}
 
 /** Hàm giả lập backend trả về PagedResult<T> */
 function getPagedStaff(pageNumber: number, pageSize: number): PagedResult<StaffItem> {
@@ -98,6 +131,13 @@ export default function StaffTestPage() {
             // controlHoverClassName="hover:bg-primary hover:text-white"
             // // Không set prevContent/nextContent -> mặc định hiển thị "<" / ">"
           />
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-semibold text-gray-900">Vehicle Card Demo</h2>
+        <div className="max-w-7xl">
+          <VehicleHorizontalCard vehicleModel={mockVehicleModel} />
         </div>
       </section>
     </div>

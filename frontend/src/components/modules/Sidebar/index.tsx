@@ -37,10 +37,28 @@ export const buildTabs = ({
         [ROLE_STAFF]: staffTabs,
         [ROLE_ADMIN]: adminTabs
     }
+    //LỌC TRÙNG CÁC TAB TRONG SIDEBAR
+    //HÀM BUILDTABS BAN ĐẦU CHỈ NỐI DEFAULTTABS VỚI CÁC TAB THEO ROLE
+    //NAY SỬA LẠI ĐỂ LỌC TRÙNG
+    //VD: ROLE_ADMIN CÓ ADMIN TABS LÀ /DASHBOARD, NẾU DEFAULT TABS CŨNG CÓ /DASHBOARD THÌ CHỈ LẤY 1 TAB
+    //ROLE_STAFF CÓ STAFF TABS LÀ /DASHBOARD, NẾU DEFAULT TABS CŨNG CÓ /DASHBOARD THÌ CHỈ LẤY 1 TAB
+    const combinedTabs = [...defaultTabs, ...(roleTabsMap[roleName ?? ""] ?? [])]
 
-    return [...defaultTabs, ...(roleTabsMap[roleName ?? ""] ?? [])]
+    const uniqueTabs: SidebarItem[] = []
+    const seenKeys = new Set<string>()
+    //LUỒNG HOẠT ĐỘNG:
+    // DUYỆT QUA TẤT CẢ CÁC TAB TRONG COMBINEDTABS
+    // NẾU CHƯA XUẤT HIỆN TRONG SEENKEYS THÌ THÊM VÀO UNIQUE TABS VÀ ĐÁNH DẤU ĐÃ XUẤT HIỆN
+    // NẾU ĐÃ XUẤT HIỆN RỒI THÌ BỎ QUA
+    for (const tab of combinedTabs) {
+        if (seenKeys.has(tab.key)) continue
+        seenKeys.add(tab.key)
+        uniqueTabs.push(tab)
+    }
+    
+    return uniqueTabs
 }
-
+    
 export function Sidebar({ tabs, selectedKey, className = "w-50" }: SidebarProps) {
     const pathname = usePathname()
     const router = useRouter()
