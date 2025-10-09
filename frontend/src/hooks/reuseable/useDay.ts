@@ -6,7 +6,7 @@ export const useDay = ({
     defaultFormat = DEFAULT_DATE_TIME_FORMAT
 }: {
     defaultFormat?: string
-}) => {
+} = {}) => {
     const toCalenderDateTime = (
         dateTime: string | number | Date | dayjs.Dayjs | null | undefined
     ) => {
@@ -19,24 +19,29 @@ export const useDay = ({
         date,
         timeZone = DEFAULT_TIMEZONE
     }: {
-        date: DateValue
+        date: DateValue | string
         timeZone?: string
     }) => {
         if (!date) return ""
+
+        if (typeof date === "string") {
+            return dayjs(date).format(defaultFormat)
+        }
+
         const dateJs = dayjs(date.toDate(timeZone))
         return dateJs.format(defaultFormat)
     }
 
-    const diffDaysCeil = ({
-        start,
-        end
+    const getDiffDaysCeil = ({
+        startDate,
+        endDate
     }: {
-        start: string | Date | dayjs.Dayjs
-        end: string | Date | dayjs.Dayjs
+        startDate: string | Date | dayjs.Dayjs | null
+        endDate: string | Date | dayjs.Dayjs | null
     }) => {
-        if (!start || !end) return -1
-        return Math.ceil(dayjs(end).diff(dayjs(start), "day", true))
+        if (!startDate || !endDate) return -1
+        return Math.ceil(dayjs(endDate).diff(dayjs(startDate), "day", true))
     }
 
-    return { toCalenderDateTime, formatDateTime, diffDaysCeil }
+    return { toCalenderDateTime, formatDateTime, getDiffDaysCeil }
 }

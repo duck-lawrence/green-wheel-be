@@ -4,14 +4,16 @@ import { motion } from "framer-motion"
 import { BreadCrumbsStyled, ButtonStyled, FieldStyled } from "@/components"
 import { GasPump, UsersFour, SteeringWheel, RoadHorizon } from "@phosphor-icons/react"
 import { formatCurrency } from "@/utils/helpers/currentcy"
-import { getDatesDiff } from "@/utils/helpers/mathDate"
 import { useParams, useRouter } from "next/navigation"
-import { useBookingFilterStore, useGetVehicleModelById, useGetMe } from "@/hooks"
+import { useBookingFilterStore, useGetVehicleModelById, useGetMe, useDay } from "@/hooks"
 import { useTranslation } from "react-i18next"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
-import { Spinner } from "@heroui/react"
+import { Spinner, useDisclosure } from "@heroui/react"
 import { ROLE_CUSTOMER } from "@/constants/constants"
 import toast from "react-hot-toast"
+import { BackendError } from "@/models/common/response"
+import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
+import { CreateRentalContractModal } from "@/components/modals/CreateRentalContractModal"
 
 export default function VehicleDetailPage() {
     const { id } = useParams()
@@ -19,12 +21,13 @@ export default function VehicleDetailPage() {
     const router = useRouter()
 
     const { t } = useTranslation()
+    const { getDiffDaysCeil } = useDay()
+    const { isOpen, onOpen, onClose } = useDisclosure()
     const { data: user } = useGetMe()
     const isCustomer = useMemo(() => {
         return user?.role?.name === ROLE_CUSTOMER
     }, [user])
 
-    const [vehicle, setVehicle] = useState<VehicleModelViewRes | null>(null)
     // handle render picture
     const [active, setActive] = useState(0)
 
@@ -35,7 +38,7 @@ export default function VehicleDetailPage() {
     const {
         data: model,
         isLoading: isModelLoading,
-        isError: isModelError
+        error: modelError
     } = useGetVehicleModelById({
         modelId: modelId || "",
         query: {
@@ -45,19 +48,28 @@ export default function VehicleDetailPage() {
         }
     })
 
-    const { totalDays, total } = useMemo(() => {
-        if (!vehicle) return { totalDays: 0, total: 0 }
+    // redirect if filter not valid
+    useEffect(() => {
+        if (!stationId || !startDate || !endDate) {
+            toast.error(t("vehicle_filter.require"))
+            router.replace("/vehicle-rental")
+        }
+        if (modelError) {
+            const error = modelError as BackendError
+            toast.error(translateWithFallback(t, error.detail))
+            router.replace("/vehicle-rental")
+        }
+    }, [endDate, modelError, router, startDate, stationId, t])
 
-        const totalDays = getDatesDiff({ startDate, endDate })
+    const { totalDays, totalPrice } = useMemo(() => {
+        if (!model) return { totalDays: 0, totalPrice: 0 }
+
+        const totalDays = getDiffDaysCeil({ startDate, endDate })
         return {
             totalDays,
-            total: totalDays * vehicle.costPerDay + vehicle.depositFee
+            totalPrice: totalDays * model.costPerDay + model.depositFee
         }
-    }, [endDate, startDate, vehicle])
-
-    useEffect(() => {
-        if (model) setVehicle(model)
-    }, [model])
+    }, [endDate, getDiffDaysCeil, model, startDate])
 
     // display item similar
     // const similarVehicles = vehicleModels
@@ -69,9 +81,9 @@ export default function VehicleDetailPage() {
         if (!user?.phone) {
             toast.error(t("user.enter_phone_to_booking"))
         } else {
-            router.replace("/rental-contracts")
+            onOpen()
         }
-    }, [router, t, user?.phone])
+    }, [onOpen, t, user?.phone])
 
     function mapSpecs(vehicle: VehicleModelViewRes) {
         return [
@@ -84,7 +96,7 @@ export default function VehicleDetailPage() {
         ]
     }
 
-    const basePolocies = (deposite: number) => [
+    const basePolicies = (deposite: number) => [
         { title: "Giấy tờ", text: "CCCD gắn chip + GPLX B1 trở lên." },
         { title: "Cọc", text: `${deposite}đ hoặc xe máy giấy tờ chính chủ. ` },
         {
@@ -97,10 +109,18 @@ export default function VehicleDetailPage() {
         }
     ]
 
-    if (!vehicle || isModelLoading || isModelError) return <Spinner />
+    if (!model || isModelLoading) return <Spinner />
 
     return (
         <div className="min-h-dvh bg-neutral-50 text-neutral-900 rounded">
+            <CreateRentalContractModal
+                isOpen={isOpen}
+                onClose={onClose}
+                modelViewRes={model}
+                totalDays={totalDays}
+                totalPrice={totalPrice}
+            />
+
             {/* Breadcrumb */}
             <div className="p-4">
                 <BreadCrumbsStyled
@@ -117,24 +137,24 @@ export default function VehicleDetailPage() {
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
                     <div>
                         <h1 className="text-3xl/tight sm:text-4xl font-bold tracking-tight">
-                            {vehicle.name}
+                            {model.name}
                         </h1>
-                        <p className="mt-1 text-neutral-600">{vehicle.description}</p>
+                        <p className="text-neutral-600">{model.description}</p>
                         {/* <p className="mt-1 text-sm text-neutral-500">
                             Hãng xe: <span className="font-medium">{vehicle.brand_name}</span> •
                             Phân khúc: <span className="font-medium">{vehicle.segment_name}</span>
                         </p> */}
-                        <p className="mt-1 text-sm text-neutral-500">
+                        <p className="text-lg text-neutral-500">
                             {t("vehicle_model.remaining_vehicle_count")} &nbsp;
-                            <span className="font-medium text-emerald-600">
-                                {vehicle.availableVehicleCount}
+                            <span className="font-extrabold text-emerald-600">
+                                {model.availableVehicleCount}
                             </span>
                         </p>
                     </div>
                     {/*  font-extrabold*/}
                     <div className="text-right">
                         <p className="text-2xl sm:text-3xl font-semibold text-emerald-600">
-                            {formatCurrency(vehicle.costPerDay)} &nbsp;
+                            {formatCurrency(model.costPerDay)} &nbsp;
                             <span className="text-base font-normal text-neutral-500">
                                 {t("vehicle_model.vnd_per_day")}
                             </span>
@@ -155,16 +175,16 @@ export default function VehicleDetailPage() {
                                 initial={{ opacity: 0, scale: 1.02 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.35 }}
-                                src={vehicle.imageUrls && vehicle.imageUrls[active]}
-                                alt={`${vehicle.name} - ${active + 1}`}
+                                src={model.imageUrls && model.imageUrls[active]}
+                                alt={`${model.name} - ${active + 1}`}
                                 className="h-full w-full object-cover"
                             />
                         </div>
 
                         {/* List sub img */}
                         <div className="row-span-1 grid grid-cols-4 gap-3">
-                            {vehicle.imageUrls &&
-                                [vehicle.imageUrl, ...vehicle.imageUrls].map((src, idx) => (
+                            {model.imageUrls &&
+                                [model.imageUrl, ...model.imageUrls].map((src, idx) => (
                                     <button
                                         key={src}
                                         onClick={() => setActive(idx)}
@@ -186,7 +206,7 @@ export default function VehicleDetailPage() {
                     <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
                         <h2 className="text-xl font-semibold mb-4">Thông số</h2>
                         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                            {mapSpecs(vehicle).map(({ key, value }) => (
+                            {mapSpecs(model).map(({ key, value }) => (
                                 <div key={key} className="rounded-xl border border-neutral-200 p-4">
                                     <p className="text-xs uppercase tracking-wide text-neutral-500">
                                         {key}
@@ -200,7 +220,7 @@ export default function VehicleDetailPage() {
                     {/*================ Policies =======================*/}
                     <section className="mt-8 rounded-2xl bg-white p-6 shadow-sm">
                         <div className="grid gap-4 md:grid-cols-2">
-                            {basePolocies(vehicle.depositFee).map((p) => (
+                            {basePolicies(model.depositFee).map((p) => (
                                 <div key={p.title} className="rounded-2xl bg-white p-5 shadow-sm">
                                     <h3 className="font-semibold">{p.title}</h3>
                                     <p className="mt-1 text-sm text-neutral-600">{p.text}</p>
@@ -226,7 +246,7 @@ export default function VehicleDetailPage() {
                                 />
                                 <FieldStyled
                                     label="Số chỗ"
-                                    value={`${vehicle.seatingCapacity}`}
+                                    value={`${model.seatingCapacity}`}
                                     icon={<UsersFour size={18} />}
                                 />
                                 <FieldStyled
@@ -236,7 +256,7 @@ export default function VehicleDetailPage() {
                                 />
                                 <FieldStyled
                                     label="Quãng đường"
-                                    value={`~${vehicle.ecoRangeKm} km`}
+                                    value={`~${model.ecoRangeKm} km`}
                                     icon={<RoadHorizon size={18} />}
                                 />
                             </div>
@@ -246,7 +266,7 @@ export default function VehicleDetailPage() {
                                 <div className="flex items-center justify-between text-sm">
                                     <span>{t("vehicle_model.unit_price")}</span>
                                     <span className="font-medium">
-                                        {formatCurrency(vehicle.costPerDay)}
+                                        {formatCurrency(model.costPerDay)}
                                     </span>
                                 </div>
                                 <div className="mt-2 flex items-center justify-between text-sm">
@@ -256,7 +276,7 @@ export default function VehicleDetailPage() {
                                 <div className="mt-2 flex items-center justify-between text-sm">
                                     <span>{t("vehicle_model.deposit_fee")}</span>
                                     <span className="font-medium">
-                                        {formatCurrency(vehicle.depositFee)}
+                                        {formatCurrency(model.depositFee)}
                                     </span>
                                 </div>
 
@@ -264,7 +284,7 @@ export default function VehicleDetailPage() {
                                 <div className="mt-3 flex items-center justify-between text-base font-semibold">
                                     <span>{t("vehicle_model.temporary_total")}</span>
                                     <span className="text-emerald-700">
-                                        {formatCurrency(total)} đ
+                                        {formatCurrency(totalPrice)}
                                     </span>
                                 </div>
                             </div>
@@ -272,7 +292,10 @@ export default function VehicleDetailPage() {
                             <ButtonStyled
                                 isDisabled={!isCustomer}
                                 className="w-full rounded-xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                            ></ButtonStyled>
+                                onPress={handleClickBooking}
+                            >
+                                {t("vehicle_model.create_rental_request")}
+                            </ButtonStyled>
                         </div>
                     </div>
                 </aside>

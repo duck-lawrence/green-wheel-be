@@ -1,27 +1,33 @@
 import { ModalStyled } from "@/components/"
-import { ModalBody, ModalContent, ModalHeader } from "@heroui/react"
+import { ModalBody, ModalContent } from "@heroui/react"
 import React from "react"
-import { useTranslation } from "react-i18next"
 import { CreateRentalContractForm } from "./CreateRentalContractForm"
 import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
 
 export function CreateRentalContractModal({
     isOpen,
     onClose,
+    totalDays,
+    totalPrice,
     modelViewRes
 }: {
     isOpen: boolean
     onClose: () => void
+    totalDays: number
+    totalPrice: number
     modelViewRes: VehicleModelViewRes
 }) {
-    const { t } = useTranslation()
-
     return (
-        <ModalStyled isOpen={isOpen} onClose={onClose}>
+        <ModalStyled isOpen={isOpen} onClose={onClose} isKeyboardDismissDisabled>
             <ModalContent className="min-w-fit px-3 py-2">
-                <ModalHeader className=" self-center">{t("car_rental.register_title")}</ModalHeader>
+                {/* <ModalHeader className=" self-center">{t("car_rental.register_title")}</ModalHeader> */}
                 <ModalBody>
-                    <CreateRentalContractForm modelViewRes={modelViewRes} onSuccess={onClose} />
+                    <CreateRentalContractForm
+                        onSuccess={onClose}
+                        totalDays={totalDays}
+                        totalPrice={totalPrice}
+                        modelViewRes={modelViewRes}
+                    />
                 </ModalBody>
             </ModalContent>
         </ModalStyled>

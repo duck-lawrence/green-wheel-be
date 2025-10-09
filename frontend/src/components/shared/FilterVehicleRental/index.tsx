@@ -4,7 +4,7 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { CalendarDateTime, fromDate } from "@internationalized/date"
 import { useTranslation } from "react-i18next"
-import { AutocompleteItem, Spinner } from "@heroui/react"
+import { AutocompleteItem, cn, Spinner } from "@heroui/react"
 import { MapPinAreaIcon } from "@phosphor-icons/react"
 import { ButtonStyled, AutocompleteStyle, DateTimeStyled } from "@/components"
 import { useBookingFilterStore, useDay, useGetAllStations, useGetAllVehicleSegments } from "@/hooks"
@@ -15,7 +15,7 @@ import { DEFAULT_TIMEZONE, MAX_HOUR, MIN_HOUR } from "@/constants/constants"
 import dayjs from "dayjs"
 import { useGetAllVehicleModels } from "@/hooks/queries/useVehicleModel"
 
-export function FilterVehicleRental() {
+export function FilterVehicleRental({ className = "" }: { className?: string }) {
     const { t } = useTranslation()
     const { formatDateTime, toCalenderDateTime } = useDay({})
     const {
@@ -191,8 +191,11 @@ export function FilterVehicleRental() {
         <>
             <form
                 onSubmit={formik.handleSubmit}
-                className="flex gap-6 px-5 pt-3 pb-8 justify-center items-center 
-                    border border-gray-300 rounded-4xl shadow-2xl min-w-fit bg-secondary"
+                className={cn(
+                    "flex gap-6 px-5 pt-3 pb-8 justify-center items-center",
+                    "border border-gray-300 rounded-4xl shadow-2xl min-w-fit bg-secondary",
+                    className
+                )}
             >
                 <div className="flex flex-col h-14">
                     <AutocompleteStyle
@@ -204,6 +207,7 @@ export function FilterVehicleRental() {
                         onSelectionChange={(id) => {
                             formik.setFieldValue("stationId", id)
                             setStationId(id as string | null)
+                            formik.handleSubmit()
                         }}
                         className="max-w-60 h-20 mr-0"
                         isClearable={false}
@@ -234,6 +238,7 @@ export function FilterVehicleRental() {
                         onSelectionChange={(id) => {
                             formik.setFieldValue("segmentId", id)
                             setSegmentId(id as string | null)
+                            formik.handleSubmit()
                         }}
                         className="max-w-40 h-20 mr-0"
                     >
@@ -264,6 +269,7 @@ export function FilterVehicleRental() {
 
                             formik.setFieldValue("startDate", date)
                             setStartDate(date)
+                            formik.handleSubmit()
                         }}
                         onBlur={() => {
                             formik.setFieldTouched("startDate")
@@ -292,6 +298,7 @@ export function FilterVehicleRental() {
 
                             formik.setFieldValue("endDate", date)
                             setEndDate(date)
+                            formik.handleSubmit()
                         }}
                         onBlur={() => {
                             formik.setFieldTouched("endDate")
