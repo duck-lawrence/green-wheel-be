@@ -61,7 +61,7 @@ namespace API.Controllers
         {
 
             string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
-            return link == null ? Ok() : Ok(link);
+            return link == null ? Ok() : Ok(new { link });
         }
 
         [HttpGet]
