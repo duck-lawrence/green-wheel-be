@@ -100,10 +100,6 @@ namespace Application
             var checklist = checklists.Where(c => c.Id == req.VehicleChecklistId).FirstOrDefault();
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
-            if(req.Description != null)
-            {
-                checklist.Description = req.Description;
-            }
             foreach (var itemReq in req.ChecklistItems)
             {
                 var existingItem = checklist.VehicleChecklistItems

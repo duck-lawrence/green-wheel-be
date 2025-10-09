@@ -28,10 +28,6 @@ public partial class Invoice : SorfDeletedEntity, IEntity
 
     public Guid ContractId { get; set; }
 
-    public Guid? ChecklistId { get; set; }
-
-    public virtual VehicleChecklist? Checklist { get; set; }
-
     public virtual RentalContract Contract { get; set; } = null!;
 
     public virtual Deposit? Deposit { get; set; }
