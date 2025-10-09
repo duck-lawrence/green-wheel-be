@@ -1,4 +1,5 @@
-import { InvoiceItemType, InvoiceStatus, PaymentMethod } from "@/constants/enum"
+import { DepositStatus, InvoiceItemType, InvoiceStatus, PaymentMethod } from "@/constants/enum"
+import { VehicleChecklistItemViewRes } from "@/models/checklist/schema/response"
 
 export type InvoiceViewRes = {
     id: string
@@ -12,7 +13,7 @@ export type InvoiceViewRes = {
     paidAt?: string
     checkListId?: string
     items: InvoiceItemViewRes[]
-    deposit: DepositViewRes
+    deposit?: DepositViewRes
 }
 
 export type DepositViewRes = {
@@ -20,7 +21,7 @@ export type DepositViewRes = {
     description?: string
     amount: number
     refundedAt?: string
-    status: number
+    status: DepositStatus
 }
 
 export type InvoiceItemViewRes = {
@@ -30,5 +31,5 @@ export type InvoiceItemViewRes = {
     notes: string
     subTotal: number
     type: InvoiceItemType
-    checkListItemId?: string
+    checkListItem?: VehicleChecklistItemViewRes
 }

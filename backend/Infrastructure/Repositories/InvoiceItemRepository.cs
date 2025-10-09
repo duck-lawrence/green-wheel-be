@@ -26,7 +26,10 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<InvoiceItem>> GetByInvoiceIdAsync(Guid invoiceId)
         {
-            return await _dbContext.InvoiceItems.Where(i => i.InvoiceId == invoiceId).ToListAsync();
+            return await _dbContext.InvoiceItems
+                .Include(i => i.ChecklistItem)
+                    .ThenInclude(cli => cli.Component)
+                .Where(i => i.InvoiceId == invoiceId).ToListAsync();
         }
     }
 }
