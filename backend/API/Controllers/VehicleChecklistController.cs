@@ -14,10 +14,12 @@ namespace API.Controllers
     public class VehicleChecklistController : ControllerBase
     {
         private readonly IVehicleChecklistService _vehicleChecklistService;
+        private readonly IChecklistItemImageService _imageService;
 
-        public VehicleChecklistController(IVehicleChecklistService vehicleChecklistService)
+        public VehicleChecklistController(IVehicleChecklistService vehicleChecklistService, IChecklistItemImageService imageService)
         {
             _vehicleChecklistService = vehicleChecklistService;
+            _imageService = imageService;
         }
 
         [HttpPost]
@@ -45,15 +47,21 @@ namespace API.Controllers
             return Ok(checklistViewRes);
         }
 
-        //[HttpPost("image")]
-        //[Consumes("multipart/form-data")]
-        //public async Task<IActionResult> UploadImage(Guid modelId, IFormFile file)
-        //{
-        //}
+        [HttpPost("image")]
+        [RoleAuthorize(RoleName.Staff)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadChecklistItemImage(Guid itemId, [FromForm(Name = "file")] IFormFile file)
+        {
+            var result = await _imageService.UploadChecklistItemImageAsync(itemId, file);
+            return Ok(result);
+        }
 
-        //[HttpDelete("image")]
-        //public async Task<IActionResult> DeleteImage(Guid modelId)
-        //{
-        //}
+        [HttpDelete("image")]
+        [RoleAuthorize(RoleName.Staff)]
+        public async Task<IActionResult> DeleteChecklistItemImage(Guid itemId)
+        {
+            var result = await _imageService.DeleteChecklistItemImageAsync(itemId);
+            return Ok(result);
+        }
     }
 }

@@ -24,19 +24,18 @@ namespace Application
     {
         private readonly IVehicleChecklistUow _uow;
         private readonly IMapper _mapper;
+
         public VehicleChecklistService(IVehicleChecklistUow uow, IMapper mapper)
         {
             _uow = uow;
             _mapper = mapper;
         }
 
-        
-
         public async Task<VehicleChecklistViewRes> CreateVehicleChecklistAsync(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req)
         {
             var staffId = userclaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var components = await _uow.VehicleRepository.GetVehicleComponentsAsync(req.VehicleId);
-            if(components == null)
+            if (components == null)
             {
                 throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
             }
@@ -65,7 +64,7 @@ namespace Application
                 {
                     checkListItemId = Guid.NewGuid();
                 } while (await _uow.VehicleChecklistItemRepository.GetByIdAsync(checkListItemId) != null);
-                checklistItems.Add( new VehicleChecklistItem()
+                checklistItems.Add(new VehicleChecklistItem()
                 {
                     Id = checkListItemId,
                     ComponentId = component.Id,
@@ -82,7 +81,7 @@ namespace Application
         public async Task<VehicleChecklistViewRes> GetByIdAsync(Guid id)
         {
             var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
-            if(vehicleChecklist == null)
+            if (vehicleChecklist == null)
             {
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
             }
@@ -94,13 +93,13 @@ namespace Application
         {
             var checklists = await _uow.VehicleChecklistRepository.GetAllAsync(
                 new Expression<Func<VehicleChecklist, object>>[]
-                { 
-                    v => v.VehicleChecklistItems 
+                {
+                    v => v.VehicleChecklistItems
                 });
             var checklist = checklists.Where(c => c.Id == req.VehicleChecklistId).FirstOrDefault();
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
-            if(req.Description != null)
+            if (req.Description != null)
             {
                 checklist.Description = req.Description;
             }
@@ -110,10 +109,10 @@ namespace Application
                     .FirstOrDefault(i => i.Id == itemReq.Id);
 
                 if (existingItem == null)
-                    continue; 
+                    continue;
 
                 existingItem.Status = itemReq.Status;
-                if(itemReq.Notes != null)
+                if (itemReq.Notes != null)
                 {
                     existingItem.Notes = itemReq.Notes;
                 }
@@ -121,5 +120,4 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
     }
-    
 }
