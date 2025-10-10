@@ -14,7 +14,8 @@ import {
     StaffReportStatus,
     StaffReportType,
     LicenseClass,
-    OrderStatus
+    OrderStatus,
+    InvoiceType
 } from "./enum"
 
 export const SexLabels: Record<Sex, string> = {
@@ -134,4 +135,11 @@ export const OrderStatusLabels: Record<OrderStatus, string> = {
     [OrderStatus.Overdue]: i18n.t("enum.overdue"),
     [OrderStatus.Completed]: i18n.t("enum.completed"),
     [OrderStatus.Cancelled]: i18n.t("enum.cancelled")
+}
+
+export const InvoiceTypeLabels: Record<InvoiceType, string> = {
+    [InvoiceType.HandoverPayment]: i18n.t("enum.handover_payment"),
+    [InvoiceType.ReturnPayment]: i18n.t("enum.return_payment"),
+    [InvoiceType.RefundPayment]: i18n.t("enum.refund_payment"),
+    [InvoiceType.OtherPayment]: i18n.t("enum.other_payment")
 }

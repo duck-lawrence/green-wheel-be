@@ -8,8 +8,8 @@ namespace Application.Dtos.RentalContract.Request
 {
     public class HandoverContractReq
     {
-        public bool IsSignByStaff { get; set; }
-        public bool IsSignByCustomer { get; set; }
+        public bool IsSignedByStaff { get; set; }
+        public bool IsSignedByCustomer { get; set; }
         public decimal? Amount { get; set; } = null;
     }
 }

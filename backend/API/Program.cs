@@ -86,6 +86,7 @@ namespace API
             builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
             builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
+            builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -101,6 +102,8 @@ namespace API
             builder.Services.AddScoped<IModelImageService, ModelImageService>();
             builder.Services.AddScoped<IPhotoService, CloudinaryService>();
             builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
+            builder.Services.AddScoped<IStationFeedbackService, StationFeedbackService>();
+            builder.Services.AddScoped<IChecklistItemImageService, ChecklistItemImageService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client

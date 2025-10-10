@@ -3,6 +3,7 @@ using Application.Abstractions;
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Invoice.Response;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
@@ -142,16 +143,15 @@ namespace Application
                 Id = invoiceId,
                 ContractId = contractId,
                 Status = (int)InvoiceStatus.Pending,
-                Tax = 0.1m, //10% dạng decimal
+                Tax = Common.Tax.BaseRentalVAT, //10% dạng decimal
                 CreatedAt = DateTimeOffset.UtcNow,
+                InvoiceType = (int)InvoiceType.Handover,
                 UpdatedAt = DateTimeOffset.UtcNow,
                 DeletedAt = null,
                 Notes = $"GreenWheel – Invoice for your order {contractId}"
             };
             await _uow.InvoiceRepository.AddAsync(invoice);
 
-            //Create invoice Item
-            var InvoiceItemNote = AutoGenerateHelper.GenerateInvoiceItemNotes(InvoiceItemType.BaseRental, days);
             Guid invoiceItemId;
             do
             {
@@ -191,7 +191,7 @@ namespace Application
             };
             
             await _uow.DepositRepository.AddAsync(deposit);
-            invoice.Subtotal = items.Quantity * items.UnitPrice;
+            invoice.Subtotal = InvoiceHelper.CalculateTotalAmount([items]);
 
 
             await _uow.SaveChangesAsync();
@@ -249,12 +249,64 @@ namespace Application
                 await _uow.VehicleRepository.UpdateAsync(vehicle);
                 await _uow.InvoiceRepository.UpdateAsync(invoice);
             }
-            contract.IsSignedByStaff = req.IsSignByStaff;
-            contract.IsSignedByCustomer = req.IsSignByCustomer;
+            contract.IsSignedByStaff = req.IsSignedByStaff;
+            contract.IsSignedByCustomer = req.IsSignedByCustomer;
             contract.ActualStartDate = DateTimeOffset.UtcNow;
             contract.HandoverStaffId = Guid.Parse(staffId);
             await _uow.RentalContractRepository.UpdateAsync(contract);
             await _uow.SaveChangesAsync();
+        }
+
+        public async Task<InvoiceViewRes?> ReturnRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
+        {
+            var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+            //var actual_end_date = DateTimeOffset.UtcNow;
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
+            contract.Status = (int)RentalContractStatus.Completed;
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+            var actual_end_date = contract.EndDate.AddHours(2);
+            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            var hours = (actual_end_date - contract.EndDate).TotalHours;
+            if (hours <= Common.Policy.MaxLateHours)
+            {
+                await _uow.SaveChangesAsync();
+                return null;
+            }
+            //Create invoice
+            Guid invoiceId;
+            do
+            {
+                invoiceId = Guid.NewGuid();
+
+            } while (await _uow.InvoiceRepository.GetByIdOptionAsync(invoiceId) != null);
+            var invoice = new Invoice()
+            {
+                Id = invoiceId,
+                ContractId = contractId,
+                Status = (int)InvoiceStatus.Pending,
+                Tax = Common.Tax.OtherVAT, //10% dạng decimal
+                Notes = $"GreenWheel – Invoice for your order {contractId}"
+            };
+            await _uow.InvoiceRepository.AddAsync(invoice);
+            Guid invoiceItemId;
+            do
+            {
+                invoiceItemId = Guid.NewGuid();
+
+            } while ((await _uow.InvoiceItemRepository.GetByIdAsync(invoiceItemId)) != null);
+            var items = new InvoiceItem()
+            {
+                Id = invoiceItemId,
+                InvoiceId = invoiceId,
+                Quantity = (int)hours,
+                UnitPrice = Common.Fee.LateReturn,
+                Type = (int)InvoiceItemType.LateReturn,
+            };
+            invoice.InvoiceType = (int)InvoiceType.Return;
+            invoice.Subtotal = InvoiceHelper.CalculateTotalAmount([items]);
+            await _uow.InvoiceItemRepository.AddRangeAsync([items]);
+            await _uow.SaveChangesAsync();
+            return _mapper.Map<InvoiceViewRes>(invoice);
         }
 
         public async Task UpdateStatus(RentalContract rentalContract, int status)
