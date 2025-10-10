@@ -20,9 +20,9 @@ namespace Application.Dtos.Invoice.Response
         public decimal PaidAmount { get; set; }
         public int? PaymentMethod { get; set; } = null;
         public string? Notes { get; set; }
+        public int InvoiceType { get; set; }
         public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
         public DateTimeOffset? PaidAt { get; set; } = null;
-        public Guid? CheckListId { get; set; } = null;
 
     }
 }

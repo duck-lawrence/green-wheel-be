@@ -36,8 +36,8 @@ export const useDay = ({
         startDate,
         endDate
     }: {
-        startDate: string | Date | dayjs.Dayjs | null
-        endDate: string | Date | dayjs.Dayjs | null
+        startDate?: string | Date | dayjs.Dayjs | null
+        endDate?: string | Date | dayjs.Dayjs | null
     }) => {
         if (!startDate || !endDate) return -1
         return Math.ceil(dayjs(endDate).diff(dayjs(startDate), "day", true))

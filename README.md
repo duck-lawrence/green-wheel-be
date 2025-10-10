@@ -1,9 +1,10 @@
-# ![Green Wheel](docs/green-wheel-text.svg)
-
+<p align="center">
+  <img src="docs/green-wheel-text.svg" alt="Green Wheel" >
+</p>
 <!-- [![backend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/backend-ci.yaml) [![frontend-ci](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml/badge.svg)](https://github.com/ducklawrence05/green-wheel/actions/workflows/frontend-ci.yaml) -->
 
 ## [Documentations](https://docs.google.com/document/d/1YYFCutl6D6C-bexIc14sZuamJwadSp8Y/edit?usp=sharing&ouid=102744078799902508261&rtpof=true&sd=true)
-Green Wheel is a self-drive vehicle rental platform that connects a customer-facing booking experience with an internal staff workspace. The monorepo houses a Next.js 15 front end and an ASP.NET Core 8 back end, built around layered architecture, rich domain modelling, and integrations for identity verification, payments, and cloud media.
+Green Wheel is a self-drive vehicle rental platform that connects a customer-facing booking experience with an internal staff workspace. The monorepo houses a Next.js 15 front end and an ASP.NET Core 8 back end.
 
 ## Project Information
 
@@ -54,11 +55,7 @@ Green Wheel is a self-drive vehicle rental platform that connects a customer-fac
 - **Secure authentication:** JWT access/refresh tokens, OTP flows, Google OAuth sign-in, and global error handling middleware.
 - **Localization-first:** English and Vietnamese translations via `i18next`, with middleware-guarded routes and persistent stores.
 
-
-
 ## Architecture Overview
-
-**Layered backend design**
 
 - `API` exposes RESTful controllers, Swagger UI, CORS policy, middleware, and global exception handling.
 - `Application` hosts business logic, DTOs, validators, mappers, services (Gemini, MoMo, rental, support, vehicle, user), and unit-of-work abstractions.
@@ -184,20 +181,6 @@ When using the manual approach, ensure SQL Server and Redis are running locally 
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\01-schema.sql
 sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\02-seeding.sql
 ```
-
-## Development Workflow
-
-- **Linting:** `npm run lint` (Next.js + ESLint + TypeScript rules)
-- **Frontend build:** `npm run build` / `npm run start`
-- **Backend build:** `dotnet build` or `dotnet publish -c Release`
-- **Environment loading:** `DotNetEnv` hydrates configuration from `.env`; secrets can be promoted to production vaults.
-- **Error handling:** `GlobalErrorHandlerMiddleware` wraps HTTP responses and logs; validation errors bubble via `ValidationFilter`.
-- **Caching:** Roles and OTP flows use Redis/in-memory caches. Clear Redis when changing critical auth data in dev.
-- **Tests:** Automated tests are not yet defined. Add unit/integration test projects under `backend/` and jest/vitest suites for the frontend as the next improvement.
-
-## Documentation & Assets
-
-Design artefacts (system architecture, CI/CD workflow, and ERD diagrams) accompany the project documentation package shared with the repository. Place them under a `docs/` directory (e.g., `docs/system-architecture.png`) to surface them in the README if you need in-repo previews.
 
 ## Project Credits
 

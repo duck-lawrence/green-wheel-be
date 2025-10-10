@@ -12,6 +12,9 @@ namespace Application.UnitOfWorks
         IVehicleChecklistItemRepository VehicleChecklistItemRepository { get; }
         IVehicleCheckListRepository VehicleChecklistRepository { get; }
         IVehicleRepository VehicleRepository { get; }
+        IRentalContractRepository RentalContractRepository { get; }
+        IInvoiceItemRepository InvoiceItemRepository { get; }
+        IInvoiceRepository InvoiceRepository { get; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
     }

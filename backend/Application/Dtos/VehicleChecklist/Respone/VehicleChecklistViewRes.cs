@@ -5,7 +5,6 @@ namespace Application.Dtos.VehicleChecklist.Respone
     public class VehicleChecklistViewRes
     {
         public Guid Id { get; set; }
-        public string? Description { get; set; }
 
         public bool IsSignedByStaff { get; set; }
 

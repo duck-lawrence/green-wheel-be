@@ -4,7 +4,7 @@ import React, { useMemo, useState } from "react"
 import { SelectItem, Selection } from "@heroui/react"
 import VehicleHorizontalCard from "@/components/modules/VehicleHorizontalCard"
 import { ButtonStyled, FilterTypeStyle, PaginationStyled, SearchStyle } from "@/components"
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 
 const DEFAULT_PAGE_SIZE = 10
 const TOTAL_VEHICLES = 105
@@ -66,7 +66,7 @@ const SEGMENT_POOL = [
 const IMAGE_POOL = [
     "https://vinfastauto.eu/themes/custom/vinfast_v2/images/v3/vf-8/exterior-color-white.webp",
     "https://vinfastauto.us/themes/custom/vinfast_v2/images/v3/homepage/header-vf-9.webp",
-    "https://vinfast-mienbac.com/wp-content/uploads/2024/10/vf5-7.png",
+    "https://vinfast-mienbac.com/wp-content/uploads/2024/10/vf5-7.png"
     // "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?q=80&w=1200",
     // "https://images.unsplash.com/photo-1523987355523-c7b5b84b79a0?q=80&w=1200"
 ]
@@ -204,7 +204,11 @@ export default function AdminFleetPage() {
             <section className="space-y-4">
                 <div className="flex flex-col gap-4">
                     {currentVehicles.map((vehicle) => (
-                        <VehicleHorizontalCard key={vehicle.id} vehicleModel={vehicle} readOnly={false} />
+                        <VehicleHorizontalCard
+                            key={vehicle.id}
+                            vehicleModel={vehicle}
+                            readOnly={false}
+                        />
                     ))}
                 </div>
 

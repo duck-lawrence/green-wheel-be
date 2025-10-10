@@ -1,8 +1,16 @@
-import { DepositStatus, InvoiceItemType, InvoiceStatus, PaymentMethod } from "@/constants/enum"
+import {
+    DepositStatus,
+    InvoiceItemType,
+    InvoiceStatus,
+    InvoiceType,
+    PaymentMethod
+} from "@/constants/enum"
 import { VehicleChecklistItemViewRes } from "@/models/checklist/schema/response"
+import { DepositViewRes } from "@/models/deposit/schema/response"
 
 export type InvoiceViewRes = {
     id: string
+    type: InvoiceType
     subtotal: number
     tax: number
     total: number
@@ -10,25 +18,16 @@ export type InvoiceViewRes = {
     paymentMentod?: PaymentMethod
     notes: string
     status: InvoiceStatus
+    type: InvoiceType
     paidAt?: string
-    checkListId?: string
-    items: InvoiceItemViewRes[]
+    invoiceItems: InvoiceItemViewRes[]
     deposit?: DepositViewRes
-}
-
-export type DepositViewRes = {
-    id: string
-    description?: string
-    amount: number
-    refundedAt?: string
-    status: DepositStatus
 }
 
 export type InvoiceItemViewRes = {
     id: string
     quantity: number
     unitPrice: number
-    notes: string
     subTotal: number
     type: InvoiceItemType
     checkListItem?: VehicleChecklistItemViewRes

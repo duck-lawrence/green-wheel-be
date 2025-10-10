@@ -9,10 +9,9 @@ namespace Application.Dtos.VehicleChecklist.Request
 {
     public class UpdateVehicleChecklistReq
     {
-        public bool IsSignByStaff { get; set; }
-        public bool IsSignByCustomer { get; set; }
+        public bool IsSignedByStaff { get; set; }
+        public bool IsSignedByCustomer { get; set; }
         public Guid VehicleChecklistId { get; set; }
-        public string? Description { get; set; }
         public IEnumerable<UpdateChecklistItemReq> ChecklistItems { get; set; }
     }
 }

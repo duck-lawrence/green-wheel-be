@@ -16,13 +16,13 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public async Task AddRangeAsync(IEnumerable<InvoiceItem> items)
-        {
-            foreach(var item in items)
-            {
-                await _dbContext.InvoiceItems.AddAsync(item);
-            }
-        }
+        //public async Task AddRangeAsync(IEnumerable<InvoiceItem> items)
+        //{
+        //    foreach(var item in items)
+        //    {
+        //        await _dbContext.InvoiceItems.AddAsync(item);
+        //    }
+        //}
 
         public async Task<IEnumerable<InvoiceItem>> GetByInvoiceIdAsync(Guid invoiceId)
         {
