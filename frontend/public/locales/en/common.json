@@ -228,7 +228,11 @@
         "confirmed": "Confirmed",
         "in_use": "In Use",
         "returned": "Returned",
-        "overdue": "Overdue"
+        "overdue": "Overdue",
+        "handover_payment": "Hand over payment",
+        "return_payment": "Return payment",
+        "refund_payment": "Refund payment",
+        "other_payment": "Other payment"
     },
     "car_rental": {
         "vehicle": "Vehicle",
@@ -324,7 +328,8 @@
     "admin": {
         "dashboard_title": "Admin Dashboard",
         "dashboard_subtitle": "Select a module from the sidebar to get started.",
-        "dropdown_management": "Admin Management"
+        "dropdown_management": "Admin Management",
+        "sidebar_fleet": "Fleet"
     },
     "footer": {
         "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",

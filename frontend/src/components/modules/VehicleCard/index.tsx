@@ -3,9 +3,9 @@ import React from "react"
 import { CardBody, CardFooter, Image } from "@heroui/react"
 import { BatteryChargingIcon, Couch, Users } from "@phosphor-icons/react"
 import { useTranslation } from "react-i18next"
-import { formatCurrency } from "@/utils/helpers/currentcy"
+import { formatCurrency } from "@/utils/helpers/currency"
 import { CardStyled } from "@/components"
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 import { Icon } from "@iconify/react"
 
 // cắt chuỗi để chỉnh format cho đẹp =)

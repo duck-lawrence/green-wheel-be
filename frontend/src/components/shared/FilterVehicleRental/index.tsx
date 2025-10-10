@@ -206,7 +206,7 @@ export function FilterVehicleRental({ className = "" }: { className?: string }) 
                         errorMessage={formik.errors.stationId}
                         onSelectionChange={(id) => {
                             formik.setFieldValue("stationId", id)
-                            setStationId(id as string | null)
+                            setStationId(id as string | undefined)
                             formik.handleSubmit()
                         }}
                         className="max-w-60 h-20 mr-0"
@@ -237,7 +237,7 @@ export function FilterVehicleRental({ className = "" }: { className?: string }) 
                         // onChange={(val) => formik.setFieldValue("segment", val)}
                         onSelectionChange={(id) => {
                             formik.setFieldValue("segmentId", id)
-                            setSegmentId(id as string | null)
+                            setSegmentId(id as string | undefined)
                             formik.handleSubmit()
                         }}
                         className="max-w-40 h-20 mr-0"

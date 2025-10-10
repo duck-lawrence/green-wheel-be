@@ -1,25 +1,25 @@
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 
 interface BookingState {
-    stationId: string | null
-    segmentId: string | null
-    startDate: string | null
-    endDate: string | null
+    stationId?: string
+    segmentId?: string
+    startDate?: string
+    endDate?: string
     filteredVehicleModels: VehicleModelViewRes[]
 }
 
 interface BookingActions {
-    setStationId: (id: string | null) => void
-    setSegmentId: (id: string | null) => void
-    setStartDate: (date: string | null) => void
-    setEndDate: (date: string | null) => void
+    setStationId: (id?: string) => void
+    setSegmentId: (id?: string) => void
+    setStartDate: (date?: string) => void
+    setEndDate: (date?: string) => void
     setBookingFilter: (
-        station: string | null,
-        segment: string | null,
-        start: string | null,
-        end: string | null
+        station?: string,
+        segment?: string,
+        startDate?: string,
+        endDate?: string
     ) => void
     clearBookingFilter: () => void
     setFilteredVehicleModels: (filteredVehicleModels: VehicleModelViewRes[]) => void
@@ -29,10 +29,10 @@ export const useBookingFilterStore = create<BookingState & BookingActions>()(
     persist(
         (set) => ({
             // --- State ---
-            stationId: null,
-            segmentId: null,
-            startDate: null,
-            endDate: null,
+            stationId: undefined,
+            segmentId: undefined,
+            startDate: undefined,
+            endDate: undefined,
             filteredVehicleModels: [],
 
             // --- Actions ---
@@ -41,20 +41,20 @@ export const useBookingFilterStore = create<BookingState & BookingActions>()(
             setStartDate: (date) => set({ startDate: date }),
             setEndDate: (date) => set({ endDate: date }),
 
-            setBookingFilter: (station, segment, start, end) =>
+            setBookingFilter: (station, segment, startDate, endDate) =>
                 set({
                     stationId: station,
                     segmentId: segment,
-                    startDate: start,
-                    endDate: end
+                    startDate: startDate,
+                    endDate: endDate
                 }),
 
             clearBookingFilter: () =>
                 set({
-                    stationId: null,
-                    segmentId: null,
-                    startDate: null,
-                    endDate: null,
+                    stationId: undefined,
+                    segmentId: undefined,
+                    startDate: undefined,
+                    endDate: undefined,
                     filteredVehicleModels: []
                 }),
 

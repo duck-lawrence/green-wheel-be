@@ -13,17 +13,23 @@ namespace Infrastructure.UnitOfWorks
         public IUserRepository Users { get; }
         public ICitizenIdentityRepository CitizenIdentities { get; }
         public IDriverLicenseRepository DriverLicenses { get; }
+        public IVehicleModelRepository VehicleModels { get; }
+        public IModelImageRepository ModelImages { get; }
 
         public MediaUow(
             IGreenWheelDbContext context,
             IUserRepository users,
             ICitizenIdentityRepository citizenIdentities,
-            IDriverLicenseRepository driverLicenses)
+            IDriverLicenseRepository driverLicenses,
+            IVehicleModelRepository vehicleModels,
+            IModelImageRepository modelImages)
         {
             _context = context;
             Users = users;
             CitizenIdentities = citizenIdentities;
             DriverLicenses = driverLicenses;
+            VehicleModels = vehicleModels;
+            ModelImages = modelImages;
         }
 
         public Task<int> SaveChangesAsync(CancellationToken ct = default)

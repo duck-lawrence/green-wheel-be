@@ -6,7 +6,7 @@ import { SteeringWheel, UsersThree } from "@phosphor-icons/react"
 import { useTranslation } from "react-i18next"
 import { CardStyled } from "@/components"
 import { formatCurrency } from "@/utils/helpers/currentcy"
-import { VehicleModelViewRes } from "@/models/vehicle-model/schema/response"
+import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 
 type VehicleHorizontalCardProps = {
     vehicleModel: VehicleModelViewRes
@@ -22,7 +22,12 @@ type SpecItem = {
     className?: string
 }
 
-export function VehicleHorizontalCard({ vehicleModel, onSelect, className, readOnly }: VehicleHorizontalCardProps) {
+export function VehicleHorizontalCard({
+    vehicleModel,
+    onSelect,
+    className,
+    readOnly
+}: VehicleHorizontalCardProps) {
     const { t } = useTranslation()
     const {
         name,
@@ -108,7 +113,11 @@ export function VehicleHorizontalCard({ vehicleModel, onSelect, className, readO
                                 : t("vehicle_model.unavailable", "Unavailable")}
                         </Chip>
 
-                        <Chip size="sm" variant="flat" className="bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        <Chip
+                            size="sm"
+                            variant="flat"
+                            className="bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"
+                        >
                             {availableVehicleCount} {unitLabel}
                         </Chip>
                     </div>
@@ -149,7 +158,9 @@ export default VehicleHorizontalCard
 
 function SpecColumn({ icon, label, value, className }: SpecItem) {
     return (
-        <div className={cn("min-w-[120px] flex flex-col items-center gap-2 text-center", className)}>
+        <div
+            className={cn("min-w-[120px] flex flex-col items-center gap-2 text-center", className)}
+        >
             {icon}
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">{label}</p>
             <p className="text-sm font-semibold text-slate-900">{value}</p>

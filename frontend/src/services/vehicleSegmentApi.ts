@@ -1,4 +1,4 @@
-import { VehicleSegmentViewRes } from "@/models/vehicle-segment/schema/response"
+import { VehicleSegmentViewRes } from "@/models/vehicle/schema/response"
 import axiosInstance from "@/utils/axios"
 import { requestWrapper } from "@/utils/helpers/axiosHelper"
 

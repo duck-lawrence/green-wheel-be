@@ -12,8 +12,6 @@ public partial class Deposit : SorfDeletedEntity, IEntity
 
     public DateTimeOffset UpdatedAt { get; set; }
 
-    public string? Description { get; set; }
-
     public decimal Amount { get; set; }
 
     public DateTimeOffset? RefundedAt { get; set; }
