@@ -1,5 +1,5 @@
 services:
-    backend:
+    greenwheel-backend:
         container_name: greenwheel-backend
         build:
             context: .
@@ -39,7 +39,7 @@ services:
             MSSQL_SA_PASSWORD: ${MSSQL_PASSWORD}
         volumes:
             - greenwheel_mssql_data:/var/opt/mssql
-            - ../init-db:/init-db
+            - ./init-db:/init-db
 
 volumes:
     greenwheel_redis_data:
