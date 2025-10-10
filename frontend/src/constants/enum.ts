@@ -61,7 +61,7 @@ export enum InvoiceItemType {
     Damage = 1,
     LateReturn = 2,
     Cleaning = 3,
-    Penalty = 4,
+    Penalty = 4, //PHẠT NGUỘI
     Other = 5
 }
 
@@ -120,4 +120,12 @@ export enum OrderStatus {
     Overdue = 6,
     Completed = 7,
     Cancelled = 8
+}
+
+// Enum cho invoice
+export enum InvoiceType {
+    HandoverPayment = 0,
+    ReturnPayment = 1,
+    RefundPayment = 2,
+    OtherPayment = 3
 }

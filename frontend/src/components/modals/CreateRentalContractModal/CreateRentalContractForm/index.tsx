@@ -20,7 +20,7 @@ import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { BackendError } from "@/models/common/response"
 import { VehicleModelViewRes } from "@/models/vehicle/schema/response"
 import { StationViewRes } from "@/models/station/schema/response"
-import { formatCurrency } from "@/utils/helpers/currentcy"
+import { formatCurrency } from "@/utils/helpers/currency"
 import { CheckboxStyled } from "@/components/styled/CheckboxStyled"
 
 type FormValues = {
