@@ -23,7 +23,7 @@ public partial class Invoice : SorfDeletedEntity, IEntity
     public string? Notes { get; set; }
 
     public int Status { get; set; }
-
+    public int InvoiceType { get; set; }
     public DateTimeOffset? PaidAt { get; set; }
 
     public Guid ContractId { get; set; }

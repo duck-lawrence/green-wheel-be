@@ -15,16 +15,25 @@ namespace Infrastructure.UnitOfWorks
         public IVehicleChecklistItemRepository VehicleChecklistItemRepository { get; }
         public IVehicleCheckListRepository VehicleChecklistRepository { get; }
         public IVehicleRepository VehicleRepository { get; }
+        public IRentalContractRepository RentalContractRepository { get; }
+        public IInvoiceRepository InvoiceRepository { get; }
+        public IInvoiceItemRepository InvoiceItemRepository { get; }
 
         public VehicleChecklistUow(IGreenWheelDbContext context,
             IVehicleChecklistItemRepository vehicleChecklistItemRepository,
             IVehicleCheckListRepository vehicleCheckListRepository,
-            IVehicleRepository vehicleRepository)
+            IVehicleRepository vehicleRepository,
+            IRentalContractRepository rentalContractRepository,
+            IInvoiceRepository invoiceRepository,
+            IInvoiceItemRepository invoiceItemRepository)
         {
             _context = context;
             VehicleChecklistItemRepository = vehicleChecklistItemRepository;
             VehicleChecklistRepository = vehicleCheckListRepository;
             VehicleRepository = vehicleRepository;
+            RentalContractRepository = rentalContractRepository;
+            InvoiceRepository = invoiceRepository;
+            InvoiceItemRepository = invoiceItemRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

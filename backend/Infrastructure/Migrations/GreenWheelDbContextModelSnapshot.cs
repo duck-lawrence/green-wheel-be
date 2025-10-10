@@ -467,6 +467,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
 
+                    b.Property<int>("InvoiceType")
+                        .HasColumnType("int")
+                        .HasColumnName("invoice_type");
+
                     b.Property<string>("Notes")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")

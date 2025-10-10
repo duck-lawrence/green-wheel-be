@@ -52,7 +52,10 @@ const mergeClassNames = <T,>(overrides?: SlotOverrides<T>): SlotOverrides<T> => 
     return result as SlotOverrides<T>
 }
 
-export type FilterTypeStyleProps<T = object> = Omit<SelectProps<T>, "variant" | "size" | "radius"> & {
+export type FilterTypeStyleProps<T = object> = Omit<
+    SelectProps<T>,
+    "variant" | "size" | "radius"
+> & {
     classNames?: SlotOverrides<T>
     showIcon?: boolean
 }

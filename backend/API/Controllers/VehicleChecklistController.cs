@@ -21,13 +21,17 @@ namespace API.Controllers
             _vehicleChecklistService = vehicleChecklistService;
             _imageService = imageService;
         }
-
+        /* 
+         * status code
+         * 200 success
+         * 
+         */
         [HttpPost]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
-            var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklistAsync(staff, req);
+            var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklist(staff, req);
             return Ok(vehicleCheckList);
         }
 

@@ -1,4 +1,4 @@
-﻿namespace Application.Dtos.Common.Request
+﻿namespace Application.Dtos.Common.Response
 {
     public class PageResult<T>
     {
