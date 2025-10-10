@@ -16,6 +16,7 @@ using Infrastructure.Repositories;
 using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using AutoMapper;
 
 namespace API
 {
@@ -81,10 +82,11 @@ namespace API
             builder.Services.AddScoped<IMomoPaymentLinkRepository, MomoPaymentRepository>();
             builder.Services.AddScoped<IModelImageRepository, ModelImageRepository>();
             builder.Services.AddScoped<IVehicleSegmentRepository, VehicleSegmentRepository>();
-            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();            
+            builder.Services.AddScoped<ICloudinaryRepository, CloudinaryRepository>();
             builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
             builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
+            builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -100,6 +102,8 @@ namespace API
             builder.Services.AddScoped<IModelImageService, ModelImageService>();
             builder.Services.AddScoped<IPhotoService, CloudinaryService>();
             builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
+            builder.Services.AddScoped<IStationFeedbackService, StationFeedbackService>();
+            builder.Services.AddScoped<IChecklistItemImageService, ChecklistItemImageService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -114,7 +118,7 @@ namespace API
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
-
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             //configure <-> setting
             //Momo
             builder.Services.Configure<MomoSettings>(builder.Configuration.GetSection("MomoSettings"));

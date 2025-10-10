@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
@@ -24,7 +25,9 @@ namespace Infrastructure.Repositories
             IQueryable<Invoice> query = _dbContext.Invoices.AsQueryable();
             if (includeItems)
             {
-                query = query.Include(i => i.InvoiceItems);
+                query = query.Include(i => i.InvoiceItems)
+                    .ThenInclude(i => i.ChecklistItem)
+                        .ThenInclude(cli => cli.Component);
             }
             if (includeDeposit)
             {

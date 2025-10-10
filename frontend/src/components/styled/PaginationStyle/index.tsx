@@ -244,10 +244,6 @@ function renderItem(
     const isLast = value === lastPage
     const inCore = coreSet.has(value)
 
-    // Quyết định render:
-    // - Luôn render các số trong core
-    // - Render "1" nếu showFirst
-    // - Render "Last" nếu showLast
     if (!inCore && !(isFirst && showFirst) && !(isLast && showLast)) return null
 
     const clickNum = () => { if (value !== currentPage) onPageChange?.(value) }
@@ -286,51 +282,9 @@ function renderItem(
 
   return null
 }
-
-/* ----------- logic helpers ----------- */
-
-// Rule theo mô tả của bạn:
-// - p <= 3         => core = [1,2,3],            leftDots: false, rightDots: true,  showFirst: false, showLast: true
-// - p >= N - 3     => core = [N-2,N-1,N],        leftDots: true,  rightDots: false, showFirst: true,  showLast: false
-// - else (giữa)    => core = [p, p+1],           leftDots: true,  rightDots: true,  showFirst: true,  showLast: true
-// function getLayout(p: number, N: number) {
-//   if (N <= 3) {
-//     return {
-//       corePages: Array.from({ length: N }, (_, i) => i + 1),
-//       showFirst: false,
-//       showLeftDots: false,
-//       showRightDots: false,
-//       showLast: false
-//     }
-//   }
-
-//   if (p <= 3) {
-//     return {
-//       corePages: [1, 2, 3],
-//       showFirst: false,
-//       showLeftDots: false,
-//       showRightDots: true,
-//       showLast: true
-//     }
-//   }
-
-//   if (p >= N - 3) {
-//   const core = [N - 2, N - 1, N]
-//   const corePages = core.includes(p) ? core : [p, ...core]  // thêm 8 khi p = N - 3
-//   return { corePages, showFirst: true, showLeftDots: true, showRightDots: false, showLast: false }
-// }
-
-//   // giữa
-//   return {
-//     corePages: [p, p + 1],
-//     showFirst: true,
-//     showLeftDots: true,
-//     showRightDots: true,
-//     showLast: true
-//   }
-// }
 function getLayout(p: number, N: number) {
-  if (N <= 3) {
+  // Nhỏ (<=5) → hiện hết, không cần dấu …
+  if (N <= 5) {
     return {
       corePages: Array.from({ length: N }, (_, i) => i + 1),
       showFirst: false,
@@ -340,33 +294,28 @@ function getLayout(p: number, N: number) {
     }
   }
 
+  // Chọn core theo vị trí
   let corePages: number[]
+  if (p <= 3) corePages = [1, 2, 3]
+  else if (p >= N - 2) corePages = [N - 2, N - 1, N]
+  else corePages = [p, p + 1]
 
-  if (p <= 3) {
-    corePages = [1, 2, 3]
-  }
-  // CUỐI: chỉ coi là "cuối" khi p >= N-2
-  else if (p >= N - 2) {
-    corePages = [N - 2, N - 1, N]
-  }
-  // GIỮA
-  else {
-    corePages = [p, p + 1]
-  }
-
+  // Đảm bảo luôn có trang hiện tại
   if (!corePages.includes(p)) corePages = [p, ...corePages]
 
-  corePages = Array.from(new Set(corePages.filter(x => x >= 1 && x <= N))).sort((a, b) => a - b)
+  // Dedupe + sort
+  corePages = Array.from(new Set(corePages.filter(x => x >= 1 && x <= N))).sort((a,b)=>a-b)
 
-  const showFirst = p > 3
-  const showLast = p < N - 2
-  const showLeftDots = showFirst
-  const lastCore = corePages[corePages.length - 1]
-  const showRightDots = showLast && lastCore < N - 1
+  const firstCore = corePages[0]
+  const lastCore  = corePages[corePages.length - 1]
+
+  const showFirst     = firstCore > 1             
+  const showLast      = lastCore  < N             
+  const showLeftDots  = showFirst && firstCore > 2 
+  const showRightDots = showLast  && lastCore  < N - 1
 
   return { corePages, showFirst, showLeftDots, showRightDots, showLast }
 }
-
 
 function buildClass(...inputs: Array<string | undefined | null | false>) {
   return cn(...inputs)

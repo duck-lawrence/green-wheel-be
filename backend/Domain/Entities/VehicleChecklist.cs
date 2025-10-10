@@ -12,8 +12,6 @@ public partial class VehicleChecklist : SorfDeletedEntity, IEntity
 
     public DateTimeOffset UpdatedAt { get; set; }
 
-    public string? Description { get; set; }
-
     public bool IsSignedByStaff { get; set; }
 
     public bool IsSignedByCustomer { get; set; }

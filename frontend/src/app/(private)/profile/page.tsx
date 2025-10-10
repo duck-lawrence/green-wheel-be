@@ -1,6 +1,5 @@
 "use client"
 import {
-    AvatarUploader,
     AvaterStyled,
     ButtonStyled,
     DatePickerStyled,
@@ -14,8 +13,8 @@ import { parseDate } from "@internationalized/date"
 import {
     useDay,
     useDeleteAvatar,
+    useGetMe,
     useImageUploadModal,
-    useProfileStore,
     useUpdateMe,
     useUploadAvatar
 } from "@/hooks"
@@ -31,10 +30,10 @@ import { DEFAULT_AVATAR_URL } from "@/constants/constants"
 import { DropdownItem, DropdownMenu, DropdownTrigger, useDisclosure } from "@heroui/react"
 import { NAME_REGEX, PHONE_REGEX } from "@/constants/regex"
 
-export default function Page() {
+export default function ProfilePage() {
     const { t } = useTranslation()
     const { formatDateTime } = useDay({})
-    const user = useProfileStore((s) => s.user)
+    const { data: user } = useGetMe()
     const updateMeMutation = useUpdateMe({ onSuccess: undefined })
     const deleteAvatarMutation = useDeleteAvatar({ onSuccess: undefined })
     const [showChange, setShowChange] = useState(true)
@@ -93,8 +92,6 @@ export default function Page() {
         <div>
             {/* Title */}
             <div className="text-3xl mb-4 px-4 pb-4 font-bold">{t("user.account_information")}</div>
-
-            <AvatarUploader />
 
             {/* Avatar Upload Modal */}
             <ImageUploaderModal

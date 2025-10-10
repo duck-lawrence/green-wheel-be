@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Repositories;
+﻿using Application.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Application.UnitOfWorks
 {
@@ -13,5 +9,7 @@ namespace Application.UnitOfWorks
         IVehicleModelRepository VehicleModelRepository { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+        Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
     }
 }

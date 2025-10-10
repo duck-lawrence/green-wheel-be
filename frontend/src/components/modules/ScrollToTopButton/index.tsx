@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react"
 import { ArrowUpIcon } from "@phosphor-icons/react"
 import { motion, AnimatePresence } from "framer-motion"
 
-export default function ScrollToTopButton() {
+export function ScrollToTopButton() {
     const [visible, setVisible] = useState(false)
     const [launch, setLaunch] = useState(false)
     const [flyHeight, setFlyHeight] = useState(0)

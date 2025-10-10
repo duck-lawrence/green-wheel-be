@@ -1,7 +1,8 @@
 "use client"
 
 import { ROLE_CUSTOMER } from "@/constants/constants"
-import { useGetMeFromCache } from "@/hooks"
+import { useGetMe } from "@/hooks"
+
 import { Spinner } from "@heroui/react"
 import { useRouter } from "next/navigation"
 import React, { useEffect, useMemo } from "react"
@@ -11,7 +12,7 @@ import { useTranslation } from "react-i18next"
 export default function CustomerLayout({ children }: { children: React.ReactNode }) {
     const router = useRouter()
     const { t } = useTranslation()
-    const user = useGetMeFromCache()
+    const { data: user } = useGetMe()
 
     const isCustomer = useMemo(() => {
         return user?.role?.name === ROLE_CUSTOMER
