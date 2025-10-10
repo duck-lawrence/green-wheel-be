@@ -1,4 +1,4 @@
-import DetailDamage from "@/components/shared/InvoiceByType/InvoiceForm/InvoiceRentalEndForm/DetailDamage"
+import DetailDamage from "@/components/shared/InvoiceForm/InvoiceReturnForm/DetailDamage"
 import { ModalStyled } from "@/components/styled"
 import { InvoiceViewRes } from "@/models/invoice/schema/response"
 import { ModalBody, ModalContent, ModalHeader } from "@heroui/react"

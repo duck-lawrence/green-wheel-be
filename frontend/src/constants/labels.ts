@@ -138,8 +138,8 @@ export const OrderStatusLabels: Record<OrderStatus, string> = {
 }
 
 export const InvoiceTypeLabels: Record<InvoiceType, string> = {
-    [InvoiceType.BookingPayment]: i18n.t("enum.booking_payment"),
+    [InvoiceType.HandoverPayment]: i18n.t("enum.handover_payment"),
     [InvoiceType.ReturnPayment]: i18n.t("enum.return_payment"),
-    [InvoiceType.DepositRefund]: i18n.t("enum.deposit_refund"),
-    [InvoiceType.DamageSupport]: i18n.t("enum.damage_support")
+    [InvoiceType.RefundPayment]: i18n.t("enum.refund_payment"),
+    [InvoiceType.OtherPayment]: i18n.t("enum.other_payment")
 }

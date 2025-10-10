@@ -1,58 +1,134 @@
-import { RentalContractStatus } from "@/constants/enum"
+import {
+    RentalContractStatus,
+    InvoiceStatus,
+    DepositStatus,
+    PaymentMethod,
+    InvoiceItemType
+} from "@/constants/enum"
 import { RentalContractViewRes } from "@/models/rental-contract/schema/response"
-import { mockInvoices } from "./mockIvoices"
 
-// 🔸 Giả lập 3 hợp đồng thuê xe điện
 export const mockContracts: RentalContractViewRes[] = [
     {
         id: "CON001",
-        description: "Thuê xe VF8 Eco 2 ngày",
-        startDate: "2025-10-05T09:00:00Z",
-        endDate: "2025-10-07T09:00:00Z",
+        description: "Hợp đồng thuê xe VF8 cho khách Nguyễn Văn A",
+        notes: "Khách thuê trong 7 ngày, nhận xe tại chi nhánh Quận 7",
+        startDate: "2025-10-01",
+        actualStartDate: "2025-10-01",
+        endDate: "2025-10-08",
+        actualEndDate: "2025-10-08",
         status: RentalContractStatus.Completed,
-        vehicleId: "VEH001",
+        vehicleId: "VH001",
         customerId: "CUS001",
         handoverStaffId: "STF001",
         returnStaffId: "STF002",
-        notes: "Khách thuê đầy đủ, có phạt nguội nhỏ",
         invoices: [
-            mockInvoices.find((x) => x.id === "INV_B001")!, // Nhận xe
-            mockInvoices.find((x) => x.id === "INV_R001")!, // Trả xe
-            mockInvoices.find((x) => x.id === "INV_D001")! // Hoàn cọc
-        ]
-    },
-    {
-        id: "CON002",
-        description: "Thuê xe VF3 trong 1 ngày",
-        startDate: "2025-10-02T09:00:00Z",
-        endDate: "2025-10-03T09:00:00Z",
-        status: RentalContractStatus.Completed,
-        vehicleId: "VEH002",
-        customerId: "CUS002",
-        handoverStaffId: "STF001",
-        returnStaffId: "STF002",
-        notes: "Xe bị trầy nhẹ, hoàn cọc đủ",
-        invoices: [
-            mockInvoices.find((x) => x.id === "INV_B002")!, // Nhận xe
-            mockInvoices.find((x) => x.id === "INV_R002")!, // Trả xe có damage
-            mockInvoices.find((x) => x.id === "INV_D002")! // Hoàn cọc đầy đủ
-        ]
-    },
-    {
-        id: "CON003",
-        description: "Thuê xe VF6 - đang hoạt động",
-        startDate: "2025-10-07T08:00:00Z",
-        endDate: "2025-10-10T08:00:00Z",
-        status: RentalContractStatus.Active,
-        vehicleId: "VEH003",
-        customerId: "CUS003",
-        handoverStaffId: "STF004",
-        returnStaffId: "STF004",
-        notes: "Khách đang thuê, có 1 hóa đơn sửa chữa giữa chuyến",
-        invoices: [
-            mockInvoices.find((x) => x.id === "INV_B003")!, // Nhận xe - chờ thanh toán
-            mockInvoices.find((x) => x.id === "INV_S001")!, // Hóa đơn hỗ trợ hư hỏng
-            mockInvoices.find((x) => x.id === "INV_S002")! // Thay pin
+            {
+                id: "INV_START_001",
+                subtotal: 10000000,
+                tax: 1000000,
+                total: 11000000,
+                payAmount: 11000000,
+                paymentMentod: PaymentMethod.MomoWallet,
+                notes: "Thanh toán khi nhận xe (cọc + tiền thuê + VAT)",
+                status: InvoiceStatus.Paid,
+                paidAt: "2025-10-01T08:00:00Z",
+                items: [
+                    {
+                        id: "IT001",
+                        quantity: 1,
+                        unitPrice: 8000000,
+                        subTotal: 8000000,
+                        type: InvoiceItemType.BaseRental
+                    },
+                    {
+                        id: "IT002",
+                        quantity: 1,
+                        unitPrice: 2000000,
+                        subTotal: 2000000,
+                        type: InvoiceItemType.Other
+                    } // tiền cọc
+                ]
+            },
+            {
+                id: "INV_END_001",
+                subtotal: 450000,
+                tax: 0,
+                total: 450000,
+                payAmount: 450000,
+                paymentMentod: PaymentMethod.Cash,
+                notes: "Thanh toán khi trả xe (vệ sinh + trễ + hư hỏng)",
+                status: InvoiceStatus.Paid,
+                paidAt: "2025-10-08T17:00:00Z",
+                items: [
+                    {
+                        id: "IT003",
+                        quantity: 1,
+                        unitPrice: 300000,
+                        subTotal: 300000,
+                        type: InvoiceItemType.Cleaning
+                    },
+                    {
+                        id: "IT004",
+                        quantity: 1,
+                        unitPrice: 150000,
+                        subTotal: 150000,
+                        type: InvoiceItemType.LateReturn
+                    }
+                ]
+            },
+            {
+                id: "INV_REFUND_001",
+                subtotal: 2000000,
+                tax: 0,
+                total: 2000000,
+                payAmount: 1800000, // do có phạt nguội 200k
+                paymentMentod: PaymentMethod.Cash,
+                notes: "Hoàn tiền cọc (trừ phạt nguội 200k)",
+                status: InvoiceStatus.Paid,
+                paidAt: "2025-10-09T09:00:00Z",
+                items: [
+                    {
+                        id: "IT005",
+                        quantity: 1,
+                        unitPrice: 2000000,
+                        subTotal: 2000000,
+                        type: InvoiceItemType.Other
+                    },
+                    {
+                        id: "IT006",
+                        quantity: 1,
+                        unitPrice: -200000,
+                        subTotal: -200000,
+                        type: InvoiceItemType.Penalty
+                    }
+                ],
+                deposit: {
+                    id: "DEP001",
+                    amount: 2000000,
+                    refundedAt: "2025-10-09T09:00:00Z",
+                    status: DepositStatus.Refunded
+                }
+            },
+            {
+                id: "INV_SUPPORT_001",
+                subtotal: 1500000,
+                tax: 0,
+                total: 1500000,
+                payAmount: 1500000,
+                paymentMentod: PaymentMethod.MomoWallet,
+                notes: "Chi phí hỗ trợ sửa chữa xe khi gặp sự cố trên đường.",
+                status: InvoiceStatus.Paid,
+                paidAt: "2025-10-05T10:30:00Z",
+                items: [
+                    {
+                        id: "IT007",
+                        quantity: 1,
+                        unitPrice: 1500000,
+                        subTotal: 1500000,
+                        type: InvoiceItemType.Damage
+                    }
+                ]
+            }
         ]
     }
 ]

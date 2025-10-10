@@ -117,8 +117,8 @@ export enum OrderStatus {
 
 // Enum cho invoice
 export enum InvoiceType {
-    BookingPayment = 0,
+    HandoverPayment = 0,
     ReturnPayment = 1,
-    DepositRefund = 2,
-    DamageSupport = 3
+    RefundPayment = 2,
+    OtherPayment = 3
 }
