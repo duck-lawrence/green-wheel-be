@@ -27,7 +27,8 @@ export enum InvoiceType {
     Handover = 0,
     Return = 1,
     Refund = 2,
-    Other = 3
+    Other = 3,
+    Reservation = 4
 }
 
 export enum RentalContractStatus {
@@ -70,28 +71,15 @@ export enum PaymentMethod {
     MomoWallet = 1
 }
 
-export enum SupportRequestStatus {
+export enum TicketType {
+    CustomerSupport = 0,
+    StaffReport = 1
+}
+
+export enum TicketStatus {
     Pending = 0,
-    InProgress = 1,
-    Resolved = 2
-}
-
-export enum SupportRequestType {
-    Technical = 0,
-    Payment = 1,
-    Other = 2
-}
-
-export enum StaffReportStatus {
-    Pending = 0,
-    InProgress = 1,
-    Resolved = 2
-}
-
-export enum StaffReportType {
-    Internal = 0,
-    RelatedToSupport = 1,
-    Other = 2
+    Resolve = 1,
+    EscalatedToAdmin = 2
 }
 
 export enum LicenseClass {
