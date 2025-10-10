@@ -119,8 +119,7 @@ namespace Application
                 var mainDto = new VehicleModelImageRes
                 {
                     ModelId = model.Id,
-                    ImageUrl = mainUpload.Url,
-                    ImagePublicId = mainUpload.PublicID
+                    ImageUrl = mainUpload.Url
                 };
 
                 return (mainDto, galleryDtos);

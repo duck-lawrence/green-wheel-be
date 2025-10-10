@@ -10,6 +10,5 @@ namespace Application.Dtos.VehicleModel.Respone
     {
         public Guid ModelId { get; set; }
         public string ImageUrl { get; set; } = null!;
-        public string ImagePublicId { get; set; } = null!;
     }
 }

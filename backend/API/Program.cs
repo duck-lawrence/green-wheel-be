@@ -103,6 +103,7 @@ namespace API
             builder.Services.AddScoped<IPhotoService, CloudinaryService>();
             builder.Services.AddScoped<ISupportRequestService, SupportRequestService>();
             builder.Services.AddScoped<IStationFeedbackService, StationFeedbackService>();
+            builder.Services.AddScoped<IChecklistItemImageService, ChecklistItemImageService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
