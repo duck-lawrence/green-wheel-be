@@ -9,8 +9,7 @@ namespace Application.Mappers
         public ModelImageProfile()
         {
             CreateMap<ModelImage, VehicleModelImageRes>()
-                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Url))
-                .ForMember(dest => dest.ImagePublicId, opt => opt.MapFrom(src => src.PublicId));
+                .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Url));
         }
     }
 }

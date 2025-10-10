@@ -28,6 +28,7 @@ namespace Application
     {
         private readonly IVehicleChecklistUow _uow;
         private readonly IMapper _mapper;
+
         public VehicleChecklistService(IVehicleChecklistUow uow, IMapper mapper)
         {
             _uow = uow;
@@ -145,7 +146,7 @@ namespace Application
         public async Task<VehicleChecklistViewRes> GetByIdAsync(Guid id)
         {
             var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
-            if(vehicleChecklist == null)
+            if (vehicleChecklist == null)
             {
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
             }
@@ -157,10 +158,10 @@ namespace Application
         {
 
             var checklists = await _uow.VehicleChecklistRepository.GetAllAsync(
-                    new Expression<Func<VehicleChecklist, object>>[]
-                    {
+                new Expression<Func<VehicleChecklist, object>>[]
+                {
                     v => v.VehicleChecklistItems
-                    });
+                });
             var checklist = checklists.Where(c => c.Id == req.VehicleChecklistId).FirstOrDefault();
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
@@ -257,5 +258,4 @@ namespace Application
             
         }
     }
-    
 }

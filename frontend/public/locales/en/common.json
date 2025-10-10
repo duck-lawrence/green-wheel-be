@@ -228,7 +228,11 @@
         "confirmed": "Confirmed",
         "in_use": "In Use",
         "returned": "Returned",
-        "overdue": "Overdue"
+        "overdue": "Overdue",
+        "handover_payment": "Hand over payment",
+        "return_payment": "Return payment",
+        "refund_payment": "Refund payment",
+        "other_payment": "Other payment"
     },
     "car_rental": {
         "vehicle": "Vehicle",
