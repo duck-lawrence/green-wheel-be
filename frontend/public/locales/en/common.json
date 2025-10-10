@@ -66,6 +66,7 @@
         "phone_require": "Phone is required",
         "invalid_phone": "Phone must be 10 digits and start with 0",
         "phone_already_exist": "This phone already exists",
+        "enter_phone_to_booking": "Please enter your phone in profile to continue booking",
         "first_name": "First name",
         "first_name_require": "First name is required",
         "invalid_first_name": "First name only contains letters",
@@ -135,7 +136,8 @@
         "payment_method_require": "Please select a payment method",
         "pickup_location_require": "Please select pickup location",
         "agree_terms_require": "You must agree to the payment terms",
-        "agree_data_policy_require": "You must agree to the data sharing terms"
+        "agree_data_policy_require": "You must agree to the data sharing terms",
+        "wait_for_confirm": "Your order is being processed. Please wait for the confirmation email before making a payment."
     },
     "vehicle_model": {
         "station": "Station",
@@ -151,7 +153,7 @@
         "number_of_days": "Number of days",
         "deposit_fee": "Deposit fee",
         "temporary_total": "Total",
-        "rental_request": "Rental request",
+        "create_rental_request": "Create rental request",
         "similar_vehicles": "Similar vehicles",
         "view_all": "View all",
         "out_of_stock": "Out of stock",
@@ -160,6 +162,7 @@
         "airbag": "Airbag"
     },
     "vehicle_filter": {
+        "require": "Please complete the filter form before continuing",
         "start_date_require": "Please select date and time to pick up the car",
         "invalid_start_date_range": "Vehicle pick-up date must be between 7 AM - 5 PM",
         "invalid_start_date": "Pick-up time must be at least 3 hours from now and within working hours (7 AM - 5 PM)",
@@ -192,7 +195,7 @@
         "unavailable": "Unavailable",
         "rented": "Rented",
         "maintenance": "Maintenance",
-        "missing_no_token": "Missing no token",
+        "missing_no_reason": "Missing no reason",
         "late_return": "Late Return",
         "base_rental": "Base Rental",
         "damage": "Damage",
@@ -225,7 +228,11 @@
         "confirmed": "Confirmed",
         "in_use": "In Use",
         "returned": "Returned",
-        "overdue": "Overdue"
+        "overdue": "Overdue",
+        "handover_payment": "Hand over payment",
+        "return_payment": "Return payment",
+        "refund_payment": "Refund payment",
+        "other_payment": "Other payment"
     },
     "car_rental": {
         "vehicle": "Vehicle",
@@ -260,7 +267,8 @@
         "place1": "Place 1",
         "place2": "Place 2",
         "detail_table": "Detail table",
-        "total": "Total"
+        "total": "Total",
+        "days": "day(s)"
     },
     "cloudinary": {
         "file_not_found": "File not fount",
@@ -270,6 +278,7 @@
         "sidebar_dashboard": "Dash Board",
         "sidebar_handovers": "Handovers",
         "sidebar_contracts": "Contracts",
+        "sidebar_test": "Test",
         "sidebar_verify_customer": "Customer Verification",
         "sidebar_payments": "On-site Payments",
         "sidebar_fleet": "Fleet",
@@ -296,7 +305,7 @@
         "handovers_table_range_separator": "to",
         "dashboard_title": "Staff dashboard",
         "dashboard_subtitle": "Select a module from the sidebar to get started.",
-        "report_page_title": "Submit report",
+        "report_page_title": "Report",
         "report_page_description": "Share operational issues or feedback with the management team.",
         "report_form_staff_name_label": "Staff name",
         "report_form_report_type_label": "Report type",
@@ -315,8 +324,12 @@
         "report_form_validation_title_max": "Title must be 100 characters or less.",
         "report_form_validation_description_required": "Description is required.",
         "report_form_validation_description_max": "Description must be 1000 characters or less."
-      
-        
+    },
+    "admin": {
+        "dashboard_title": "Admin Dashboard",
+        "dashboard_subtitle": "Select a module from the sidebar to get started.",
+        "dropdown_management": "Admin Management",
+        "sidebar_fleet": "Fleet"
     },
     "footer": {
         "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",

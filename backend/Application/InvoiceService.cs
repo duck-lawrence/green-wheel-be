@@ -1,10 +1,13 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Invoice.Response;
 using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.Momo.Request;
 using Application.Repositories;
 using Application.UnitOfWorks;
+using AutoMapper;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -17,10 +20,14 @@ namespace Application
     public class InvoiceService : IInvoiceService
     {
         private readonly IInvoiceUow _uow;
+        private readonly IMapper _mapper;
+        private readonly IMomoService _momoService;
 
-        public InvoiceService(IInvoiceUow uow)
+        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService)
         {
             _uow = uow;
+            _mapper = mapper;
+            _momoService = momoService;
         }
 
         public async Task CashPayment(Invoice invoice)
@@ -41,14 +48,31 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task<Invoice> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
+        public async Task<InvoiceViewRes> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
         {
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if (invoice == null)
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
-            return invoice;
+            var invoiceViewRes = _mapper.Map<InvoiceViewRes>(invoice);
+            return invoiceViewRes;
+        }
+
+        public async Task<string?> ProcessPayment(Guid id, int paymentMethod)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, false, true);
+            if (paymentMethod == (int)PaymentMethod.Cash)
+            {
+                await CashPayment(invoice);
+            }
+            else if (paymentMethod == (int)PaymentMethod.MomoWallet)
+            {
+                var amount = invoice.Subtotal + invoice.Deposit.Amount + invoice.Subtotal * invoice.Tax;
+                var link = await _momoService.CreatePaymentAsync(amount, id, invoice.Notes);
+                return link;
+            }
+            return null;
         }
 
         public async Task ProcessUpdateInvoice(MomoIpnReq momoIpnReq, Guid invoiceId)

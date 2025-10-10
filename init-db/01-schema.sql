@@ -7,6 +7,8 @@ CREATE DATABASE green_wheel_db
 GO
 USE green_wheel_db
 GO
+SET QUOTED_IDENTIFIER ON;
+GO
 
 -- Table
 
@@ -328,24 +330,26 @@ CREATE TABLE [rental_contracts] (
     [customer_id] uniqueidentifier NOT NULL,
     [handover_staff_id] uniqueidentifier,
     [return_staff_id] uniqueidentifier,
+    [station_id] uniqueidentifier NOT NULL,
 
     CONSTRAINT fk_rental_contracts_vehicles FOREIGN KEY ([vehicle_id]) REFERENCES [vehicles]([id]),
     CONSTRAINT fk_rental_contracts_customers FOREIGN KEY ([customer_id]) REFERENCES [users]([id]),
     CONSTRAINT fk_rental_contracts_handover_staffs FOREIGN KEY ([handover_staff_id]) REFERENCES [staffs]([user_id]),
-    CONSTRAINT fk_rental_contracts_return_staffs FOREIGN KEY ([return_staff_id]) REFERENCES [staffs]([user_id])
+    CONSTRAINT fk_rental_contracts_return_staffs FOREIGN KEY ([return_staff_id]) REFERENCES [staffs]([user_id]),
+    CONSTRAINT fk_rental_contracts_stations FOREIGN KEY ([station_id]) REFERENCES [stations]([id])
 );
 GO
 CREATE INDEX idx_rental_contracts_vehicle_id ON rental_contracts (vehicle_id);
 CREATE INDEX idx_rental_contracts_customer_id ON rental_contracts (customer_id);
 CREATE INDEX idx_rental_contracts_handover_staff_id ON rental_contracts (handover_staff_id);
 CREATE INDEX idx_rental_contracts_return_staff_id ON rental_contracts (return_staff_id);
+CREATE INDEX idx_rental_contracts_station_id ON rental_contracts (station_id);
 GO
 
 CREATE TABLE [vehicle_checklists] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [description] nvarchar(255),
     [is_signed_by_staff] bit NOT NULL DEFAULT (0),
     [is_signed_by_customer] bit NOT NULL DEFAULT (0),
     [deleted_at] datetimeoffset,
@@ -401,19 +405,17 @@ CREATE TABLE [invoices] (
     [payment_method] int NOT NULL, -- 0: Cash, 1: MomoWallet
     [notes] nvarchar(255),
     [status] int NOT NULL DEFAULT 0, -- Pending, Paid, Cancelled
+    [type] int NOT NULL DEFAULT 0,
 
     [paid_at] datetimeoffset,
     [deleted_at] datetimeoffset,
 
     [contract_id] uniqueidentifier NOT NULL,
-    [checklist_id] uniqueidentifier,
 
-    CONSTRAINT fk_invoices_contracts FOREIGN KEY ([contract_id]) REFERENCES [rental_contracts]([id]),
-    CONSTRAINT fk_invoices_checklists FOREIGN KEY ([checklist_id]) REFERENCES [vehicle_checklists]([id])
+    CONSTRAINT fk_invoices_contracts FOREIGN KEY ([contract_id]) REFERENCES [rental_contracts]([id])
 );
 GO
 CREATE INDEX idx_invoices_contract_id ON invoices (contract_id);
-CREATE UNIQUE INDEX uq_invoices_checklist_id ON invoices (checklist_id) WHERE checklist_id IS NOT NULL;
 GO
 
 CREATE TABLE [invoice_items] (
@@ -423,7 +425,6 @@ CREATE TABLE [invoice_items] (
     
     [quantity] int NOT NULL DEFAULT 1,
     [unit_price] decimal(10,2) NOT NULL,
-    [notes] nvarchar(255),
     [type] int NOT NULL, -- 0: BaseRental, 1: Damage, 2: LateReturn, 3: Cleaning, 4: Penalty, 5: Other
     [deleted_at] datetimeoffset,
 
@@ -442,7 +443,6 @@ CREATE TABLE [deposits] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [description] nvarchar(255),
     [amount] decimal(10,2) NOT NULL,
     [refunded_at] datetimeoffset,
     [status] int NOT NULL DEFAULT 0, -- Pending, Paid, Refunded, Forfeited

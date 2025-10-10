@@ -5,6 +5,8 @@ using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using System.Security.Claims;
 
 namespace API.Controllers
@@ -30,7 +32,7 @@ namespace API.Controllers
          */
         [HttpPost]
         [Authorize]
-        [RoleAuthorize("Customer")]
+        [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> CreateRentalContract(CreateRentalContractReq createReq)
         {
             var userClaims = HttpContext.User;
@@ -72,6 +74,7 @@ namespace API.Controllers
         * 422: business error (citizen id)
         * 200: success
         */
+        [RoleAuthorize(RoleName.Staff)]
         [HttpPost("offline")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
@@ -89,11 +92,42 @@ namespace API.Controllers
         * 404: rentalContract not found
         * 200: success
         */
+        [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
-        public async Task<IActionResult> GetByCusPhoneAndContractId([FromQuery] string? phone, [FromQuery] int? status)
+        public async Task<IActionResult> GetByCusPhoneAndContractStatus([FromQuery] string? phone, [FromQuery] int? status)
         {
             var contractViews = await _rentalContractService.GetByCustomerPhoneAndContractStatus(status, phone);
             return Ok(contractViews);
         }
+
+        /*
+         * Status code
+         * 
+         */
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPut("{id}/handover")]
+        public async Task<IActionResult> HandoverRentalContract(Guid id, HandoverContractReq req)
+        {
+            var staff = HttpContext.User;
+            await _rentalContractService.HandoverRentalContractAsync(staff, id, req);
+            return Ok();
+
+        }
+
+        /*
+         * Status code
+         * 404 contract not found
+         * 200 success
+         */
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPut("{id}/return")]
+        public async Task<IActionResult> ReturnRentalContract(Guid id)
+        {
+            var staff = HttpContext.User;
+            var invoiceView = await _rentalContractService.ReturnRentalContractAsync(staff, id);
+            return invoiceView == null ? Ok() : Ok(invoiceView);
+        }
+
+        
     }
 }

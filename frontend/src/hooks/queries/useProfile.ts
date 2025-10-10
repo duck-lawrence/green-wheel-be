@@ -6,18 +6,12 @@ import { BackendError } from "@/models/common/response"
 import { translateWithFallback } from "@/utils/helpers/translateWithFallback"
 import { UserUpdateReq } from "@/models/user/schema/request"
 import { UserProfileViewRes } from "@/models/user/schema/response"
-import { useProfileStore } from "@/hooks"
 import { profileApi } from "@/services/profileApi"
 
-export function useInvalidateMeQuery() {
+export const useInvalidateMeQuery = () => {
     const queryClient = useQueryClient()
 
     return () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.ME })
-}
-
-export function useGetMeFromCache(): UserProfileViewRes | undefined {
-    const queryClient = useQueryClient()
-    return queryClient.getQueryData<UserProfileViewRes>(QUERY_KEYS.ME)
 }
 
 export const useGetMe = ({ enabled = true }: { enabled?: boolean } = {}) => {
@@ -31,7 +25,6 @@ export const useGetMe = ({ enabled = true }: { enabled?: boolean } = {}) => {
 
 export const useUpdateMe = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
-    const updateUser = useProfileStore((s) => s.updateUser)
     const queryClient = useQueryClient()
 
     return useMutation({
@@ -49,14 +42,11 @@ export const useUpdateMe = ({ onSuccess }: { onSuccess?: () => void }) => {
                 }
             })
 
-            updateUser(data)
             onSuccess?.()
             toast.success(t("success.update"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -64,7 +54,6 @@ export const useUpdateMe = ({ onSuccess }: { onSuccess?: () => void }) => {
 export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const queryClient = useQueryClient()
-    const updateUser = useProfileStore((s) => s.updateUser)
 
     return useMutation({
         mutationFn: profileApi.uploadAvatar,
@@ -77,15 +66,12 @@ export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
                     ...data
                 }
             })
-            updateUser({ avatarUrl: data.avatarUrl })
 
             onSuccess?.()
             toast.success(t("success.upload"))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }
@@ -93,7 +79,6 @@ export const useUploadAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
 export const useDeleteAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
     const { t } = useTranslation()
     const queryClient = useQueryClient()
-    const updateUser = useProfileStore((s) => s.updateUser)
 
     return useMutation({
         mutationFn: profileApi.deleteAvatar,
@@ -106,15 +91,12 @@ export const useDeleteAvatar = ({ onSuccess }: { onSuccess?: () => void }) => {
                     avatarUrl: undefined
                 }
             })
-            updateUser({ avatarUrl: undefined })
 
             onSuccess?.()
             toast.success(translateWithFallback(t, data.message))
         },
         onError: (error: BackendError) => {
-            if (error.detail !== undefined) {
-                toast.error(translateWithFallback(t, error.detail))
-            }
+            toast.error(translateWithFallback(t, error.detail))
         }
     })
 }

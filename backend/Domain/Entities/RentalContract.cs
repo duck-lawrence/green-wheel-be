@@ -33,6 +33,8 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
     public Guid? VehicleId { get; set; }
 
     public Guid CustomerId { get; set; }
+    public Guid StationId { get; set; }
+    
 
     public Guid? HandoverStaffId { get; set; }
 
@@ -45,6 +47,8 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
     public virtual Staff? ReturnStaff { get; set; }
+
+    public Station Station { get; set; } = null!;
 
     public virtual Vehicle? Vehicle { get; set; }
 

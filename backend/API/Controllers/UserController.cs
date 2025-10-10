@@ -1,13 +1,9 @@
 ﻿using API.Filters;
-using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
-using AutoMapper;
-using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,19 +16,13 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IGoogleCredentialService _googleService;
-        private readonly ICitizenIdentityService _citizenIdentityService;
-        private readonly IDriverLicenseService _driverLicenseService;
 
         public UserController(IUserService service
-            , IGoogleCredentialService googleCredentialService,
-            ICitizenIdentityService citizenIdentityService,
-            IDriverLicenseService driverLicenseService
+            , IGoogleCredentialService googleCredentialService
             )
         {
             _userService = service;
             _googleService = googleCredentialService;
-            _citizenIdentityService = citizenIdentityService;
-            _driverLicenseService = driverLicenseService;
         }
 
         /*
@@ -67,7 +57,7 @@ namespace API.Controllers
                 await _userService.Logout(refreshToken);
                 return Ok();
             }
-            return Unauthorized(Message.UserMessage.Unauthorized);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -118,10 +108,7 @@ namespace API.Controllers
                     AccessToken = accessToken
                 });
             }
-            else
-            {
-                return Unauthorized(Message.UserMessage.InvalidToken);
-            }
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -187,7 +174,7 @@ namespace API.Controllers
                 await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
                 return Ok();
             }
-            return Unauthorized(Message.UserMessage.InvalidToken);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         /*
@@ -208,7 +195,7 @@ namespace API.Controllers
                     AccessToken = accessToken
                 });
             }
-            return Unauthorized(Message.UserMessage.Unauthorized);
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         [HttpPost("login-google")]
@@ -242,7 +229,7 @@ namespace API.Controllers
                     AccessToken = accesstoken
                 });
             }
-            return BadRequest();
+            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         [HttpGet("me")]
@@ -388,7 +375,7 @@ namespace API.Controllers
          */
 
         [HttpGet]
-        [RoleAuthorize("Staff", "Admin")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllUsersAsync();
