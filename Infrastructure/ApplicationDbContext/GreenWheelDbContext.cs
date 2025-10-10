@@ -11,6 +11,7 @@ namespace Infrastructure.ApplicationDbContext;
 public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 {
     private readonly UpdateTimestampInterceptor _updateInterceptor;
+
     public GreenWheelDbContext()
     {
     }
@@ -57,8 +58,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
     public virtual DbSet<StationFeedback> StationFeedbacks { get; set; }
 
-    public virtual DbSet<SupportRequest> SupportRequests { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Vehicle> Vehicles { get; set; }
@@ -72,11 +71,15 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
     public virtual DbSet<VehicleModel> VehicleModels { get; set; }
 
     public virtual DbSet<VehicleSegment> VehicleSegments { get; set; }
+    public virtual DbSet<Ticket> Tickets { get; set; }
+
     public DbSet<T> Set<T>() where T : class, IEntity => base.Set<T>();
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(_updateInterceptor);
     }
+
     private static string ToSnakeCase(string name)
     {
         if (string.IsNullOrEmpty(name)) return name;
@@ -89,6 +92,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
         return result.ToLower();
     }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Brand>(entity =>
@@ -378,7 +382,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.HasIndex(e => e.ContractId, "idx_invoices_contract_id");
 
-
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
@@ -401,8 +404,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("tax");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
-
-          
 
             entity.HasOne(d => d.Contract).WithMany(p => p.Invoices)
                 .HasForeignKey(d => d.ContractId)
@@ -767,46 +768,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasConstraintName("fk_feedback_stations");
         });
 
-        modelBuilder.Entity<SupportRequest>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__support___3213E83F22E367C7");
-
-            entity.ToTable("support_requests");
-
-            entity.HasIndex(e => e.StaffId, "idx_support_requests_staff_id");
-
-            entity.HasIndex(e => e.CustomerId, "idx_support_requests_user_id");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("(newid())")
-                .HasColumnName("id");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(sysdatetimeoffset())")
-                .HasColumnName("created_at");
-            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Reply).HasColumnName("reply");
-            entity.Property(e => e.StaffId).HasColumnName("staff_id");
-            entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Title)
-                .HasMaxLength(255)
-                .HasColumnName("title");
-            entity.Property(e => e.Type).HasColumnName("type");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("(sysdatetimeoffset())")
-                .HasColumnName("updated_at");
-
-            entity.HasOne(d => d.Customer).WithMany(p => p.SupportRequests)
-                .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_support_requests_user");
-
-            entity.HasOne(d => d.Staff).WithMany(p => p.SupportRequests)
-                .HasForeignKey(d => d.StaffId)
-                .HasConstraintName("fk_support_requests_staff");
-        });
-
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__users__3213E83F083E0E83");
@@ -1103,6 +1064,37 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
+        });
+        modelBuilder.Entity<Ticket>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__tickets__3213E83F");
+            entity.ToTable("tickets");
+
+            entity.HasIndex(e => e.CustomerId, "idx_tickets_customer_id");
+            entity.HasIndex(e => e.AssigneeId, "idx_tickets_assignee_id");
+
+            entity.Property(e => e.Id).HasDefaultValueSql("(newid())").HasColumnName("id");
+            entity.Property(e => e.Title).HasMaxLength(255).HasColumnName("title");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Reply).HasColumnName("reply");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Type).HasColumnName("type");
+            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
+            entity.Property(e => e.AssigneeId).HasColumnName("assignee_id");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetimeoffset())").HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetimeoffset())").HasColumnName("updated_at");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+
+            entity.HasOne(d => d.Customer)
+                .WithMany(p => p.Tickets)
+                .HasForeignKey(d => d.CustomerId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_tickets_customers");
+
+            entity.HasOne(d => d.Assignee)
+                .WithMany(p => p.AssignedTickets)
+                .HasForeignKey(d => d.AssigneeId)
+                .HasConstraintName("fk_tickets_assignees");
         });
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

@@ -26,9 +26,8 @@ public partial class Staff : SorfDeletedEntity
 
     public virtual Station Station { get; set; } = null!;
 
-    public virtual ICollection<SupportRequest> SupportRequests { get; set; } = new List<SupportRequest>();
-
     public virtual User User { get; set; } = null!;
 
     public virtual ICollection<VehicleChecklist> VehicleChecklists { get; set; } = new List<VehicleChecklist>();
+    public virtual ICollection<Ticket> AssignedTickets { get; set; } = new List<Ticket>();
 }

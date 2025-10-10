@@ -5,10 +5,8 @@ using Application.Constants;
 using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Response;
-using Application.Dtos.UserSupport.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
 
 using Application.Helpers;
 using Application.Repositories;
@@ -39,7 +37,7 @@ namespace Application
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
         private readonly IMediaUow _mediaUow;
-        private readonly ISupportRequestRepository _supportRepo;
+        private readonly ITicketRepository _supportRepo;
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ICitizenIdentityRepository _citizenIdentityRepository;
         private readonly IDriverLicenseRepository _driverLicenseRepository;
@@ -58,7 +56,7 @@ namespace Application
              ICitizenIdentityService citizenService,
              IDriverLicenseService driverService,
              IMediaUow mediaUow,
-             ISupportRequestRepository supportRepo,
+             ITicketRepository supportRepo,
              IRentalContractRepository rentalContractRepository,
              ICitizenIdentityRepository citizenIdentityRepository,
              IDriverLicenseRepository driverLicenseRepository

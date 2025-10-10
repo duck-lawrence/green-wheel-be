@@ -1,6 +1,12 @@
-﻿namespace Application.Dtos.UserSupport.Response
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Dtos.Ticket.Response
 {
-    public class SupportRes
+    public class TicketRes
     {
         public Guid Id { get; set; }
         public string Title { get; set; } = null!;
@@ -10,6 +16,6 @@
         public string Type { get; set; } = null!;
         public DateTimeOffset CreatedAt { get; set; }
         public string CustomerName { get; set; } = null!;
-        public string? StaffName { get; set; }
+        public string? AssigneeName { get; set; }
     }
 }

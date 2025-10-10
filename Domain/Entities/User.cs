@@ -48,7 +48,6 @@ public partial class User : SorfDeletedEntity, IEntity
 
     public virtual ICollection<StationFeedback> StationFeedbacks { get; set; } = new List<StationFeedback>();
 
-    public virtual ICollection<SupportRequest> SupportRequests { get; set; } = new List<SupportRequest>();
-
     public virtual ICollection<VehicleChecklist> VehicleChecklists { get; set; } = new List<VehicleChecklist>();
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }

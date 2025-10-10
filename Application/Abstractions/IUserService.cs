@@ -1,10 +1,6 @@
 ﻿using Application.Constants;
-using Application.Dtos.Common.Request;
-using Application.Dtos.RentalContract.Respone;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
-using Application.Dtos.UserSupport.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
@@ -65,11 +61,15 @@ namespace Application.Abstractions
         Task<object?> GetMyCitizenIdentityAsync(Guid userId);
 
         Task<object?> GetMyDriverLicenseAsync(Guid userId);
+
         Task<Guid> CreateAnounymousAccount(CreateUserReq req);
+
         Task<UserProfileViewRes> GetUserByPhoneAsync(string phone);
+
         Task<IEnumerable<User>> GetAllUsersAsync();
+
         Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber);
+
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
-        
     }
 }
