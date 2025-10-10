@@ -23,86 +23,46 @@ namespace API.Controllers
             _vehicleModelService = vehicleModelService;
         }
 
-        // ----------------- GALLERY IMAGES -----------------
-
+        // ---------- SUB-IMAGES (gallery) ----------
         [HttpPost("sub-images")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadSubImages(Guid modelId, [FromForm] UploadModelImagesReq req)
+        public async Task<IActionResult> UploadSubImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
         {
-            var images = await _modelImageService.UploadModelImagesAsync(modelId, req.Files);
-
-            var res = images.Select(x => new VehicleModelImageRes
-            {
-                ModelId = x.ModelId,
-                ImageUrl = x.Url,
-                ImagePublicId = x.PublicId
-            });
-
-            return Ok(new
-            {
-                data = res,
-                message = Message.CloudinaryMessage.UploadSuccess
-            });
+            var res = await _modelImageService.UploadModelImagesAsync(modelId, req.Files);
+            return Ok(new { data = res, message = Message.CloudinaryMessage.UploadSuccess });
         }
 
         [HttpDelete("sub-images")]
         [Consumes("application/json")]
-        public async Task<IActionResult> DeleteSubImages(Guid modelId, [FromBody] DeleteModelImagesReq req)
+        public async Task<IActionResult> DeleteSubImages([FromRoute] Guid modelId, [FromBody] DeleteModelImagesReq req)
         {
             await _modelImageService.DeleteModelImagesAsync(modelId, req.ImageIds);
             return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        // ----------------- MAIN IMAGE -----------------
-
+        // ---------- MAIN IMAGE ----------
         [HttpPost("main-image")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadMainImage(Guid modelId, IFormFile file)
+        public async Task<IActionResult> UploadMainImage([FromRoute] Guid modelId, [FromForm(Name = "file")] IFormFile file)
         {
             var imageUrl = await _vehicleModelService.UploadMainImageAsync(modelId, file);
-
-            var res = new VehicleModelImageRes
-            {
-                ModelId = modelId,
-                ImageUrl = imageUrl,
-                ImagePublicId = $"models/{modelId}/main"
-            };
-
-            return Ok(new
-            {
-                data = res,
-                message = Message.CloudinaryMessage.UploadSuccess
-            });
+            return Ok(new { data = new { modelId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
         }
 
         [HttpDelete("main-image")]
-        public async Task<IActionResult> DeleteMainImage(Guid modelId)
+        public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
         {
             await _vehicleModelService.DeleteMainImageAsync(modelId);
             return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        // ----------------- MAIN IMAGE & SUB IMAGE -----------------
-        [HttpPost("image")]
+        // ---------- MAIN + GALLERY ----------
+        [HttpPost("images")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadImage(Guid modelId, [FromForm] UploadModelImagesReq req)
+        public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
         {
-            var (mainImageUrl, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
-            var response = new
-            {
-                main = new
-                {
-                    modelId,
-                    imageUrl = mainImageUrl
-                },
-                gallery = galleryImages.Select(x => new { x.Id, x.Url, x.PublicId })
-            };
-            return Ok(
-                new
-                {
-                    data = response,
-                    Message = Message.CloudinaryMessage.UploadSuccess
-                });
+            var (mainImage, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
+            return Ok(new { data = new { main = mainImage, gallery = galleryImages }, message = Message.CloudinaryMessage.UploadSuccess });
         }
     }
 }

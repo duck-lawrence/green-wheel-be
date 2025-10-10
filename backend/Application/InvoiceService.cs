@@ -3,6 +3,7 @@ using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.Invoice.Response;
 using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.Momo.Request;
 using Application.Repositories;
 using Application.UnitOfWorks;
@@ -20,7 +21,8 @@ namespace Application
     {
         private readonly IInvoiceUow _uow;
         private readonly IMapper _mapper;
-        private readonly IMomoService _momoService; 
+        private readonly IMomoService _momoService;
+
         public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService)
         {
             _uow = uow;
@@ -57,13 +59,12 @@ namespace Application
             return invoiceViewRes;
         }
 
-        public async Task<string?>  ProcessPayment(Guid id, int paymentMethod)
+        public async Task<string?> ProcessPayment(Guid id, int paymentMethod)
         {
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, false, true);
             if (paymentMethod == (int)PaymentMethod.Cash)
             {
                 await CashPayment(invoice);
-                
             }
             else if (paymentMethod == (int)PaymentMethod.MomoWallet)
             {

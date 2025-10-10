@@ -23,6 +23,13 @@ export enum InvoiceStatus {
     Cancelled = 2
 }
 
+export enum InvoiceType {
+    Handover = 0,
+    Return = 1,
+    Refund = 2,
+    Other = 3
+}
+
 export enum RentalContractStatus {
     RequestPending = 0,
     PaymentPending = 1,

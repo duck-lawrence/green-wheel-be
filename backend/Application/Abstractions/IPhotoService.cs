@@ -1,11 +1,12 @@
 ﻿using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Microsoft.AspNetCore.Http;
 
 namespace Application.Abstractions
 {
     public interface IPhotoService
     {
-        //upload image 
+        //upload image
         Task<PhotoUploadResult> UploadPhotoAsync(UploadImageReq file, string folder = null);
 
         //delete image

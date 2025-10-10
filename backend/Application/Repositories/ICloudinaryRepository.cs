@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 
 namespace Application.Repositories
 {

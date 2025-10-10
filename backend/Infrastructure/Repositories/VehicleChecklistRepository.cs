@@ -16,12 +16,20 @@ namespace Infrastructure.Repositories
         public VehicleChecklistRepository(IGreenWheelDbContext dbContext) : base(dbContext)
         {
         }
-        public override Task<VehicleChecklist?> GetByIdAsync(Guid id)
+        public async override Task<VehicleChecklist?> GetByIdAsync(Guid id)
         {
-            var vehicleChecklist = _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
+            var vehicleChecklist = await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
                 .Include(vc => vc.VehicleChecklistItems)
                     .ThenInclude(vci => vci.Component).FirstOrDefaultAsync();
             return vehicleChecklist;
+        }
+
+        public async Task<RentalContract?> GetRentalContractByCheckListIdAsync(Guid id)
+        {
+            var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
+                .Include(vc => vc.Contract).FirstOrDefaultAsync());
+            
+            return vehicleChecklist == null ? null : vehicleChecklist.Contract;
         }
     }
 }

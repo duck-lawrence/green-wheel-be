@@ -3,13 +3,13 @@ import { VehicleComponentViewRes } from "@/models/vehicle/schema/response"
 
 export type VehicleChecklistViewRes = {
     id: string
-    description?: string
     isSignedByStaff: boolean
     isSignedByCustomer: boolean
     staffId: string
     customerId?: string
     vehicleId: string
     contractId?: string
+    vehicleChecklistItems?: VehicleChecklistItemViewRes[]
 }
 
 export type VehicleChecklistItemViewRes = {

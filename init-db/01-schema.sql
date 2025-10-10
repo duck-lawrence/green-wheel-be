@@ -405,6 +405,7 @@ CREATE TABLE [invoices] (
     [payment_method] int NOT NULL, -- 0: Cash, 1: MomoWallet
     [notes] nvarchar(255),
     [status] int NOT NULL DEFAULT 0, -- Pending, Paid, Cancelled
+    [type] int NOT NULL DEFAULT 0,
 
     [paid_at] datetimeoffset,
     [deleted_at] datetimeoffset,
