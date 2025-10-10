@@ -2,12 +2,13 @@
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.VehicleModel.Request;
+using Application.Dtos.VehicleModel.Respone;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
     [ApiController]
-    [RoleAuthorize(new[] { "Staff", "Admin" })]
+    [RoleAuthorize(["Staff", "Admin"])]
     [Route("api/vehicle-models/{modelId:guid}")]
     public class ModelImagesController : ControllerBase
     {

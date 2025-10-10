@@ -1,4 +1,6 @@
 -- SEED DATA
+USE green_wheel_db;
+GO
 
 -- Roles
 INSERT INTO roles (created_at, updated_at, name, description)

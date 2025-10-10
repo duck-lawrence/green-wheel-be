@@ -9,7 +9,6 @@ namespace Application.Dtos.Deposit.Respone
     public class DepositViewRes
     {
         public Guid Id { get; set; }
-        public string? Description { get; set; }
         public decimal Amount { get; set; }
         public DateTimeOffset? RefundedAt { get; set; }
         public int Status { get; set; }

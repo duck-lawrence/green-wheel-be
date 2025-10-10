@@ -321,6 +321,12 @@
         "report_form_validation_description_required": "Description is required.",
         "report_form_validation_description_max": "Description must be 1000 characters or less."
     },
+    "admin": {
+        "dashboard_title": "Admin Dashboard",
+        "dashboard_subtitle": "Select a module from the sidebar to get started.",
+        "dropdown_management": "Admin Management",
+        "sidebar_fleet": "Fleet"
+    },
     "footer": {
         "green_wheel_company_name": "GREEN WHEEL Trading and Service Joint Stock Company",
         "introduction": "Introduction",
