@@ -25,6 +25,7 @@ namespace Application
         {
             var ticket = new Ticket
             {
+                Id = Guid.NewGuid(),
                 Title = req.Title,
                 Description = req.Description,
                 Type = (int)TicketType.CustomerSupport,
