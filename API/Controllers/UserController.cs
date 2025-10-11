@@ -303,13 +303,13 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        //Create anonymouse account
+        //Create anonymous account
         [RoleAuthorize("Staff")]
         [HttpPost("anonymous")]
-        public async Task<IActionResult> CreateAnonymouseAccount([FromForm] CreateUserReq req)
+        public async Task<IActionResult> CreateAnonymousAccount([FromForm] CreateUserReq req)
         {
             var userId = await _userService.CreateAnounymousAccount(req);
-            return Ok(userId);
+            return Ok(new { userId });
         }
 
         //upload citizenId for Anonymous
