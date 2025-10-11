@@ -9,5 +9,7 @@ namespace Application.Repositories
         Task<PageResult<Ticket>> GetAllAsync(PaginationParams pagination);
 
         Task<IEnumerable<Ticket>> GetByCustomerAsync(Guid customerId);
+
+        Task<PageResult<Ticket>> GetEscalatedAsync(PaginationParams pagination);
     }
 }

@@ -37,11 +37,27 @@ namespace Application
             return ticket.Id;
         }
 
+        public async Task EscalateToAdminAsync(Guid id)
+        {
+            var ticket = await _repo.GetByIdAsync(id) ?? throw new KeyNotFoundException("Ticket not found");
+            if (ticket.Status == (int)TicketStatus.EscalatedToAdmin) throw new InvalidOperationException("This ticket is already escalated.");
+
+            ticket.Status = (int)TicketStatus.EscalatedToAdmin;
+            await _repo.UpdateAsync(ticket);
+        }
+
         public async Task<PageResult<TicketRes>> GetAllAsync(PaginationParams pagination)
         {
             var page = await _repo.GetAllAsync(pagination);
             var data = _mapper.Map<IEnumerable<TicketRes>>(page.Items);
 
+            return new PageResult<TicketRes>(data, page.PageNumber, page.PageSize, page.Total);
+        }
+
+        public async Task<PageResult<TicketRes>> GetEscalatedTicketsAsync(PaginationParams pagination)
+        {
+            var page = await _repo.GetEscalatedAsync(pagination);
+            var data = _mapper.Map<IEnumerable<TicketRes>>(page.Items);
             return new PageResult<TicketRes>(data, page.PageNumber, page.PageSize, page.Total);
         }
 

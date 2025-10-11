@@ -19,7 +19,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [RoleAuthorize("Customer")]
+        [RoleAuthorize(["Staff", "Customer"])]
         public async Task<IActionResult> Create([FromBody] CreateTicketReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -51,6 +51,23 @@ namespace API.Controllers
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _service.UpdateAsync(id, req, staffId);
             return NoContent();
+        }
+
+        [HttpPatch("{id}/escalated-to-admin")]
+        [RoleAuthorize("Staff")]
+        public async Task<IActionResult> EscalateToAdmin(Guid id)
+        {
+            var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _service.EscalateToAdminAsync(id);
+            return NoContent();
+        }
+
+        [HttpGet("escalated")]
+        [RoleAuthorize("Admin")]
+        public async Task<IActionResult> GetEscalatedTickets([FromQuery] PaginationParams pagination)
+        {
+            var data = await _service.GetEscalatedTicketsAsync(pagination);
+            return Ok(data);
         }
     }
 }

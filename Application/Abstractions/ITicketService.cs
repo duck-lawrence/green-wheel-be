@@ -14,5 +14,9 @@ namespace Application.Abstractions
         Task<IEnumerable<TicketRes>> GetByCustomerAsync(Guid customerId);
 
         Task UpdateAsync(Guid id, UpdateTicketReq req, Guid staffId);
+
+        Task EscalateToAdminAsync(Guid id);
+
+        Task<PageResult<TicketRes>> GetEscalatedTicketsAsync(PaginationParams pagination);
     }
 }

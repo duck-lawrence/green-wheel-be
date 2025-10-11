@@ -1,10 +1,11 @@
-﻿using Application.Dtos.Common.Request;
+﻿using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
+using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
-using Application.Helpers;
 
 namespace Infrastructure.Repositories
 {
@@ -17,9 +18,10 @@ namespace Infrastructure.Repositories
         public async Task<PageResult<Ticket>> GetAllAsync(PaginationParams pagination)
         {
             var query = _dbContext.Tickets
-                .Include(t => t.RequesterId)
-                .Include(t => t.Assignee)
-                .OrderByDescending(t => t.CreatedAt);
+                .Include(t => t.Requester) // include User
+                .Include(t => t.Assignee)  // include Staff
+                .OrderByDescending(t => t.CreatedAt)
+                .AsQueryable();
 
             var total = await query.CountAsync();
             var items = await query.ApplyPagination(pagination).ToListAsync();
@@ -34,6 +36,23 @@ namespace Infrastructure.Repositories
                 .OrderByDescending(x => x.CreatedAt)
                 .Include(x => x.Assignee)
                 .ToListAsync();
+        }
+
+        public async Task<PageResult<Ticket>> GetEscalatedAsync(PaginationParams pagination)
+        {
+            var query = _dbContext.Tickets
+                .Where(t => t.Status == (int)TicketStatus.EscalatedToAdmin)
+                .Include(t => t.Requester)
+                .Include(t => t.Assignee)
+                .OrderByDescending(t => t.CreatedAt);
+
+            var total = await query.CountAsync();
+            var items = await query
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return new PageResult<Ticket>(items, pagination.PageNumber, pagination.PageSize, total);
         }
     }
 }

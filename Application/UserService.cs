@@ -595,7 +595,7 @@ namespace Application
             }
         }
 
-        public async Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file)
+        public async Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
@@ -630,7 +630,7 @@ namespace Application
             }
         }
 
-        public async Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file)
+        public async Task<DriverLicenseRes> UploadDriverLicenseAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
@@ -663,7 +663,7 @@ namespace Application
             }
         }
 
-        public async Task<object?> GetMyCitizenIdentityAsync(Guid userId)
+        public async Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId)
         {
             var entity = await _citizenService.GetByUserId(userId);
             if (entity == null) return null;
@@ -671,7 +671,7 @@ namespace Application
             return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
-        public async Task<object?> GetMyDriverLicenseAsync(Guid userId)
+        public async Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId)
         {
             var entity = await _driverService.GetByUserIdAsync(userId);
             if (entity == null) return null;
