@@ -57,9 +57,10 @@ namespace Application.Constants
             public const string NotFoundAvatar = "No avatar to delete";
 
             //Citizen Identity
-            public const string NotHaveCitizenIdentity = "user.not_have_citizen_identity";
+            public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
 
-            public const string NotHaveDriverLicense = "user.not_have_driver_license";
+            public const string InvalidLicenseData = "user.invalid_license_data";
+            public const string LicenseNotFound = "user.license_not_found";
         }
 
         //Common error
@@ -156,13 +157,6 @@ namespace Application.Constants
             public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
         }
 
-        //Licenses
-        public static class LicensesMessage
-        {
-            public const string InvalidLicenseData = "licenses.invalid_license_data";
-            public const string LicenseNotFound = "licenses.not_found";
-        }
-
         //VEHICLE IMAGE
         public static class ModelImageMessage
         {
@@ -179,11 +173,6 @@ namespace Application.Constants
             public const string EmptyFile = "upload.empty_file";
             public const string InvalidFile = "upload.invalid_file";
             public const string Failed = "upload.failed";
-        }
-
-        public static class CitizenIdentityMessage
-        {
-            public const string CitizenIdentityNotFound = "citizen_identity.not_found";
         }
 
         public static class VehicleComponentMessage

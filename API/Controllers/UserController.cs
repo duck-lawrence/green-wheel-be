@@ -276,10 +276,6 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyCitizenIdentityAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 
@@ -304,10 +300,6 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyDriverLicenseAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 

@@ -42,7 +42,7 @@ namespace Application
             var license = await _licenseRepo.GetByLicenseNumber(licenseNumber);
             if (license == null)
             {
-                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+                throw new NotFoundException(Message.UserMessage.LicenseNotFound);
             }
             return license;
         }
@@ -73,7 +73,7 @@ namespace Application
         {
             var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
+                throw new BusinessException(Message.UserMessage.InvalidLicenseData);
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
