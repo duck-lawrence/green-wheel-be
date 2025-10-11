@@ -190,7 +190,7 @@ sqlcmd -S localhost,1434 -U sa -P '<YourStrong!Passw0rd>' -i ..\init-db\02-seedi
 | --- | --- | --- | --- |
 | 1 | SE192160 | Trang Thuận Đức | [duck-lawrence](https://github.com/duck-lawrence) |
 | 2 | SE183274 | Ngô Gia Huy | [devgiahuy](https://github.com/devgiahuy) |
-| 3 | SE192427 | Lê Hoàng Duy | [MavilH](https://github.com/MavilH) |
+| 3 | SE192427 | Lê Hoàng Duy | [mavil-chudomirovich](https://github.com/mavil-chudomirovich) |
 | 4 | SE194177 | Nguyễn Quang Huy | [WuagHy](https://github.com/WuagHy) |
 | 5 | QE190133 | Phạm Hồng Phúc | [PhucPhamHong-dev](https://github.com/PhucPhamHong-dev) |
 
