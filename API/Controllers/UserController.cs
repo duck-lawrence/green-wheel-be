@@ -122,10 +122,10 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordReq userChangePasswordDto)
         {
-            if (userChangePasswordDto.OldPassword == null)
-            {
-                return BadRequest(Message.UserMessage.OldPasswordIsRequired);
-            }
+            //if (userChangePasswordDto.OldPassword == null)
+            //{
+            //    return BadRequest(Message.UserMessage.OldPasswordIsRequired);
+            //}
             var user = HttpContext.User;
             await _userService.ChangePassword(user, userChangePasswordDto);
             return Ok();
@@ -276,10 +276,6 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyCitizenIdentityAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 
@@ -304,10 +300,6 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyDriverLicenseAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 

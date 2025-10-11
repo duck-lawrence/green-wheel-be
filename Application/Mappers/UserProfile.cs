@@ -28,14 +28,11 @@ namespace Application.Mappers
                 .ForMember(dest => dest.Password,
                            opt => opt.MapFrom(src => PasswordHelper.HashPassword(src.Password)));
 
-            CreateMap<User, UserProfileViewRes>();
-            
             CreateMap<CreateUserReq, User>();
-            
+
             CreateMap<CitizenIdentity, CitizenIdentityRes>();
 
             CreateMap<DriverLicense, DriverLicenseRes>();
-        
         }
     }
 }

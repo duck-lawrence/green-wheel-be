@@ -21,11 +21,13 @@ namespace API.Controllers
             _vehicleChecklistService = vehicleChecklistService;
             _imageService = imageService;
         }
-        /* 
+
+        /*
          * status code
          * 200 success
-         * 
+         *
          */
+
         [HttpPost]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
@@ -54,6 +56,7 @@ namespace API.Controllers
         [HttpPost("image")]
         [RoleAuthorize(RoleName.Staff)]
         [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadChecklistItemImage(Guid itemId, [FromForm(Name = "file")] IFormFile file)
         {
             var result = await _imageService.UploadChecklistItemImageAsync(itemId, file);
