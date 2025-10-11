@@ -8,10 +8,6 @@ public partial class Invoice : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public decimal Subtotal { get; set; }
 
     public decimal Tax { get; set; }
@@ -23,8 +19,14 @@ public partial class Invoice : SorfDeletedEntity, IEntity
     public string? Notes { get; set; }
 
     public int Status { get; set; }
-    public int InvoiceType { get; set; }
+
+    public int Type { get; set; }
+
     public DateTimeOffset? PaidAt { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public Guid ContractId { get; set; }
 

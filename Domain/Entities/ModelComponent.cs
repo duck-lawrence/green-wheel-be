@@ -12,6 +12,8 @@ public partial class ModelComponent : SorfDeletedEntity, IEntity
 
     public DateTimeOffset UpdatedAt { get; set; }
 
+   
+
     public Guid ModelId { get; set; }
 
     public Guid ComponentId { get; set; }

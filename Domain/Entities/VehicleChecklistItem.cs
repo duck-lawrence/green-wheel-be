@@ -8,10 +8,6 @@ public partial class VehicleChecklistItem : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string? Notes { get; set; }
 
     public int Status { get; set; }
@@ -19,6 +15,10 @@ public partial class VehicleChecklistItem : SorfDeletedEntity, IEntity
     public string? ImageUrl { get; set; }
 
     public string? ImagePublicId { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public Guid ComponentId { get; set; }
 

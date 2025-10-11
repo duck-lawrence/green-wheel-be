@@ -251,7 +251,7 @@ namespace Application
             if (!invoieItems.IsNullOrEmpty())
             {
                 invoice.Subtotal = InvoiceHelper.CalculateTotalAmount(invoieItems);
-                invoice.InvoiceType = (int)InvoiceType.Return;
+                invoice.Type = (int)InvoiceType.Return;
                 await _uow.InvoiceRepository.AddAsync(invoice);
                 await _uow.InvoiceItemRepository.AddRangeAsync(invoieItems);
             }

@@ -8,13 +8,13 @@ public partial class Vehicle : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string LicensePlate { get; set; } = null!;
 
     public int Status { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public Guid ModelId { get; set; }
 

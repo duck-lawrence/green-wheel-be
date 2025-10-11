@@ -8,10 +8,6 @@ public partial class VehicleModel : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string Description { get; set; } = null!;
@@ -19,6 +15,8 @@ public partial class VehicleModel : SorfDeletedEntity, IEntity
     public decimal CostPerDay { get; set; }
 
     public decimal DepositFee { get; set; }
+
+    public decimal ReservationFee { get; set; }
 
     public int SeatingCapacity { get; set; }
 
@@ -31,8 +29,14 @@ public partial class VehicleModel : SorfDeletedEntity, IEntity
     public decimal EcoRangeKm { get; set; }
 
     public decimal SportRangeKm { get; set; }
+
     public string? ImageUrl { get; set; }
+
     public string? ImagePublicId { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public Guid BrandId { get; set; }
 

@@ -208,6 +208,7 @@ CREATE TABLE [vehicle_models] (
     [description] nvarchar(255) NOT NULL,
     [cost_per_day] decimal(10,2) NOT NULL,
     [deposit_fee] decimal(10, 2) NOT NULL,
+    [reservation_fee] decimal(10, 2) NOT NULL,
     [seating_capacity] int NOT NULL,
     [number_of_airbags] int NOT NULL,
     [motor_power] decimal(5,1) NOT NULL,

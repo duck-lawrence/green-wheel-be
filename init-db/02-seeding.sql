@@ -50,11 +50,11 @@ DECLARE @brandVinfast UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM brands WHERE name
 DECLARE @segmentSUV UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM vehicle_segments WHERE name='SUV');
 DECLARE @segmentCompact UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM vehicle_segments WHERE name='Compact');
 
-INSERT INTO vehicle_models (created_at, updated_at, name, description, cost_per_day, deposit_fee, seating_capacity, number_of_airbags, motor_power, battery_capacity, eco_range_km, sport_range_km, brand_id, segment_id)
+INSERT INTO vehicle_models (created_at, updated_at, name, description, cost_per_day, deposit_fee, reservation_fee, seating_capacity, number_of_airbags, motor_power, battery_capacity, eco_range_km, sport_range_km, brand_id, segment_id)
 VALUES
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF e34', N'SUV điện hạng C', 1200000, 10000000, 5, 6, 110.0, 42.0, 285.0, 250.0, @brandVinfast, @segmentSUV),
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF 5', N'Compact SUV điện hạng A', 800000, 8000000, 5, 4, 70.0, 37.0, 300.0, 260.0, @brandVinfast, @segmentCompact),
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF 8', N'SUV điện hạng D', 2000000, 15000000, 7, 10, 300.0, 90.0, 420.0, 400.0, @brandVinfast, @segmentSUV);
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF e34', N'SUV điện hạng C', 1200000, 10000000, 10000000, 5, 6, 110.0, 42.0, 285.0, 250.0, @brandVinfast, @segmentSUV),
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF 5', N'Compact SUV điện hạng A', 800000, 8000000, 10000000, 5, 4, 70.0, 37.0, 300.0, 260.0, @brandVinfast, @segmentCompact),
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF 8', N'SUV điện hạng D', 2000000, 15000000, 10000000, 7, 10, 300.0, 90.0, 420.0, 400.0, @brandVinfast, @segmentSUV);
 
 -- Vehicle Components (các bộ phận cơ bản)
 INSERT INTO vehicle_components (created_at, updated_at, name, description)

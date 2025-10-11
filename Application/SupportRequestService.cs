@@ -23,14 +23,14 @@ namespace Application
 
         public async Task<Guid> CreateAsync(Guid customerId, CreateSupportReq req)
         {
-            var entity = new SupportRequest
+            var entity = new Ticket
             {
                 Id = Guid.NewGuid(),
                 Title = req.Title,
                 Description = req.Description,
                 Type = req.Type,
                 Status = 0,
-                CustomerId = customerId,
+                RequesterId = customerId,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
             };
@@ -59,7 +59,7 @@ namespace Application
 
             entity.Reply = req.Reply ?? entity.Reply;
             entity.Status = req.Status ?? entity.Status;
-            entity.StaffId = staffId;
+            entity.AssigneeId = staffId;
             entity.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _repo.UpdateAsync(entity);

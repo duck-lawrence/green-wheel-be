@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum SupportRequestType
+    public enum TicketType
     {
-        Technical = 0,
-          Payment = 1,
-          Other = 2
+        CustomerSupport = 0,
+        StaffReport = 1
     }
 }
