@@ -15,6 +15,7 @@ namespace Application.Constants
             public const string MissingToken = "user.missing_token";
             public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
+            public const string NotHavePassword = "user.is_google_linked_not_password";
 
             //otp
             public const string InvalidOTP = "user.invalid_otp";
@@ -26,7 +27,6 @@ namespace Application.Constants
 
             //register
             public const string EmailAlreadyExists = "user.email_already_exists";
-
             public const string EmailIsRequired = "user.email_require";
             public const string InvalidEmail = "user.invalid_email";
             public const string PasswordTooShort = "user.password_too_short";
