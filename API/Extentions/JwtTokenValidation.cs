@@ -36,7 +36,7 @@ namespace API.Extentions
                             if (hasAuthorize)
                             {
 
-                                throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
+                                throw new UnauthorizedAccessException(Message.UserMessage.InvalidAccessToken);
                             }
 
 

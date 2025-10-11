@@ -13,6 +13,7 @@ namespace Application.Constants
         {
             //auth
             public const string MissingToken = "user.missing_token";
+            public const string InvalidAccessToken = "user.invalid_access_token";
             public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
             public const string NotHavePassword = "user.is_google_linked_not_password";
