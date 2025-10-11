@@ -1080,37 +1080,6 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
         });
-        modelBuilder.Entity<Ticket>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__tickets__3213E83F");
-            entity.ToTable("tickets");
-
-            entity.HasIndex(e => e.CustomerId, "idx_tickets_customer_id");
-            entity.HasIndex(e => e.AssigneeId, "idx_tickets_assignee_id");
-
-            entity.Property(e => e.Id).HasDefaultValueSql("(newid())").HasColumnName("id");
-            entity.Property(e => e.Title).HasMaxLength(255).HasColumnName("title");
-            entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.Reply).HasColumnName("reply");
-            entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Type).HasColumnName("type");
-            entity.Property(e => e.CustomerId).HasColumnName("customer_id");
-            entity.Property(e => e.AssigneeId).HasColumnName("assignee_id");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysdatetimeoffset())").HasColumnName("created_at");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysdatetimeoffset())").HasColumnName("updated_at");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-
-            entity.HasOne(d => d.Customer)
-                .WithMany(p => p.Tickets)
-                .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_tickets_customers");
-
-            entity.HasOne(d => d.Assignee)
-                .WithMany(p => p.AssignedTickets)
-                .HasForeignKey(d => d.AssigneeId)
-                .HasConstraintName("fk_tickets_assignees");
-        });
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {
             // Đổi tên bảng

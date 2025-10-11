@@ -17,7 +17,7 @@ namespace Infrastructure.Repositories
         public async Task<PageResult<Ticket>> GetAllAsync(PaginationParams pagination)
         {
             var query = _dbContext.Tickets
-                .Include(t => t.Customer)
+                .Include(t => t.RequesterId)
                 .Include(t => t.Assignee)
                 .OrderByDescending(t => t.CreatedAt);
 
@@ -30,7 +30,7 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<Ticket>> GetByCustomerAsync(Guid customerId)
         {
             return await _dbContext.Tickets
-                .Where(x => x.CustomerId == customerId)
+                .Where(x => x.RequesterId == customerId)
                 .OrderByDescending(x => x.CreatedAt)
                 .Include(x => x.Assignee)
                 .ToListAsync();

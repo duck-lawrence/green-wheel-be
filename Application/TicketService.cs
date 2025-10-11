@@ -29,7 +29,7 @@ namespace Application
                 Description = req.Description,
                 Type = (int)TicketType.CustomerSupport,
                 Status = (int)TicketStatus.Pending,
-                CustomerId = customerId
+                RequesterId = customerId
             };
 
             await _repo.AddAsync(ticket);

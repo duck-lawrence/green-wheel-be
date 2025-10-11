@@ -7,8 +7,6 @@ using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
-using Application.Dtos.UserSupport.Response;
 using Application.Helpers;
 using Application.Repositories;
 using Application.UnitOfWorks;
@@ -98,7 +96,7 @@ namespace Application
 
             if (userFromDB != null)
             {
-                if(userFromDB.IsGoogleLinked && userFromDB.Password == null)
+                if (userFromDB.IsGoogleLinked && userFromDB.Password == null)
                 {
                     throw new ForbidenException(Message.UserMessage.NotHavePassword);
                 }
@@ -347,7 +345,7 @@ namespace Application
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
-            if(userFromDB.Password == null && !userFromDB.IsGoogleLinked)
+            if (userFromDB.Password == null && !userFromDB.IsGoogleLinked)
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
@@ -480,6 +478,7 @@ namespace Application
                 { TokenType.AccessToken.ToString() , accessToken}
             };
         }
+
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());

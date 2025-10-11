@@ -1,7 +1,6 @@
 ﻿using Application.Constants;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
 using Google.Apis.Auth;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -39,7 +38,6 @@ namespace Application.Abstractions
         Task ResetPassword(string forgotPasswordToken, string password);
 
         Task<Dictionary<string, string>> LoginWithGoogle(GoogleJsonWebSignature.Payload payload);
-
 
         Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims);
 

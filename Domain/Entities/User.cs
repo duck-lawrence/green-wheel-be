@@ -51,5 +51,4 @@ public partial class User : SorfDeletedEntity, IEntity
     public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
     public virtual ICollection<VehicleChecklist> VehicleChecklists { get; set; } = new List<VehicleChecklist>();
-    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 }
