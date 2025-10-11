@@ -8,10 +8,6 @@ public partial class Brand : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string Description { get; set; } = null!;
@@ -19,5 +15,10 @@ public partial class Brand : SorfDeletedEntity, IEntity
     public string Country { get; set; } = null!;
 
     public int FoundedYear { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
     public virtual ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
 }

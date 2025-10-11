@@ -423,7 +423,7 @@ namespace Application
                 RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
                 if (refreshTokenFromDB == null)
                 {
-                    throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+                    throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
                 }
                 string newAccessToken = GenerateAccessToken(refreshTokenFromDB.UserId);
                 string newRefreshToken = await GenerateRefreshToken(refreshTokenFromDB.UserId, claims);
@@ -432,7 +432,7 @@ namespace Application
                 return newAccessToken;
             }
 
-            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+            throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
         }
 
         public async Task<Dictionary<string, string>> LoginWithGoogle(string email)

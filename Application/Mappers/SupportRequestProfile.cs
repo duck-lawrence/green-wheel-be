@@ -8,7 +8,7 @@ namespace Application.Mappers
     {
         public SupportRequestProfile()
         {
-            CreateMap<SupportRequest, SupportRes>();
+            CreateMap<Ticket, SupportRes>();
         }
     }
 }

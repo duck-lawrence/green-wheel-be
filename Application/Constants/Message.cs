@@ -13,7 +13,7 @@ namespace Application.Constants
         {
             //auth
             public const string MissingToken = "user.missing_token";
-
+            public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
 
             //otp

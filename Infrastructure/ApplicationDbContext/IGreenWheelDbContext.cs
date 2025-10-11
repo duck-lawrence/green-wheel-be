@@ -37,13 +37,11 @@ namespace Infrastructure.ApplicationDbContext
 
          DbSet<Staff> Staffs { get; set; }
 
-         DbSet<StaffReport> StaffReports { get; set; }
-
          DbSet<Station> Stations { get; set; }
 
          DbSet<StationFeedback> StationFeedbacks { get; set; }
 
-         DbSet<SupportRequest> SupportRequests { get; set; }
+         DbSet<Ticket> Tickets { get; set; }
 
          DbSet<User> Users { get; set; }
 

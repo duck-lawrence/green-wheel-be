@@ -145,7 +145,7 @@ namespace Application
                 Status = (int)InvoiceStatus.Pending,
                 Tax = Common.Tax.BaseRentalVAT, //10% dạng decimal
                 CreatedAt = DateTimeOffset.UtcNow,
-                InvoiceType = (int)InvoiceType.Handover,
+                Type = (int)InvoiceType.Handover,
                 UpdatedAt = DateTimeOffset.UtcNow,
                 DeletedAt = null,
                 Notes = $"GreenWheel – Invoice for your order {contractId}"
@@ -302,7 +302,7 @@ namespace Application
                 UnitPrice = Common.Fee.LateReturn,
                 Type = (int)InvoiceItemType.LateReturn,
             };
-            invoice.InvoiceType = (int)InvoiceType.Return;
+            invoice.Type = (int)InvoiceType.Return;
             invoice.Subtotal = InvoiceHelper.CalculateTotalAmount([items]);
             await _uow.InvoiceItemRepository.AddRangeAsync([items]);
             await _uow.SaveChangesAsync();
