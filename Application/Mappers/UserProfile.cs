@@ -19,7 +19,10 @@ namespace Application.Mappers
                 .ForMember(dest => dest.CitizenUrl,
                     opt => opt.MapFrom(src => src.CitizenIdentity != null ? src.CitizenIdentity.ImageUrl : null))
                 .ForMember(dest => dest.Station,
-                    opt => opt.MapFrom(src => src.Staff != null ? src.Staff.Station : null));
+                    opt => opt.MapFrom(src => src.Staff != null ? src.Staff.Station : null))
+                .ForMember(dest => dest.NeedSetPassword,
+                    opt => opt.MapFrom(src => src.Password == null));
+            
 
             CreateMap<UserRegisterReq, User>()
                 .ForMember(dest => dest.Password,

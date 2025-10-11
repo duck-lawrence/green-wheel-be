@@ -16,6 +16,7 @@ namespace Application.Dtos.User.Respone
         public string? CitizenUrl { get; set; }
         public RoleViewRes? Role { get; set; }
         public StationViewRes? Station { get; set; }
+        public bool NeedSetPassword { get; set; }
     }
 }
 

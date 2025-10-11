@@ -203,7 +203,7 @@ namespace API.Controllers
         {
             var payload = await _googleService.VerifyCredential(loginGoogleReqDto.Credential);
 
-            Dictionary<string, string> tokens = await _userService.LoginWithGoogle(payload.Email);
+            Dictionary<string, string> tokens = await _userService.LoginWithGoogle(payload);
             bool needSetPassword = true;
             if (tokens.TryGetValue(TokenType.AccessToken.ToString(), out var token))
             {
@@ -216,20 +216,6 @@ namespace API.Controllers
                 FirstName = payload.GivenName,
                 LastName = payload.FamilyName
             });
-        }
-
-        [HttpPost("login-google/set-password")]
-        public async Task<IActionResult> SetPassword(GoogleSetPasswordReq googleSetPasswordReqDto)
-        {
-            if (Request.Cookies.TryGetValue(CookieKeys.SetPasswordToken, out var setPasswordToken))
-            {
-                string accesstoken = await _userService.SetPasswordAsync(setPasswordToken, googleSetPasswordReqDto);
-                return Ok(new
-                {
-                    AccessToken = accesstoken
-                });
-            }
-            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
         [HttpGet("me")]
