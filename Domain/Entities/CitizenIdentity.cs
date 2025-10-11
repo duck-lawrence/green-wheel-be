@@ -8,10 +8,6 @@ public partial class CitizenIdentity : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string Number { get; set; } = null!;
 
     public string FullName { get; set; } = null!;
@@ -27,6 +23,11 @@ public partial class CitizenIdentity : SorfDeletedEntity, IEntity
     public string ImageUrl { get; set; } = null!;
 
     public string ImagePublicId { get; set; } = null!;
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
 
     public Guid UserId { get; set; }
 

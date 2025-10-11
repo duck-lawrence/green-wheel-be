@@ -8,10 +8,6 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string Description { get; set; } = null!;
 
     public string? Notes { get; set; }
@@ -30,15 +26,21 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
 
     public int Status { get; set; }
 
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
+   
+
     public Guid? VehicleId { get; set; }
 
     public Guid CustomerId { get; set; }
-    public Guid StationId { get; set; }
-    
 
     public Guid? HandoverStaffId { get; set; }
 
     public Guid? ReturnStaffId { get; set; }
+
+    public Guid StationId { get; set; }
 
     public virtual User Customer { get; set; } = null!;
 
@@ -48,7 +50,7 @@ public partial class RentalContract : SorfDeletedEntity, IEntity
 
     public virtual Staff? ReturnStaff { get; set; }
 
-    public Station Station { get; set; } = null!;
+    public virtual Station Station { get; set; } = null!;
 
     public virtual Vehicle? Vehicle { get; set; }
 

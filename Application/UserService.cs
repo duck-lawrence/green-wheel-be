@@ -7,12 +7,14 @@ using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-
+using Application.Dtos.UserSupport.Request;
+using Application.Dtos.UserSupport.Response;
 using Application.Helpers;
 using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -96,6 +98,10 @@ namespace Application
 
             if (userFromDB != null)
             {
+                if(userFromDB.IsGoogleLinked && userFromDB.Password == null)
+                {
+                    throw new ForbidenException(Message.UserMessage.NotHavePassword);
+                }
                 if (PasswordHelper.VerifyPassword(user.Password, userFromDB.Password))
                 {
                     //tạo refreshtoken và lưu nó vào DB lẫn cookie
@@ -337,7 +343,11 @@ namespace Application
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
-            if (!PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
+            if (userFromDB.Password != null && !PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
+            {
+                throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
+            }
+            if(userFromDB.Password == null && !userFromDB.IsGoogleLinked)
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
@@ -421,7 +431,7 @@ namespace Application
                 RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
                 if (refreshTokenFromDB == null)
                 {
-                    throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+                    throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
                 }
                 string newAccessToken = GenerateAccessToken(refreshTokenFromDB.UserId);
                 string newRefreshToken = await GenerateRefreshToken(refreshTokenFromDB.UserId, claims);
@@ -430,28 +440,36 @@ namespace Application
                 return newAccessToken;
             }
 
-            throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+            throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
         }
 
-        public async Task<Dictionary<string, string>> LoginWithGoogle(string email)
+        public async Task<Dictionary<string, string>> LoginWithGoogle(GoogleJsonWebSignature.Payload req)
         {
             var _context = _contextAccessor.HttpContext;
-            User user = await _userRepository.GetByEmailAsync(email);
+            User user = await _userRepository.GetByEmailAsync(req.Email);
             if (user == null)
             {
-                string setPasswordToken = JwtHelper.GenerateEmailToken(email, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
-                    _jwtSettings.SetPasswordTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
-                _context.Response.Cookies.Append(CookieKeys.SetPasswordToken, setPasswordToken, new CookieOptions
+                Guid id;
+                do
                 {
-                    HttpOnly = true,
-                    Secure = true,         // chỉ gửi qua HTTPS
-                    SameSite = SameSiteMode.Strict, // tránh CSRF
-                    Expires = DateTime.UtcNow.AddMinutes(_jwtSettings.SetPasswordTokenExpiredTime) // hạn sử dụng
-                });
-                return new Dictionary<string, string>
+                    id = Guid.NewGuid();
+                } while (await _userRepository.GetByIdAsync(id) != null);
+                var roles = _cache.Get<List<Role>>("AllRoles");
+                user = new User
                 {
-                    { TokenType.SetPasswordToken.ToString() , setPasswordToken }
+                    Id = id,
+                    FirstName = req.GivenName,
+                    LastName = req.FamilyName,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Email = req.Email,
+                    Password = null,
+                    DateOfBirth = null,
+                    RoleId = roles.FirstOrDefault(r => r.Name == RoleName.Customer)!.Id,
+                    IsGoogleLinked = true,
+                    DeletedAt = null,
                 };
+                await _userRepository.AddAsync(user);
             }
 
             if (user.IsGoogleLinked == false) user.IsGoogleLinked = true;
@@ -462,49 +480,6 @@ namespace Application
                 { TokenType.AccessToken.ToString() , accessToken}
             };
         }
-
-        public async Task<string> SetPasswordAsync(string setPasswordToken, GoogleSetPasswordReq req)
-        {
-            //----check in black list
-            if (await _jwtBackListRepository.CheckTokenInBlackList(setPasswordToken))
-            {
-                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
-            }
-            //------------------------
-            var claims = JwtHelper.VerifyToken(setPasswordToken, _jwtSettings.SetPasswordTokenSecret, TokenType.SetPasswordToken.ToString(),
-                _jwtSettings.Issuer, _jwtSettings.Audience);
-            //------------------------
-            string email = claims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString();
-            Guid id;
-            do
-            {
-                id = Guid.NewGuid();
-            } while (await _userRepository.GetByIdAsync(id) != null);
-            var roles = _cache.Get<List<Role>>("AllRoles");
-            var user = new User
-            {
-                Id = id,
-                FirstName = req.FirstName,
-                LastName = req.LastName,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                Email = email,
-                Password = PasswordHelper.HashPassword(req.Password),
-                DateOfBirth = req.DateOfBirth,
-                RoleId = roles.FirstOrDefault(r => r.Name == "Customer")!.Id,
-                IsGoogleLinked = true,
-                DeletedAt = null,
-            };
-            await _userRepository.AddAsync(user);
-            await GenerateRefreshToken(id, null);
-
-            //----save to black list
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-            await _jwtBackListRepository.SaveTokenAsyns(setPasswordToken, expSeconds);
-
-            return GenerateAccessToken(id);
-        }
-
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());

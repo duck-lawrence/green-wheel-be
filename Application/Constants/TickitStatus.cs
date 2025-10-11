@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum StaffReportType
+    public enum TicketStatus
     {
-        Internal = 0,
-        RelatredToSupport = 1,
-        Other = 2
+        Pending = 0,
+        Resolve = 1,
+        EscalatedToAdmin = 2
     }
 }

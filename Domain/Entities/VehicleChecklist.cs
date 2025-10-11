@@ -8,13 +8,15 @@ public partial class VehicleChecklist : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
+    public int Type { get; set; }
 
     public bool IsSignedByStaff { get; set; }
 
     public bool IsSignedByCustomer { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public Guid StaffId { get; set; }
 
@@ -27,8 +29,6 @@ public partial class VehicleChecklist : SorfDeletedEntity, IEntity
     public virtual RentalContract? Contract { get; set; }
 
     public virtual User? Customer { get; set; }
-
-    public virtual Invoice? Invoice { get; set; }
 
     public virtual Staff Staff { get; set; } = null!;
 

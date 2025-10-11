@@ -8,15 +8,16 @@ public partial class InvoiceItem : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public int Quantity { get; set; }
 
     public decimal UnitPrice { get; set; }
 
     public int Type { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
 
     public Guid InvoiceId { get; set; }
 

@@ -69,7 +69,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__brands__3213E83F39FD01A6");
+                        .HasName("PK__brands__3213E83F059728E8");
 
                     b.ToTable("brands", (string)null);
                 });
@@ -145,12 +145,12 @@ namespace Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__citizen___3213E83F5AA98353");
+                        .HasName("PK__citizen___3213E83F408A30E8");
 
-                    b.HasIndex(new[] { "UserId" }, "UQ__citizen___B9BE370E6D3C6B98")
+                    b.HasIndex(new[] { "UserId" }, "UQ__citizen___B9BE370E481A507A")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Number" }, "UQ__citizen___FD291E41F15782F6")
+                    b.HasIndex(new[] { "Number" }, "UQ__citizen___FD291E418DEE80E9")
                         .IsUnique();
 
                     b.HasIndex(new[] { "UserId" }, "uq_citizen_identities_user_id")
@@ -200,9 +200,9 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__deposits__3213E83FA62669D9");
+                        .HasName("PK__deposits__3213E83F4BF955F9");
 
-                    b.HasIndex(new[] { "InvoiceId" }, "UQ__deposits__F58DFD48A531CFB0")
+                    b.HasIndex(new[] { "InvoiceId" }, "UQ__deposits__F58DFD48F4DC99FD")
                         .IsUnique();
 
                     b.HasIndex(new[] { "InvoiceId" }, "uq_deposits_invoice_id")
@@ -261,7 +261,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__dispatch__3213E83F4F8E6A7E");
+                        .HasName("PK__dispatch__3213E83FFD04387E");
 
                     b.HasIndex(new[] { "ApprovedAdminId" }, "idx_dispatch_requests_approved_admin_id");
 
@@ -307,7 +307,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__dispatch__3213E83FF6079550");
+                        .HasName("PK__dispatch__3213E83F6A5E62C1");
 
                     b.HasIndex(new[] { "DispatchRequestId" }, "idx_dispatch_request_staffs_dispatch_request_id");
 
@@ -349,7 +349,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__dispatch__3213E83FF618BAA1");
+                        .HasName("PK__dispatch__3213E83FABA133AC");
 
                     b.HasIndex(new[] { "DispatchRequestId" }, "idx_dispatch_request_vehicles_dispatch_request_id");
 
@@ -433,12 +433,12 @@ namespace Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__driver_l__3213E83F0C52E57F");
+                        .HasName("PK__driver_l__3213E83F4D350890");
 
-                    b.HasIndex(new[] { "UserId" }, "UQ__driver_l__B9BE370EC7CF60FE")
+                    b.HasIndex(new[] { "UserId" }, "UQ__driver_l__B9BE370EAA9A89D5")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Number" }, "UQ__driver_l__FD291E41C4B31239")
+                    b.HasIndex(new[] { "Number" }, "UQ__driver_l__FD291E4146A88AD9")
                         .IsUnique();
 
                     b.HasIndex(new[] { "UserId" }, "uq_driver_licenses_user_id")
@@ -460,16 +460,14 @@ namespace Infrastructure.Migrations
                         .HasColumnName("contract_id");
 
                     b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
-                        .HasColumnName("created_at");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
-
-                    b.Property<int>("InvoiceType")
-                        .HasColumnType("int")
-                        .HasColumnName("invoice_type");
 
                     b.Property<string>("Notes")
                         .HasMaxLength(255)
@@ -500,12 +498,18 @@ namespace Infrastructure.Migrations
                         .HasColumnType("decimal(10, 2)")
                         .HasColumnName("tax");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int")
+                        .HasColumnName("type");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
-                        .HasColumnName("updated_at");
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__invoices__3213E83FD78CB2FD");
+                        .HasName("PK__invoices__3213E83FEF8BD7B0");
 
                     b.HasIndex(new[] { "ContractId" }, "idx_invoices_contract_id");
 
@@ -559,7 +563,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__invoice___3213E83FA6AF7666");
+                        .HasName("PK__invoice___3213E83FE13C2420");
 
                     b.HasIndex(new[] { "ChecklistItemId" }, "idx_invoice_items_checklist_item_id")
                         .IsUnique()
@@ -603,7 +607,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__model_co__3213E83F3C4DADC3");
+                        .HasName("PK__model_co__3213E83FDA9DBCD6");
 
                     b.HasIndex(new[] { "ComponentId" }, "idx_model_components_component_id");
 
@@ -653,9 +657,9 @@ namespace Infrastructure.Migrations
                         .HasColumnName("url");
 
                     b.HasKey("Id")
-                        .HasName("PK__model_im__3213E83FF3E97981");
+                        .HasName("PK__model_im__3213E83F7D19EE76");
 
-                    b.HasIndex(new[] { "Url" }, "UQ__model_im__DD7784175340E62A")
+                    b.HasIndex(new[] { "Url" }, "UQ__model_im__DD7784174BE82DAE")
                         .IsUnique();
 
                     b.HasIndex(new[] { "ModelId" }, "idx_model_images_model_id");
@@ -676,6 +680,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("(sysdatetimeoffset())");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("deleted_at");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("datetimeoffset")
@@ -706,7 +714,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__refresh___3213E83F8B43C8C7");
+                        .HasName("PK__refresh___3213E83FE1A69D44");
 
                     b.HasIndex(new[] { "UserId" }, "idx_refresh_tokens_user_id");
 
@@ -797,15 +805,15 @@ namespace Infrastructure.Migrations
                         .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__rental_c__3213E83F817349DC");
-
-                    b.HasIndex("StationId");
+                        .HasName("PK__rental_c__3213E83F26D603E6");
 
                     b.HasIndex(new[] { "CustomerId" }, "idx_rental_contracts_customer_id");
 
                     b.HasIndex(new[] { "HandoverStaffId" }, "idx_rental_contracts_handover_staff_id");
 
                     b.HasIndex(new[] { "ReturnStaffId" }, "idx_rental_contracts_return_staff_id");
+
+                    b.HasIndex(new[] { "StationId" }, "idx_rental_contracts_station_id");
 
                     b.HasIndex(new[] { "VehicleId" }, "idx_rental_contracts_vehicle_id");
 
@@ -849,7 +857,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__roles__3213E83F94B3D944");
+                        .HasName("PK__roles__3213E83FD8FE6012");
 
                     b.ToTable("roles", (string)null);
                 });
@@ -869,82 +877,11 @@ namespace Infrastructure.Migrations
                         .HasColumnName("station_id");
 
                     b.HasKey("UserId")
-                        .HasName("PK__staffs__B9BE370FBBD826E4");
+                        .HasName("PK__staffs__B9BE370F598C9242");
 
                     b.HasIndex(new[] { "StationId" }, "idx_staffs_station_id");
 
                     b.ToTable("staffs", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.StaffReport", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("(newid())");
-
-                    b.Property<Guid?>("AdminId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("admin_id");
-
-                    b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("(sysdatetimeoffset())");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("deleted_at");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("description");
-
-                    b.Property<string>("Reply")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("reply");
-
-                    b.Property<Guid>("StaffId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("staff_id");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int")
-                        .HasColumnName("status");
-
-                    b.Property<Guid?>("SupportRequestId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("support_request_id");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("title");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int")
-                        .HasColumnName("type");
-
-                    b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("(sysdatetimeoffset())");
-
-                    b.HasKey("Id")
-                        .HasName("PK__staff_re__3213E83F5156E646");
-
-                    b.HasIndex(new[] { "AdminId" }, "idx_staff_reports_admin_id");
-
-                    b.HasIndex(new[] { "StaffId" }, "idx_staff_reports_staff_id");
-
-                    b.HasIndex(new[] { "SupportRequestId" }, "idx_staff_reports_support_id");
-
-                    b.ToTable("staff_reports", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.Station", b =>
@@ -984,7 +921,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__stations__3213E83FDE57DAC6");
+                        .HasName("PK__stations__3213E83F2847A073");
 
                     b.ToTable("stations", (string)null);
                 });
@@ -1030,7 +967,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__station___3213E83F2B055C9C");
+                        .HasName("PK__station___3213E83F4AFEE7FD");
 
                     b.HasIndex(new[] { "CustomerId" }, "idx_station_feedbacks_customer_id");
 
@@ -1039,7 +976,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("station_feedbacks", (string)null);
                 });
 
-            modelBuilder.Entity("Domain.Entities.SupportRequest", b =>
+            modelBuilder.Entity("Domain.Entities.Ticket", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1047,15 +984,15 @@ namespace Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("(newid())");
 
+                    b.Property<Guid?>("AssigneeId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("assignee_id");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("(sysdatetimeoffset())");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("customer_id");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")
@@ -1070,9 +1007,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("reply");
 
-                    b.Property<Guid?>("StaffId")
+                    b.Property<Guid>("RequesterId")
                         .HasColumnType("uniqueidentifier")
-                        .HasColumnName("staff_id");
+                        .HasColumnName("requester_id");
 
                     b.Property<int>("Status")
                         .HasColumnType("int")
@@ -1095,13 +1032,13 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__support___3213E83F22E367C7");
+                        .HasName("PK__tickets__3213E83F2FACC57D");
 
-                    b.HasIndex(new[] { "StaffId" }, "idx_support_requests_staff_id");
+                    b.HasIndex(new[] { "AssigneeId" }, "idx_tickets_assignee_id");
 
-                    b.HasIndex(new[] { "CustomerId" }, "idx_support_requests_user_id");
+                    b.HasIndex(new[] { "RequesterId" }, "idx_tickets_requester_id");
 
-                    b.ToTable("support_requests", (string)null);
+                    b.ToTable("tickets", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -1184,7 +1121,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__users__3213E83F083E0E83");
+                        .HasName("PK__users__3213E83F3D8F393F");
 
                     b.HasIndex(new[] { "RoleId" }, "idx_users_role_id");
 
@@ -1234,9 +1171,9 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicles__3213E83F1CEAB601");
+                        .HasName("PK__vehicles__3213E83F9468F02D");
 
-                    b.HasIndex(new[] { "LicensePlate" }, "UQ__vehicles__F72CD56E11B6394E")
+                    b.HasIndex(new[] { "LicensePlate" }, "UQ__vehicles__F72CD56E6B1143A7")
                         .IsUnique();
 
                     b.HasIndex(new[] { "ModelId" }, "idx_vehicles_model_id");
@@ -1272,10 +1209,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
 
-                    b.Property<Guid?>("InvoiceId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("invoice_id");
-
                     b.Property<bool>("IsSignedByCustomer")
                         .HasColumnType("bit")
                         .HasColumnName("is_signed_by_customer");
@@ -1288,6 +1221,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("staff_id");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int")
+                        .HasColumnName("type");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetimeoffset")
@@ -1299,9 +1236,7 @@ namespace Infrastructure.Migrations
                         .HasColumnName("vehicle_id");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83F5B95E7CD");
-
-                    b.HasIndex("InvoiceId");
+                        .HasName("PK__vehicle___3213E83F2D960DD1");
 
                     b.HasIndex(new[] { "ContractId" }, "idx_vehicle_checklists_contract_id");
 
@@ -1366,7 +1301,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83F906FB6F6");
+                        .HasName("PK__vehicle___3213E83F9C65BF9C");
 
                     b.HasIndex(new[] { "ChecklistId" }, "idx_vehicle_checklist_items_checklist_id");
 
@@ -1416,7 +1351,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83F39DCC37F");
+                        .HasName("PK__vehicle___3213E83F4A457319");
 
                     b.ToTable("vehicle_components", (string)null);
                 });
@@ -1466,11 +1401,13 @@ namespace Infrastructure.Migrations
                         .HasColumnName("eco_range_km");
 
                     b.Property<string>("ImagePublicId")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
                         .HasColumnName("image_public_id");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
                         .HasColumnName("image_url");
 
                     b.Property<decimal>("MotorPower")
@@ -1486,6 +1423,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("NumberOfAirbags")
                         .HasColumnType("int")
                         .HasColumnName("number_of_airbags");
+
+                    b.Property<decimal>("ReservationFee")
+                        .HasColumnType("decimal(10, 2)")
+                        .HasColumnName("reservation_fee");
 
                     b.Property<int>("SeatingCapacity")
                         .HasColumnType("int")
@@ -1506,7 +1447,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83F7DCE480B");
+                        .HasName("PK__vehicle___3213E83FDB87BC7C");
 
                     b.HasIndex(new[] { "SegmentId" }, "idx_vehicle_models__segment_id");
 
@@ -1552,7 +1493,7 @@ namespace Infrastructure.Migrations
                         .HasDefaultValueSql("(sysdatetimeoffset())");
 
                     b.HasKey("Id")
-                        .HasName("PK__vehicle___3213E83FB644C5D3");
+                        .HasName("PK__vehicle___3213E83FA98668EE");
 
                     b.ToTable("vehicle_segments", (string)null);
                 });
@@ -1753,8 +1694,8 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Station", "Station")
                         .WithMany("RentalContracts")
                         .HasForeignKey("StationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_rental_contracts_stations");
 
                     b.HasOne("Domain.Entities.Vehicle", "Vehicle")
                         .WithMany("RentalContracts")
@@ -1791,31 +1732,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.StaffReport", b =>
-                {
-                    b.HasOne("Domain.Entities.Staff", "Admin")
-                        .WithMany("StaffReportAdmins")
-                        .HasForeignKey("AdminId")
-                        .HasConstraintName("fk_staff_reports_admin");
-
-                    b.HasOne("Domain.Entities.Staff", "Staff")
-                        .WithMany("StaffReportStaffs")
-                        .HasForeignKey("StaffId")
-                        .IsRequired()
-                        .HasConstraintName("fk_staff_reports_staffs");
-
-                    b.HasOne("Domain.Entities.SupportRequest", "SupportRequest")
-                        .WithMany("StaffReports")
-                        .HasForeignKey("SupportRequestId")
-                        .HasConstraintName("fk_staff_reports_support");
-
-                    b.Navigation("Admin");
-
-                    b.Navigation("Staff");
-
-                    b.Navigation("SupportRequest");
-                });
-
             modelBuilder.Entity("Domain.Entities.StationFeedback", b =>
                 {
                     b.HasOne("Domain.Entities.User", "Customer")
@@ -1835,22 +1751,22 @@ namespace Infrastructure.Migrations
                     b.Navigation("Station");
                 });
 
-            modelBuilder.Entity("Domain.Entities.SupportRequest", b =>
+            modelBuilder.Entity("Domain.Entities.Ticket", b =>
                 {
-                    b.HasOne("Domain.Entities.User", "Customer")
-                        .WithMany("SupportRequests")
-                        .HasForeignKey("CustomerId")
+                    b.HasOne("Domain.Entities.Staff", "Assignee")
+                        .WithMany("Tickets")
+                        .HasForeignKey("AssigneeId")
+                        .HasConstraintName("fk_tickets_staff");
+
+                    b.HasOne("Domain.Entities.User", "Requester")
+                        .WithMany("Tickets")
+                        .HasForeignKey("RequesterId")
                         .IsRequired()
-                        .HasConstraintName("fk_support_requests_user");
+                        .HasConstraintName("fk_tickets_user");
 
-                    b.HasOne("Domain.Entities.Staff", "Staff")
-                        .WithMany("SupportRequests")
-                        .HasForeignKey("StaffId")
-                        .HasConstraintName("fk_support_requests_staff");
+                    b.Navigation("Assignee");
 
-                    b.Navigation("Customer");
-
-                    b.Navigation("Staff");
+                    b.Navigation("Requester");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>
@@ -1895,10 +1811,6 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("CustomerId")
                         .HasConstraintName("fk_vehicle_checklists_users");
 
-                    b.HasOne("Domain.Entities.Invoice", "Invoice")
-                        .WithMany()
-                        .HasForeignKey("InvoiceId");
-
                     b.HasOne("Domain.Entities.Staff", "Staff")
                         .WithMany("VehicleChecklists")
                         .HasForeignKey("StaffId")
@@ -1914,8 +1826,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Contract");
 
                     b.Navigation("Customer");
-
-                    b.Navigation("Invoice");
 
                     b.Navigation("Staff");
 
@@ -2003,11 +1913,7 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("RentalContractReturnStaffs");
 
-                    b.Navigation("StaffReportAdmins");
-
-                    b.Navigation("StaffReportStaffs");
-
-                    b.Navigation("SupportRequests");
+                    b.Navigation("Tickets");
 
                     b.Navigation("VehicleChecklists");
                 });
@@ -2027,11 +1933,6 @@ namespace Infrastructure.Migrations
                     b.Navigation("Vehicles");
                 });
 
-            modelBuilder.Entity("Domain.Entities.SupportRequest", b =>
-                {
-                    b.Navigation("StaffReports");
-                });
-
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Navigation("CitizenIdentity");
@@ -2046,7 +1947,7 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("StationFeedbacks");
 
-                    b.Navigation("SupportRequests");
+                    b.Navigation("Tickets");
 
                     b.Navigation("VehicleChecklists");
                 });

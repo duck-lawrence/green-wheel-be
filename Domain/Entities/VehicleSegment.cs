@@ -8,13 +8,13 @@ public partial class VehicleSegment : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string Name { get; set; } = null!;
 
     public string Description { get; set; } = null!;
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
 
     public virtual ICollection<VehicleModel> VehicleModels { get; set; } = new List<VehicleModel>();
 }

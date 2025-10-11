@@ -93,6 +93,10 @@ namespace Application.Helpers
                     var typeClaim = principal.FindFirst("type"); // hoặc "token_type" tùy bạn set khi tạo
                     if (typeClaim == null || !typeClaim.Value.Equals(type, StringComparison.OrdinalIgnoreCase))
                     {
+                        if (type == TokenType.RefreshToken.ToString())
+                        {
+                            throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
+                        }
                         throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken);
                     }
                 }
@@ -101,6 +105,10 @@ namespace Application.Helpers
             }
             catch
             {
+                if(type == TokenType.RefreshToken.ToString())
+                {
+                    throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
+                }
                 throw new UnauthorizedAccessException(Message.UserMessage.InvalidToken); // token không hợp lệ hoặc đã hết hạn
             }
         }

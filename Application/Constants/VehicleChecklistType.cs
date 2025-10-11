@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Application.Constants
 {
-    public enum SupportRequestType
+    public enum VehicleChecklistType
     {
-        Technical = 0,
-          Payment = 1,
-          Other = 2
+        OutOfContract = 0,
+        Handover = 1,
+        Return = 2
     }
 }

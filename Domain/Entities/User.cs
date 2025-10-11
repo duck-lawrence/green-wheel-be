@@ -8,10 +8,6 @@ public partial class User : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
 
-    public DateTimeOffset CreatedAt { get; set; }
-
-    public DateTimeOffset UpdatedAt { get; set; }
-
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
@@ -32,6 +28,10 @@ public partial class User : SorfDeletedEntity, IEntity
 
     public string? AvatarPublicId { get; set; }
 
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+
     public Guid RoleId { get; set; }
 
     public virtual CitizenIdentity? CitizenIdentity { get; set; }
@@ -47,6 +47,8 @@ public partial class User : SorfDeletedEntity, IEntity
     public virtual Staff? Staff { get; set; }
 
     public virtual ICollection<StationFeedback> StationFeedbacks { get; set; } = new List<StationFeedback>();
+
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
     public virtual ICollection<VehicleChecklist> VehicleChecklists { get; set; } = new List<VehicleChecklist>();
     public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();

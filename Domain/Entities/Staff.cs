@@ -8,6 +8,8 @@ public partial class Staff : SorfDeletedEntity
 {
     public Guid UserId { get; set; }
 
+   
+
     public Guid StationId { get; set; }
 
     public virtual ICollection<DispatchRequest> DispatchRequestApprovedAdmins { get; set; } = new List<DispatchRequest>();
@@ -20,11 +22,9 @@ public partial class Staff : SorfDeletedEntity
 
     public virtual ICollection<RentalContract> RentalContractReturnStaffs { get; set; } = new List<RentalContract>();
 
-    public virtual ICollection<StaffReport> StaffReportAdmins { get; set; } = new List<StaffReport>();
-
-    public virtual ICollection<StaffReport> StaffReportStaffs { get; set; } = new List<StaffReport>();
-
     public virtual Station Station { get; set; } = null!;
+
+    public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
 
     public virtual User User { get; set; } = null!;
 

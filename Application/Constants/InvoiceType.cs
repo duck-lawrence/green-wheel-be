@@ -11,6 +11,7 @@ namespace Application.Constants
         Handover = 0,
         Return = 1,
         Refund = 2,
-        Other = 3
+        Reservation = 3,
+        Other = 4
     }
 }
