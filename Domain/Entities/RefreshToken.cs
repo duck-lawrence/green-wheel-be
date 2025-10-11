@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public partial class RefreshToken : SorfDeletedEntity, IEntity
+public partial class RefreshToken : IEntity
 {
     public Guid Id { get; set; }
 

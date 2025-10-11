@@ -122,10 +122,10 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordReq userChangePasswordDto)
         {
-            if (userChangePasswordDto.OldPassword == null)
-            {
-                return BadRequest(Message.UserMessage.OldPasswordIsRequired);
-            }
+            //if (userChangePasswordDto.OldPassword == null)
+            //{
+            //    return BadRequest(Message.UserMessage.OldPasswordIsRequired);
+            //}
             var user = HttpContext.User;
             await _userService.ChangePassword(user, userChangePasswordDto);
             return Ok();

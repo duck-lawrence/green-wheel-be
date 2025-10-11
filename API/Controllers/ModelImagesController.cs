@@ -26,6 +26,7 @@ namespace API.Controllers
         // ---------- SUB-IMAGES (gallery) ----------
         [HttpPost("sub-images")]
         [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadSubImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
         {
             var res = await _modelImageService.UploadModelImagesAsync(modelId, req.Files);
@@ -34,6 +35,7 @@ namespace API.Controllers
 
         [HttpDelete("sub-images")]
         [Consumes("application/json")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> DeleteSubImages([FromRoute] Guid modelId, [FromBody] DeleteModelImagesReq req)
         {
             await _modelImageService.DeleteModelImagesAsync(modelId, req.ImageIds);
@@ -43,6 +45,7 @@ namespace API.Controllers
         // ---------- MAIN IMAGE ----------
         [HttpPost("main-image")]
         [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadMainImage([FromRoute] Guid modelId, [FromForm(Name = "file")] IFormFile file)
         {
             var imageUrl = await _vehicleModelService.UploadMainImageAsync(modelId, file);
@@ -59,6 +62,7 @@ namespace API.Controllers
         // ---------- MAIN + GALLERY ----------
         [HttpPost("images")]
         [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
         {
             var (mainImage, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
