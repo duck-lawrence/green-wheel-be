@@ -14,7 +14,7 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<DriverLicense?> GetByUserId(Guid userId)
+        public async Task<DriverLicense?> GetByUserIdAsync(Guid userId)
         {
             return await _context.DriverLicenses
                 .FirstOrDefaultAsync(x => x.UserId == userId && x.DeletedAt == null);

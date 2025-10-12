@@ -35,7 +35,7 @@ namespace Application
             => await _licenseRepo.GetByIdAsync(id);
 
         public async Task<DriverLicense?> GetByUserIdAsync(Guid userId)
-            => await _licenseRepo.GetByUserId(userId);
+            => await _licenseRepo.GetByUserIdAsync(userId);
 
         public async Task<DriverLicense?> GetByLicenseNumberAsync(string licenseNumber)
         {
@@ -49,7 +49,7 @@ namespace Application
 
         public async Task<bool> DeleteAsync(Guid userId, string publicId)
         {
-            var existing = await _licenseRepo.GetByUserId(userId);
+            var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
 
@@ -97,7 +97,7 @@ namespace Application
                 Class = licenseClass
             };
 
-            var existing = await _licenseRepo.GetByUserId(userId);
+            var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing != null)
             {
                 entity.Id = existing.Id;

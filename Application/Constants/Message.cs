@@ -203,5 +203,15 @@ namespace Application.Constants
         {
             public const string VehicleChecklistNotFound = "vehicle_checklist.not_found";
         }
+
+        public static class StationFeedbackMessage
+        {
+            public const string FeedbackNotFound = "station_feedback.not_found";
+        }
+
+        public static class VehicleModelImageMessage
+        {
+            public const string NoMainImage = "vehicle_model_image.not_found";
+        }
     }
 }
