@@ -26,7 +26,9 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null)
         {
-            var rentalContracts = _dbContext.RentalContracts
+            var rentalContracts = await _dbContext.RentalContracts
+                .Include(x => x.Vehicle)
+                .Include(x => x.Station)
                 .Include(x => x.Invoices)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)

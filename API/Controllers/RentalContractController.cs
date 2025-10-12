@@ -37,9 +37,9 @@ namespace API.Controllers
         {
             var userClaims = HttpContext.User;
             var userID = Guid.Parse(userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString());
-            var rentalContractViewRes = await _rentalContractService.CreateRentalContractAsync(userID, createReq);
-            return Ok(
-                rentalContractViewRes
+            await _rentalContractService.CreateRentalContractAsync(userID, createReq);
+            return Created(
+                // rentalContractViewRes
             );
         }
         /*
@@ -83,8 +83,8 @@ namespace API.Controllers
             {
                 return BadRequest(Message.UserMessage.UserIdIsRequired);
             } 
-            var rentalContractViewRes = await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
-            return Ok(rentalContractViewRes);
+            await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
+            return Created();
         }
 
         /*
