@@ -59,7 +59,6 @@ namespace API.Controllers
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-
             string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
             return link == null ? Ok() : Ok(new { link });
         }

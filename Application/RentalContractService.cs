@@ -224,7 +224,7 @@ namespace Application
             {
                 throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
             }
-            var invoice = (await _uow.InvoiceRepository.GetByContractAsync(id)).FirstOrDefault();
+            var invoice = (await _uow.InvoiceRepository.GetByContractAsync(id)).Where(i => i.Type == (int)InvoiceType.Handover).FirstOrDefault();
             if(invoice == null)
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);

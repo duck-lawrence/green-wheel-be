@@ -141,9 +141,9 @@ namespace API.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateRentalContractStatus(Guid id)
         {
-            
+            await _rentalContractService.UpdateStatusAsync(id);
+            return Ok();
         }
-
         
     }
 }
