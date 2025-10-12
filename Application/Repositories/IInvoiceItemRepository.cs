@@ -10,6 +10,5 @@ namespace Application.Repositories
     public interface IInvoiceItemRepository : IGenericRepository<InvoiceItem>
     {
         Task<IEnumerable<InvoiceItem>> GetByInvoiceIdAsync(Guid invoiceId);
-        Task AddRangeAsync(IEnumerable<InvoiceItem> items);
     }
 }

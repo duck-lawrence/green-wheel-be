@@ -19,5 +19,6 @@ namespace Application.Abstractions
         Task<IEnumerable<RentalContractViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null);
         Task HandoverRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
         Task<InvoiceViewRes?> ReturnRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
+        Task<RentalContractViewRes?> GetContractByUserId(ClaimsPrincipal userClaims);
     }
 }

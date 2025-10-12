@@ -142,6 +142,7 @@ namespace Application.Constants
             public const string NotHavePermission = "momo.not_have_permission";
             public const string InvalidEndpoint = "momo.invalid_end_point";
             public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
+            public const string PaymentFailed = "momo.payment_failed";
         }
 
         public static class InvoiceMessage

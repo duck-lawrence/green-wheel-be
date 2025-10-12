@@ -19,9 +19,16 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId)
+        public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status = null)
         {
-            return await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId).ToListAsync();
+            var contracts = await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
+                .Include(r => r.Invoices)
+                .ToListAsync();
+            if (status != null)
+            {
+                contracts = (List<RentalContract>)contracts.Where(c => c.Status == status);
+            }
+            return contracts;
         }
 
         public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null)
@@ -52,5 +59,13 @@ namespace Infrastructure.Repositories
             && r.Status != (int)RentalContractStatus.Completed
             && r.Status != (int)RentalContractStatus.Cancelled).FirstOrDefaultAsync()) != null;
         }
+
+        public override async Task<RentalContract?> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.RentalContracts.Where(r => r.Id == id)
+                .Include(r => r.Invoices).FirstOrDefaultAsync();
+        }
+
+        
     }
 }

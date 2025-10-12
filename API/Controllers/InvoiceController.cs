@@ -35,10 +35,10 @@ namespace API.Controllers
          */
 
         [HttpPost("process-update")]
-        public async Task<IActionResult> ProcessUpdateInvoice([FromBody] MomoIpnReq req)
+        public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
-            await _invoiceService.ProcessUpdateInvoice(req, Guid.Parse(req.OrderId));
+            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId));
             return Ok(new { resultCode = 0, message = "Received" });
         }
 
@@ -59,11 +59,11 @@ namespace API.Controllers
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-
             string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
             return link == null ? Ok() : Ok(new { link });
         }
 
+        [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
         {

@@ -75,7 +75,7 @@ namespace Application
             return null;
         }
 
-        public async Task ProcessUpdateInvoice(MomoIpnReq momoIpnReq, Guid invoiceId)
+        public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
         {
             if (momoIpnReq.ResultCode == (int)MomoPaymentStatus.Success)
             {
@@ -84,21 +84,22 @@ namespace Application
                 {
                     throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
                 }
-                var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
-                if (rentalContract == null)
-                {
-                    throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-                }
-                rentalContract.Status = (int)RentalContractStatus.Active;
+                //var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
+                //if (rentalContract == null)
+                //{
+                //    throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+                //}
+                //rentalContract.Status = (int)RentalContractStatus.Active;
                 invoice.Status = (int)InvoiceStatus.Paid;
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
                 invoice.PaidAmount = momoIpnReq.Amount;
                 invoice.PaidAt = DateTimeOffset.FromUnixTimeMilliseconds(momoIpnReq.ResponseTime);
                 await _uow.InvoiceRepository.UpdateAsync(invoice);
-                await _uow.RentalContractRepository.UpdateAsync(rentalContract);
+                //await _uow.RentalContractRepository.UpdateAsync(rentalContract);
                 await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
                 await _uow.SaveChangesAsync();
             }
+            throw new Exception(Message.MomoMessage.PaymentFailed);
         }
 
         public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
@@ -109,6 +110,12 @@ namespace Application
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
 
             return invoices;
+        }
+
+        public async Task<IEnumerable<InvoiceViewRes>?> GetByContractIdAndStatus(Guid? contractId, int? status)
+        {
+            var invoices = await _uow.InvoiceRepository.GetInvoiceByContractIdAndStatus(contractId, status);
+            return _mapper.Map<IEnumerable<InvoiceViewRes>?>(invoices);
         }
     }
 }
