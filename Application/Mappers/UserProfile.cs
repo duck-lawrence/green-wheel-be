@@ -29,9 +29,12 @@ namespace Application.Mappers
 
             CreateMap<CreateUserReq, User>();
 
-            CreateMap<CitizenIdentity, CitizenIdentityRes>();
+            CreateMap<DriverLicense, DriverLicenseRes>()
+            .ForMember(dest => dest.Class, opt => opt.MapFrom(src => src.Class.ToString()))
+            .ForMember(dest => dest.Sex, opt => opt.MapFrom(src => src.Sex.ToString()));
 
-            CreateMap<DriverLicense, DriverLicenseRes>();
+            CreateMap<CitizenIdentity, CitizenIdentityRes>()
+                .ForMember(dest => dest.Sex, opt => opt.MapFrom(src => src.Sex.ToString()));
         }
     }
 }
