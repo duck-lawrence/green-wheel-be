@@ -1,7 +1,9 @@
 ﻿using API.Filters;
 using Application.Abstractions;
 using Application.Constants;
+using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.Common.Request;
+using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
@@ -265,6 +267,7 @@ namespace API.Controllers
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
             return Ok(result);
+            return Ok(result);
         }
 
         [HttpGet("citizen-identity")]
@@ -295,6 +298,17 @@ namespace API.Controllers
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyDriverLicenseAsync(userId);
             return Ok(result);
+        }
+        
+        [HttpGet]
+        [RoleAuthorize(["Staff", "Admin"])]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? phone,
+            [FromQuery] string? citizenIdNumber,
+            [FromQuery] string? driverLicenseNumber)
+        {
+            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            return Ok(users);
         }
 
         //Create anonymous account
@@ -369,15 +383,39 @@ namespace API.Controllers
         //    var userView = await _userService.GetByDriverLicenseAsync(number);
         //    return Ok(userView);
         //}
-        [HttpGet]
-        [RoleAuthorize(["Staff", "Admin"])]
-        public async Task<IActionResult> GetAll(
-            [FromQuery] string? phone,
-            [FromQuery] string? citizenIdNumber,
-            [FromQuery] string? driverLicenseNumber)
+        
+        [RoleAuthorize("Customer")]
+        [HttpPatch("citizen-identity")]
+        public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
         {
-            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
-            return Ok(users);
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            return Ok(result);
+        }
+
+        [RoleAuthorize("Customer")]
+        [HttpPatch("driver-license")]
+        public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
+            return Ok(result);
+        }
+
+        [RoleAuthorize(["Staff", "Admin"])]
+        [HttpPatch("{userId:guid}/citizen-identity")]
+        public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
+        {
+            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            return Ok(result);
+        }
+
+        [RoleAuthorize(["Staff", "Admin"])]
+        [HttpPatch("{userId:guid}/driver-license")]
+        public async Task<IActionResult> UpdateDriverLicenseForUser(Guid userId, [FromBody] UpdateDriverLicenseReq req)
+        {
+            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
+            return Ok(result);
         }
     }
 }

@@ -34,18 +34,16 @@ namespace Infrastructure.Repositories
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.DriverLicense)
-                .ToListAsync();
-            if (!string.IsNullOrEmpty(phone) && status != null)
+                .AsQueryable();
+            if (!string.IsNullOrEmpty(phone))
             {
-                rentalContracts = rentalContracts.Where(rc => rc.Status == status && rc.Customer.Phone == phone).ToList();
-            }else if (!string.IsNullOrEmpty(phone))
-            {
-                rentalContracts = rentalContracts.Where(rc => rc.Customer.Phone == phone).ToList();
-            }else if(status != null)
-            {
-                rentalContracts = rentalContracts.Where(rc => rc.Status == status).ToList();
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.Phone == phone);
             }
-            return rentalContracts;
+            if(status != null)
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Status == status);
+            }
+            return await rentalContracts.ToListAsync();
         }
 
         public async Task<bool> HasActiveContractAsync(Guid customerId)

@@ -1,5 +1,7 @@
 ﻿using Application.Constants;
+using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.CitizenIdentity.Response;
+using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
@@ -59,6 +61,8 @@ namespace Application.Abstractions
 
         Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId);
 
+        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+      
         Task<Guid> CreateAnounymousAccount(CreateUserReq req);
 
         Task<UserProfileViewRes> GetUserByPhoneAsync(string phone);
@@ -67,8 +71,9 @@ namespace Application.Abstractions
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
 
-        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
-
+        Task<CitizenIdentityRes> UpdateCitizenIdentityAsync(Guid userId, UpdateCitizenIdentityReq req);
+      
+        Task<DriverLicenseRes> UpdateDriverLicenseAsync(Guid userId, UpdateDriverLicenseReq req);
         //Task UpdateMyIdentityAsync(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
     }
 }
