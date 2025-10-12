@@ -264,10 +264,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
-            return Ok(new
-            {
-                citizen_identity = result
-            });
+            return Ok(result);
         }
 
         [HttpGet("citizen-identity")]
@@ -287,10 +284,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadDriverLicenseAsync(userId, file);
-            return Ok(new
-            {
-                driver_license = result
-            });
+            return Ok(result);
         }
 
         // Lấy bằng user trong token
@@ -306,7 +300,7 @@ namespace API.Controllers
         //Create anonymous account
         [RoleAuthorize("Staff")]
         [HttpPost("anonymous")]
-        public async Task<IActionResult> CreateAnonymousAccount([FromForm] CreateUserReq req)
+        public async Task<IActionResult> CreateAnonymousAccount([FromBody] CreateUserReq req)
         {
             var userId = await _userService.CreateAnounymousAccount(req);
             return Ok(new { userId });
@@ -362,7 +356,7 @@ namespace API.Controllers
 
         [HttpGet("citizen-identity/{idNumber}")]
         [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
+        public async Task<IActionResult> GetUserByCitizenIdNumber(string idNumber)
         {
             var userView = await _userService.GetByCitizenIdentityAsync(idNumber);
             return Ok(userView);
@@ -370,7 +364,7 @@ namespace API.Controllers
 
         [HttpGet("driver-license/{number}")]
         [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> getUserByDriverLisence(string number)
+        public async Task<IActionResult> GetUserByDriverLisence(string number)
         {
             var userView = await _userService.GetByDriverLicenseAsync(number);
             return Ok(userView);
