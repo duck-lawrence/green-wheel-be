@@ -266,10 +266,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
-            return Ok(new
-            {
-                citizen_identity = result
-            });
+            return Ok(result);
         }
 
         [HttpGet("citizen-identity")]
@@ -278,10 +275,6 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyCitizenIdentityAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 
@@ -293,10 +286,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadDriverLicenseAsync(userId, file);
-            return Ok(new
-            {
-                driver_license = result
-            });
+            return Ok(result);
         }
 
         // Lấy bằng user trong token
@@ -306,20 +296,27 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyDriverLicenseAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
+        
+        [HttpGet]
+        [RoleAuthorize(["Staff", "Admin"])]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? phone,
+            [FromQuery] string? citizenIdNumber,
+            [FromQuery] string? driverLicenseNumber)
+        {
+            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            return Ok(users);
+        }
 
-        //Create anonymouse account
+        //Create anonymous account
         [RoleAuthorize("Staff")]
         [HttpPost("anonymous")]
-        public async Task<IActionResult> CreateAnonymouseAccount([FromForm] CreateUserReq req)
+        public async Task<IActionResult> CreateAnonymousAccount([FromBody] CreateUserReq req)
         {
             var userId = await _userService.CreateAnounymousAccount(req);
-            return Ok(userId);
+            return Ok(new { userId });
         }
 
         //upload citizenId for Anonymous
@@ -385,21 +382,7 @@ namespace API.Controllers
         //    var userView = await _userService.GetByDriverLicenseAsync(number);
         //    return Ok(userView);
         //}
-        [HttpGet]
-        [RoleAuthorize(["Staff", "Admin"])]
-        public async Task<IActionResult> SearchUser(
-            [FromQuery] string? phone,
-            [FromQuery] string? citizenIdNumber,
-            [FromQuery] string? driverLicenseNumber)
-        {
-            var users = await _userService.SearchUserAsync(phone, citizenIdNumber, driverLicenseNumber);
-
-            if (users == null || !users.Any())
-                return NotFound(new { message = Message.UserMessage.UserNotFound });
-
-            return Ok(users);
-        }
-
+        
         [RoleAuthorize("Customer")]
         [HttpPatch("citizen-identity")]
         public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)

@@ -612,7 +612,7 @@ namespace Application
             try
             {
                 var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -646,7 +646,7 @@ namespace Application
             try
             {
                 var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -669,7 +669,8 @@ namespace Application
         public async Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId)
         {
             var entity = await _citizenService.GetByUserId(userId);
-            if (entity == null) return null;
+            if (entity == null)
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
             return _mapper.Map<CitizenIdentityRes>(entity);
         }
@@ -677,7 +678,8 @@ namespace Application
         public async Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId)
         {
             var entity = await _driverService.GetByUserIdAsync(userId);
-            if (entity == null) return null;
+            if (entity == null)
+                throw new NotFoundException(Message.UserMessage.LicenseNotFound);
 
             return _mapper.Map<DriverLicenseRes>(entity);
         }
@@ -716,18 +718,12 @@ namespace Application
             return userViewRes;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return users;
-        }
-
         public async Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber)
         {
             var citizenIdentity = await _citizenIdentityRepository.GetByIdNumberAsync(idNumber);
             if (citizenIdentity == null)
             {
-                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
             }
             var userView = _mapper.Map<UserProfileViewRes>(citizenIdentity.User);
             return userView;
@@ -738,13 +734,13 @@ namespace Application
             var driverLicense = await _driverLicenseRepository.GetByLicenseNumber(number);
             if (driverLicense == null)
             {
-                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
             }
             var userView = _mapper.Map<UserProfileViewRes>(driverLicense.User);
             return userView;
         }
 
-        public async Task<IEnumerable<UserProfileViewRes>> SearchUserAsync(
+        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
             string? phone,
             string? citizenIdNumber,
             string? driverLicenseNumber)
