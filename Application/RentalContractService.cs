@@ -38,7 +38,7 @@ namespace Application
             _mapper = mapper;
             _emailSettings = emailSettings.Value;
         }
-        public async Task<RentalContractViewRes> CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
+        public async Task CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
         {
             //ktra xem có cccd hay chưa
             //var citizenIdentity = await _uow.CitizenIdentityRepository.GetByUserIdAsync(userID);
@@ -185,13 +185,13 @@ namespace Application
 
             await _uow.SaveChangesAsync();
             //lấy vehicle có join bảng model để in ra view res
-            vehicle = await _uow.VehicleRepository.GetByIdOptionAsync(vehicle.Id, true);
-            contract.Vehicle = vehicle;
-            var rentalContractViewRespone = _mapper.Map<RentalContractViewRes>(contract);
-            return rentalContractViewRespone;
+            // vehicle = await _uow.VehicleRepository.GetByIdOptionAsync(vehicle.Id, true);
+            // contract.Vehicle = vehicle;
+            // var rentalContractViewRespone = _mapper.Map<RentalContractViewRes>(contract);
+            // return rentalContractViewRespone;
         }
 
-        public async Task<IEnumerable<RentalContractForStaffViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null)
+        public async Task<IEnumerable<RentalContractViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null)
         {
             var contracts = await _uow.RentalContractRepository.GetAllAsync(status, phone);
             if (contracts == null)
@@ -199,7 +199,7 @@ namespace Application
             throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
 
             }
-            var contractViewRes = _mapper.Map<IEnumerable<RentalContractForStaffViewRes>>(contracts);
+            var contractViewRes = _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts);
             return contractViewRes;
 
         }

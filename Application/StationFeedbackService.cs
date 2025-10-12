@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.StationFeedback.Request;
 using Application.Repositories;
 using AutoMapper;
@@ -33,7 +34,7 @@ public class StationFeedbackService : IStationFeedbackService
     {
         var feedback = await _repo.GetByIdAsync(id);
         if (feedback == null || feedback.CustomerId != customerId)
-            throw new Exception("Feedback not found or access denied");
+            throw new Exception(Message.StationFeedbackMessage.FeedbackNotFound);
 
         await _repo.DeleteAsync(id);
     }

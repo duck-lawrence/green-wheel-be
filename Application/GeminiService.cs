@@ -15,29 +15,35 @@ namespace Application
     {
         private readonly HttpClient _httpClient;
         private readonly GeminiSettings _settings;
-        private readonly ILogger<GeminiService> _logger;
 
         public GeminiService(HttpClient httpClient, IOptions<GeminiSettings> options, ILogger<GeminiService> logger)
         {
             _httpClient = httpClient;
             _settings = options.Value;
-            _logger = logger;
-
             _httpClient.Timeout = TimeSpan.FromSeconds(_settings.HttpTimeoutSeconds);
         }
 
-        //CCCD
         public async Task<CreateCitizenIdentityReq?> ExtractCitizenIdAsync(string imageUrl)
         {
             var prompt = """
-            You are an OCR assistant.
-            Extract the fields from this Vietnamese Citizen ID card.
-            Return ONLY a valid JSON object with keys:
-            {id_number, full_name, nationality, sex, date_of_birth, expires_at}.
-            Dates MUST be yyyy-MM-dd.
-            If a field is missing, use empty string.
-            Do not add any explanation, only JSON.
-            """;
+                You are an OCR AI. Extract text from the image of a Vietnamese Citizen ID Card (Căn cước công dân Việt Nam).
+
+                Return only this JSON object:
+                {
+                  "id_number": "...",
+                  "full_name": "...",
+                  "nationality": "...",
+                  "sex": "...",
+                  "date_of_birth": "yyyy-MM-dd",
+                  "expires_at": "yyyy-MM-dd"
+                }
+
+                Guidelines:
+                - If text is in uppercase (e.g. NGUYEN VAN A), still extract normally.
+                - Keep Vietnamese accents (e.g. Việt Nam, Nguyễn Văn A).
+                - Do NOT include additional text, explanations, or Markdown.
+                - Do NOT return empty strings for missing fields. Always try to guess if possible.
+                """; ;
 
             var text = await CallGeminiAndExtractText(imageUrl, prompt);
             if (string.IsNullOrWhiteSpace(text)) return null;
@@ -48,23 +54,32 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to deserialize citizen identity JSON: {Raw}", text);
                 return null;
             }
         }
 
-        //  Bằng lái xe
         public async Task<CreateDriverLicenseReq?> ExtractDriverLicenseAsync(string imageUrl)
         {
             var prompt = """
-                You are an OCR assistant.
-                Extract the fields from this Vietnamese Driver License (Bằng lái xe Việt Nam).
-                Return ONLY a valid JSON object with the following keys:
-                {Number, FullName, Nationality, Sex, DateOfBirth, ExpiresAt, Class}.
-                Dates MUST be yyyy-MM-dd.
-                If a field is missing, use empty string.
-                Do not add any explanation, only JSON.
-                """;
+            You are an OCR assistant for Vietnamese Driver Licenses (Bằng lái xe Việt Nam).
+
+            Extract and return ONLY this JSON:
+            {
+              "Number": "string",
+              "FullName": "string",
+              "Nationality": "string",
+              "Sex": "string",
+              "DateOfBirth": "string (yyyy-MM-dd)",
+              "ExpiresAt": "string (yyyy-MM-dd)",
+              "Class": "string"
+            }
+
+            Rules:
+            - Detect text in both Vietnamese and English.
+            - If a field is missing, return empty string "".
+            - Dates must follow yyyy-MM-dd.
+            - Output JSON only, no markdown or extra commentary.
+            """;
 
             var text = await CallGeminiAndExtractText(imageUrl, prompt);
             if (string.IsNullOrWhiteSpace(text)) return null;
@@ -75,12 +90,10 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to deserialize driver license JSON: {Raw}", text);
                 return null;
             }
         }
 
-        // Helper chung gọi Gemini API
         private async Task<string?> CallGeminiAndExtractText(string imageUrl, string prompt)
         {
             object imagePart;
@@ -91,7 +104,6 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to fetch/encode image: {Url}", imageUrl);
                 return null;
             }
 
@@ -110,7 +122,6 @@ namespace Application
             };
 
             var url = $"{_settings.ApiBaseUrl}/models/{_settings.ModelName}:generateContent?key={_settings.ApiKey}";
-            _logger.LogInformation("Gemini Request | Model: {Model}, Url: {Url}", _settings.ModelName, imageUrl);
 
             HttpResponseMessage response;
             try
@@ -119,14 +130,12 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "HTTP error while calling Gemini API");
                 return null;
             }
 
             var raw = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Gemini API Error {Status}: {Error}", response.StatusCode, raw);
                 return null;
             }
 
@@ -150,13 +159,10 @@ namespace Application
 
                 if (string.IsNullOrWhiteSpace(text))
                 {
-                    _logger.LogWarning("Gemini returned empty text for {Url}", imageUrl);
                     return null;
                 }
 
-                // Clean JSON text
                 text = text.Replace("```json", "").Replace("```", "").Trim();
-
                 var match = Regex.Match(text, "{.*}", RegexOptions.Singleline);
                 if (match.Success) text = match.Value;
 
@@ -164,7 +170,6 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error parsing Gemini response: {Response}", raw);
                 return null;
             }
         }

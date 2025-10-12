@@ -35,7 +35,7 @@ namespace Application
             => await _licenseRepo.GetByIdAsync(id);
 
         public async Task<DriverLicense?> GetByUserIdAsync(Guid userId)
-            => await _licenseRepo.GetByUserId(userId);
+            => await _licenseRepo.GetByUserIdAsync(userId);
 
         public async Task<DriverLicense?> GetByLicenseNumberAsync(string licenseNumber)
         {
@@ -49,7 +49,7 @@ namespace Application
 
         public async Task<bool> DeleteAsync(Guid userId, string publicId)
         {
-            var existing = await _licenseRepo.GetByUserId(userId);
+            var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
 
@@ -75,8 +75,13 @@ namespace Application
             if (dto == null)
                 throw new BusinessException(Message.UserMessage.InvalidLicenseData);
 
+            // parse ngày
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
+
+            // parse sex + class thành int
+            var sex = ParseSex(dto.Sex);
+            var licenseClass = ParseLicenseClass(dto.Class);
 
             var entity = new DriverLicense
             {
@@ -84,15 +89,15 @@ namespace Application
                 Number = dto.Number ?? string.Empty,
                 FullName = dto.FullName ?? string.Empty,
                 Nationality = dto.Nationality ?? string.Empty,
-                Sex = dto.Sex,
+                Sex = sex,
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
                 ImagePublicId = publicId,
-                Class = dto.Class
+                Class = licenseClass
             };
 
-            var existing = await _licenseRepo.GetByUserId(userId);
+            var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing != null)
             {
                 entity.Id = existing.Id;
@@ -104,6 +109,14 @@ namespace Application
             }
 
             return entity;
+        }
+
+        private static int ParseSex(string? sexStr)
+        {
+            if (string.IsNullOrWhiteSpace(sexStr)) return 0;
+            var s = sexStr.Trim().ToLower();
+            if (s.Contains("nữ") || s.Contains("female") || s == "f") return 1;
+            return 0;
         }
 
         private static int ParseLicenseClass(string? classString)

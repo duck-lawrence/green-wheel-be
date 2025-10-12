@@ -1,7 +1,9 @@
 ﻿using API.Filters;
 using Application.Abstractions;
 using Application.Constants;
+using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.Common.Request;
+using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
@@ -264,10 +266,8 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
-            return Ok(new
-            {
-                citizen_identity = result
-            });
+            return Ok(result);
+            return Ok(result);
         }
 
         [HttpGet("citizen-identity")]
@@ -287,10 +287,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadDriverLicenseAsync(userId, file);
-            return Ok(new
-            {
-                driver_license = result
-            });
+            return Ok(result);
         }
 
         // Lấy bằng user trong token
@@ -302,14 +299,25 @@ namespace API.Controllers
             var result = await _userService.GetMyDriverLicenseAsync(userId);
             return Ok(result);
         }
+        
+        [HttpGet]
+        [RoleAuthorize(["Staff", "Admin"])]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? phone,
+            [FromQuery] string? citizenIdNumber,
+            [FromQuery] string? driverLicenseNumber)
+        {
+            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            return Ok(users);
+        }
 
-        //Create anonymouse account
+        //Create anonymous account
         [RoleAuthorize("Staff")]
         [HttpPost("anonymous")]
-        public async Task<IActionResult> CreateAnonymouseAccount([FromForm] CreateUserReq req)
+        public async Task<IActionResult> CreateAnonymousAccount([FromBody] CreateUserReq req)
         {
             var userId = await _userService.CreateAnounymousAccount(req);
-            return Ok(userId);
+            return Ok(new { userId });
         }
 
         //upload citizenId for Anonymous
@@ -339,41 +347,75 @@ namespace API.Controllers
          * 404 not found
          */
 
-        [HttpGet("phone/{phone}")]
-        [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> GetUserByPhone(string phone)
+        //[HttpGet("phone/{phone}")]
+        //[RoleAuthorize("Staff", "Admin")]
+        //public async Task<IActionResult> GetUserByPhone(string phone)
+        //{
+        //    var user = await _userService.GetUserByPhoneAsync(phone);
+        //    return Ok(user);
+        //}
+
+        ///*
+        // * Status code
+        // * 200 success
+        // */
+
+        //[HttpGet]
+        //[RoleAuthorize(RoleName.Staff, RoleName.Admin)]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var users = await _userService.GetAllUsersAsync();
+        //    return Ok(users);
+        //}
+
+        //[HttpGet("citizen-identity/{idNumber}")]
+        //[RoleAuthorize("Staff", "Admin")]
+        //public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
+        //{
+        //    var userView = await _userService.GetByCitizenIdentityAsync(idNumber);
+        //    return Ok(userView);
+        //}
+
+        //[HttpGet("driver-license/{number}")]
+        //[RoleAuthorize("Staff", "Admin")]
+        //public async Task<IActionResult> getUserByDriverLisence(string number)
+        //{
+        //    var userView = await _userService.GetByDriverLicenseAsync(number);
+        //    return Ok(userView);
+        //}
+        
+        [RoleAuthorize("Customer")]
+        [HttpPatch("citizen-identity")]
+        public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
         {
-            var user = await _userService.GetUserByPhoneAsync(phone);
-            return Ok(user);
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            return Ok(result);
         }
 
-        /*
-         * Status code
-         * 200 success
-         */
-
-        [HttpGet]
-        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
-        public async Task<IActionResult> GetAll()
+        [RoleAuthorize("Customer")]
+        [HttpPatch("driver-license")]
+        public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
         {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
+            return Ok(result);
         }
 
-        [HttpGet("citizen-identity/{idNumber}")]
-        [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
+        [RoleAuthorize(["Staff", "Admin"])]
+        [HttpPatch("{userId:guid}/citizen-identity")]
+        public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
         {
-            var userView = await _userService.GetByCitizenIdentityAsync(idNumber);
-            return Ok(userView);
+            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            return Ok(result);
         }
 
-        [HttpGet("driver-license/{number}")]
-        [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> getUserByDriverLisence(string number)
+        [RoleAuthorize(["Staff", "Admin"])]
+        [HttpPatch("{userId:guid}/driver-license")]
+        public async Task<IActionResult> UpdateDriverLicenseForUser(Guid userId, [FromBody] UpdateDriverLicenseReq req)
         {
-            var userView = await _userService.GetByDriverLicenseAsync(number);
-            return Ok(userView);
+            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
+            return Ok(result);
         }
     }
 }

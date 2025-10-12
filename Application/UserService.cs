@@ -2,13 +2,13 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
+using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Dtos.UserSupport.Request;
-using Application.Dtos.UserSupport.Response;
 using Application.Helpers;
 using Application.Repositories;
 using Application.UnitOfWorks;
@@ -16,6 +16,7 @@ using AutoMapper;
 using Domain.Entities;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -39,7 +40,7 @@ namespace Application
         private readonly ICitizenIdentityService _citizenService;
         private readonly IDriverLicenseService _driverService;
         private readonly IMediaUow _mediaUow;
-        private readonly ISupportRequestRepository _supportRepo;
+        private readonly ITicketRepository _supportRepo;
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ICitizenIdentityRepository _citizenIdentityRepository;
         private readonly IDriverLicenseRepository _driverLicenseRepository;
@@ -58,7 +59,7 @@ namespace Application
              ICitizenIdentityService citizenService,
              IDriverLicenseService driverService,
              IMediaUow mediaUow,
-             ISupportRequestRepository supportRepo,
+             ITicketRepository supportRepo,
              IRentalContractRepository rentalContractRepository,
              ICitizenIdentityRepository citizenIdentityRepository,
              IDriverLicenseRepository driverLicenseRepository
@@ -98,7 +99,7 @@ namespace Application
 
             if (userFromDB != null)
             {
-                if(userFromDB.IsGoogleLinked && userFromDB.Password == null)
+                if (userFromDB.IsGoogleLinked && userFromDB.Password == null)
                 {
                     throw new ForbidenException(Message.UserMessage.NotHavePassword);
                 }
@@ -347,7 +348,7 @@ namespace Application
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
-            if(userFromDB.Password == null && !userFromDB.IsGoogleLinked)
+            if (userFromDB.Password == null && !userFromDB.IsGoogleLinked)
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
@@ -480,6 +481,7 @@ namespace Application
                 { TokenType.AccessToken.ToString() , accessToken}
             };
         }
+
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
@@ -596,7 +598,7 @@ namespace Application
             }
         }
 
-        public async Task<object> UploadCitizenIdAsync(Guid userId, IFormFile file)
+        public async Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
@@ -631,14 +633,14 @@ namespace Application
             }
         }
 
-        public async Task<object> UploadDriverLicenseAsync(Guid userId, IFormFile file)
+        public async Task<DriverLicenseRes> UploadDriverLicenseAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
             var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "driver-licenses");
             if (string.IsNullOrEmpty(uploaded.Url))
                 throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
-            var old = await _mediaUow.DriverLicenses.GetByUserId(userId);
+            var old = await _mediaUow.DriverLicenses.GetByUserIdAsync(userId);
 
             await using var trx = await _mediaUow.BeginTransactionAsync();
             try
@@ -664,19 +666,19 @@ namespace Application
             }
         }
 
-        public async Task<object?> GetMyCitizenIdentityAsync(Guid userId)
+        public async Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId)
         {
             var entity = await _citizenService.GetByUserId(userId);
-            if (entity == null) 
+            if (entity == null)
                 throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
             return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
-        public async Task<object?> GetMyDriverLicenseAsync(Guid userId)
+        public async Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId)
         {
             var entity = await _driverService.GetByUserIdAsync(userId);
-            if (entity == null) 
+            if (entity == null)
                 throw new NotFoundException(Message.UserMessage.LicenseNotFound);
 
             return _mapper.Map<DriverLicenseRes>(entity);
@@ -716,12 +718,6 @@ namespace Application
             return userViewRes;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return users;
-        }
-
         public async Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber)
         {
             var citizenIdentity = await _citizenIdentityRepository.GetByIdNumberAsync(idNumber);
@@ -742,6 +738,58 @@ namespace Application
             }
             var userView = _mapper.Map<UserProfileViewRes>(driverLicense.User);
             return userView;
+        }
+
+        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
+            string? phone,
+            string? citizenIdNumber,
+            string? driverLicenseNumber)
+        {
+            // Query bắt đầu từ DbContext vì UserRepository generic không expose DbSet
+            var query = _mediaUow.Users.GetQueryable()
+            .Include(u => u.CitizenIdentity)
+            .Include(u => u.DriverLicense)
+            .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(phone))
+                query = query.Where(u => u.Phone == phone);
+
+            if (!string.IsNullOrWhiteSpace(citizenIdNumber))
+                query = query.Where(u => u.CitizenIdentity != null && u.CitizenIdentity.Number == citizenIdNumber);
+
+            if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
+                query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
+
+            var users = await query.ToListAsync();
+            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users);
+        }
+
+        public async Task<CitizenIdentityRes> UpdateCitizenIdentityAsync(Guid userId, UpdateCitizenIdentityReq req)
+        {
+            var entity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
+            if (entity == null) throw new Exception(Message.UserMessage.UserNotFound);
+            if (req.Number != null) entity.Number = req.Number;
+            if (req.FullName != null) entity.FullName = req.FullName;
+            if (req.Nationality != null) entity.Nationality = req.Nationality;
+            if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+            if (req.DateOfBirth.HasValue) entity.DateOfBirth = req.DateOfBirth.Value;
+            await _citizenIdentityRepository.UpdateAsync(entity);
+            return _mapper.Map<CitizenIdentityRes>(entity);
+        }
+
+        public async Task<DriverLicenseRes> UpdateDriverLicenseAsync(Guid userId, UpdateDriverLicenseReq req)
+        {
+            var entity = await _driverLicenseRepository.GetByUserIdAsync(userId);
+            if (req.Number != null) entity.Number = req.Number;
+            if (req.Class.HasValue) entity.Class = req.Class.Value;
+            if (req.FullName != null) entity.FullName = req.FullName;
+            if (req.Nationality != null) entity.Nationality = req.Nationality;
+            if (req.Sex.HasValue) entity.Sex = req.Sex.Value;
+            if (req.DateOfBirth.HasValue) entity.DateOfBirth = req.DateOfBirth.Value;
+            if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+
+            await _driverLicenseRepository.UpdateAsync(entity);
+            return _mapper.Map<DriverLicenseRes>(entity);
         }
     }
 }
