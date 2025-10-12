@@ -26,7 +26,7 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null)
         {
-            var rentalContracts = await _dbContext.RentalContracts
+            var rentalContracts = _dbContext.RentalContracts
                 .Include(x => x.Vehicle)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
@@ -39,7 +39,7 @@ namespace Infrastructure.Repositories
             {
                 rentalContracts = rentalContracts.Where(rc => rc.Customer.Phone == phone);
             }
-            if(status != null)
+            if (status != null)
             {
                 rentalContracts = rentalContracts.Where(rc => rc.Status == status);
             }
@@ -48,11 +48,9 @@ namespace Infrastructure.Repositories
 
         public async Task<bool> HasActiveContractAsync(Guid customerId)
         {
-            return await (_dbContext.RentalContracts.Where(r => r.CustomerId == customerId 
+            return await (_dbContext.RentalContracts.Where(r => r.CustomerId == customerId
             && r.Status != (int)RentalContractStatus.Completed
             && r.Status != (int)RentalContractStatus.Cancelled).FirstOrDefaultAsync()) != null;
         }
-
-        
     }
 }
