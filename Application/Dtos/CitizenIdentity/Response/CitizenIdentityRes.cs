@@ -7,8 +7,9 @@
         public string FullName { get; set; } = null!;
         public string Nationality { get; set; } = null!;
         public string Sex { get; set; } = null!;
-        public string DateOfBirth { get; set; } = null!;
-        public string ExpiresAt { get; set; } = null!;
+        public DateTimeOffset DateOfBirth { get; set; }
+
+        public DateTimeOffset ExpiresAt { get; set; }
         public string ImageUrl { get; set; } = null!;
     }
 }

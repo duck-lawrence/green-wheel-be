@@ -13,7 +13,7 @@ namespace Application.Mappers
     {
         public VehicleChecklistItemProfile()
         {
-            CreateMap<VehicleChecklistItem, VehicleChecklistItemViewRes>();
+            CreateMap<VehicleChecklistItem, ChecklistItemImageRes>();
         }
     }
 }

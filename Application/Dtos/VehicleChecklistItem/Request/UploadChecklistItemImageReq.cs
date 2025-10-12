@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.VehicleChecklistItem.Request
 {
-    public class UploadImgIteamReq
+    public class UploadChecklistItemImageReq
     {
-        public IFormFile File { get; set; }
+        public Guid ItemId { get; set; }
+        public IFormFile File { get; set; } = null!;
     }
 }
