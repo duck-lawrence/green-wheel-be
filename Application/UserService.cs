@@ -795,5 +795,21 @@ namespace Application
             await _driverLicenseRepository.UpdateAsync(entity);
             return _mapper.Map<DriverLicenseRes>(entity);
         }
+
+        public async Task DeleteCitizenIdentityAsync(Guid userId)
+        {
+            var license = _citizenIdentityRepository.GetByUserIdAsync(userId);
+            if (license != null) throw new Exception(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+            var publictId = license.Result.ImagePublicId;
+            await _citizenService.RemoveAsync(userId, publictId);
+        }
+
+        public async Task DeleteDriverLicenseAsync(Guid userId)
+        {
+            var license = _driverService.GetByUserIdAsync(userId);
+            if (license != null) throw new Exception(Message.LicensesMessage.LicenseNotFound);
+            var publictId = license.Result.ImagePublicId;
+            await _driverService.DeleteAsync(userId, publictId);
+        }
     }
 }

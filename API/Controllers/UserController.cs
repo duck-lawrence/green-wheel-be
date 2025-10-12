@@ -400,7 +400,7 @@ namespace API.Controllers
             return Ok(users);
         }
 
-        [RoleAuthorize("Customer")]
+        [RoleAuthorize(RoleName.Customer)]
         [HttpPatch("citizen-identity")]
         public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
         {
@@ -409,7 +409,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [RoleAuthorize("Customer")]
+        [RoleAuthorize(RoleName.Customer)]
         [HttpPatch("driver-license")]
         public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
         {
@@ -418,7 +418,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [RoleAuthorize(["Staff", "Admin"])]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [HttpPatch("{userId:guid}/citizen-identity")]
         public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
         {
@@ -426,12 +426,46 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [RoleAuthorize(["Staff", "Admin"])]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [HttpPatch("{userId:guid}/driver-license")]
         public async Task<IActionResult> UpdateDriverLicenseForUser(Guid userId, [FromBody] UpdateDriverLicenseReq req)
         {
             var result = await _userService.UpdateDriverLicenseAsync(userId, req);
             return Ok(result);
+        }
+
+        [RoleAuthorize(RoleName.Customer)]
+        [HttpDelete("citizen-identity")]
+        public async Task<IActionResult> DeleteCitizenIdentityForUser()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userService.DeleteCitizenIdentityAsync(userId);
+            return Ok();
+        }
+
+        [RoleAuthorize(RoleName.Customer)]
+        [HttpDelete("driver-license")]
+        public async Task<IActionResult> DeleteDriverLicenseForUser()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userService.DeleteDriverLicenseAsync(userId);
+            return Ok();
+        }
+
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        [HttpDelete("{userId:guid}/driver-license")]
+        public async Task<IActionResult> DeleteDriverLicenseForStaff(Guid userId)
+        {
+            await _userService.DeleteDriverLicenseAsync(userId);
+            return Ok();
+        }
+
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        [HttpDelete("{userId:guid}/citizen-identity")]
+        public async Task<IActionResult> DeleteCitizenIdentityForStaff(Guid userId)
+        {
+            await _userService.DeleteCitizenIdentityAsync(userId);
+            return Ok();
         }
     }
 }

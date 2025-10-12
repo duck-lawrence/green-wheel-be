@@ -76,5 +76,9 @@ namespace Application.Abstractions
         Task<CitizenIdentityRes> UpdateCitizenIdentityAsync(Guid userId, UpdateCitizenIdentityReq req);
 
         Task<DriverLicenseRes> UpdateDriverLicenseAsync(Guid userId, UpdateDriverLicenseReq req);
+
+        Task DeleteDriverLicenseAsync(Guid userId);
+
+        Task DeleteCitizenIdentityAsync(Guid userId);
     }
 }
