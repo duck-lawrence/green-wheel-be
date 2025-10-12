@@ -37,9 +37,8 @@ namespace Application
         {
             var citizenIdentity = await _citizenRepo.GetByIdNumberAsync(identityNumber);
             if (citizenIdentity == null)
-            {
                 throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
-            }
+
             return citizenIdentity;
         }
 
@@ -58,14 +57,15 @@ namespace Application
             var entity = new CitizenIdentity
             {
                 UserId = userId,
-                Number = dto.IdNumber ?? string.Empty,
-                FullName = dto.FullName ?? string.Empty,
-                Nationality = dto.Nationality ?? string.Empty,
-                Sex = dto.Sex,
+                Number = dto.IdNumber?.Trim() ?? string.Empty,
+                FullName = NormalizeName(dto.FullName),
+                Nationality = dto.Nationality?.Trim() ?? string.Empty,
+                Sex = ParseSex(dto.Sex),
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
                 ImageUrl = imageUrl,
-                ImagePublicId = publicId
+                ImagePublicId = publicId,
+                UpdatedAt = DateTimeOffset.UtcNow
             };
 
             var existing = await _citizenRepo.GetByUserIdAsync(userId);
@@ -76,6 +76,7 @@ namespace Application
             }
             else
             {
+                entity.CreatedAt = DateTimeOffset.UtcNow;
                 await _citizenRepo.AddAsync(entity);
             }
 
@@ -102,6 +103,23 @@ namespace Application
             identity.UpdatedAt = DateTimeOffset.UtcNow;
             await _citizenRepo.UpdateAsync(identity);
             return identity;
+        }
+
+        private static int ParseSex(string? sexStr)
+        {
+            if (string.IsNullOrWhiteSpace(sexStr)) return 0;
+            var s = sexStr.Trim().ToLower();
+            if (s.Contains("nữ") || s.Contains("female") || s == "f") return 1;
+            return 0;
+        }
+
+        private static string NormalizeName(string? fullName)
+        {
+            if (string.IsNullOrWhiteSpace(fullName)) return string.Empty;
+            var parts = fullName.Trim().ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < parts.Length; i++)
+                parts[i] = char.ToUpper(parts[i][0]) + parts[i].Substring(1);
+            return string.Join(' ', parts);
         }
     }
 }

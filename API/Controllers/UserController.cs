@@ -347,41 +347,61 @@ namespace API.Controllers
          * 404 not found
          */
 
-        [HttpGet("phone/{phone}")]
+        //[HttpGet("phone/{phone}")]
+        //[RoleAuthorize("Staff", "Admin")]
+        //public async Task<IActionResult> GetUserByPhone(string phone)
+        //{
+        //    var user = await _userService.GetUserByPhoneAsync(phone);
+        //    return Ok(user);
+        //}
+
+        ///*
+        // * Status code
+        // * 200 success
+        // */
+
+        //[HttpGet]
+        //[RoleAuthorize(RoleName.Staff, RoleName.Admin)]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var users = await _userService.GetAllUsersAsync();
+        //    return Ok(users);
+        //}
+
+        //[HttpGet("citizen-identity/{idNumber}")]
+        //[RoleAuthorize("Staff", "Admin")]
+        //public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
+        //{
+        //    var userView = await _userService.GetByCitizenIdentityAsync(idNumber);
+        //    return Ok(userView);
+        //}
+
+        //[HttpGet("driver-license/{number}")]
+        //[RoleAuthorize("Staff", "Admin")]
+        //public async Task<IActionResult> getUserByDriverLisence(string number)
+        //{
+        //    var userView = await _userService.GetByDriverLicenseAsync(number);
+        //    return Ok(userView);
+        //}
+        [HttpGet("search")]
         [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> GetUserByPhone(string phone)
+        public async Task<IActionResult> SearchUser(
+            [FromQuery] string? phone,
+            [FromQuery] string? citizenIdNumber,
+            [FromQuery] string? driverLicenseNumber)
         {
-            var user = await _userService.GetUserByPhoneAsync(phone);
+            if (string.IsNullOrWhiteSpace(phone) &&
+                string.IsNullOrWhiteSpace(citizenIdNumber) &&
+                string.IsNullOrWhiteSpace(driverLicenseNumber))
+            {
+                return BadRequest(new { message = Message.CommonMessage.NotFound });
+            }
+
+            var user = await _userService.SearchUserAsync(phone, citizenIdNumber, driverLicenseNumber);
+            if (user == null)
+                return NotFound(new { message = Message.UserMessage.UserNotFound });
+
             return Ok(user);
-        }
-
-        /*
-         * Status code
-         * 200 success
-         */
-
-        [HttpGet]
-        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
-        public async Task<IActionResult> GetAll()
-        {
-            var users = await _userService.GetAllUsersAsync();
-            return Ok(users);
-        }
-
-        [HttpGet("citizen-identity/{idNumber}")]
-        [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> getUserByCitizenIdNumber(string idNumber)
-        {
-            var userView = await _userService.GetByCitizenIdentityAsync(idNumber);
-            return Ok(userView);
-        }
-
-        [HttpGet("driver-license/{number}")]
-        [RoleAuthorize("Staff", "Admin")]
-        public async Task<IActionResult> getUserByDriverLisence(string number)
-        {
-            var userView = await _userService.GetByDriverLicenseAsync(number);
-            return Ok(userView);
         }
     }
 }
