@@ -15,13 +15,11 @@ namespace Application
     {
         private readonly HttpClient _httpClient;
         private readonly GeminiSettings _settings;
-        private readonly ILogger<GeminiService> _logger;
 
         public GeminiService(HttpClient httpClient, IOptions<GeminiSettings> options, ILogger<GeminiService> logger)
         {
             _httpClient = httpClient;
             _settings = options.Value;
-            _logger = logger;
             _httpClient.Timeout = TimeSpan.FromSeconds(_settings.HttpTimeoutSeconds);
         }
 
@@ -50,15 +48,12 @@ namespace Application
             var text = await CallGeminiAndExtractText(imageUrl, prompt);
             if (string.IsNullOrWhiteSpace(text)) return null;
 
-            _logger.LogWarning("Gemini CitizenId raw output: {Raw}", text);
-
             try
             {
                 return JsonSerializer.Deserialize<CreateCitizenIdentityReq>(text);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to deserialize citizen identity JSON: {Raw}", text);
                 return null;
             }
         }
@@ -89,15 +84,12 @@ namespace Application
             var text = await CallGeminiAndExtractText(imageUrl, prompt);
             if (string.IsNullOrWhiteSpace(text)) return null;
 
-            _logger.LogWarning("Gemini DriverLicense raw output: {Raw}", text);
-
             try
             {
                 return JsonSerializer.Deserialize<CreateDriverLicenseReq>(text);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to deserialize driver license JSON: {Raw}", text);
                 return null;
             }
         }
@@ -112,7 +104,6 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to fetch/encode image: {Url}", imageUrl);
                 return null;
             }
 
@@ -131,7 +122,6 @@ namespace Application
             };
 
             var url = $"{_settings.ApiBaseUrl}/models/{_settings.ModelName}:generateContent?key={_settings.ApiKey}";
-            _logger.LogInformation("Gemini Request | Model: {Model} | Image: {Url}", _settings.ModelName, imageUrl);
 
             HttpResponseMessage response;
             try
@@ -140,14 +130,12 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "HTTP error while calling Gemini API");
                 return null;
             }
 
             var raw = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError("Gemini API Error {Status}: {Error}", response.StatusCode, raw);
                 return null;
             }
 
@@ -171,7 +159,6 @@ namespace Application
 
                 if (string.IsNullOrWhiteSpace(text))
                 {
-                    _logger.LogWarning("Gemini returned empty text for {Url}", imageUrl);
                     return null;
                 }
 
@@ -183,7 +170,6 @@ namespace Application
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error parsing Gemini response: {Response}", raw);
                 return null;
             }
         }

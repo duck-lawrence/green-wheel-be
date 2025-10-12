@@ -63,12 +63,12 @@ namespace Application.Abstractions
 
         Task<UserProfileViewRes> GetUserByPhoneAsync(string phone);
 
-        Task<IEnumerable<User>> GetAllUsersAsync();
-
         Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber);
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
 
-        Task<UserProfileViewRes?> SearchUserAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+
+        //Task UpdateMyIdentityAsync(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq);
     }
 }
