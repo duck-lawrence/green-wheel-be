@@ -21,6 +21,11 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
+        public IQueryable<User> GetQueryable()
+        {
+            return _dbContext.Users.AsQueryable();
+        }
+
         public async Task<User?> GetByPhoneAsync(string phone)
         {
             var user = await _dbContext.Users
@@ -28,11 +33,12 @@ namespace Infrastructure.Repositories
                 .Include(x => x.DriverLicense).FirstOrDefaultAsync(x => x.Phone == phone);
             return user;
         }
-        //Hàm GetByIdWithRoleAsync chỉ mở rộng cách lấy dữ liệu user: nó vẫn trả về User?, 
-        // nhưng thêm Include(user => user.Role) và Include(user => user.Staff) 
-        // để load thêm thông tin liên quan (role, staff). Backend trước đây khi gọi GetByIdAsync sẽ không có các navigation này, nên /users/me không trả được trường role. 
+
+        //Hàm GetByIdWithRoleAsync chỉ mở rộng cách lấy dữ liệu user: nó vẫn trả về User?,
+        // nhưng thêm Include(user => user.Role) và Include(user => user.Staff)
+        // để load thêm thông tin liên quan (role, staff). Backend trước đây khi gọi GetByIdAsync sẽ không có các navigation này, nên /users/me không trả được trường role.
         // Bây giờ UserService.GetMe gọi hàm mới, nhờ đó JSON phản hồi có role, roleId, roleDetail, stationId. (Phúc thêm)
-        // Mục đích:  response /api/users/me trả về đầy đủ thông tin role, 
+        // Mục đích:  response /api/users/me trả về đầy đủ thông tin role,
         // giúp useAuth ở frontend biết chắc user có role “staff”.
         public async Task<User?> GetByIdWithFullInfoAsync(Guid id)
         {
@@ -47,4 +53,3 @@ namespace Infrastructure.Repositories
         }
     }
 }
-

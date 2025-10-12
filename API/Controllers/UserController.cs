@@ -383,25 +383,19 @@ namespace API.Controllers
         //    var userView = await _userService.GetByDriverLicenseAsync(number);
         //    return Ok(userView);
         //}
-        [HttpGet("search")]
-        [RoleAuthorize("Staff", "Admin")]
+        [HttpGet]
+        [RoleAuthorize(["Staff", "Admin"])]
         public async Task<IActionResult> SearchUser(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
             [FromQuery] string? driverLicenseNumber)
         {
-            if (string.IsNullOrWhiteSpace(phone) &&
-                string.IsNullOrWhiteSpace(citizenIdNumber) &&
-                string.IsNullOrWhiteSpace(driverLicenseNumber))
-            {
-                return BadRequest(new { message = Message.CommonMessage.NotFound });
-            }
+            var users = await _userService.SearchUserAsync(phone, citizenIdNumber, driverLicenseNumber);
 
-            var user = await _userService.SearchUserAsync(phone, citizenIdNumber, driverLicenseNumber);
-            if (user == null)
+            if (users == null || !users.Any())
                 return NotFound(new { message = Message.UserMessage.UserNotFound });
 
-            return Ok(user);
+            return Ok(users);
         }
     }
 }

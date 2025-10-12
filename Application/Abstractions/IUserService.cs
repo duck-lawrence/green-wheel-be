@@ -69,6 +69,6 @@ namespace Application.Abstractions
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
 
-        Task<UserProfileViewRes?> SearchUserAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+        Task<IEnumerable<UserProfileViewRes>> SearchUserAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
     }
 }

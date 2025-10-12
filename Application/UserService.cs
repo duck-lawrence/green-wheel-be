@@ -14,6 +14,7 @@ using AutoMapper;
 using Domain.Entities;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -741,38 +742,28 @@ namespace Application
             return userView;
         }
 
-        public async Task<UserProfileViewRes?> SearchUserAsync(
+        public async Task<IEnumerable<UserProfileViewRes>> SearchUserAsync(
             string? phone,
             string? citizenIdNumber,
             string? driverLicenseNumber)
         {
-            User? user = null;
+            // Query bắt đầu từ DbContext vì UserRepository generic không expose DbSet
+            var query = _mediaUow.Users.GetQueryable()
+            .Include(u => u.CitizenIdentity)
+            .Include(u => u.DriverLicense)
+            .AsNoTracking();
 
-            // 1️ Ưu tiên tìm theo số điện thoại
             if (!string.IsNullOrWhiteSpace(phone))
-            {
-                user = await _userRepository.GetByPhoneAsync(phone);
-                if (user != null)
-                    return _mapper.Map<UserProfileViewRes>(user);
-            }
+                query = query.Where(u => u.Phone == phone);
 
-            // 2️ Nếu không có phone hoặc không tìm thấy => tìm theo CCCD
             if (!string.IsNullOrWhiteSpace(citizenIdNumber))
-            {
-                var citizen = await _citizenIdentityRepository.GetByIdNumberAsync(citizenIdNumber);
-                if (citizen != null && citizen.User != null)
-                    return _mapper.Map<UserProfileViewRes>(citizen.User);
-            }
+                query = query.Where(u => u.CitizenIdentity != null && u.CitizenIdentity.Number == citizenIdNumber);
 
-            // 3 Nếu không có 2 cái trên => tìm theo GPLX
             if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
-            {
-                var driver = await _driverLicenseRepository.GetByLicenseNumber(driverLicenseNumber);
-                if (driver != null && driver.User != null)
-                    return _mapper.Map<UserProfileViewRes>(driver.User);
-            }
+                query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
 
-            return null;
+            var users = await query.ToListAsync();
+            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users);
         }
     }
 }
