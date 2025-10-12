@@ -267,6 +267,7 @@ namespace API.Controllers
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
             return Ok(result);
+            return Ok(result);
         }
 
         [HttpGet("citizen-identity")]
