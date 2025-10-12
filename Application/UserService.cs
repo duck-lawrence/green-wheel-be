@@ -146,14 +146,9 @@ namespace Application
                 _jwtSettings.Issuer, _jwtSettings.Audience);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Iat).Value, out long iatSeconds);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-            Guid refreshTokenId;
-            do
-            {
-                refreshTokenId = Guid.NewGuid();
-            } while (await _refreshTokenRepository.GetByIdAsync(refreshTokenId) != null);
+           
             await _refreshTokenRepository.AddAsync(new RefreshToken()
-            {
-                Id = refreshTokenId,
+            { 
                 UserId = userId,
                 Token = token,
                 IssuedAt = DateTimeOffset.FromUnixTimeSeconds(iatSeconds).UtcDateTime,

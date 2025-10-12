@@ -55,7 +55,6 @@ namespace API.Controllers
             return Ok(invoiceView);
         }
 
-        [RoleAuthorize(RoleName.Customer)]
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {

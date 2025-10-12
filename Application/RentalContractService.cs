@@ -181,6 +181,7 @@ namespace Application
             
             await _uow.DepositRepository.AddAsync(deposit);
             handoverInvoice.Subtotal = InvoiceHelper.CalculateTotalAmount([baseRentalItem]);
+            reservationInvoice.Subtotal = InvoiceHelper.CalculateTotalAmount([reservationRentalItem]);
 
 
             await _uow.SaveChangesAsync();

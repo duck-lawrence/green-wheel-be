@@ -61,14 +61,24 @@ namespace Application
 
         public async Task<string?> ProcessPayment(Guid id, int paymentMethod)
         {
-            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, false, true);
+            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, false, true) 
+                ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             if (paymentMethod == (int)PaymentMethod.Cash)
             {
                 await CashPayment(invoice);
             }
             else if (paymentMethod == (int)PaymentMethod.MomoWallet)
             {
-                var amount = invoice.Subtotal + invoice.Deposit.Amount + invoice.Subtotal * invoice.Tax;
+                Invoice reservationInvoice = null;
+                if (invoice.Type == (int)InvoiceType.Handover)
+                {
+                    reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
+                }
+                var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax 
+                                                + (invoice.Deposit != null ? invoice.Deposit.Amount : 0) 
+                                                - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal: 0 : 0);
+                                                //nếu mà reservation k null thì ktra coi status của nó có thanh toán hay chưa nếu rồi thì lấy ra phí thay
+                                                //toán còn không thì là 0 cho mọi case
                 var link = await _momoService.CreatePaymentAsync(amount, id, invoice.Notes);
                 return link;
             }
