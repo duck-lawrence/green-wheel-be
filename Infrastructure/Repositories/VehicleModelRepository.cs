@@ -60,9 +60,12 @@ namespace Infrastructure.Repositories
                         v.Status == (int)VehicleStatus.Available ||
                         (
                             (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                            !v.RentalContracts.Any(rc =>
-                                endBuffer > rc.StartDate && startBuffer < rc.EndDate
-                            )
+                            !v.RentalContracts
+                                .Where(rc => rc.Status == (int)RentalContractStatus.Active)
+                                .Any(rc =>
+                                    startBuffer < rc.EndDate &&
+                                    endBuffer > rc.StartDate
+                                )
                         )
                     ));
             }
@@ -98,9 +101,12 @@ namespace Infrastructure.Repositories
                     v.Status == (int)VehicleStatus.Available ||
                     (
                         (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                        !v.RentalContracts.Any(rc =>
-                            endBuffer > rc.StartDate && startBuffer < rc.EndDate
-                        )
+                        !v.RentalContracts
+                            .Where(rc => rc.Status == (int)RentalContractStatus.Active)
+                            .Any(rc =>
+                                startBuffer < rc.EndDate &&
+                                endBuffer > rc.StartDate
+                            )
                     )
                 ));
 

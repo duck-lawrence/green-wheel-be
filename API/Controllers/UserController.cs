@@ -264,10 +264,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
-            return Ok(new
-            {
-                citizen_identity = result
-            });
+            return Ok(result);
         }
 
         [HttpGet("citizen-identity")]
@@ -276,10 +273,6 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyCitizenIdentityAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 
@@ -291,10 +284,7 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadDriverLicenseAsync(userId, file);
-            return Ok(new
-            {
-                driver_license = result
-            });
+            return Ok(result);
         }
 
         // Lấy bằng user trong token
@@ -304,20 +294,16 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.GetMyDriverLicenseAsync(userId);
-
-            if (result == null)
-                return NotFound(new { Message = Message.LicensesMessage.LicenseNotFound });
-
             return Ok(result);
         }
 
-        //Create anonymouse account
+        //Create anonymous account
         [RoleAuthorize("Staff")]
         [HttpPost("anonymous")]
-        public async Task<IActionResult> CreateAnonymouseAccount([FromForm] CreateUserReq req)
+        public async Task<IActionResult> CreateAnonymousAccount([FromBody] CreateUserReq req)
         {
             var userId = await _userService.CreateAnounymousAccount(req);
-            return Ok(userId);
+            return Ok(new { userId });
         }
 
         //upload citizenId for Anonymous

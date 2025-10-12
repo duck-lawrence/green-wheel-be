@@ -37,8 +37,9 @@ namespace Application
         {
             var citizenIdentity = await _citizenRepo.GetByIdNumberAsync(identityNumber);
             if (citizenIdentity == null)
-                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
-
+            {
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
+            }
             return citizenIdentity;
         }
 
@@ -49,7 +50,7 @@ namespace Application
         {
             var dto = await _geminiService.ExtractCitizenIdAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.LicensesMessage.InvalidLicenseData);
+                throw new BusinessException(Message.UserMessage.InvalidLicenseData);
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
