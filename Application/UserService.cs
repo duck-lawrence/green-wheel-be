@@ -667,7 +667,7 @@ namespace Application
         public async Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId)
         {
             var entity = await _citizenService.GetByUserId(userId);
-            if (entity == null) 
+            if (entity == null)
                 throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
             return _mapper.Map<CitizenIdentityRes>(entity);
@@ -676,7 +676,7 @@ namespace Application
         public async Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId)
         {
             var entity = await _driverService.GetByUserIdAsync(userId);
-            if (entity == null) 
+            if (entity == null)
                 throw new NotFoundException(Message.UserMessage.LicenseNotFound);
 
             return _mapper.Map<DriverLicenseRes>(entity);
@@ -716,12 +716,6 @@ namespace Application
             return userViewRes;
         }
 
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return users;
-        }
-
         public async Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber)
         {
             var citizenIdentity = await _citizenIdentityRepository.GetByIdNumberAsync(idNumber);
@@ -744,7 +738,7 @@ namespace Application
             return userView;
         }
 
-        public async Task<IEnumerable<UserProfileViewRes>> SearchUserAsync(
+        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
             string? phone,
             string? citizenIdNumber,
             string? driverLicenseNumber)

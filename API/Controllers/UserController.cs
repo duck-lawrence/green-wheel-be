@@ -371,12 +371,12 @@ namespace API.Controllers
         //}
         [HttpGet]
         [RoleAuthorize(["Staff", "Admin"])]
-        public async Task<IActionResult> SearchUser(
+        public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
             [FromQuery] string? driverLicenseNumber)
         {
-            var users = await _userService.SearchUserAsync(phone, citizenIdNumber, driverLicenseNumber);
+            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
             return Ok(users);
         }
     }

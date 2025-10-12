@@ -13,6 +13,7 @@ namespace Application.Constants
         {
             //auth
             public const string MissingToken = "user.missing_token";
+
             public const string InvalidAccessToken = "user.invalid_access_token";
             public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
@@ -181,6 +182,17 @@ namespace Application.Constants
             public const string EmptyFile = "upload.empty_file";
             public const string InvalidFile = "upload.invalid_file";
             public const string Failed = "upload.failed";
+        }
+
+        public static class StationFeedbackMessage
+        {
+            public const string FeedbackNotFound = "station_feedback.not_found";
+            public const string AccessDenied = "station_feedback.access_denied";
+        }
+
+        public static class VehicleModelImageMessage
+        {
+            public const string NoMainImage = "vehicle_model.no_main_image";
         }
 
         public static class VehicleComponentMessage
