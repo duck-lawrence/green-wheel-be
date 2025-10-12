@@ -13,8 +13,8 @@ namespace Application.Dtos.DriverLicense.Response
         public string FullName { get; set; }
         public string Class { get; set; }
         public string Sex { get; set; }
-        public string DateOfBirth { get; set; } = null!;
-        public string ExpiresAt { get; set; } = null!;
+        public DateTimeOffset DateOfBirth { get; set; }
+        public DateTimeOffset ExpiresAt { get; set; }
         public string ImageUrl { get; set; } = null!;
     }
 }
