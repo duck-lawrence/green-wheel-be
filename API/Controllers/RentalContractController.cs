@@ -128,6 +128,22 @@ namespace API.Controllers
             return invoiceView == null ? Ok() : Ok(invoiceView);
         }
 
+        [RoleAuthorize(RoleName.Customer)]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetContractByUserId(Guid id)
+        {
+            var user = HttpContext.User;
+            var rentalViews = await _rentalContractService.GetContractByUserId(user);
+            return Ok(rentalViews);
+        }
+
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> UpdateRentalContractStatus(Guid id)
+        {
+            
+        }
+
         
     }
 }

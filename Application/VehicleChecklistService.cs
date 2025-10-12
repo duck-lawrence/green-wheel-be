@@ -212,7 +212,7 @@ namespace Application
                 Id = invoiceId,
                 ContractId = contract.Id,
                 Status = (int)InvoiceStatus.Pending,
-                Tax = Common.Tax.OtherVAT,
+                Tax = Common.Tax.NoneVAT,
                 Notes = $"GreenWheel – Invoice for your order {contract.Id}"
             };
             IEnumerable<InvoiceItem> invoieItems = [];

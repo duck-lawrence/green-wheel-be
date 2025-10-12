@@ -53,6 +53,12 @@ namespace Infrastructure.Repositories
             && r.Status != (int)RentalContractStatus.Cancelled).FirstOrDefaultAsync()) != null;
         }
 
+        public override async Task<RentalContract?> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.RentalContracts.Where(r => r.Id == id)
+                .Include(r => r.Invoices).FirstOrDefaultAsync();
+        }
+
         
     }
 }

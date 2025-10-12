@@ -8,7 +8,7 @@ namespace Application.Abstractions
 {
     public interface IInvoiceService
     {
-        Task ProcessUpdateInvoice(MomoIpnReq momoIpnReq, Guid invoiceId);
+        Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId);
 
         Task<InvoiceViewRes> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
 
@@ -18,6 +18,7 @@ namespace Application.Abstractions
 
         Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination);
 
-        //Task<IEnumerable<Invoice>> GetByContractId(Guid contractId);
+        Task<IEnumerable<InvoiceViewRes>?> GetByContractIdAndStatus(Guid? contractId, int? status);
+
     }
 }
