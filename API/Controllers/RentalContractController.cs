@@ -48,7 +48,7 @@ namespace API.Controllers
          200 succes
          */
         [HttpPut("{id}/accept")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> AcceptRentalContract(Guid id)
         {
             await _rentalContractService.VerifyRentalContract(id);
@@ -61,7 +61,7 @@ namespace API.Controllers
          200 succes
          */
         [HttpPut("{id}/reject")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> RejectRentalContract(Guid id, [FromBody] int vehicleStatus)
         {
             await _rentalContractService.VerifyRentalContract(id, false, vehicleStatus);

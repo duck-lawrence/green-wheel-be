@@ -1,19 +1,24 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
+using Application.AppSettingConfigurations;
 using Application.Constants;
-using Application.Dtos.Invoice.Response;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
+using Application.Dtos.Invoice.Response;
 using Application.Dtos.Momo.Request;
+using Application.Helpers;
 using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.AspNetCore.Routing.Template;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Application
 {
@@ -22,12 +27,14 @@ namespace Application
         private readonly IInvoiceUow _uow;
         private readonly IMapper _mapper;
         private readonly IMomoService _momoService;
+        private readonly EmailSettings _emailSettings;
 
-        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService)
+        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService, IOptions<EmailSettings> emailSettings)
         {
             _uow = uow;
             _mapper = mapper;
             _momoService = momoService;
+            _emailSettings = emailSettings.Value;
         }
 
         public async Task CashPayment(Invoice invoice)
@@ -104,12 +111,24 @@ namespace Application
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
                 invoice.PaidAmount = momoIpnReq.Amount;
                 invoice.PaidAt = DateTimeOffset.FromUnixTimeMilliseconds(momoIpnReq.ResponseTime);
+                
                 await _uow.InvoiceRepository.UpdateAsync(invoice);
                 //await _uow.RentalContractRepository.UpdateAsync(rentalContract);
                 await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
                 await _uow.SaveChangesAsync();
+                var subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
+                var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PaymentSuccessTemplate.html");
+                var body = System.IO.File.ReadAllText(templatePath);
+                var customer = (await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId))!.Customer;
+                body = body
+                     .Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
+                     .Replace("{InvoiceCode}", invoice.Id.ToString())
+                     .Replace("{PaidAmount}", $"{invoice.PaidAmount?.ToString("N0")} VND")
+                     .Replace("{PaymentMethod}", Enum.GetName(typeof(PaymentMethod), invoice.PaymentMethod))
+                     .Replace("{InvoiceType}", Enum.GetName(typeof(InvoiceType), invoice.Type))
+                     .Replace("{PaidAt}", invoice.PaidAt?.ToString("dd/MM/yyyy HH:mm"));
+                await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
             }
-            throw new Exception(Message.MomoMessage.PaymentFailed);
         }
 
         public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
