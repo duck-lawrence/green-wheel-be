@@ -37,6 +37,14 @@ namespace Application
             _mapper = mapper;
             _emailSettings = emailSettings.Value;
         }
+
+        public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
+        {
+            var contract = _uow.RentalContractRepository.GetByIdAsync(id);
+            if(contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            
+            return _mapper.Map<RentalContractViewRes>(contract);
+        }
         public async Task CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
         {
             //ktra xem có cccd hay chưa
@@ -205,7 +213,7 @@ namespace Application
             return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts ?? []);
         }
 
-        public async Task HandoverRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
+        public async Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
@@ -247,7 +255,7 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task<InvoiceViewRes?> ReturnRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
+        public async Task<InvoiceViewRes?> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
