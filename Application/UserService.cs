@@ -771,12 +771,20 @@ namespace Application
         public async Task<CitizenIdentityRes> UpdateCitizenIdentityAsync(Guid userId, UpdateCitizenIdentityReq req)
         {
             var entity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
-            if (entity == null) throw new Exception(Message.UserMessage.UserNotFound);
-            if (req.Number != null) entity.Number = req.Number;
-            if (req.FullName != null) entity.FullName = req.FullName;
-            if (req.Nationality != null) entity.Nationality = req.Nationality;
-            if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+            if (entity == null)
+                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+
+            if (!string.IsNullOrWhiteSpace(req.Number) && req.Number != entity.Number)
+                await VerifyUniqueNumberAsync.VerifyUniqueIdentityNumberAsync(req.Number, userId, _citizenIdentityRepository);
+
+            if (!string.IsNullOrWhiteSpace(req.Number)) entity.Number = req.Number.Trim();
+            if (!string.IsNullOrWhiteSpace(req.FullName)) entity.FullName = req.FullName.Trim();
+            if (!string.IsNullOrWhiteSpace(req.Nationality)) entity.Nationality = req.Nationality.Trim();
             if (req.DateOfBirth.HasValue) entity.DateOfBirth = req.DateOfBirth.Value;
+            if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
             await _citizenIdentityRepository.UpdateAsync(entity);
             return _mapper.Map<CitizenIdentityRes>(entity);
         }
@@ -784,6 +792,12 @@ namespace Application
         public async Task<DriverLicenseRes> UpdateDriverLicenseAsync(Guid userId, UpdateDriverLicenseReq req)
         {
             var entity = await _driverLicenseRepository.GetByUserIdAsync(userId);
+            if (entity == null)
+                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+
+            if (!string.IsNullOrWhiteSpace(req.Number) && req.Number != entity.Number)
+                await VerifyUniqueNumberAsync.VerifyUniqueDriverLicenseNumberAsync(req.Number, userId, _driverLicenseRepository);
+
             if (req.Class.HasValue)
             {
                 if (!Enum.IsDefined(typeof(LicenseClass), req.Class.Value))
@@ -791,12 +805,15 @@ namespace Application
 
                 entity.Class = (int)req.Class.Value;
             }
-            if (req.Number != null) entity.Number = req.Number;
-            if (req.FullName != null) entity.FullName = req.FullName;
-            if (req.Nationality != null) entity.Nationality = req.Nationality;
+
+            if (!string.IsNullOrWhiteSpace(req.Number)) entity.Number = req.Number.Trim();
+            if (!string.IsNullOrWhiteSpace(req.FullName)) entity.FullName = req.FullName.Trim();
+            if (!string.IsNullOrWhiteSpace(req.Nationality)) entity.Nationality = req.Nationality.Trim();
             if (req.Sex.HasValue) entity.Sex = req.Sex.Value;
             if (req.DateOfBirth.HasValue) entity.DateOfBirth = req.DateOfBirth.Value;
             if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
 
             await _driverLicenseRepository.UpdateAsync(entity);
             return _mapper.Map<DriverLicenseRes>(entity);

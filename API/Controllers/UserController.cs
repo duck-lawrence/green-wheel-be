@@ -406,7 +406,23 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(result);
+            return Ok(new
+            {
+                message = Message.CitizenIdentityMessage.CitizenIdentityUpdated,
+                data = result
+            });
+        }
+
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        [HttpPatch("{userId:guid}/citizen-identity")]
+        public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
+        {
+            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            return Ok(new
+            {
+                message = Message.CitizenIdentityMessage.CitizenIdentityUpdatedForTarget,
+                data = result
+            });
         }
 
         [RoleAuthorize(RoleName.Customer)]
@@ -415,15 +431,11 @@ namespace API.Controllers
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UpdateDriverLicenseAsync(userId, req);
-            return Ok(result);
-        }
-
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        [HttpPatch("{userId:guid}/citizen-identity")]
-        public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
-        {
-            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(result);
+            return Ok(new
+            {
+                message = Message.DriverLicenseMessage.DriverLicenseUpdated,
+                data = result
+            });
         }
 
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
@@ -431,7 +443,11 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateDriverLicenseForUser(Guid userId, [FromBody] UpdateDriverLicenseReq req)
         {
             var result = await _userService.UpdateDriverLicenseAsync(userId, req);
-            return Ok(result);
+            return Ok(new
+            {
+                message = Message.DriverLicenseMessage.DriverLicenseUpdatedForTarget,
+                data = result
+            });
         }
 
         [RoleAuthorize(RoleName.Customer)]
