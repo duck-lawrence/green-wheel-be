@@ -57,12 +57,12 @@ VALUES
   (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'VinFast VF 8', N'SUV điện hạng D', 2000000, 15000000, 10000000, 7, 10, 300.0, 90.0, 420.0, 400.0, @brandVinfast, @segmentSUV);
 
 -- Vehicle Components (các bộ phận cơ bản)
-INSERT INTO vehicle_components (created_at, updated_at, name, description)
+INSERT INTO vehicle_components (created_at, updated_at, name, description, damage_fee)
 VALUES
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Động cơ điện', N'Bộ phận tạo công suất vận hành'),
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Pin', N'Nguồn năng lượng cho xe'),
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Hệ thống phanh', N'Tăng độ an toàn khi di chuyển'),
-  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Nội thất', N'Ghế ngồi, màn hình, tiện ích nội thất');
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Động cơ điện', N'Bộ phận tạo công suất vận hành', 10000),
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Pin', N'Nguồn năng lượng cho xe', 10000),
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Hệ thống phanh', N'Tăng độ an toàn khi di chuyển', 10000),
+  (SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), N'Nội thất', N'Ghế ngồi, màn hình, tiện ích nội thất', 10000);
 
 -- Model Components (gán các components vào tất cả models)
 DECLARE @compEngine UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM vehicle_components WHERE name=N'Động cơ điện');

@@ -5,6 +5,7 @@ using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using Application.AppExceptions;
+using Application.Dtos.Vehicle.Respone;
 
 namespace Application
 {
@@ -12,14 +13,16 @@ namespace Application
     {
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IMapper _mapper;
+
         public VehicleService(IVehicleRepository vehicleRepository, IMapper mapper)
         {
             _vehicleRepository = vehicleRepository;
             _mapper = mapper;
         }
+
         public async Task<Guid> CreateVehicleAsync(CreateVehicleReq createVehicleReq)
         {
-            if(await _vehicleRepository.GetByLicensePlateAsync(createVehicleReq.LicensePlate) != null)
+            if (await _vehicleRepository.GetByLicensePlateAsync(createVehicleReq.LicensePlate) != null)
             {
                 throw new ConflictDuplicateException(Message.VehicleMessage.LicensePlateIsExist);
             }
@@ -40,6 +43,20 @@ namespace Application
             return await _vehicleRepository.DeleteAsync(id);
         }
 
+        public async Task<IEnumerable<VehicleViewRes>> GetAllVehicle()
+        {
+            var vehicles = await _vehicleRepository.GetAllAsync();
+
+            return _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles);
+        }
+
+        public async Task<VehicleViewRes> GetVehicleById(Guid id)
+        {
+            var vehicle = await _vehicleRepository.GetByIdOptionAsync(id, includeModel: true);
+            if (vehicle == null) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            return _mapper.Map<VehicleViewRes>(vehicle);
+        }
+
         //public async Task<Vehicle> GetVehicle(Guid stationId, Guid modelId,
         //    DateTimeOffset startDate, DateTimeOffset endDate)
         //{
@@ -49,15 +66,15 @@ namespace Application
         public async Task<int> UpdateVehicleAsync(Guid Id, UpdateVehicleReq updateVehicleReq)
         {
             var vehicleFromDb = await _vehicleRepository.GetByIdAsync(Id);
-            if(vehicleFromDb == null)
+            if (vehicleFromDb == null)
             {
                 throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
             }
-            if(updateVehicleReq.LicensePlate != null)
+            if (updateVehicleReq.LicensePlate != null)
             {
                 vehicleFromDb.LicensePlate = updateVehicleReq.LicensePlate;
             }
-            if(updateVehicleReq.Status != null)
+            if (updateVehicleReq.Status != null)
             {
                 vehicleFromDb.Status = (int)updateVehicleReq.Status;
             }
@@ -71,7 +88,5 @@ namespace Application
             }
             return await _vehicleRepository.UpdateAsync(vehicleFromDb);
         }
-
-        
     }
 }

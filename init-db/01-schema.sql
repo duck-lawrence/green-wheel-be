@@ -115,7 +115,7 @@ GO
 
 CREATE TABLE [driver_licenses] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [number] nvarchar(20) UNIQUE NOT NULL,
+    [number] nvarchar(20) NOT NULL,
     [class] int NOT NULL, -- 0: B1, 1: B, 2: C1, 3: C, 4: D1, 5: D2, 6: D, 7: BE, 8: C1E, 9: CE, 10: D1E, 11: D2E, 12: DE
     [full_name] nvarchar(100) NOT NULL,
     [nationality] nvarchar(50) NOT NULL,
@@ -129,16 +129,17 @@ CREATE TABLE [driver_licenses] (
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
-    [user_id] uniqueidentifier UNIQUE NOT NULL,
+    [user_id] uniqueidentifier NOT NULL,
 
-    CONSTRAINT fk_driver_users FOREIGN KEY ([user_id]) REFERENCES [users]([id]),
-    CONSTRAINT uq_driver_licenses_user_id UNIQUE ([user_id])
+    CONSTRAINT fk_driver_users FOREIGN KEY ([user_id]) REFERENCES [users]([id])
 )
+GO
+CREATE INDEX idx_driver_licenses_user_id ON driver_licenses (user_id);
 GO
 
 CREATE TABLE [citizen_identities] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [number] nvarchar(20) UNIQUE NOT NULL,
+    [number] nvarchar(20) NOT NULL,
     [full_name] nvarchar(100) NOT NULL,
     [nationality] nvarchar(50) NOT NULL,
     [sex] int NOT NULL DEFAULT 0, -- Male, Female
@@ -151,11 +152,12 @@ CREATE TABLE [citizen_identities] (
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
-    [user_id] uniqueidentifier UNIQUE NOT NULL,
+    [user_id] uniqueidentifier NOT NULL,
 
-    CONSTRAINT fk_citizen_users FOREIGN KEY ([user_id]) REFERENCES [users]([id]),
-    CONSTRAINT uq_citizen_identities_user_id UNIQUE ([user_id])
+    CONSTRAINT fk_citizen_users FOREIGN KEY ([user_id]) REFERENCES [users]([id])
 )
+GO
+CREATE INDEX idx_citizen_identities_user_id ON citizen_identities (user_id);
 GO
 
 CREATE TABLE [station_feedbacks] (
@@ -254,7 +256,8 @@ CREATE TABLE [vehicle_components] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     [name] nvarchar(100) NOT NULL,
     [description] nvarchar(255) NOT NULL,
-
+    [damage_fee] decimal(18, 2) NOT NULL,
+    
     [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset

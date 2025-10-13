@@ -11,15 +11,18 @@ namespace API.Controllers
     public class VehicleController : ControllerBase
     {
         private readonly IVehicleService _vehicleService;
+
         public VehicleController(IVehicleService vehicleService)
         {
             _vehicleService = vehicleService;
         }
+
         /*
          401: unauthorized
          403: not have permission
          200: success
          */
+
         [RoleAuthorize(RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateVehicle(CreateVehicleReq createVehicleReq)
@@ -30,25 +33,29 @@ namespace API.Controllers
                 VehicleId = vehicleId
             });
         }
+
         /*
         401: unauthorized
          403: not have permission
         200: success
         404: vehicle does not exist
         */
+
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         [HttpPatch("{Id}")]
         public async Task<IActionResult> UpdateVehicle([FromRoute] Guid id, UpdateVehicleReq updateVehicleReq)
         {
-             await _vehicleService.UpdateVehicleAsync(id, updateVehicleReq);
+            await _vehicleService.UpdateVehicleAsync(id, updateVehicleReq);
             return Ok();
         }
+
         /*
          401: unauthorized
          403: not have permission
          200 success
          404: vehicle not found
          */
+
         [RoleAuthorize("Admin")]
         [HttpDelete("{Id}")]
         public async Task<IActionResult> DeleteVehicle([FromRoute] Guid id)
@@ -57,5 +64,20 @@ namespace API.Controllers
             return Ok();
         }
 
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var vehicle = await _vehicleService.GetAllVehicle();
+            return Ok(vehicle);
+        }
+
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById([FromRoute] Guid id)
+        {
+            var vehicle = await _vehicleService.GetVehicleById(id);
+            return Ok(vehicle);
+        }
     }
 }

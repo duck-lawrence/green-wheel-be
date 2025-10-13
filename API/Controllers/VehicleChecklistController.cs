@@ -37,6 +37,14 @@ namespace API.Controllers
             return Ok(vehicleCheckList);
         }
 
+
+        /*
+         * status code
+         * 200 success
+         * 404 not found
+         * 403 don't have permission
+         * 401 unauthorize
+         */
         [HttpPut]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req)
@@ -45,6 +53,11 @@ namespace API.Controllers
             return Ok();
         }
 
+        /*
+         * status code
+         * 200 success
+         * 404 not found
+         */
         [HttpGet("{id}")]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> GetById(Guid id)

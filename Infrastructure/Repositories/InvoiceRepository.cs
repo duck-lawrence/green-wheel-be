@@ -15,6 +15,21 @@ namespace Infrastructure.Repositories
         {
         }
 
+        public async Task<IEnumerable<Invoice>?> GetInvoiceByContractIdAndStatus(Guid? contractId, int? status)
+        {
+            var invoices = await _dbContext.Invoices
+                .Include(i => i.InvoiceItems)
+                .Include(i => i.Contract).ToListAsync();
+            if (contractId != null)
+            {
+                invoices = (List<Invoice>)invoices.Where(i => i.Contract.Id == contractId);
+            }
+            if (status != null)
+            {
+                invoices = (List<Invoice>)invoices.Where(i => i.Status == status);
+            }
+            return invoices;
+        }
         public async Task<IEnumerable<Invoice>> GetByContractAsync(Guid ContractId)
         {
             return await _dbContext.Invoices.Where(i => i.ContractId == ContractId).ToListAsync();

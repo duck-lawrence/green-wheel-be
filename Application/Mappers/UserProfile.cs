@@ -22,6 +22,7 @@ namespace Application.Mappers
                     opt => opt.MapFrom(src => src.Staff != null ? src.Staff.Station : null))
                 .ForMember(dest => dest.NeedSetPassword,
                     opt => opt.MapFrom(src => src.Password == null));
+            
 
             CreateMap<UserRegisterReq, User>()
                 .ForMember(dest => dest.Password,

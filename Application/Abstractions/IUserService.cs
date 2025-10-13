@@ -61,17 +61,15 @@ namespace Application.Abstractions
 
         Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId);
 
+        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+      
         Task<Guid> CreateAnounymousAccount(CreateUserReq req);
 
         Task<UserProfileViewRes> GetUserByPhoneAsync(string phone);
 
-        Task<IEnumerable<User>> GetAllUsersAsync();
-
         Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber);
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
-
-        Task<IEnumerable<UserProfileViewRes>> SearchUserAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
 
         Task<CitizenIdentityRes> UpdateCitizenIdentityAsync(Guid userId, UpdateCitizenIdentityReq req);
 
