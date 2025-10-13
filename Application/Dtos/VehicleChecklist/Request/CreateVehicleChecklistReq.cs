@@ -10,5 +10,6 @@ namespace Application.Dtos.VehicleChecklist.Request
     {
         public Guid? VehicleId { get; set; } = null;
         public Guid? ContractId { get; set; } = null;
+        public int Type { get; set; }
     }
 }

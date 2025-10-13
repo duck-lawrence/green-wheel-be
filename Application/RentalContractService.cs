@@ -42,7 +42,6 @@ namespace Application
         {
             var contract = _uow.RentalContractRepository.GetByIdAsync(id);
             if(contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            
             return _mapper.Map<RentalContractViewRes>(contract);
         }
         public async Task CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
@@ -131,13 +130,6 @@ namespace Application
             };
             await _uow.RentalContractRepository.AddAsync(contract);
 
-            ////Update vehicle
-            //if(vehicle.Status == (int)VehicleStatus.Available)
-            //{
-            //    vehicle.Status = (int)VehicleStatus.Unavaible;
-            //    await _uow.VehicleRepository.UpdateAsync(vehicle);
-            //}
-
             Guid handoverInvoiceId = Guid.NewGuid();    
             Guid reservationInvoiceId = Guid.NewGuid();
 
@@ -192,17 +184,12 @@ namespace Application
 
 
             await _uow.SaveChangesAsync();
-            //lấy vehicle có join bảng model để in ra view res
-            // vehicle = await _uow.VehicleRepository.GetByIdOptionAsync(vehicle.Id, true);
-            // contract.Vehicle = vehicle;
-            // var rentalContractViewRespone = _mapper.Map<RentalContractViewRes>(contract);
-            // return rentalContractViewRespone;
         }
 
         public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
         {
             var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone, req.CitizenIdentityNumber, req.DriverLicenseNumber);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts ?? []);
+            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
 
         }
 
@@ -210,7 +197,7 @@ namespace Application
         {
             var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts ?? []);
+            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? [];
         }
 
         public async Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
