@@ -204,7 +204,7 @@ namespace API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
-            //app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();  
 
             app.UseAuthentication();
             app.UseAuthorization();

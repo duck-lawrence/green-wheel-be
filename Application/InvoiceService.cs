@@ -66,30 +66,23 @@ namespace Application
             return invoiceViewRes;
         }
 
-        public async Task<string?> ProcessPayment(Guid id, int paymentMethod)
+        public async Task<string> ProcessHandoverInvoice(Invoice invoice)
         {
-            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, false, true) 
-                ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
-            if (paymentMethod == (int)PaymentMethod.Cash)
-            {
-                await CashPayment(invoice);
-            }
-            else if (paymentMethod == (int)PaymentMethod.MomoWallet)
-            {
-                Invoice reservationInvoice = null;
-                if (invoice.Type == (int)InvoiceType.Handover)
-                {
-                    reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
-                }
-                var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax 
-                                                + (invoice.Deposit != null ? invoice.Deposit.Amount : 0) 
-                                                - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal: 0 : 0);
-                                                //nếu mà reservation k null thì ktra coi status của nó có thanh toán hay chưa nếu rồi thì lấy ra phí thay
-                                                //toán còn không thì là 0 cho mọi case
-                var link = await _momoService.CreatePaymentAsync(amount, id, invoice.Notes);
-                return link;
-            }
-            return null;
+            Invoice reservationInvoice = null;
+            reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
+            var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax
+                                            + (invoice.Deposit != null ? invoice.Deposit.Amount : 0)
+                                            - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal : 0 : 0);
+            //nếu mà reservation k null thì ktra coi status của nó có thanh toán hay chưa nếu rồi thì lấy ra phí thay
+            //toán còn không thì là 0 cho mọi case
+            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes);
+            return link;
+        }
+
+        public async Task<string> ProcessReservationInvoice(Invoice invoice)
+        {
+            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes);
+            return link;
         }
 
         public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
@@ -101,12 +94,6 @@ namespace Application
                 {
                     throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
                 }
-                //var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId);
-                //if (rentalContract == null)
-                //{
-                //    throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-                //}
-                //rentalContract.Status = (int)RentalContractStatus.Active;
                 invoice.Status = (int)InvoiceStatus.Paid;
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
                 invoice.PaidAmount = momoIpnReq.Amount;
@@ -145,6 +132,16 @@ namespace Application
         {
             var invoices = await _uow.InvoiceRepository.GetInvoiceByContractIdAndStatus(contractId, status);
             return _mapper.Map<IEnumerable<InvoiceViewRes>?>(invoices);
+        }
+
+        public async Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
+            if(invoice == null)
+            {
+                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+            }
+            return invoice;
         }
     }
 }

@@ -9,6 +9,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
+using Application.AppExceptions;
 
 namespace API.Controllers
 {
@@ -55,13 +56,32 @@ namespace API.Controllers
             return Ok(invoiceView);
         }
 
+        /*
+         500 invoice type error
+         404 not found
+         200 success
+         */
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
-            return link == null ? Ok() : Ok(new { link });
+            var invoice = await _invoiceService.GetRawInvoiceById(id, false, true); 
+            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
+            {
+                await _invoiceService.CashPayment(invoice);
+                return Ok();
+            }
+            string link = invoice.Type switch
+            {
+                (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice),
+                (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice),
+                _ => throw new Exception(),
+            };
+            return Ok(new { link });
         }
 
+        /*
+         200 success
+         */
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
