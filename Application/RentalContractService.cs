@@ -194,21 +194,15 @@ namespace Application
         public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
         {
             var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone, req.CitizenIdentityNumber, req.DriverLicenseNumber);
-            if (contracts == null)
-            {
-            throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-
-            }
-            var contractViewRes = _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts);
-            return contractViewRes;
+            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts ?? []);
 
         }
 
-        public async Task<RentalContractViewRes?> GetContractByUser(ClaimsPrincipal userClaims, int? status = null)
+        public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status = null)
         {
             var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
-            return _mapper.Map<RentalContractViewRes>(contracts);
+            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts ?? []);
         }
 
         public async Task HandoverRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)

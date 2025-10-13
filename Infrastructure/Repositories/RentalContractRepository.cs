@@ -22,7 +22,10 @@ namespace Infrastructure.Repositories
         public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status = null)
         {
             var contracts = await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
-                .Include(r => r.Invoices)
+                .Include(x => x.Vehicle)
+                    .ThenInclude(v => v.Model)
+                .Include(x => x.Station)
+                .Include(x => x.Invoices)
                 .ToListAsync();
             if (status != null)
             {
@@ -36,6 +39,7 @@ namespace Infrastructure.Repositories
         {
             var rentalContracts = _dbContext.RentalContracts
                 .Include(x => x.Vehicle)
+                    .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
                 .Include(x => x.Customer)
