@@ -14,6 +14,7 @@ namespace Application.Mappers
         public VehicleChecklistItemProfile()
         {
             CreateMap<VehicleChecklistItem, ChecklistItemImageRes>();
+            CreateMap<VehicleChecklistItem, VehicleChecklistItemViewRes>();
         }
     }
 }

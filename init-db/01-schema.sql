@@ -256,7 +256,8 @@ CREATE TABLE [vehicle_components] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
     [name] nvarchar(100) NOT NULL,
     [description] nvarchar(255) NOT NULL,
-
+    [damage_fee] decimal(18, 2) NOT NULL,
+    
     [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset
