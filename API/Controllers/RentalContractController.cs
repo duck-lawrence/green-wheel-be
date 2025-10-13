@@ -130,10 +130,10 @@ namespace API.Controllers
 
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyContract()
+        public async Task<IActionResult> GetMyContracts()
         {
             var user = HttpContext.User;
-            var rentalViews = await _rentalContractService.GetContractByUser(user);
+            var rentalViews = await _rentalContractService.GetMyContracts(user);
             return Ok(rentalViews);
         }
 
