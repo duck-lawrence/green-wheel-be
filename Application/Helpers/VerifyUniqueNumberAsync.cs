@@ -14,21 +14,21 @@ namespace Application.Helpers
         public static async Task VerifyUniqueIdentityNumberAsync(string number, Guid userId, ICitizenIdentityRepository repo)
         {
             if (string.IsNullOrEmpty(number))
-                throw new BadRequestException(Message.LicensesMessage.InvalidLicenseData);
+                throw new BadRequestException(Message.UserMessage.InvalidDriverLicenseData);
             var exiting = await repo.GetByIdNumberAsync(number);
             if (exiting == null) return;
             if (exiting.UserId == userId) return;
             if (exiting.DeletedAt == null)
-                throw new ConflictDuplicateException(Message.CitizenIdentityMessage.CitizenIdentityDuplicate);
+                throw new ConflictDuplicateException(Message.UserMessage.CitizenIdentityDuplicate);
         }
 
         public static async Task VerifyUniqueDriverLicenseNumberAsync(string number, Guid userId, IDriverLicenseRepository repo)
         {
-            if (string.IsNullOrEmpty(number)) throw new BadRequestException(Message.LicensesMessage.InvalidLicenseData);
+            if (string.IsNullOrEmpty(number)) throw new BadRequestException(Message.UserMessage.InvalidDriverLicenseData);
             var exiting = await repo.GetByLicenseNumber(number);
             if (exiting == null) return;
             if (exiting.UserId == userId) return;
-            if (exiting.DeletedAt == null) throw new ConflictDuplicateException(Message.DriverLicenseMessage.DriverLicenseDuplicate);
+            if (exiting.DeletedAt == null) throw new ConflictDuplicateException(Message.UserMessage.DriverLicenseDuplicate);
         }
     }
 }

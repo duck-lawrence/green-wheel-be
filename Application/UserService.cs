@@ -146,9 +146,9 @@ namespace Application
                 _jwtSettings.Issuer, _jwtSettings.Audience);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Iat).Value, out long iatSeconds);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-           
+
             await _refreshTokenRepository.AddAsync(new RefreshToken()
-            { 
+            {
                 UserId = userId,
                 Token = token,
                 IssuedAt = DateTimeOffset.FromUnixTimeSeconds(iatSeconds).UtcDateTime,
@@ -607,7 +607,7 @@ namespace Application
             try
             {
                 var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -641,7 +641,7 @@ namespace Application
             try
             {
                 var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -674,7 +674,7 @@ namespace Application
         {
             var entity = await _driverService.GetByUserIdAsync(userId);
             if (entity == null)
-                throw new NotFoundException(Message.UserMessage.LicenseNotFound);
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
 
             return _mapper.Map<DriverLicenseRes>(entity);
         }
@@ -763,7 +763,7 @@ namespace Application
         {
             var entity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
             if (entity == null)
-                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
             if (!string.IsNullOrWhiteSpace(req.Number) && req.Number != entity.Number)
                 await VerifyUniqueNumberAsync.VerifyUniqueIdentityNumberAsync(req.Number, userId, _citizenIdentityRepository);
@@ -784,7 +784,7 @@ namespace Application
         {
             var entity = await _driverLicenseRepository.GetByUserIdAsync(userId);
             if (entity == null)
-                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
 
             if (!string.IsNullOrWhiteSpace(req.Number) && req.Number != entity.Number)
                 await VerifyUniqueNumberAsync.VerifyUniqueDriverLicenseNumberAsync(req.Number, userId, _driverLicenseRepository);
@@ -814,7 +814,7 @@ namespace Application
         {
             var citizenIdentity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
             if (citizenIdentity == null)
-                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
             if (!string.IsNullOrEmpty(citizenIdentity.ImagePublicId))
                 await _photoService.DeletePhotoAsync(citizenIdentity.ImagePublicId);
@@ -826,7 +826,7 @@ namespace Application
         {
             var driverLicense = await _driverLicenseRepository.GetByUserIdAsync(userId);
             if (driverLicense == null)
-                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
 
             if (!string.IsNullOrEmpty(driverLicense.ImagePublicId))
                 await _photoService.DeletePhotoAsync(driverLicense.ImagePublicId);

@@ -51,7 +51,7 @@ namespace Application
         {
             var dto = await _geminiService.ExtractCitizenIdAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);

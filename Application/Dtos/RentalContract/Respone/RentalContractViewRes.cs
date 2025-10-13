@@ -25,6 +25,7 @@ namespace Application.Dtos.RentalContract.Respone
         public bool IsSignedByStaff { get; set; }
         public bool IsSignedByCustomer { get; set; }
         public int Status { get; set; }
+        public int Type { get; set; }
 
         public VehicleViewRes Vehicle { get; set; }
         public UserProfileViewRes Customer { get; set; }

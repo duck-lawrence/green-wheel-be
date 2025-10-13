@@ -44,7 +44,7 @@ namespace Application
             var license = await _licenseRepo.GetByLicenseNumber(licenseNumber);
             if (license == null)
             {
-                throw new NotFoundException(Message.UserMessage.LicenseNotFound);
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
             }
             return license;
         }
@@ -66,7 +66,7 @@ namespace Application
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
             if (!Enum.IsDefined(typeof(LicenseClass), license.Class))
-                throw new BadHttpRequestException(Message.LicensesMessage.InvalidLicenseData);
+                throw new BadHttpRequestException(Message.UserMessage.InvalidDriverLicenseData);
             license.UpdatedAt = DateTimeOffset.UtcNow;
             await _licenseRepo.UpdateAsync(license);
             return license;
@@ -76,7 +76,7 @@ namespace Application
         {
             var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
             // parse ngày
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
@@ -126,7 +126,7 @@ namespace Application
         private static int ParseLicenseClass(string? classString)
         {
             if (string.IsNullOrWhiteSpace(classString))
-                throw new BadRequestException(Message.LicensesMessage.LicenseNotFound);
+                throw new BadRequestException(Message.UserMessage.DriverLicenseNotFound);
 
             var normalized = classString.Trim().ToUpper();
 

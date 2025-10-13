@@ -62,8 +62,12 @@ namespace Application.Constants
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
 
-            public const string InvalidLicenseData = "user.invalid_license_data";
-            public const string LicenseNotFound = "user.license_not_found";
+            public const string CitizenIdentityUpdated = "user.citizen_identity_updated";
+            public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
+
+            public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
+            public const string DriverLicenseNotFound = "user.driver_license_not_found";
+            public const string DriverLicenseDuplicate = "user.driver_license_duplicate";
         }
 
         //Common error
@@ -204,16 +208,6 @@ namespace Application.Constants
         public static class VehicleChecklistMessage
         {
             public const string VehicleChecklistNotFound = "vehicle_checklist.not_found";
-        }
-
-        public static class StationFeedbackMessage
-        {
-            public const string FeedbackNotFound = "station_feedback.not_found";
-        }
-
-        public static class VehicleModelImageMessage
-        {
-            public const string NoMainImage = "vehicle_model_image.not_found";
         }
     }
 }

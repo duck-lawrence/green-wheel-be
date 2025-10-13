@@ -299,7 +299,7 @@ namespace API.Controllers
             var result = await _userService.GetMyDriverLicenseAsync(userId);
             return Ok(result);
         }
-        
+
         [HttpGet]
         [RoleAuthorize(["Staff", "Admin"])]
         public async Task<IActionResult> GetAll(
@@ -383,18 +383,14 @@ namespace API.Controllers
         //    var userView = await _userService.GetByDriverLicenseAsync(number);
         //    return Ok(userView);
         //}
-        
+
         [RoleAuthorize("Customer")]
         [HttpPatch("citizen-identity")]
         public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(new
-            {
-                message = Message.CitizenIdentityMessage.CitizenIdentityUpdated,
-                data = result
-            });
+            return Ok(result);
         }
 
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
@@ -402,11 +398,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
         {
             var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(new
-            {
-                message = Message.CitizenIdentityMessage.CitizenIdentityUpdatedForTarget,
-                data = result
-            });
+            return Ok(result);
         }
 
         [RoleAuthorize("Customer")]
@@ -431,11 +423,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateDriverLicenseForStaff(Guid userId, [FromBody] UpdateDriverLicenseReq req)
         {
             var result = await _userService.UpdateDriverLicenseAsync(userId, req);
-            return Ok(new
-            {
-                message = Message.DriverLicenseMessage.DriverLicenseUpdatedForTarget,
-                data = result
-            });
+            return Ok(result);
         }
 
         [RoleAuthorize(RoleName.Customer)]
