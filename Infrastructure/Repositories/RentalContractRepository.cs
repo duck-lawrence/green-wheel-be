@@ -26,6 +26,9 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
+                    .ThenInclude(i => i.InvoiceItems)
+                .Include(x => x.Invoices)
+                    .ThenInclude(i => i.Deposit)
                 .AsQueryable();
             if (status != null)
             {
@@ -42,6 +45,9 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
+                    .ThenInclude(i => i.InvoiceItems)
+                .Include(x => x.Invoices)
+                    .ThenInclude(i => i.Deposit)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
@@ -80,14 +86,14 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
+                    .ThenInclude(i => i.InvoiceItems)
+                .Include(x => x.Invoices)
+                    .ThenInclude(i => i.Deposit)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.DriverLicense)
                 .FirstOrDefaultAsync();
-                
         }
-
-        
     }
 }
