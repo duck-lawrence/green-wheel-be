@@ -1,39 +1,61 @@
-﻿<div style="font-family:Segoe UI, Arial, sans-serif; font-size:16px; color:#1f2937; line-height:1.6;">
-  <p style="font-size:18px;">Dear {CustomerName},</p>
+﻿<div style="font-family:Segoe UI, Arial, sans-serif; font-size:16px; color:#1f2937; line-height:1.6; background-color:#f9fafb; padding:40px;">
+    <div style="max-width:600px; background-color:#ffffff; margin:auto; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.08); padding:36px 48px;">
 
-  <p stype="color:#1f2937;">
-    Thank you for booking a vehicle with <b style="color:#33cc66;">GreenWheel</b>.<br />
-    To complete your reservation, please proceed with the payment:
-  </p>
+        <h1 style="color:#00c63e; text-align: center; margin-top: 0;">
+            GreenWheel
+        </h1>
+        <h2 style="color:#00c63e; text-align: center; margin-top: 0;">
+            Your Rental Contract Has Been Approved
+        </h2>
+        <p style="font-size: 18px; color: black ">Dear {CustomerName},</p>
 
-  <ul style="font-size:16px; line-height:1.7; color:#1f2937; list-style-type:none; padding-left:0;">
-    <li style="margin-bottom:4px;"><b>- Booking ID:</b> {BookingId}</li>
-    <li style="margin-bottom:4px;"><b>- Vehicle:</b> {VehicleModelName}</li>
-    <li style="margin-bottom:4px;"><b>- License plate:</b> {LisencePlate}</li>
-    <li style="margin-bottom:4px;"><b>- Station:</b> {StationName}</li>
-    <li style="margin-bottom:4px;"><b>- Rental period:</b> {StartDate} – {EndDate}</li>
-    <li style="margin-bottom:4px;"><b>- Amount due:</b> {AmountDue}</li>
-  </ul>
+        <p style="color:black">
+            Thank you for booking a vehicle with <b style="color:#00c63e;">GreenWheel</b>.<br />
+            To confirm your reservation, please proceed with the payment below:
+        </p>
 
-  <p stype="color:#1f2937;">
-      You can pay directly in the  <b style="color:#33cc66;">GreenWheel</b> website or click the button below:
-  </p>
+        <ul style="font-size:16px; line-height:1.7; list-style-type:none; padding-left:0;">
+            <li style="margin-bottom: 4px; color: black"><b>Booking ID:</b> {BookingId}</li>
+            <li style="margin-bottom: 4px; color: black"><b>Vehicle:</b> {VehicleModelName}</li>
+            <li style="margin-bottom: 4px; color: black"><b>License plate:</b> {LisencePlate}</li>
+            <li style="margin-bottom: 4px; color: black"><b>Station:</b> {StationName}</li>
+            <li style="margin-bottom: 4px; color: black"><b>Rental period:</b> {StartDate} – {EndDate}</li>
+        </ul>
 
-  <p>
-    <a href="{PaymentLink}" 
-       style="display:inline-block; background-color:#2563eb; color:#ffffff; 
-              text-decoration:none; padding:12px 28px; border-radius:8px; 
-              font-size:16px; font-weight:600;">
-      Pay Now
-    </a>
-  </p>
+        <div style="background-color: #fef9c3; color: black; border-left:4px solid #facc15; padding: 12px 18px; margin: 20px 0; border-radius: 8px;">
+            <b style="color:#ca8a04;">Important:</b><br />
+            <p style="color:black">
+                To secure your vehicle, you must <b>complete the full payment</b> or at least pay the <b>reservation fee</b> before <b>{Deadline}</b>.
+                <br />Otherwise, the vehicle may be released to other customers.
+            </p>
+        </div>
 
-  <p style="font-size:16px; color:#1f2937;">
-      <i>Note:</i> Your reservation will be automatically cancelled if payment is not completed before {Deadline}.
-  </p>
+        <p style="color:black">
+            You can make payment directly on the <b style="color:#00c63e;">GreenWheel</b> website, or simply click the button below:
+        </p>
 
-  <p style="font-size:16px; color:#1f2937;">
-    Best regards,<br />
-    <b>The HYCAT Team</b>
-  </p>
+        <p>
+            <a href="{PaymentLink}"
+               style="display:inline-block; background-color:#2563eb; color:#ffffff;
+                text-decoration:none; padding:14px 32px; border-radius:8px;
+                font-size:16px; font-weight:600;">
+                Pay Now
+            </a>
+        </p>
+
+        <p style="font-size:16px; color:black; margin-top:28px;">
+            <i>Note:</i> You can review your booking details anytime on your <b style="color:#00c63e;">GreenWheel</b> account dashboard.
+        </p>
+        <p style="margin-top:20px; color:black">
+            <i>Note:</i> If you believe there was an issue with this payment, please contact our billing team within 48 hours via
+            <a href="mailto:greenwheel.work@gmail.com" style="color:#2563eb;">greenwheel.work@gmail.com</a>.
+        </p>
+        <p style="font-size:16px; color:#1f2937; margin-top:32px;">
+            Best regards,<br />
+            <b>The HYCAT Team</b>
+        </p>
+        <p style="font-size:16px; color:black; text-align:center; margin-top:24px;">
+            This is an automated confirmation email. Please do not reply directly.
+        </p>
+    </div>
 </div>

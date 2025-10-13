@@ -17,7 +17,8 @@ namespace Application.Constants
         public static class Tax
         {
             public const decimal BaseRentalVAT = 0.10m;
-            public const decimal OtherVAT = 0m;
+            public const decimal NoneVAT = 0m;
+
         }
 
         public static class Policy

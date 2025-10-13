@@ -37,9 +37,9 @@ namespace API.Controllers
         {
             var userClaims = HttpContext.User;
             var userID = Guid.Parse(userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString());
-            var rentalContractViewRes = await _rentalContractService.CreateRentalContractAsync(userID, createReq);
-            return Ok(
-                rentalContractViewRes
+            await _rentalContractService.CreateRentalContractAsync(userID, createReq);
+            return Created(
+                // rentalContractViewRes
             );
         }
         /*
@@ -48,7 +48,7 @@ namespace API.Controllers
          200 succes
          */
         [HttpPut("{id}/accept")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> AcceptRentalContract(Guid id)
         {
             await _rentalContractService.VerifyRentalContract(id);
@@ -61,7 +61,7 @@ namespace API.Controllers
          200 succes
          */
         [HttpPut("{id}/reject")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> RejectRentalContract(Guid id, [FromBody] int vehicleStatus)
         {
             await _rentalContractService.VerifyRentalContract(id, false, vehicleStatus);
@@ -83,8 +83,8 @@ namespace API.Controllers
             {
                 return BadRequest(Message.UserMessage.UserIdIsRequired);
             } 
-            var rentalContractViewRes = await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
-            return Ok(rentalContractViewRes);
+            await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
+            return Created();
         }
 
         /*
@@ -94,9 +94,9 @@ namespace API.Controllers
         */
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
-        public async Task<IActionResult> GetByCusPhoneAndContractStatus([FromQuery] string? phone, [FromQuery] int? status)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllRentalContactReq req)
         {
-            var contractViews = await _rentalContractService.GetByCustomerPhoneAndContractStatus(status, phone);
+            var contractViews = await _rentalContractService.GetAll(req);
             return Ok(contractViews);
         }
 
@@ -109,7 +109,7 @@ namespace API.Controllers
         public async Task<IActionResult> HandoverRentalContract(Guid id, HandoverContractReq req)
         {
             var staff = HttpContext.User;
-            await _rentalContractService.HandoverRentalContractAsync(staff, id, req);
+            await _rentalContractService.HandoverProcessRentalContractAsync(staff, id, req);
             return Ok();
 
         }
@@ -124,10 +124,33 @@ namespace API.Controllers
         public async Task<IActionResult> ReturnRentalContract(Guid id)
         {
             var staff = HttpContext.User;
-            var invoiceView = await _rentalContractService.ReturnRentalContractAsync(staff, id);
+            var invoiceView = await _rentalContractService.ReturnProcessRentalContractAsync(staff, id);
             return invoiceView == null ? Ok() : Ok(invoiceView);
         }
 
+        [RoleAuthorize(RoleName.Customer)]
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyContracts(int status)
+        {
+            var user = HttpContext.User;
+            var rentalViews = await _rentalContractService.GetMyContracts(user, status);
+            return Ok(rentalViews);
+        }
+
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateRentalContractStatus(Guid id)
+        {
+            await _rentalContractService.UpdateStatusAsync(id);
+            return Ok();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var contractView = await _rentalContractService.GetByIdAsync(id);
+            return Ok(contractView);
+        }
         
     }
 }

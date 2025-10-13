@@ -128,11 +128,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.ToTable("citizen_identities");
 
-            entity.HasIndex(e => e.UserId, "UQ__citizen___B9BE370E481A507A").IsUnique();
-
-            entity.HasIndex(e => e.Number, "UQ__citizen___FD291E418DEE80E9").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "uq_citizen_identities_user_id").IsUnique();
+            entity.HasIndex(e => e.UserId, "idx_citizen_identities_user_id");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -330,11 +326,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.ToTable("driver_licenses");
 
-            entity.HasIndex(e => e.UserId, "UQ__driver_l__B9BE370EAA9A89D5").IsUnique();
-
-            entity.HasIndex(e => e.Number, "UQ__driver_l__FD291E4146A88AD9").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "uq_driver_licenses_user_id").IsUnique();
+            entity.HasIndex(e => e.UserId, "idx_driver_licenses_user_id");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")

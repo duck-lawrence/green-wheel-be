@@ -14,6 +14,7 @@ namespace Application.Constants
             //auth
             public const string MissingToken = "user.missing_token";
 
+            public const string InvalidAccessToken = "user.invalid_access_token";
             public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
             public const string NotHavePassword = "user.is_google_linked_not_password";
@@ -59,9 +60,10 @@ namespace Application.Constants
             public const string NotFoundAvatar = "No avatar to delete";
 
             //Citizen Identity
-            public const string NotHaveCitizenIdentity = "user.not_have_citizen_identity";
+            public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
 
-            public const string NotHaveDriverLicense = "user.not_have_driver_license";
+            public const string InvalidLicenseData = "user.invalid_license_data";
+            public const string LicenseNotFound = "user.license_not_found";
         }
 
         //Common error
@@ -140,6 +142,7 @@ namespace Application.Constants
             public const string NotHavePermission = "momo.not_have_permission";
             public const string InvalidEndpoint = "momo.invalid_end_point";
             public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
+            public const string PaymentFailed = "momo.payment_failed";
         }
 
         public static class InvoiceMessage
@@ -156,13 +159,6 @@ namespace Application.Constants
         public static class VehicleSegmentMessage
         {
             public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
-        }
-
-        //Licenses
-        public static class LicensesMessage
-        {
-            public const string InvalidLicenseData = "licenses.invalid_license_data";
-            public const string LicenseNotFound = "licenses.not_found";
         }
 
         //VEHICLE IMAGE
@@ -189,9 +185,15 @@ namespace Application.Constants
             public const string Failed = "upload.failed";
         }
 
-        public static class CitizenIdentityMessage
+        public static class StationFeedbackMessage
         {
-            public const string CitizenIdentityNotFound = "citizen_identity.not_found";
+            public const string FeedbackNotFound = "station_feedback.not_found";
+            public const string AccessDenied = "station_feedback.access_denied";
+        }
+
+        public static class VehicleModelImageMessage
+        {
+            public const string NoMainImage = "vehicle_model.no_main_image";
         }
 
         public static class VehicleComponentMessage

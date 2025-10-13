@@ -16,6 +16,8 @@ namespace Application.Dtos.VehicleChecklist.Respone
         public Guid VehicleId { get; set; }
 
         public Guid? ContractId { get; set; }
-        public IEnumerable<ChecklistItemImageRes>? VehicleChecklistItems { get; set; }
+      
+        //public IEnumerable<ChecklistItemImageRes>? VehicleChecklistItems { get; set; }
+        public IEnumerable<VehicleChecklistItemViewRes>? VehicleChecklistItems { get; set; }
     }
 }

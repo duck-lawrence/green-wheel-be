@@ -11,9 +11,9 @@ public partial class VehicleComponent : SorfDeletedEntity, IEntity
     public string Name { get; set; } = null!;
 
     public string Description { get; set; } = null!;
-
+    public decimal DamageFee { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
-
+    
     public DateTimeOffset UpdatedAt { get; set; }
 
     public virtual ICollection<ModelComponent> ModelComponents { get; set; } = new List<ModelComponent>();

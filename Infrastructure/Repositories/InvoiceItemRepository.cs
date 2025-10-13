@@ -16,14 +16,6 @@ namespace Infrastructure.Repositories
         {
         }
 
-        //public async Task AddRangeAsync(IEnumerable<InvoiceItem> items)
-        //{
-        //    foreach(var item in items)
-        //    {
-        //        await _dbContext.InvoiceItems.AddAsync(item);
-        //    }
-        //}
-
         public async Task<IEnumerable<InvoiceItem>> GetByInvoiceIdAsync(Guid invoiceId)
         {
             return await _dbContext.InvoiceItems
@@ -31,5 +23,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(cli => cli.Component)
                 .Where(i => i.InvoiceId == invoiceId).ToListAsync();
         }
+
+       
     }
 }
