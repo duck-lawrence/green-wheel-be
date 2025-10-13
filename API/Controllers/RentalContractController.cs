@@ -147,7 +147,8 @@ namespace API.Controllers
 
         public async Task<IActionResult> GetById(Guid id)
         {
-            await _rentalContractService.
+            var contractView = await _rentalContractService.GetByIdAsync(id);
+            return Ok(contractView);
         }
         
     }

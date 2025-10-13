@@ -21,17 +21,17 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status = null)
         {
-            var contracts = await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
+            var contracts = _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
                 .Include(x => x.Vehicle)
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
-                .ToListAsync();
+                .AsQueryable();
             if (status != null)
             {
-                contracts = (List<RentalContract>)contracts.Where(c => c.Status == status);
+                contracts = contracts.Where(c => c.Status == status);
             }
-            return contracts;
+            return await contracts.ToListAsync();
         }
 
         public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
