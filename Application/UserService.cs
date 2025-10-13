@@ -775,8 +775,14 @@ namespace Application
         public async Task<DriverLicenseRes> UpdateDriverLicenseAsync(Guid userId, UpdateDriverLicenseReq req)
         {
             var entity = await _driverLicenseRepository.GetByUserIdAsync(userId);
+            if (req.Class.HasValue)
+            {
+                if (!Enum.IsDefined(typeof(LicenseClass), req.Class.Value))
+                    throw new BadRequestException($"Invalid license class: {req.Class.Value}");
+
+                entity.Class = (int)req.Class.Value;
+            }
             if (req.Number != null) entity.Number = req.Number;
-            if (req.Class.HasValue) entity.Class = req.Class.Value;
             if (req.FullName != null) entity.FullName = req.FullName;
             if (req.Nationality != null) entity.Nationality = req.Nationality;
             if (req.Sex.HasValue) entity.Sex = req.Sex.Value;
@@ -785,6 +791,30 @@ namespace Application
 
             await _driverLicenseRepository.UpdateAsync(entity);
             return _mapper.Map<DriverLicenseRes>(entity);
+        }
+
+        public async Task DeleteCitizenIdentityAsync(Guid userId)
+        {
+            var citizenIdentity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
+            if (citizenIdentity == null)
+                throw new NotFoundException(Message.CitizenIdentityMessage.CitizenIdentityNotFound);
+
+            if (!string.IsNullOrEmpty(citizenIdentity.ImagePublicId))
+                await _photoService.DeletePhotoAsync(citizenIdentity.ImagePublicId);
+            citizenIdentity.DeletedAt = DateTimeOffset.UtcNow;
+            await _mediaUow.SaveChangesAsync();
+        }
+
+        public async Task DeleteDriverLicenseAsync(Guid userId)
+        {
+            var driverLicense = await _driverLicenseRepository.GetByUserIdAsync(userId);
+            if (driverLicense == null)
+                throw new NotFoundException(Message.LicensesMessage.LicenseNotFound);
+
+            if (!string.IsNullOrEmpty(driverLicense.ImagePublicId))
+                await _photoService.DeletePhotoAsync(driverLicense.ImagePublicId);
+            driverLicense.DeletedAt = DateTimeOffset.UtcNow;
+            await _mediaUow.SaveChangesAsync();
         }
     }
 }

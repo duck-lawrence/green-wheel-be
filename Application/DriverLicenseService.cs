@@ -4,6 +4,7 @@ using Application.Constants;
 using Application.Dtos.DriverLicense.Request;
 using Application.Repositories;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Application
 {
@@ -63,7 +64,8 @@ namespace Application
             var existing = await _licenseRepo.GetByIdAsync(license.Id);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
-
+            if (!Enum.IsDefined(typeof(LicenseClass), license.Class))
+                throw new BadHttpRequestException(Message.LicensesMessage.InvalidLicenseData);
             license.UpdatedAt = DateTimeOffset.UtcNow;
             await _licenseRepo.UpdateAsync(license);
             return license;
@@ -121,18 +123,19 @@ namespace Application
 
         private static int ParseLicenseClass(string? classString)
         {
-            if (string.IsNullOrWhiteSpace(classString)) return 0;
+            if (string.IsNullOrWhiteSpace(classString))
+                throw new BadRequestException(Message.LicensesMessage.LicenseNotFound);
 
-            return classString.Trim().ToUpper() switch
+            var normalized = classString.Trim().ToUpper();
+
+            // Thử parse thành enum
+            if (Enum.TryParse(typeof(LicenseClass), normalized, ignoreCase: true, out var value)
+                && Enum.IsDefined(typeof(LicenseClass), value))
             {
-                "A1" => 1,
-                "A2" => 2,
-                "B1" => 3,
-                "B2" => 4,
-                "C" => 5,
-                "D" => 6,
-                _ => 0
-            };
+                return (int)value;
+            }
+
+            throw new BadRequestException($"Invalid license class: {classString}");
         }
     }
 }
