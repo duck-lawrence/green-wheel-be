@@ -109,7 +109,7 @@ namespace API.Controllers
         public async Task<IActionResult> HandoverRentalContract(Guid id, HandoverContractReq req)
         {
             var staff = HttpContext.User;
-            await _rentalContractService.HandoverRentalContractAsync(staff, id, req);
+            await _rentalContractService.HandoverProcessRentalContractAsync(staff, id, req);
             return Ok();
 
         }
@@ -124,16 +124,16 @@ namespace API.Controllers
         public async Task<IActionResult> ReturnRentalContract(Guid id)
         {
             var staff = HttpContext.User;
-            var invoiceView = await _rentalContractService.ReturnRentalContractAsync(staff, id);
+            var invoiceView = await _rentalContractService.ReturnProcessRentalContractAsync(staff, id);
             return invoiceView == null ? Ok() : Ok(invoiceView);
         }
 
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyContracts()
+        public async Task<IActionResult> GetMyContracts(int status)
         {
             var user = HttpContext.User;
-            var rentalViews = await _rentalContractService.GetMyContracts(user);
+            var rentalViews = await _rentalContractService.GetMyContracts(user, status);
             return Ok(rentalViews);
         }
 
@@ -143,6 +143,11 @@ namespace API.Controllers
         {
             await _rentalContractService.UpdateStatusAsync(id);
             return Ok();
+        }
+
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            await _rentalContractService.
         }
         
     }

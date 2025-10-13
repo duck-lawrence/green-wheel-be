@@ -76,8 +76,14 @@ namespace Infrastructure.Repositories
         public override async Task<RentalContract?> GetByIdAsync(Guid id)
         {
             return await _dbContext.RentalContracts.Where(r => r.Id == id)
-                .Include(r => r.Invoices)
-                .Include(r => r.Customer)
+                .Include(x => x.Vehicle)
+                    .ThenInclude(v => v.Model)
+                .Include(x => x.Station)
+                .Include(x => x.Invoices)
+                .Include(x => x.Customer)
+                    .ThenInclude(u => u.CitizenIdentity)
+                .Include(x => x.Customer)
+                    .ThenInclude(u => u.DriverLicense)
                 .FirstOrDefaultAsync();
                 
         }
