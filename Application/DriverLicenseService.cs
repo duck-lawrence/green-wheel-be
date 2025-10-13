@@ -2,6 +2,7 @@
 using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.DriverLicense.Request;
+using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -80,7 +81,8 @@ namespace Application
             // parse ngày
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
-
+            await VerifyUniqueNumberAsync.VerifyUniqueDriverLicenseNumberAsync(dto.Number ?? string.Empty, userId,
+                _licenseRepo);
             // parse sex + class thành int
             var sex = ParseSex(dto.Sex);
             var licenseClass = ParseLicenseClass(dto.Class);
