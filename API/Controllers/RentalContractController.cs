@@ -145,6 +145,7 @@ namespace API.Controllers
             return Ok();
         }
 
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var contractView = await _rentalContractService.GetByIdAsync(id);
