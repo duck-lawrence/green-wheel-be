@@ -1,5 +1,4 @@
-﻿
-using Application.Abstractions;
+﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
@@ -368,7 +367,6 @@ namespace Application
                            .Replace("{StationName}", station.Name)
                            .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
                            .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"))
-                           .Replace("{AmountDue}", (invoice.First().Tax * invoice.First().Subtotal).ToString("N0") + "VNĐ")
                            .Replace("{PaymentLink}", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1")
                            .Replace("{Deadline}", "....");
             }
