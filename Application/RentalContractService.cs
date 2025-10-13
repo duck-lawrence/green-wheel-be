@@ -40,7 +40,7 @@ namespace Application
 
         public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
         {
-            var contract = _uow.RentalContractRepository.GetByIdAsync(id);
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
             if(contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             return _mapper.Map<RentalContractViewRes>(contract);
         }

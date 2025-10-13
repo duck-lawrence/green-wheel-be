@@ -99,11 +99,8 @@ namespace Application
             {
                 throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
             }
-            Guid checkListId;
-            do
-            {
-                checkListId = Guid.NewGuid();
-            } while (await _uow.VehicleChecklistRepository.GetByIdAsync(checkListId) != null);
+            Guid checkListId = Guid.NewGuid();
+            
             var checklist = new VehicleChecklist()
             {
                 Id = checkListId,
@@ -119,14 +116,8 @@ namespace Application
             var checklistItems = new List<VehicleChecklistItem>();
             foreach (var component in components)
             {
-                Guid checkListItemId;
-                do
-                {
-                    checkListItemId = Guid.NewGuid();
-                } while (await _uow.VehicleChecklistItemRepository.GetByIdAsync(checkListItemId) != null);
                 checklistItems.Add(new VehicleChecklistItem()
                 {
-                    Id = checkListItemId,
                     ComponentId = component.Id,
                     Component = component,
                     ChecklistId = checkListId
@@ -152,12 +143,7 @@ namespace Application
         public async Task UpdateVehicleChecklistAsync(UpdateVehicleChecklistReq req)
         {
 
-            var checklists = await _uow.VehicleChecklistRepository.GetAllAsync(
-                new Expression<Func<VehicleChecklist, object>>[]
-                {
-                    v => v.VehicleChecklistItems
-                });
-            var checklist = checklists.Where(c => c.Id == req.VehicleChecklistId).FirstOrDefault();
+            var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(req.VehicleChecklistId);
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
             var contract = await _uow.VehicleChecklistRepository.GetRentalContractByCheckListIdAsync(req.VehicleChecklistId);
@@ -169,6 +155,8 @@ namespace Application
             {
                 await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract);
             }
+            checklist.IsSignedByStaff = req.IsSignedByStaff;
+            checklist.IsSignedByCustomer = req.IsSignedByCustomer;
 
             await _uow.SaveChangesAsync();
         }
@@ -194,14 +182,9 @@ namespace Application
         }
 
         private async Task UpdateVehicleChecklistInsideContractAsync(VehicleChecklist checklist, 
-            IEnumerable<UpdateChecklistItemReq> checklictReq, RentalContract contract)
+            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract)
         {
-            Guid invoiceId;
-            do
-            {
-                invoiceId = Guid.NewGuid();
-
-            } while (await _uow.InvoiceRepository.GetByIdOptionAsync(invoiceId) != null);
+            Guid invoiceId = Guid.NewGuid();
             var invoice = new Invoice()
             {
                 Id = invoiceId,
@@ -210,31 +193,26 @@ namespace Application
                 Tax = Common.Tax.NoneVAT,
                 Notes = $"GreenWheel – Invoice for your order {contract.Id}"
             };
-            IEnumerable<InvoiceItem> invoieItems = [];
-            foreach (var itemReq in checklictReq)
+            IEnumerable<InvoiceItem> invoiceItems = [];
+            foreach (var itemReq in checklistReq)
             {
                 var existingItem = checklist.VehicleChecklistItems
                     .FirstOrDefault(i => i.Id == itemReq.Id);
 
                 if (existingItem == null) continue;
 
-                if(itemReq.Status != (int)DamageStatus.Good)
+                if(itemReq.Status != (int)DamageStatus.Good && checklist.Type == (int)VehicleChecklistType.Return)
                 {
-                    Guid invoiceItemId;
-                    do
-                    {
-                        invoiceItemId = Guid.NewGuid();
-
-                    } while ((await _uow.InvoiceItemRepository.GetByIdAsync(invoiceItemId)) != null);
+                    Guid invoiceItemId = Guid.NewGuid();
                     var invoiceItem = new InvoiceItem()
                     {
                         Id = invoiceItemId,
                         InvoiceId = invoiceId,
                         Quantity = 1,
-                        UnitPrice = DamageCompensationHelper.CalculateCompensation(1000, itemReq.Status),
+                        UnitPrice = DamageCompensationHelper.CalculateCompensation(existingItem.Component.DamageFee, itemReq.Status),
                         Type = (int)InvoiceItemType.Damage,
                     };
-                    invoieItems.Append(invoiceItem);
+                    invoiceItems = invoiceItems.Append(invoiceItem);
                 }
 
                 existingItem.Status = itemReq.Status;
@@ -243,14 +221,13 @@ namespace Application
                     existingItem.Notes = itemReq.Notes;
                 }
             }
-            if (!invoieItems.IsNullOrEmpty())
+            if (invoiceItems != null)
             {
-                invoice.Subtotal = InvoiceHelper.CalculateTotalAmount(invoieItems);
+                invoice.Subtotal = InvoiceHelper.CalculateTotalAmount(invoiceItems);
                 invoice.Type = (int)InvoiceType.Return;
                 await _uow.InvoiceRepository.AddAsync(invoice);
-                await _uow.InvoiceItemRepository.AddRangeAsync(invoieItems);
+                await _uow.InvoiceItemRepository.AddRangeAsync(invoiceItems);
             }
-            
         }
     }
 }
