@@ -94,9 +94,9 @@ namespace API.Controllers
         */
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
-        public async Task<IActionResult> GetByCusPhoneAndContractStatus([FromQuery] string? phone, [FromQuery] int? status)
+        public async Task<IActionResult> GetAll([FromQuery] GetAllRentalContactReq req)
         {
-            var contractViews = await _rentalContractService.GetByCustomerPhoneAndContractStatus(status, phone);
+            var contractViews = await _rentalContractService.GetAll(req);
             return Ok(contractViews);
         }
 
@@ -130,10 +130,10 @@ namespace API.Controllers
 
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetContractByUserId(Guid id)
+        public async Task<IActionResult> GetMyContract()
         {
             var user = HttpContext.User;
-            var rentalViews = await _rentalContractService.GetContractByUserId(user);
+            var rentalViews = await _rentalContractService.GetContractByUser(user);
             return Ok(rentalViews);
         }
 

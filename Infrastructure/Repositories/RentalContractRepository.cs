@@ -31,7 +31,8 @@ namespace Infrastructure.Repositories
             return contracts;
         }
 
-        public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null)
+        public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
+            string? citizenIdentityNumber = null, string? driverLicenseNumber = null)
         {
             var rentalContracts = _dbContext.RentalContracts
                 .Include(x => x.Vehicle)
@@ -49,6 +50,14 @@ namespace Infrastructure.Repositories
             if (status != null)
             {
                 rentalContracts = rentalContracts.Where(rc => rc.Status == status);
+            }
+            if (!string.IsNullOrEmpty(citizenIdentityNumber))
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.CitizenIdentity.Number == citizenIdentityNumber);
+            }
+            if (!string.IsNullOrEmpty(driverLicenseNumber))
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
             }
             return await rentalContracts.ToListAsync();
         }

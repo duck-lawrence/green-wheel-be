@@ -16,9 +16,9 @@ namespace Application.Abstractions
         Task CreateRentalContractAsync(Guid UserID, CreateRentalContractReq createRentalContractReq);
          Task VerifyRentalContract(Guid id, bool haveVehicle = true, int? vehicleStatus = null);
         Task UpdateStatusAsync(Guid id);
-        Task<IEnumerable<RentalContractViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null);
+        Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req);
         Task HandoverRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
         Task<InvoiceViewRes?> ReturnRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
-        Task<RentalContractViewRes?> GetContractByUserId(ClaimsPrincipal userClaims);
+        Task<RentalContractViewRes?> GetContractByUser(ClaimsPrincipal userClaims, int? status = null);
     }
 }

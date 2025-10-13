@@ -191,9 +191,9 @@ namespace Application
             // return rentalContractViewRespone;
         }
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetByCustomerPhoneAndContractStatus(int? status = null, string? phone = null)
+        public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
         {
-            var contracts = await _uow.RentalContractRepository.GetAllAsync(status, phone);
+            var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone, req.CitizenIdentityNumber, req.DriverLicenseNumber);
             if (contracts == null)
             {
             throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
@@ -204,10 +204,10 @@ namespace Application
 
         }
 
-        public async Task<RentalContractViewRes?> GetContractByUserId(ClaimsPrincipal userClaims)
+        public async Task<RentalContractViewRes?> GetContractByUser(ClaimsPrincipal userClaims, int? status = null)
         {
             var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
-            var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId));
+            var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
             return _mapper.Map<RentalContractViewRes>(contracts);
         }
 
