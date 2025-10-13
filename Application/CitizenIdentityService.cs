@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
 
@@ -53,7 +54,7 @@ namespace Application
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
-
+            await VerifyUniqueNumberAsync.VerifyUniqueIdentityNumberAsync(dto.IdNumber ?? string.Empty, userId, _citizenRepo);
             var entity = new CitizenIdentity
             {
                 UserId = userId,

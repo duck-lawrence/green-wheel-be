@@ -192,6 +192,12 @@ namespace Application.Constants
         public static class CitizenIdentityMessage
         {
             public const string CitizenIdentityNotFound = "citizen_identity.not_found";
+            public const string CitizenIdentityDuplicate = "citizen_identity.duplicated";
+        }
+
+        public static class DriverLicenseMessage
+        {
+            public const string DriverLicenseDuplicate = "driver_license.duplicated";
         }
 
         public static class VehicleComponentMessage
