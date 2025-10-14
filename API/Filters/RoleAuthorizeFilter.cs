@@ -27,7 +27,6 @@ namespace API.Filters
             if (!user.Identity?.IsAuthenticated ?? true)
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
-                
             }
             //take userId
             var userId = user.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
@@ -41,7 +40,7 @@ namespace API.Filters
                 throw new Exception();
             }
             var roleList = _cache.Get<List<Role>>("AllRoles");
-            var userInDB = await userService.GetUserByIdAsync(Guid.Parse(userId));
+            var userInDB = await userService.GetByIdAsync(Guid.Parse(userId));
             var userRole = roleList.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
 
             if (userRole == null || !_roles.Contains(userRole))
