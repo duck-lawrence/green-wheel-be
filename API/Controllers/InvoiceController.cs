@@ -65,8 +65,8 @@ namespace API.Controllers
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            var invoice = await _invoiceService.GetRawInvoiceById(id, false, true);
-            if (paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
+            var invoice = await _invoiceService.GetRawInvoiceById(id, true, true); 
+            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
             {
                 await _invoiceService.CashPayment(invoice);
                 return Ok();

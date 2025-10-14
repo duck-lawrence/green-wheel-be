@@ -1,4 +1,5 @@
 ﻿using Application.Dtos.Invoice.Response;
+using Application.Helpers;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -16,8 +17,7 @@ namespace Application.Mappers
             CreateMap<Invoice, InvoiceViewRes>()
             .ForMember(dest => dest.Total,
                 otp => otp.MapFrom(src =>
-                    src.Subtotal + src.Subtotal * src.Tax +
-                    (src.Deposit == null ? 0 : src.Deposit.Amount)
+                    InvoiceHelper.CalculateTotalAmount(src)
                 ));
         }
     }

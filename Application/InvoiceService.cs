@@ -70,9 +70,8 @@ namespace Application
         {
             Invoice reservationInvoice = null;
             reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
-            var amount = invoice.Subtotal + invoice.Subtotal * invoice.Tax
-                                            + (invoice.Deposit != null ? invoice.Deposit.Amount : 0)
-                                            - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal : 0 : 0);
+            var amount = InvoiceHelper.CalculateTotalAmount(invoice)
+                              - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal : 0 : 0);
             //nếu mà reservation k null thì ktra coi status của nó có thanh toán hay chưa nếu rồi thì lấy ra phí thay
             //toán còn không thì là 0 cho mọi case
             var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
@@ -81,7 +80,14 @@ namespace Application
 
         public async Task<string> ProcessReservationInvoice(Invoice invoice, string fallbackUrl)
         {
-            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes, fallbackUrl);
+            var amount = InvoiceHelper.CalculateTotalAmount(invoice);
+            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes);
+            return link;
+        }
+
+        public async Task<string> ProcessReturnInvoice(Invoice invoice)
+        {
+            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes);
             return link;
         }
 
@@ -98,9 +104,18 @@ namespace Application
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
                 invoice.PaidAmount = momoIpnReq.Amount;
                 invoice.PaidAt = DateTimeOffset.FromUnixTimeMilliseconds(momoIpnReq.ResponseTime);
-
                 await _uow.InvoiceRepository.UpdateAsync(invoice);
-                //await _uow.RentalContractRepository.UpdateAsync(rentalContract);
+                
+                if(invoice.Type == (int)InvoiceType.Handover)
+                {
+                    var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
+                    if (reservationInvoice.Status != (int)InvoiceStatus.Paid)
+                    {
+                        reservationInvoice.Status = (int)InvoiceStatus.Cancelled;
+                        await _uow.InvoiceRepository.UpdateAsync(reservationInvoice);
+                    }
+                }
+
                 await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
                 await _uow.SaveChangesAsync();
                 var subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
