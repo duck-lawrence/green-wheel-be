@@ -153,7 +153,7 @@ namespace Application
             }
             else
             {
-                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract);
+                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract, req.ReturnInvoiceId);
             }
             checklist.IsSignedByStaff = req.IsSignedByStaff;
             checklist.IsSignedByCustomer = req.IsSignedByCustomer;
@@ -182,17 +182,17 @@ namespace Application
         }
 
         private async Task UpdateVehicleChecklistInsideContractAsync(VehicleChecklist checklist, 
-            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract)
+            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract, Guid? returnInvoiceId)
         {
-            Guid invoiceId = Guid.NewGuid();
-            var invoice = new Invoice()
+            Invoice returnInvoice = null;
+            if(checklist.Type == (int)VehicleChecklistType.Return)
             {
-                Id = invoiceId,
-                ContractId = contract.Id,
-                Status = (int)InvoiceStatus.Pending,
-                Tax = Common.Tax.NoneVAT,
-                Notes = $"GreenWheel – Invoice for your order {contract.Id}"
-            };
+                returnInvoice = await _uow.InvoiceRepository.GetByIdAsync((Guid)returnInvoiceId!);
+                if(returnInvoice == null)
+                {
+                    throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                }
+            }
             IEnumerable<InvoiceItem> invoiceItems = [];
             foreach (var itemReq in checklistReq)
             {
@@ -207,7 +207,7 @@ namespace Application
                     var invoiceItem = new InvoiceItem()
                     {
                         Id = invoiceItemId,
-                        InvoiceId = invoiceId,
+                        InvoiceId = (Guid)returnInvoiceId!,
                         Quantity = 1,
                         UnitPrice = DamageCompensationHelper.CalculateCompensation(existingItem.Component.DamageFee, itemReq.Status),
                         Type = (int)InvoiceItemType.Damage,
@@ -223,9 +223,9 @@ namespace Application
             }
             if (invoiceItems != null)
             {
-                invoice.Subtotal = InvoiceHelper.CalculateTotalAmount(invoiceItems);
-                invoice.Type = (int)InvoiceType.Return;
-                await _uow.InvoiceRepository.AddAsync(invoice);
+                //nếu vô đc trong này thì chắc chắn đã lấy đc return Invoice ở trên rồi
+                returnInvoice!.Subtotal = returnInvoice.Subtotal + InvoiceHelper.CalculateSubTotalAmount(invoiceItems);
+                await _uow.InvoiceRepository.AddAsync(returnInvoice);
                 await _uow.InvoiceItemRepository.AddRangeAsync(invoiceItems);
             }
         }
