@@ -66,19 +66,19 @@ namespace API.Controllers
             return Ok(checklistViewRes);
         }
 
-        [HttpPost("image")]
+        [HttpPost("items/{itemId}/image")]
         [RoleAuthorize(RoleName.Staff)]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadChecklistItemImage([FromQuery] Guid itemId, [FromForm(Name = "file")] IFormFile file)
+        public async Task<IActionResult> UploadChecklistItemImage(Guid itemId, [FromForm(Name = "file")] IFormFile file)
         {
             var result = await _imageService.UploadChecklistItemImageAsync(itemId, file);
             return Ok(result);
         }
 
-        [HttpDelete("image")]
+        [HttpDelete("items/{itemId}/image")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> DeleteChecklistItemImage([FromQuery] Guid itemId)
+        public async Task<IActionResult> DeleteChecklistItemImage(Guid itemId)
         {
             var result = await _imageService.DeleteChecklistItemImageAsync(itemId);
             return Ok(result);

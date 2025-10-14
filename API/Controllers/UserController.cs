@@ -388,7 +388,7 @@ namespace API.Controllers
         }
 
         //upload citizenId for Anonymous
-        [HttpPost("{id}/citizen-identity")]
+        [HttpPut("{id}/citizen-identity")]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -398,7 +398,7 @@ namespace API.Controllers
             return Ok(citizenIdentity);
         }
 
-        [HttpPost("{id}/driver-license")]
+        [HttpPut("{id}/driver-license")]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
