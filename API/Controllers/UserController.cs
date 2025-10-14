@@ -27,6 +27,12 @@ namespace API.Controllers
             _googleService = googleCredentialService;
         }
 
+        // ===========================
+        // Auth
+        // ===========================
+
+        #region auth
+
         /*
          Status code:
          200: Login successfully
@@ -185,8 +191,7 @@ namespace API.Controllers
          401: invalid token
          */
 
-        [HttpPost]
-        [Route("refresh-token")]
+        [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken()
         {
             if (Request.Cookies.TryGetValue(CookieKeys.RefreshToken, out var refreshToken))
@@ -220,6 +225,14 @@ namespace API.Controllers
             });
         }
 
+        #endregion auth
+
+        // ===========================
+        // Profile
+        // ===========================
+
+        #region profile
+
         [HttpGet("me")]
         [Authorize]
         public async Task<IActionResult> GetMe()
@@ -233,8 +246,8 @@ namespace API.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateMe([FromBody] UserUpdateReq userUpdateReq)
         {
-            var userClaims = HttpContext.User;
-            await _userService.UpdateMeAsync(userClaims, userUpdateReq);
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userService.UpdateAsync(userId, userUpdateReq);
             return Ok();
         }
 
@@ -258,7 +271,9 @@ namespace API.Controllers
             return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        [HttpPost("citizen-identity")]
+        #region document
+
+        [HttpPut("citizen-identity")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -267,6 +282,16 @@ namespace API.Controllers
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var result = await _userService.UploadCitizenIdAsync(userId, file);
             return Ok(result);
+        }
+
+        [HttpPut("driver-license")]
+        [Authorize]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UploadDriverLicenseAsync(userId, file);
             return Ok(result);
         }
 
@@ -279,18 +304,6 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpPost("driver-license")]
-        [Authorize]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UploadDriverLicenseAsync(userId, file);
-            return Ok(result);
-        }
-
-        // Lấy bằng user trong token
         [HttpGet("driver-license")]
         [Authorize]
         public async Task<IActionResult> GetMyDriverLicense()
@@ -300,8 +313,54 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        [Authorize]
+        [HttpPatch("citizen-identity")]
+        public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPatch("driver-license")]
+        public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpDelete("citizen-identity")]
+        public async Task<IActionResult> DeleteCitizenIdentity()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userService.DeleteCitizenIdentityAsync(userId);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpDelete("driver-license")]
+        public async Task<IActionResult> DeleteDriverLicense()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userService.DeleteDriverLicenseAsync(userId);
+            return Ok();
+        }
+
+        #endregion document
+
+        #endregion profile
+
+        // ===========================
+        // ===== User Management =====
+        // ===========================
+
+        #region user-management
+
         [HttpGet]
-        [RoleAuthorize(["Staff", "Admin"])]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
@@ -312,34 +371,76 @@ namespace API.Controllers
         }
 
         //Create anonymous account
-        [RoleAuthorize("Staff")]
-        [HttpPost("anonymous")]
-        public async Task<IActionResult> CreateAnonymousAccount([FromBody] CreateUserReq req)
+        [HttpPost]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> Create([FromBody] CreateUserReq req)
         {
-            var userId = await _userService.CreateAnounymousAccount(req);
+            var userId = await _userService.CreateAsync(req);
             return Ok(new { userId });
+        }
+
+        [HttpPatch("{id}")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> UpdateById(Guid id, [FromBody] UserUpdateReq req)
+        {
+            await _userService.UpdateAsync(id, req);
+            return Ok();
         }
 
         //upload citizenId for Anonymous
         [HttpPost("{id}/citizen-identity")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadCitizenIdForAnonymous(Guid id, [FromForm] IFormFile file)
+        public async Task<IActionResult> UploadCitizenIdById(Guid id, [FromForm] IFormFile file)
         {
             var citizenIdentity = await _userService.UploadCitizenIdAsync(id, file);
             return Ok(citizenIdentity);
         }
 
         [HttpPost("{id}/driver-license")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadDriverLicenseForAnonymous(Guid id, [FromForm] IFormFile file)
+        public async Task<IActionResult> UploadDriverLicenseById(Guid id, [FromForm] IFormFile file)
         {
             var driverLisence = await _userService.UploadDriverLicenseAsync(id, file);
             return Ok(driverLisence);
         }
+
+        [HttpPatch("{id}/citizen-identity")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> UpdateCitizenIdentityById(Guid id, [FromBody] UpdateCitizenIdentityReq req)
+        {
+            var result = await _userService.UpdateCitizenIdentityAsync(id, req);
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}/driver-license")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> UpdateDriverLicenseById(Guid id, [FromBody] UpdateDriverLicenseReq req)
+        {
+            var result = await _userService.UpdateDriverLicenseAsync(id, req);
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}/citizen-identity")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> DeleteCitizenIdentityById(Guid id)
+        {
+            await _userService.DeleteCitizenIdentityAsync(id);
+            return Ok();
+        }
+
+        [HttpDelete("{id}/driver-license")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> DeleteDriverLicenseById(Guid id)
+        {
+            await _userService.DeleteDriverLicenseAsync(id);
+            return Ok();
+        }
+
+        #endregion user-management
 
         /*
          * Status code
@@ -351,7 +452,7 @@ namespace API.Controllers
         //[RoleAuthorize("Staff", "Admin")]
         //public async Task<IActionResult> GetUserByPhone(string phone)
         //{
-        //    var user = await _userService.GetUserByPhoneAsync(phone);
+        //    var user = await _userService.GetByPhoneAsync(phone);
         //    return Ok(user);
         //}
 
@@ -383,81 +484,5 @@ namespace API.Controllers
         //    var userView = await _userService.GetByDriverLicenseAsync(number);
         //    return Ok(userView);
         //}
-
-        [RoleAuthorize("Customer")]
-        [HttpPatch("citizen-identity")]
-        public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(result);
-        }
-
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        [HttpPatch("{userId:guid}/citizen-identity")]
-        public async Task<IActionResult> UpdateCitizenIdentityForUser(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
-        {
-            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(result);
-        }
-
-        [RoleAuthorize("Customer")]
-        [HttpPatch("driver-license")]
-        public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
-            return Ok(result);
-        }
-
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        [HttpPatch("{userId:guid}/citizen-identity")]
-        public async Task<IActionResult> UpdateCitizenIdentityForStaff(Guid userId, [FromBody] UpdateCitizenIdentityReq req)
-        {
-            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(result);
-        }
-
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        [HttpPatch("{userId:guid}/driver-license")]
-        public async Task<IActionResult> UpdateDriverLicenseForStaff(Guid userId, [FromBody] UpdateDriverLicenseReq req)
-        {
-            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
-            return Ok(result);
-        }
-
-        [RoleAuthorize(RoleName.Customer)]
-        [HttpDelete("citizen-identity")]
-        public async Task<IActionResult> DeleteCitizenIdentity()
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteCitizenIdentityAsync(userId);
-            return Ok();
-        }
-
-        [RoleAuthorize(RoleName.Customer)]
-        [HttpDelete("driver-license")]
-        public async Task<IActionResult> DeleteDriverLicense()
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteDriverLicenseAsync(userId);
-            return Ok();
-        }
-
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        [HttpDelete("{userId:guid}/driver-license")]
-        public async Task<IActionResult> DeleteDriverLicenseForStaff(Guid userId)
-        {
-            await _userService.DeleteDriverLicenseAsync(userId);
-            return Ok();
-        }
-
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        [HttpDelete("{userId:guid}/citizen-identity")]
-        public async Task<IActionResult> DeleteCitizenIdentityForStaff(Guid userId)
-        {
-            await _userService.DeleteCitizenIdentityAsync(userId);
-            return Ok();
-        }
     }
 }

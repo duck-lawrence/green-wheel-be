@@ -10,17 +10,10 @@ using System.Threading.Tasks;
 
 namespace Application.Validators.User
 {
-    public class UserRegisterReqValidator : AbstractValidator<UserRegisterReq>
+    public class CreateUserReqValidator : AbstractValidator<CreateUserReq>
     {
-        public UserRegisterReqValidator()
+        public CreateUserReqValidator()
         {
-            RuleFor(x => x.Password)
-                .NotEmpty().WithMessage(Message.UserMessage.PasswordCanNotEmpty)
-                .MinimumLength(8).WithMessage(Message.UserMessage.PasswordTooShort);
-
-            RuleFor(x => x.ConfirmPassword)
-                .Equal(x => x.Password).WithMessage(Message.UserMessage.ConfirmPasswordIsIncorrect);
-
             RuleFor(x => x.DateOfBirth)
                 .NotEmpty().WithMessage(Message.UserMessage.DateOfBirthIsRequired)
                 .Must(dob =>
