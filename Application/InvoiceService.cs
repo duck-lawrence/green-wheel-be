@@ -81,13 +81,13 @@ namespace Application
         public async Task<string> ProcessReservationInvoice(Invoice invoice, string fallbackUrl)
         {
             var amount = InvoiceHelper.CalculateTotalAmount(invoice);
-            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes);
+            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
             return link;
         }
 
-        public async Task<string> ProcessReturnInvoice(Invoice invoice)
+        public async Task<string> ProcessReturnInvoice(Invoice invoice, string fallbackUrl)
         {
-            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes);
+            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes, fallbackUrl);
             return link;
         }
 
@@ -105,8 +105,8 @@ namespace Application
                 invoice.PaidAmount = momoIpnReq.Amount;
                 invoice.PaidAt = DateTimeOffset.FromUnixTimeMilliseconds(momoIpnReq.ResponseTime);
                 await _uow.InvoiceRepository.UpdateAsync(invoice);
-                
-                if(invoice.Type == (int)InvoiceType.Handover)
+
+                if (invoice.Type == (int)InvoiceType.Handover)
                 {
                     var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
                     if (reservationInvoice.Status != (int)InvoiceStatus.Paid)
