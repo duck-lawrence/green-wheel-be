@@ -11,8 +11,8 @@ namespace Application.Abstractions
 {
     public interface IVehicleChecklistService
     {
-        Task<VehicleChecklistViewRes> CreateVehicleChecklist(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req);
+        Task<VehicleChecklistViewRes> Create(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req);
         Task<VehicleChecklistViewRes> GetByIdAsync(Guid id);
-        Task UpdateVehicleChecklistAsync(UpdateVehicleChecklistReq req);
+        Task UpdateAsync(UpdateVehicleChecklistReq req);
     }
 }

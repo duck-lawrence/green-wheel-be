@@ -33,7 +33,7 @@ namespace API.Controllers
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
-            var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklist(staff, req);
+            var vehicleCheckList = await _vehicleChecklistService.Create(staff, req);
             return Ok(vehicleCheckList);
         }
 
@@ -49,7 +49,7 @@ namespace API.Controllers
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req)
         {
-            await _vehicleChecklistService.UpdateVehicleChecklistAsync(req);
+            await _vehicleChecklistService.UpdateAsync(req);
             return Ok();
         }
 

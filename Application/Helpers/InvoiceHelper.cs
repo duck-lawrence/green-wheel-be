@@ -17,19 +17,22 @@ namespace Application.Helpers
             if (invoice.Type == (int)InvoiceType.Return)
             {
                 var itemCleaning = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Cleaning).FirstOrDefault();
-                var itemPentatys = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Penalty);
                 var itemLateReturn = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.LateReturn).FirstOrDefault();
-                total = _CalculateSubTotalAmount([itemCleaning])
-                     + _CalculateSubTotalAmount([itemLateReturn])
-                     + _CalculateSubTotalAmount(itemPentatys);
+                total += _CalculateSubTotalAmount([itemCleaning])
+                     + _CalculateSubTotalAmount([itemLateReturn]);
             }
             if (invoice.Type == (int)InvoiceType.Handover)
             {
                 total += invoice.Deposit.Amount;
                 
             }
+            if(invoice.Type == (int)InvoiceType.Refund)
+            {
+                var itemPentatys = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Penalty);
+                total += _CalculateSubTotalAmount(itemPentatys);
+            }
+
             total += invoice.Subtotal + invoice.Subtotal * invoice.Tax; 
-            
             return total;
         }
 
