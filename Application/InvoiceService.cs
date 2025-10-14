@@ -81,13 +81,13 @@ namespace Application
         public async Task<string> ProcessReservationInvoice(Invoice invoice, string fallbackUrl)
         {
             var amount = InvoiceHelper.CalculateTotalAmount(invoice);
-            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes);
+            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
             return link;
         }
 
-        public async Task<string> ProcessReturnInvoice(Invoice invoice)
+        public async Task<string> ProcessReturnInvoice(Invoice invoice, string fallbackUrl)
         {
-            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes);
+            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes, fallbackUrl);
             return link;
         }
 

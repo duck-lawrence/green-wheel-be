@@ -59,6 +59,6 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(i => i.Id == id);
         }
 
-
+        
     }
 }
