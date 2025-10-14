@@ -152,6 +152,19 @@ namespace API.Controllers
             var contractView = await _rentalContractService.GetByIdAsync(id);
             return Ok(contractView);
         }
+
+        /*
+         * status code
+         * 400 not found
+         * 404 bad request, this contract can not cancle
+         * 200 success
+         */
+        [RoleAuthorize(RoleName.Customer)]
+        [HttpPut("{id}/cancle")]
+        public async Task<IActionResult> CancleRentalContract(Guid id) {
+            await _rentalContractService.CancleRentalContract(id);
+            return Ok();
+        }
         
     }
 }

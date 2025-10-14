@@ -131,6 +131,7 @@ namespace Application.Constants
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
             public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
+            public const string CanNotCancle = "rental_contract.can_not_cancle";
         }
 
         //Station

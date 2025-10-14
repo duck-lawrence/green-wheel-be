@@ -306,6 +306,12 @@ namespace Application
             var invoices = contract.Invoices.Where( i => i.Type == (int)InvoiceType.Reservation || i.Type == (int)InvoiceType.Handover);
             if(invoices.Any(i => i.Status == (int)InvoiceStatus.Paid && contract.Status == (int)RentalContractStatus.PaymentPending)){
                 contract.Status = (int)RentalContractStatus.Active;
+                var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId!);
+                if(vehicle.Status == (int)VehicleStatus.Available)
+                {
+                    vehicle.Status = (int)VehicleStatus.Unavaible;
+                    await _uow.VehicleRepository.UpdateAsync(vehicle);
+                }
                 await _uow.RentalContractRepository.UpdateAsync(contract);
                 await _uow.SaveChangesAsync();
             }
@@ -385,6 +391,18 @@ namespace Application
             }
              await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
             await _uow.SaveChangesAsync();
+        }
+
+        public async Task CancleRentalContract(Guid id)
+        {
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
+            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            if(contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
+            {
+                throw new BadRequestException(Message.RentalContractMessage.CanNotCancle);
+            }
+            contract.Status = (int) RentalContractStatus.Cancelled;
+            await _uow.RentalContractRepository.UpdateAsync(contract);
         }
     }
 }
