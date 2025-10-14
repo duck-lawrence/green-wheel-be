@@ -66,7 +66,7 @@ namespace Application
             return invoiceViewRes;
         }
 
-        public async Task<string> ProcessHandoverInvoice(Invoice invoice)
+        public async Task<string> ProcessHandoverInvoice(Invoice invoice, string fallbackUrl)
         {
             Invoice reservationInvoice = null;
             reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
@@ -75,13 +75,13 @@ namespace Application
                                             - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal : 0 : 0);
             //nếu mà reservation k null thì ktra coi status của nó có thanh toán hay chưa nếu rồi thì lấy ra phí thay
             //toán còn không thì là 0 cho mọi case
-            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes);
+            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
             return link;
         }
 
-        public async Task<string> ProcessReservationInvoice(Invoice invoice)
+        public async Task<string> ProcessReservationInvoice(Invoice invoice, string fallbackUrl)
         {
-            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes);
+            var link = await _momoService.CreatePaymentAsync(invoice.Subtotal, invoice.Id, invoice.Notes, fallbackUrl);
             return link;
         }
 
@@ -98,7 +98,7 @@ namespace Application
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
                 invoice.PaidAmount = momoIpnReq.Amount;
                 invoice.PaidAt = DateTimeOffset.FromUnixTimeMilliseconds(momoIpnReq.ResponseTime);
-                
+
                 await _uow.InvoiceRepository.UpdateAsync(invoice);
                 //await _uow.RentalContractRepository.UpdateAsync(rentalContract);
                 await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
@@ -137,7 +137,7 @@ namespace Application
         public async Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false)
         {
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
-            if(invoice == null)
+            if (invoice == null)
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }

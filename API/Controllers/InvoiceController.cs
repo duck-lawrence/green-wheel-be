@@ -61,19 +61,20 @@ namespace API.Controllers
          404 not found
          200 success
          */
+
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            var invoice = await _invoiceService.GetRawInvoiceById(id, false, true); 
-            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
+            var invoice = await _invoiceService.GetRawInvoiceById(id, false, true);
+            if (paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
             {
                 await _invoiceService.CashPayment(invoice);
                 return Ok();
             }
             string link = invoice.Type switch
             {
-                (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice),
-                (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice),
+                (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice, paymentReq.FallbackUrl),
                 _ => throw new Exception(),
             };
             return Ok(new { link });
@@ -82,6 +83,7 @@ namespace API.Controllers
         /*
          200 success
          */
+
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
@@ -90,5 +92,4 @@ namespace API.Controllers
             return Ok(result);
         }
     }
-    
 }

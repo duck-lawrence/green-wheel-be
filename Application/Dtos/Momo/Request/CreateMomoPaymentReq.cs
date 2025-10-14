@@ -10,6 +10,7 @@ namespace Application.Dtos.Momo.Request
     {
         public decimal Amount { get; set; }
         public Guid InvoiceId { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = null!;
+        public string FallbackUrl { get; set; } = null!;
     }
 }

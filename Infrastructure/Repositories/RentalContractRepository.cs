@@ -19,16 +19,16 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status = null)
+        public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status)
         {
             var contracts = _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
                 .Include(x => x.Vehicle)
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
-                .Include(x => x.Invoices)
-                    .ThenInclude(i => i.InvoiceItems)
-                .Include(x => x.Invoices)
-                    .ThenInclude(i => i.Deposit)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.InvoiceItems)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.Deposit)
                 .AsQueryable();
             if (status != null)
             {
@@ -44,10 +44,10 @@ namespace Infrastructure.Repositories
                 .Include(x => x.Vehicle)
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
-                .Include(x => x.Invoices)
-                    .ThenInclude(i => i.InvoiceItems)
-                .Include(x => x.Invoices)
-                    .ThenInclude(i => i.Deposit)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.InvoiceItems)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.Deposit)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)

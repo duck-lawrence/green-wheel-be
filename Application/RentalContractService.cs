@@ -193,7 +193,7 @@ namespace Application
 
         }
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status = null)
+        public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status)
         {
             var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);

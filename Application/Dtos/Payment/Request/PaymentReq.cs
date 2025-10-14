@@ -9,5 +9,6 @@ namespace Application.Dtos.Payment.Request
     public class PaymentReq
     {
         public int PaymentMethod { get; set; }
+        public string FallbackUrl { get; set; } = null!;
     }
 }

@@ -20,6 +20,6 @@ namespace Application.Abstractions
         Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req);
         Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
         Task<InvoiceViewRes?> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
-        Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status = null);
+        Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
     }
 }

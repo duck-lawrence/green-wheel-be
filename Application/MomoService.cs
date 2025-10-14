@@ -11,7 +11,6 @@ using System.Globalization;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-
 namespace Application
 {
     public class MomoService : IMomoService
@@ -28,15 +27,16 @@ namespace Application
             _momoPaymentLinkRepositorys = momoPaymentLinkRepositorys;
             _invoiceRepository = invoiceRepository;
         }
-        public async Task<string> CreatePaymentAsync(decimal amount, Guid invoiceId, string description)
+
+        public async Task<string> CreatePaymentAsync(decimal amount, Guid invoiceId, string description, string fallbackUrl)
         {
             var paymentLink = await _momoPaymentLinkRepositorys.GetPaymentLinkAsync(invoiceId.ToString());
-            if(!string.IsNullOrEmpty(paymentLink))
+            if (!string.IsNullOrEmpty(paymentLink))
             {
                 return paymentLink;
             }
             var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
-            if(invoice == null)
+            if (invoice == null)
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
@@ -45,7 +45,7 @@ namespace Application
                 throw new BadRequestException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             }
             var requestId = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-            
+
             var rawData =
                     $"accessKey={_momoSettings.AccessKey}" +
                     $"&amount={amount.ToString("0", CultureInfo.InvariantCulture)}" +
@@ -54,10 +54,9 @@ namespace Application
                     $"&orderId={invoiceId}" +
                     $"&orderInfo={description}(Invoice ID: {invoiceId})" +
                     $"&partnerCode={_momoSettings.PartnerCode}" +
-                    $"&redirectUrl={_momoSettings.RedirectUrl}" +
+                    $"&redirectUrl={fallbackUrl}" +
                     $"&requestId={requestId}" +
                     $"&requestType={_momoSettings.RequestType}";
-
 
             //create signature
             var signature = MomoHelper.CreateSignature(rawData, _momoSettings.SecretKey);
@@ -70,7 +69,7 @@ namespace Application
                 Amount = amount.ToString("0"),
                 OrderId = invoiceId.ToString(),
                 OrderInfo = $"{description}(Invoice ID: {invoiceId})",
-                RedirectUrl = _momoSettings.RedirectUrl,
+                RedirectUrl = fallbackUrl,
                 IpnUrl = _momoSettings.IpnUrl,
                 RequestType = _momoSettings.RequestType,
                 ExtraData = "",
@@ -83,7 +82,7 @@ namespace Application
 
             if (!response.IsSuccessStatusCode)
             {
-                if((int)response.StatusCode == 400)
+                if ((int)response.StatusCode == 400)
                 {
                     throw new BadRequestException(Message.MomoMessage.InvalidSignature);
                 }
@@ -99,13 +98,11 @@ namespace Application
                 {
                     throw new BadRequestException(Message.MomoMessage.InvalidEndpoint);
                 }
-
             }
             // Deserialize phản hồi JSON
             //Đọc json (respone) từ momo và map vào MomoPaymentRes
             var momoResponse = await response.Content.ReadFromJsonAsync<MomoPaymentRes>();
 
-            
             if (momoResponse == null)
             {
                 throw new Exception(Message.JsonMessage.ParsingFailed);
@@ -137,15 +134,12 @@ namespace Application
                 $"&resultCode={req.ResultCode}" +
                 $"&transId={req.TransId}";
 
-
             var signature = MomoHelper.CreateSignature(rawData, _momoSettings.SecretKey);
 
             if (!string.Equals(signature, req.Signature, StringComparison.OrdinalIgnoreCase))
             {
                 throw new BadRequestException("Invalid MoMo signature");
             }
-           
-            
         }
     }
 }

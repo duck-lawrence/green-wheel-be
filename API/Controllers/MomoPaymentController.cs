@@ -29,12 +29,9 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateMomoPayment(CreateMomoPaymentReq req)
         {
-            var res = await _momoService.CreatePaymentAsync(req.Amount, req.InvoiceId, req.Description);
+            var res = await _momoService.CreatePaymentAsync(req.Amount, req.InvoiceId, req.Description, req.FallbackUrl);
             return Ok(new { res });
         }
-
-
-        
     }
 
 }

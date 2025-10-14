@@ -11,13 +11,17 @@ namespace Application.Abstractions
         Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId);
 
         Task<InvoiceViewRes> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
+
         Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination);
 
         Task<IEnumerable<InvoiceViewRes>?> GetByContractIdAndStatus(Guid? contractId, int? status);
-        Task CashPayment(Invoice invoice);
-        Task<string> ProcessReservationInvoice(Invoice invoice);
-        Task<string> ProcessHandoverInvoice(Invoice invoice);
-        Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
 
+        Task CashPayment(Invoice invoice);
+
+        Task<string> ProcessReservationInvoice(Invoice invoice, string fallbackUrl);
+
+        Task<string> ProcessHandoverInvoice(Invoice invoice, string fallbackUrl);
+
+        Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
     }
 }
