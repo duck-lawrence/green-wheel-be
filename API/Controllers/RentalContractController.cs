@@ -130,7 +130,7 @@ namespace API.Controllers
 
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyContracts(int status)
+        public async Task<IActionResult> GetMyContracts([FromQuery] int? status)
         {
             var user = HttpContext.User;
             var rentalViews = await _rentalContractService.GetMyContracts(user, status);
@@ -145,6 +145,7 @@ namespace API.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {

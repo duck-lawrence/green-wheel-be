@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
 
@@ -50,11 +51,11 @@ namespace Application
         {
             var dto = await _geminiService.ExtractCitizenIdAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
-
+            await VerifyUniqueNumberAsync.VerifyUniqueIdentityNumberAsync(dto.IdNumber ?? string.Empty, userId, _citizenRepo);
             var entity = new CitizenIdentity
             {
                 UserId = userId,
