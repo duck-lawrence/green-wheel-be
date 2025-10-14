@@ -494,19 +494,17 @@ namespace Application
 
         public async Task UpdateMeAsync(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
         {
+            Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+
             if (!string.IsNullOrEmpty(userUpdateReq.Phone))
             {
-                if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
-                {
+                var existingUser = await _userRepository.GetByPhoneAsync(userUpdateReq.Phone);
+                if (existingUser != null && existingUser.Id != userID)
                     throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
-                }
             }
-            Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-            User userFromDb = await _userRepository.GetByIdAsync(userID);
-            if (userFromDb == null)
-            {
-                throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
-            }
+            User userFromDb = await _userRepository.GetByIdAsync(userID)
+                ?? throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
+
             if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
             if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
             if (!string.IsNullOrEmpty(userUpdateReq.Phone)) userFromDb.Phone = userUpdateReq.Phone;
@@ -740,22 +738,7 @@ namespace Application
             string? citizenIdNumber,
             string? driverLicenseNumber)
         {
-            // Query bắt đầu từ DbContext vì UserRepository generic không expose DbSet
-            var query = _mediaUow.Users.GetQueryable()
-            .Include(u => u.CitizenIdentity)
-            .Include(u => u.DriverLicense)
-            .AsNoTracking();
-
-            if (!string.IsNullOrWhiteSpace(phone))
-                query = query.Where(u => u.Phone == phone);
-
-            if (!string.IsNullOrWhiteSpace(citizenIdNumber))
-                query = query.Where(u => u.CitizenIdentity != null && u.CitizenIdentity.Number == citizenIdNumber);
-
-            if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
-                query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
-
-            var users = await query.ToListAsync();
+            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
             return _mapper.Map<IEnumerable<UserProfileViewRes>>(users);
         }
 

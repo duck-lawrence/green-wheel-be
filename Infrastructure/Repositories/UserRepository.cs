@@ -16,16 +16,38 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
-        public IQueryable<User> GetQueryable()
+        public async Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber)
         {
-            return _dbContext.Users.AsQueryable();
+            var query = _dbContext.Users
+                .Include(user => user.Role)
+                .Include(user => user.DriverLicense)
+                .Include(user => user.CitizenIdentity)
+                .Include(user => user.Staff)
+                    .ThenInclude(staff => staff.Station)
+                .AsQueryable()
+                .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(phone))
+                query = query.Where(u => u.Phone == phone);
+
+            if (!string.IsNullOrWhiteSpace(citizenIdNumber))
+                query = query.Where(u => u.CitizenIdentity != null && u.CitizenIdentity.Number == citizenIdNumber);
+
+            if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
+                query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
+
+            return await query.ToListAsync();
         }
 
         public async Task<User?> GetByPhoneAsync(string phone)
         {
             var user = await _dbContext.Users
-                .Include(x => x.CitizenIdentity)
-                .Include(x => x.DriverLicense).FirstOrDefaultAsync(x => x.Phone == phone);
+                .Include(user => user.Role)
+                .Include(user => user.DriverLicense)
+                .Include(user => user.CitizenIdentity)
+                .Include(user => user.Staff)
+                    .ThenInclude(staff => staff.Station)
+                .FirstOrDefaultAsync(x => x.Phone == phone);
             return user;
         }
 
