@@ -226,15 +226,15 @@ namespace Application
             }
         }
 
-        public async Task<VehicleChecklistViewRes> GetByContractIdAsync(Guid id)
+        public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId)
         {
-            var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByContractIdAsync(id);
-            if (vehicleChecklist == null)
+            var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId);
+            if (vehicleChecklists.IsNullOrEmpty())
             {
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
             }
-            var checklistViewRes = _mapper.Map<VehicleChecklistViewRes>(vehicleChecklist);
-            return checklistViewRes;
+            var checklistsViewRes = _mapper.Map<IEnumerable<VehicleChecklistViewRes>>(vehicleChecklists);
+            return checklistsViewRes;
         }
     }
 }
