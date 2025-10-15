@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Application.Repositories
 {
     public interface IVehicleCheckListRepository : IGenericRepository<VehicleChecklist>
-    { 
+    {
+        Task<VehicleChecklist?> GetByContractIdAsync(Guid id);
     }
 }

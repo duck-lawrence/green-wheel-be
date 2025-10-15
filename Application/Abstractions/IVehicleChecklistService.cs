@@ -13,6 +13,7 @@ namespace Application.Abstractions
     {
         Task<Guid> Create(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req);
         Task<VehicleChecklistViewRes> GetByIdAsync(Guid id);
+        Task<VehicleChecklistViewRes> GetByContractIdAsync(Guid id);
         Task UpdateAsync(UpdateVehicleChecklistReq req);
     }
 }

@@ -66,6 +66,14 @@ namespace API.Controllers
             return Ok(checklistViewRes);
         }
 
+        [HttpGet]
+        [RoleAuthorize(RoleName.Staff)]
+        public async Task<IActionResult> GetByContractId(Guid id)
+        {
+            var checklistViewRes = await _vehicleChecklistService.GetByContractIdAsync(id);
+            return Ok(checklistViewRes);
+        }
+
         [HttpPost("items/{itemId}/image")]
         [RoleAuthorize(RoleName.Staff)]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -83,5 +91,7 @@ namespace API.Controllers
             var result = await _imageService.DeleteChecklistItemImageAsync(itemId);
             return Ok(result);
         }
+
+        
     }
 }
