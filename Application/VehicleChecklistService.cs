@@ -138,10 +138,10 @@ namespace Application
             return checklistViewRes;
         }
 
-        public async Task UpdateAsync(UpdateVehicleChecklistReq req)
+        public async Task UpdateAsync(UpdateVehicleChecklistReq req, Guid id)
         {
 
-            var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(req.VehicleChecklistId);
+            var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
             
@@ -151,7 +151,7 @@ namespace Application
             }
             else
             {
-                var contract = await _uow.RentalContractRepository.GetByCheckListIdAsync(req.VehicleChecklistId);
+                var contract = await _uow.RentalContractRepository.GetByCheckListIdAsync(id);
                 await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!, req.ReturnInvoiceId);
             }
             checklist.IsSignedByStaff = req.IsSignedByStaff;
