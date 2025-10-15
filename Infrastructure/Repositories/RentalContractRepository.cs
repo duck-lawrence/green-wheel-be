@@ -95,5 +95,13 @@ namespace Infrastructure.Repositories
                     .ThenInclude(u => u.DriverLicense)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<RentalContract?> GetByCheckListIdAsync(Guid id)
+        {
+            var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
+                .Include(vc => vc.Contract).FirstOrDefaultAsync());
+
+            return vehicleChecklist == null ? null : vehicleChecklist.Contract;
+        }
     }
 }

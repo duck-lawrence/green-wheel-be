@@ -62,7 +62,14 @@ namespace Application
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
-            var invoiceViewRes = _mapper.Map<InvoiceViewRes>(invoice);
+            var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId))
+                            .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
+            var reservationFee = 0;
+            if (reservationInvoice != null && reservationInvoice.Status == (int)InvoiceStatus.Paid)
+            {
+                reservationFee = (int)reservationInvoice.Subtotal;
+            }
+            var invoiceViewRes = _mapper.Map<InvoiceViewRes>(invoice, otp => otp.Items["ReservationFee"] = reservationFee);
             return invoiceViewRes;
         }
 

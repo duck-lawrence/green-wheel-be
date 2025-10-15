@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Constants;
+using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,15 @@ namespace Infrastructure.Repositories
         public async Task<Deposit?> GetByInvoiceIdAsync(Guid invoiceId)
         {
             return await _dbContext.Deposits.FirstOrDefaultAsync(x => x.InvoiceId == invoiceId);
+        }
+
+        public async Task<Deposit> GetByContractIdAsync(Guid contractId)
+        {
+            return (await _dbContext.Deposits
+                            .Include(d => d.Invoice)
+                                .ThenInclude(i => i.Contract)
+                                .Where(d => d.Invoice.Type == (int)InvoiceType.Handover
+                                          && d.Invoice.ContractId == contractId).FirstOrDefaultAsync())!;
         }
     }
 }

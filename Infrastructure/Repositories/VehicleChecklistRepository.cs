@@ -20,16 +20,15 @@ namespace Infrastructure.Repositories
         {
             var vehicleChecklist = await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
                 .Include(vc => vc.VehicleChecklistItems)
-                    .ThenInclude(vci => vci.Component).FirstOrDefaultAsync();
+                    .ThenInclude(vci => vci.Component)
+                .Include(vc => vc.Vehicle)
+                .Include(vc => vc.Staff)
+                    .ThenInclude(s => s.User)
+                .Include(vc => vc.Customer)
+                    .FirstOrDefaultAsync();
             return vehicleChecklist;
         }
 
-        public async Task<RentalContract?> GetRentalContractByCheckListIdAsync(Guid id)
-        {
-            var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
-                .Include(vc => vc.Contract).FirstOrDefaultAsync());
-            
-            return vehicleChecklist == null ? null : vehicleChecklist.Contract;
-        }
+        
     }
 }

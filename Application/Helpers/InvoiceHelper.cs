@@ -16,10 +16,8 @@ namespace Application.Helpers
             decimal total = 0;
             if (invoice.Type == (int)InvoiceType.Return)
             {
-                var itemCleaning = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Cleaning).FirstOrDefault();
                 var itemLateReturn = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.LateReturn).FirstOrDefault();
-                total += _CalculateSubTotalAmount([itemCleaning])
-                     + _CalculateSubTotalAmount([itemLateReturn]);
+                total += _CalculateSubTotalAmount([itemLateReturn]);
             }
             if (invoice.Type == (int)InvoiceType.Handover)
             {
@@ -38,26 +36,20 @@ namespace Application.Helpers
 
         public static decimal CalculateSubTotalAmount(IEnumerable<InvoiceItem> items)
         {
-            if (items == null || !items.Any())
+            if (items == null || !items.Any() || items.Any(x => x == null))
                 return 0;
-
             return items.Where(i =>
             i.Type != (int)InvoiceItemType.Penalty &&
-            i.Type != (int)InvoiceItemType.Cleaning &&
             i.Type != (int)InvoiceItemType.LateReturn)
                 .Sum(item => item.UnitPrice * item.Quantity);
         }
-
-
         //hàm này sẽ dùng để tính nội bộ trong này chứ k dùng ở ngoài
         private static decimal _CalculateSubTotalAmount(IEnumerable<InvoiceItem> items)
         {
-            if (items == null || !items.Any())
+            if (items == null || !items.Any() || items.Any(x => x == null))
                 return 0;
-
             return items
                 .Sum(item => item.UnitPrice * item.Quantity);
         }
-
     }
 }

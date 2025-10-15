@@ -37,7 +37,7 @@ namespace Application
 
         
 
-        public async Task<VehicleChecklistViewRes> Create(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req)
+        public async Task<Guid> Create(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req)
         {
             var staffId = userclaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             if(req.Type != (int)VehicleChecklistType.OutOfContract)
@@ -49,7 +49,7 @@ namespace Application
                 return await CreateVehicleChecklistOutSideContract(Guid.Parse(staffId), (Guid)req.VehicleId, req.Type);
             }
         }
-        private async Task<VehicleChecklistViewRes> CreateVehicleChecklistOutSideContract(Guid staffId, Guid vehicleId, int type)
+        private async Task<Guid> CreateVehicleChecklistOutSideContract(Guid staffId, Guid vehicleId, int type)
         {
            
             var components = await _uow.VehicleRepository.GetVehicleComponentsAsync(vehicleId);
@@ -82,11 +82,11 @@ namespace Application
             }
             await _uow.VehicleChecklistItemRepository.AddRangeAsync(checklistItems);
             await _uow.SaveChangesAsync();
-            var checkListViewRes = _mapper.Map<VehicleChecklistViewRes>(checklist);
-            return checkListViewRes;
+            
+            return checklist.Id;
         }
 
-        private async Task<VehicleChecklistViewRes> CreateVehicleChecklistInSideContract(Guid staffId, Guid contractId, int type)
+        private async Task<Guid> CreateVehicleChecklistInSideContract(Guid staffId, Guid contractId, int type)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
             if(contract == null)
@@ -124,8 +124,7 @@ namespace Application
             }
             await _uow.VehicleChecklistItemRepository.AddRangeAsync(checklistItems);
             await _uow.SaveChangesAsync();
-            var checkListViewRes = _mapper.Map<VehicleChecklistViewRes>(checklist);
-            return checkListViewRes;
+            return checklist.Id;
         }
 
         public async Task<VehicleChecklistViewRes> GetByIdAsync(Guid id)
@@ -145,14 +144,15 @@ namespace Application
             var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(req.VehicleChecklistId);
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
-            var contract = await _uow.VehicleChecklistRepository.GetRentalContractByCheckListIdAsync(req.VehicleChecklistId);
+            
             if(checklist.Type == (int)VehicleChecklistType.OutOfContract)
             {
                 await UpdateVehicleChecklistOutSideContractAsync(checklist, req.ChecklistItems);
             }
             else
             {
-                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract, req.ReturnInvoiceId);
+                var contract = await _uow.RentalContractRepository.GetByCheckListIdAsync(req.VehicleChecklistId);
+                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!, req.ReturnInvoiceId);
             }
             checklist.IsSignedByStaff = req.IsSignedByStaff;
             checklist.IsSignedByCustomer = req.IsSignedByCustomer;

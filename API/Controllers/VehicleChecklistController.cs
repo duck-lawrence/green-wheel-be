@@ -33,8 +33,8 @@ namespace API.Controllers
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
-            var vehicleCheckList = await _vehicleChecklistService.Create(staff, req);
-            return Ok(vehicleCheckList);
+            var id = await _vehicleChecklistService.Create(staff, req);
+            return Ok(new {id});
         }
 
 
