@@ -5,21 +5,19 @@ using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.User.Request;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
-    [Route("api/user-profiles/me")]
+    [Route("api/me")]
     [ApiController]
     public class UserProfileController : ControllerBase
     {
         private readonly IUserService _userService;
 
         public UserProfileController(IUserService service
-            , IGoogleCredentialService googleCredentialService
-            )
+            , IGoogleCredentialService googleCredentialService)
         {
             _userService = service;
         }

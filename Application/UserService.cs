@@ -28,12 +28,7 @@ namespace Application
     {
         private readonly IUserRepository _userRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IOTPRepository _otpRepository;
-        private readonly IJwtBlackListRepository _jwtBackListRepository;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly JwtSettings _jwtSettings;
-        private readonly EmailSettings _emailSettings;
-        private readonly OTPSettings _otpSettings;
         private readonly IMapper _mapper;
         private readonly IMemoryCache _cache;
         private readonly IPhotoService _photoService;
@@ -44,6 +39,11 @@ namespace Application
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ICitizenIdentityRepository _citizenIdentityRepository;
         private readonly IDriverLicenseRepository _driverLicenseRepository;
+        private readonly IEmailSerivce _emailService;
+        private readonly JwtSettings _jwtSettings;
+        private readonly OTPSettings _otpSettings;
+        private readonly IOTPRepository _otpRepository;
+        private readonly IJwtBlackListRepository _jwtBackListRepository;
 
         public UserService(IUserRepository repository,
             IOptions<JwtSettings> jwtSettings,
@@ -62,15 +62,16 @@ namespace Application
              ITicketRepository supportRepo,
              IRentalContractRepository rentalContractRepository,
              ICitizenIdentityRepository citizenIdentityRepository,
-             IDriverLicenseRepository driverLicenseRepository
+             IDriverLicenseRepository driverLicenseRepository,
+             IEmailSerivce emailSerivce
             )
         {
             _userRepository = repository;
             _refreshTokenRepository = refreshTokenRepository;
             _otpRepository = otpRepository;
             _jwtBackListRepository = jwtBackListRepository;
+            _emailService = emailSerivce;
             _jwtSettings = jwtSettings.Value;
-            _emailSettings = emailSettings.Value;
             _contextAccessor = httpContextAccessor;
             _otpSettings = otpSetting.Value;
             _mapper = mapper;
@@ -200,7 +201,7 @@ namespace Application
             var body = File.ReadAllText(templatePath);
 
             body = body.Replace("{OtpCode}", otp);
-            await EmailHelper.SendEmailAsync(_emailSettings, email, subject, body);
+            await _emailService.SendEmailAsync(email, subject, body);
         }
 
         /*

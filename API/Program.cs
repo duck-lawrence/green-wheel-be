@@ -17,6 +17,7 @@ using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using AutoMapper;
+using Infrastructure.ExternalService;
 
 namespace API
 {
@@ -87,6 +88,7 @@ namespace API
             builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
+            builder.Services.AddScoped<IEmailSerivce, EmailService>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();

@@ -11,7 +11,7 @@ using System.Globalization;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace Application
+namespace Infrastructure.ExternalService
 {
     public class MomoService : IMomoService
     {
@@ -122,7 +122,7 @@ namespace Application
             var rawData =
                 $"accessKey={_momoSettings.AccessKey}" +
                 $"&amount={req.Amount.ToString("0", CultureInfo.InvariantCulture)}" +
-                $"&extraData={(req.ExtraData ?? "")}" +
+                $"&extraData={req.ExtraData ?? ""}" +
                 $"&message={req.Message}" +
                 $"&orderId={req.OrderId}" +
                 $"&orderInfo={req.OrderInfo}" +

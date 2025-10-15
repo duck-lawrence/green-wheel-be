@@ -27,14 +27,14 @@ namespace Application
         private readonly IInvoiceUow _uow;
         private readonly IMapper _mapper;
         private readonly IMomoService _momoService;
-        private readonly EmailSettings _emailSettings;
+        private readonly IEmailSerivce _emailService;
 
-        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService, IOptions<EmailSettings> emailSettings)
+        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService, IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce)
         {
             _uow = uow;
             _mapper = mapper;
             _momoService = momoService;
-            _emailSettings = emailSettings.Value;
+            _emailService = emailSerivce;
         }
 
         public async Task CashPayment(Invoice invoice)
@@ -136,7 +136,7 @@ namespace Application
                      .Replace("{PaymentMethod}", Enum.GetName(typeof(PaymentMethod), invoice.PaymentMethod))
                      .Replace("{InvoiceType}", Enum.GetName(typeof(InvoiceType), invoice.Type))
                      .Replace("{PaidAt}", invoice.PaidAt?.ToString("dd/MM/yyyy HH:mm"));
-                await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
+                await _emailService.SendEmailAsync(customer.Email, subject, body);
             }
         }
 
