@@ -225,5 +225,16 @@ namespace Application
                 await _uow.InvoiceItemRepository.AddRangeAsync(invoiceItems);
             }
         }
+
+        public async Task<VehicleChecklistViewRes> GetByContractIdAsync(Guid id)
+        {
+            var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByContractIdAsync(id);
+            if (vehicleChecklist == null)
+            {
+                throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+            }
+            var checklistViewRes = _mapper.Map<VehicleChecklistViewRes>(vehicleChecklist);
+            return checklistViewRes;
+        }
     }
 }
