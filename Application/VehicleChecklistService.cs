@@ -5,22 +5,12 @@ using Application.Dtos.VehicleChecklist.Request;
 using Application.Dtos.VehicleChecklist.Respone;
 using Application.Dtos.VehicleChecklistItem.Request;
 using Application.Helpers;
-using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application
 {

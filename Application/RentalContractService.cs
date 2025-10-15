@@ -2,7 +2,6 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
-using Application.Dtos.Invoice.Response;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
@@ -10,19 +9,9 @@ using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Net.WebSockets;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace Application
 {
@@ -30,12 +19,12 @@ namespace Application
     {
         private readonly IRentalContractUow _uow;
         private readonly IMapper _mapper;
-        private readonly EmailSettings _emailSettings;
-        public RentalContractService(IRentalContractUow uow, IMapper mapper, IOptions<EmailSettings> emailSettings)
+        private readonly IEmailSerivce _emailService;
+        public RentalContractService(IRentalContractUow uow, IMapper mapper, IOptions<EmailSettings> emailSettings, IEmailSerivce emailService)
         {
             _uow = uow;
             _mapper = mapper;
-            _emailSettings = emailSettings.Value;
+            _emailService = emailService;
         }
 
         public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
@@ -416,7 +405,7 @@ namespace Application
                            .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
                            .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"));
             }
-             await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
+            await _emailService.SendEmailAsync(customer.Email, subject, body);
             await _uow.SaveChangesAsync();
         }
 
