@@ -49,7 +49,7 @@ namespace API.Controllers
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req, Guid id)
         {
-            await _vehicleChecklistService.UpdateAsync(id, req);
+            await _vehicleChecklistService.UpdateAsync(req, id);
             return Ok();
         }
 
