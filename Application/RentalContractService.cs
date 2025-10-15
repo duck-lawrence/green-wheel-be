@@ -42,7 +42,14 @@ namespace Application
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
             if(contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            return _mapper.Map<RentalContractViewRes>(contract);
+            var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(id))
+                            .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
+            var reservationFee = 0;
+            if(reservationInvoice != null && reservationInvoice.Status == (int)InvoiceStatus.Paid)
+            {
+                reservationFee = (int)reservationInvoice.Subtotal;
+            }
+            return _mapper.Map<RentalContractViewRes>(contract, otp => otp.Items["ReservationFee"] = reservationFee);
         }
         public async Task CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
         {
@@ -242,7 +249,7 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task<InvoiceViewRes?> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
+        public async Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
@@ -256,44 +263,61 @@ namespace Application
             if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             var hours = (actual_end_date - contract.EndDate).TotalHours; //tính thời gian trể
             hours = Double.Ceiling(hours);
-
-            Guid invoiceId = Guid.NewGuid();
-            var invoice = new Invoice()
+            IEnumerable<Invoice> invoices = [];
+            Guid returnInvoiceId = Guid.NewGuid();
+            var returnInvoice = new Invoice()
             {
-                Id = invoiceId,
+                Id = returnInvoiceId,
                 ContractId = contractId,
                 Status = (int)InvoiceStatus.Pending,
                 Tax = Common.Tax.BaseVAT, //10% dạng decimal
-                Notes = $"GreenWheel – Invoice for your order {contractId}"
+                Notes = $"GreenWheel – Invoice for your order {contractId}",
+                Type = (int)InvoiceType.Return  
             };
-            await _uow.InvoiceRepository.AddAsync(invoice);
-            IEnumerable<InvoiceItem> items = []; //tạo trước invoice item
+            invoices = invoices.Append(returnInvoice);
+
+            IEnumerable<InvoiceItem> returnInvoiceItems = []; //tạo trước invoice item
 
             if (hours > Common.Policy.MaxLateHours)
             {
                 //phí trể giờ
-                items = items.Append(new InvoiceItem()
+                returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
                 {
-                    InvoiceId = invoiceId,
+                    InvoiceId = returnInvoiceId,
                     Quantity = (int)hours,
                     UnitPrice = Common.Fee.LateReturn,
                     Type = (int)InvoiceItemType.LateReturn,
                 });
             }
             //phí dọn dẹp
-            items = items.Append(new InvoiceItem()
+            returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
             {
-                InvoiceId = invoiceId,
-                Quantity = (int)hours,
+                InvoiceId = returnInvoiceId,
+                Quantity = 1,
                 UnitPrice = Common.Fee.Cleaning,
                 Type = (int)InvoiceItemType.Cleaning,
             });
-            invoice.Type = (int)InvoiceType.Return;
-            invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
+
+            //tạo hoá đơn refund
+            Guid refundInvoiceId = Guid.NewGuid();
+            var refundInvoice = new Invoice()
+            {
+                Id = returnInvoiceId,
+                ContractId = contractId,
+                Status = (int)InvoiceStatus.Pending,
+                Tax = Common.Tax.NoneVAT, //10% dạng decimal
+                Notes = $"GreenWheel – Invoice for your order {contractId}",
+                Type = (int)InvoiceType.Refund
+            };
+            invoices = invoices.Append(refundInvoice);
+            var deposit = await _uow.DepositRepository.GetByContractIdAsync(contractId);
+            refundInvoice.Subtotal = deposit.Amount;
+            returnInvoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(returnInvoiceItems);
+            await _uow.InvoiceRepository.AddRangeAsync(invoices);
             await _uow.RentalContractRepository.UpdateAsync(contract);
-            await _uow.InvoiceItemRepository.AddRangeAsync(items);
+            await _uow.InvoiceItemRepository.AddRangeAsync(returnInvoiceItems);
             await _uow.SaveChangesAsync();
-            return _mapper.Map<InvoiceViewRes>(invoice);
+            return returnInvoice.Id;
         }
 
         public async Task UpdateStatusAsync(Guid id)

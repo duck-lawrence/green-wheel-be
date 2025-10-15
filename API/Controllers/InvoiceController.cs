@@ -75,6 +75,37 @@ namespace API.Controllers
             {
                 (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Return => await _invoiceService.ProcessReturnInvoice(invoice, paymentReq.FallbackUrl),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 _ => throw new Exception(),
             };
             return Ok(new { link });

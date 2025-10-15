@@ -10,6 +10,7 @@ namespace Application.Repositories
     public interface IDepositRepository : IGenericRepository<Deposit>
     {
         Task<Deposit?> GetByInvoiceIdAsync(Guid invoiceId);
+        Task<Deposit> GetByContractIdAsync(Guid contractId);
 
     }
 }

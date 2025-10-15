@@ -22,6 +22,8 @@ namespace Application.Abstractions
 
         Task<string> ProcessHandoverInvoice(Invoice invoice, string fallbackUrl);
 
+        Task<string> ProcessReturnInvoice(Invoice invoice, string fallbackUrl);
+
         Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
     }
 }

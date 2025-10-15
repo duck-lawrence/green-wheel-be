@@ -124,8 +124,8 @@ namespace API.Controllers
         public async Task<IActionResult> ReturnRentalContract(Guid id)
         {
             var staff = HttpContext.User;
-            var invoiceView = await _rentalContractService.ReturnProcessRentalContractAsync(staff, id);
-            return invoiceView == null ? Ok() : Ok(invoiceView);
+            var returnInvoiceId = await _rentalContractService.ReturnProcessRentalContractAsync(staff, id);
+            return Ok(returnInvoiceId);
         }
 
         [RoleAuthorize(RoleName.Customer)]
