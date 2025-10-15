@@ -2,8 +2,10 @@
 using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.DriverLicense.Request;
+using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace Application
 {
@@ -35,21 +37,21 @@ namespace Application
             => await _licenseRepo.GetByIdAsync(id);
 
         public async Task<DriverLicense?> GetByUserIdAsync(Guid userId)
-            => await _licenseRepo.GetByUserId(userId);
+            => await _licenseRepo.GetByUserIdAsync(userId);
 
         public async Task<DriverLicense?> GetByLicenseNumberAsync(string licenseNumber)
         {
             var license = await _licenseRepo.GetByLicenseNumber(licenseNumber);
             if (license == null)
             {
-                throw new NotFoundException(Message.UserMessage.LicenseNotFound);
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
             }
             return license;
         }
 
         public async Task<bool> DeleteAsync(Guid userId, string publicId)
         {
-            var existing = await _licenseRepo.GetByUserId(userId);
+            var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
 
@@ -63,7 +65,8 @@ namespace Application
             var existing = await _licenseRepo.GetByIdAsync(license.Id);
             if (existing == null)
                 throw new NotFoundException(Message.UserMessage.UserNotFound);
-
+            if (!Enum.IsDefined(typeof(LicenseClass), license.Class))
+                throw new BadHttpRequestException(Message.UserMessage.InvalidDriverLicenseData);
             license.UpdatedAt = DateTimeOffset.UtcNow;
             await _licenseRepo.UpdateAsync(license);
             return license;
@@ -73,12 +76,13 @@ namespace Application
         {
             var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
             if (dto == null)
-                throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
             // parse ngày
             DateTimeOffset.TryParse(dto.DateOfBirth, out var dob);
             DateTimeOffset.TryParse(dto.ExpiresAt, out var exp);
-
+            await VerifyUniqueNumberAsync.VerifyUniqueDriverLicenseNumberAsync(dto.Number ?? string.Empty, userId,
+                _licenseRepo);
             // parse sex + class thành int
             var sex = ParseSex(dto.Sex);
             var licenseClass = ParseLicenseClass(dto.Class);
@@ -97,7 +101,7 @@ namespace Application
                 Class = licenseClass
             };
 
-            var existing = await _licenseRepo.GetByUserId(userId);
+            var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing != null)
             {
                 entity.Id = existing.Id;
@@ -121,18 +125,19 @@ namespace Application
 
         private static int ParseLicenseClass(string? classString)
         {
-            if (string.IsNullOrWhiteSpace(classString)) return 0;
+            if (string.IsNullOrWhiteSpace(classString))
+                throw new BadRequestException(Message.UserMessage.DriverLicenseNotFound);
 
-            return classString.Trim().ToUpper() switch
+            var normalized = classString.Trim().ToUpper();
+
+            // Thử parse thành enum
+            if (Enum.TryParse(typeof(LicenseClass), normalized, ignoreCase: true, out var value)
+                && Enum.IsDefined(typeof(LicenseClass), value))
             {
-                "A1" => 1,
-                "A2" => 2,
-                "B1" => 3,
-                "B2" => 4,
-                "C" => 5,
-                "D" => 6,
-                _ => 0
-            };
+                return (int)value;
+            }
+
+            throw new BadRequestException($"Invalid license class: {classString}");
         }
     }
 }

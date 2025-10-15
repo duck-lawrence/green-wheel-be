@@ -39,8 +39,8 @@ namespace Application
 
         public async Task EscalateToAdminAsync(Guid id)
         {
-            var ticket = await _repo.GetByIdAsync(id) ?? throw new KeyNotFoundException("Ticket not found");
-            if (ticket.Status == (int)TicketStatus.EscalatedToAdmin) throw new InvalidOperationException("This ticket is already escalated.");
+            var ticket = await _repo.GetByIdAsync(id) ?? throw new KeyNotFoundException(Message.TicketMessage.TicketNotFound);
+            if (ticket.Status == (int)TicketStatus.EscalatedToAdmin) throw new InvalidOperationException(Message.TicketMessage.AlreadyEscalated);
 
             ticket.Status = (int)TicketStatus.EscalatedToAdmin;
             await _repo.UpdateAsync(ticket);
@@ -70,7 +70,7 @@ namespace Application
         public async Task UpdateAsync(Guid id, UpdateTicketReq req, Guid staffId)
         {
             var ticket = await _repo.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException("Ticket not found");
+                ?? throw new KeyNotFoundException(Message.TicketMessage.TicketNotFound);
 
             if (req.Reply is not null)
                 ticket.Reply = req.Reply;

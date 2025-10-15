@@ -1,4 +1,7 @@
-﻿using Application.Dtos.VehicleChecklistItem.Respone;
+﻿using Application.Dtos.User.Respone;
+using Application.Dtos.Vehicle.Respone;
+using Application.Dtos.VehicleChecklistItem.Respone;
+using Domain.Entities;
 
 namespace Application.Dtos.VehicleChecklist.Respone
 {
@@ -9,13 +12,15 @@ namespace Application.Dtos.VehicleChecklist.Respone
         public bool IsSignedByStaff { get; set; }
 
         public bool IsSignedByCustomer { get; set; }
-        public Guid StaffId { get; set; }
+        public UserProfileViewRes Staff { get; set; }
 
-        public Guid? CustomerId { get; set; }
+        public UserProfileViewRes? Customer { get; set; }
 
-        public Guid VehicleId { get; set; }
+        public VehicleViewRes Vehicle { get; set; }
 
         public Guid? ContractId { get; set; }
-        public IEnumerable<ChecklistItemImageRes>? VehicleChecklistItems { get; set; }
+      
+        //public IEnumerable<ChecklistItemImageRes>? VehicleChecklistItems { get; set; }
+        public IEnumerable<VehicleChecklistItemViewRes>? VehicleChecklistItems { get; set; }
     }
 }

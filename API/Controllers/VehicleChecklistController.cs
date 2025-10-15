@@ -33,18 +33,31 @@ namespace API.Controllers
         public async Task<IActionResult> CreateVehicleChecklist(CreateVehicleChecklistReq req)
         {
             var staff = HttpContext.User;
-            var vehicleCheckList = await _vehicleChecklistService.CreateVehicleChecklist(staff, req);
-            return Ok(vehicleCheckList);
+            var id = await _vehicleChecklistService.Create(staff, req);
+            return Ok(new {id});
         }
 
+
+        /*
+         * status code
+         * 200 success
+         * 404 not found
+         * 403 don't have permission
+         * 401 unauthorize
+         */
         [HttpPut]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req)
         {
-            await _vehicleChecklistService.UpdateVehicleChecklistAsync(req);
+            await _vehicleChecklistService.UpdateAsync(req);
             return Ok();
         }
 
+        /*
+         * status code
+         * 200 success
+         * 404 not found
+         */
         [HttpGet("{id}")]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> GetById(Guid id)
@@ -53,22 +66,32 @@ namespace API.Controllers
             return Ok(checklistViewRes);
         }
 
-        [HttpPost("image")]
+        [HttpGet]
+        [RoleAuthorize(RoleName.Staff)]
+        public async Task<IActionResult> GetByContractId(Guid id)
+        {
+            var checklistViewRes = await _vehicleChecklistService.GetByContractIdAsync(id);
+            return Ok(checklistViewRes);
+        }
+
+        [HttpPost("items/{itemId}/image")]
         [RoleAuthorize(RoleName.Staff)]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadChecklistItemImage([FromQuery] Guid itemId, [FromForm(Name = "file")] IFormFile file)
+        public async Task<IActionResult> UploadChecklistItemImage(Guid itemId, [FromForm(Name = "file")] IFormFile file)
         {
             var result = await _imageService.UploadChecklistItemImageAsync(itemId, file);
             return Ok(result);
         }
 
-        [HttpDelete("image")]
+        [HttpDelete("items/{itemId}/image")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> DeleteChecklistItemImage([FromQuery] Guid itemId)
+        public async Task<IActionResult> DeleteChecklistItemImage(Guid itemId)
         {
             var result = await _imageService.DeleteChecklistItemImageAsync(itemId);
             return Ok(result);
         }
+
+        
     }
 }

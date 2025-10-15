@@ -9,9 +9,12 @@ namespace Application.Repositories
 {
     public interface IRentalContractRepository : IGenericRepository<RentalContract>
     {
-        Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId);
+        Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status = null);
         Task<bool> HasActiveContractAsync(Guid customerId);
-        Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null);
-        
+        Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
+            string? citizenIdentity = null, string? driverLicense = null);
+        Task<RentalContract?> GetByCheckListIdAsync(Guid id);
+
+
     }
 }

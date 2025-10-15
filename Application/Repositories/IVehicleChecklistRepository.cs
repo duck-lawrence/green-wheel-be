@@ -11,6 +11,6 @@ namespace Application.Repositories
 {
     public interface IVehicleCheckListRepository : IGenericRepository<VehicleChecklist>
     {
-        Task<RentalContract?> GetRentalContractByCheckListIdAsync(Guid id);
+        Task<VehicleChecklist?> GetByContractIdAsync(Guid id);
     }
 }

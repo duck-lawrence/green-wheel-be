@@ -9,6 +9,7 @@ using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
+using Application.AppExceptions;
 
 namespace API.Controllers
 {
@@ -35,10 +36,10 @@ namespace API.Controllers
          */
 
         [HttpPost("process-update")]
-        public async Task<IActionResult> ProcessUpdateInvoice([FromBody] MomoIpnReq req)
+        public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
-            await _invoiceService.ProcessUpdateInvoice(req, Guid.Parse(req.OrderId));
+            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId));
             return Ok(new { resultCode = 0, message = "Received" });
         }
 
@@ -55,15 +56,66 @@ namespace API.Controllers
             return Ok(invoiceView);
         }
 
-        [RoleAuthorize(RoleName.Customer)]
+        /*
+         500 invoice type error
+         404 not found
+         200 success
+         */
+
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
+            var invoice = await _invoiceService.GetRawInvoiceById(id, true, true); 
+            if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
+            {
+                await _invoiceService.CashPayment(invoice);
+                return Ok();
+            }
+            string link = invoice.Type switch
+            {
+                (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Return => await _invoiceService.ProcessReturnInvoice(invoice, paymentReq.FallbackUrl),
 
-            string? link = await _invoiceService.ProcessPayment(id, paymentReq.PaymentMethod);
-            return link == null ? Ok() : Ok(new { link });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                _ => throw new Exception(),
+            };
+            return Ok(new { link });
         }
 
+        /*
+         200 success
+         */
+
+        [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
         public async Task<IActionResult> GetAllInvoices([FromQuery] PaginationParams pagination)
         {
@@ -71,5 +123,4 @@ namespace API.Controllers
             return Ok(result);
         }
     }
-    
 }

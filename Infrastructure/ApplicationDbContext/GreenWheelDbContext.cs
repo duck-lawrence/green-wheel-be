@@ -120,6 +120,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
+
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<CitizenIdentity>(entity =>
@@ -128,11 +130,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.ToTable("citizen_identities");
 
-            entity.HasIndex(e => e.UserId, "UQ__citizen___B9BE370E481A507A").IsUnique();
-
-            entity.HasIndex(e => e.Number, "UQ__citizen___FD291E418DEE80E9").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "uq_citizen_identities_user_id").IsUnique();
+            entity.HasIndex(e => e.UserId, "idx_citizen_identities_user_id");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -168,6 +166,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey<CitizenIdentity>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_citizen_users");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Deposit>(entity =>
@@ -201,6 +201,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey<Deposit>(d => d.InvoiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_deposits_invoices");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<DispatchRequest>(entity =>
@@ -254,6 +256,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.ToStationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_dispatch_requests_to_stations");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<DispatchRequestStaff>(entity =>
@@ -288,6 +292,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.StaffId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_dispatch_request_staffs_staffs");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<DispatchRequestVehicle>(entity =>
@@ -322,6 +328,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.VehicleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_dispatch_request_vehicles_vehicles");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<DriverLicense>(entity =>
@@ -330,11 +338,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.ToTable("driver_licenses");
 
-            entity.HasIndex(e => e.UserId, "UQ__driver_l__B9BE370EAA9A89D5").IsUnique();
-
-            entity.HasIndex(e => e.Number, "UQ__driver_l__FD291E4146A88AD9").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "uq_driver_licenses_user_id").IsUnique();
+            entity.HasIndex(e => e.UserId, "idx_driver_licenses_user_id");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
@@ -371,6 +375,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey<DriverLicense>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_driver_users");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Invoice>(entity =>
@@ -413,6 +419,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.ContractId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_invoices_contracts");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<InvoiceItem>(entity =>
@@ -455,6 +463,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.InvoiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_invoice_items_invoices");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<ModelComponent>(entity =>
@@ -489,6 +499,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.ModelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_model_components_vehicle_models");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<ModelImage>(entity =>
@@ -523,6 +535,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.ModelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_model_images_vehicle_models");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>
@@ -622,6 +636,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.HasOne(d => d.Vehicle).WithMany(p => p.RentalContracts)
                 .HasForeignKey(d => d.VehicleId)
                 .HasConstraintName("fk_rental_contracts_vehicles");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -646,6 +662,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Staff>(entity =>
@@ -671,6 +689,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey<Staff>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_staff_users");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Station>(entity =>
@@ -695,6 +715,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<StationFeedback>(entity =>
@@ -731,6 +753,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.StationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_feedback_stations");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Ticket>(entity =>
@@ -771,6 +795,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.RequesterId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_tickets_user");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -823,6 +849,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.RoleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_users_roles");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
@@ -863,6 +891,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.StationId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_vehicles_stations");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<VehicleChecklist>(entity =>
@@ -914,6 +944,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.VehicleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_vehicle_checklists_vehicles");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<VehicleChecklistItem>(entity =>
@@ -962,6 +994,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.ComponentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_vehicle_checklist_items_components");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<VehicleComponent>(entity =>
@@ -986,6 +1020,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<VehicleModel>(entity =>
@@ -1055,6 +1091,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
                 .HasForeignKey(d => d.SegmentId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_model_segments");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
 
         modelBuilder.Entity<VehicleSegment>(entity =>
@@ -1079,6 +1117,8 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")
                 .HasColumnName("updated_at");
+                
+            entity.HasQueryFilter(e => e.DeletedAt == null);
         });
         foreach (var entity in modelBuilder.Model.GetEntityTypes())
         {

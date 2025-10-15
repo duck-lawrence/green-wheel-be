@@ -2,8 +2,10 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
+using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
@@ -14,6 +16,7 @@ using AutoMapper;
 using Domain.Entities;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -90,6 +93,12 @@ namespace Application
             -> !null <=> correct email and password => generate refreshToken (set to cookie) and accessToken return to frontend
          */
 
+        // ===========================
+        // Auth
+        // ===========================
+
+        #region auth
+
         public async Task<string?> Login(UserLoginReq user)
         {
             User userFromDB = await _userRepository.GetByEmailAsync(user.Email);
@@ -143,14 +152,9 @@ namespace Application
                 _jwtSettings.Issuer, _jwtSettings.Audience);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Iat).Value, out long iatSeconds);
             long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
-            Guid refreshTokenId;
-            do
-            {
-                refreshTokenId = Guid.NewGuid();
-            } while (await _refreshTokenRepository.GetByIdAsync(refreshTokenId) != null);
+
             await _refreshTokenRepository.AddAsync(new RefreshToken()
             {
-                Id = refreshTokenId,
                 UserId = userId,
                 Token = token,
                 IssuedAt = DateTimeOffset.FromUnixTimeSeconds(iatSeconds).UtcDateTime,
@@ -308,7 +312,7 @@ namespace Application
             user.Id = id;
             user.CreatedAt = user.UpdatedAt = DateTime.UtcNow;
             user.Email = email;
-            user.RoleId = roles.FirstOrDefault(r => r.Name == "Customer").Id;
+            user.RoleId = roles.FirstOrDefault(r => r.Name == RoleName.Customer).Id;
             user.DeletedAt = null;
             Guid userId = await _userRepository.AddAsync(user);
             string accesstoken = GenerateAccessToken(userId);
@@ -479,6 +483,14 @@ namespace Application
             };
         }
 
+        #endregion auth
+
+        // ===========================
+        // Profile
+        // ===========================
+
+        #region profile
+
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
             Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
@@ -494,33 +506,24 @@ namespace Application
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
 
-        public async Task UpdateMeAsync(ClaimsPrincipal userClaims, UserUpdateReq userUpdateReq)
+        public async Task UpdateAsync(Guid userId, UserUpdateReq req)
         {
-            if (!string.IsNullOrEmpty(userUpdateReq.Phone))
+            if (!string.IsNullOrEmpty(req.Phone))
             {
-                if (await _userRepository.GetByPhoneAsync(userUpdateReq.Phone) != null)
-                {
+                var existingUser = await _userRepository.GetByPhoneAsync(req.Phone);
+                if (existingUser != null && existingUser.Id != userId)
                     throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
-                }
             }
-            Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
-            User userFromDb = await _userRepository.GetByIdAsync(userID);
-            if (userFromDb == null)
-            {
-                throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
-            }
-            if (userUpdateReq.FirstName != null) userFromDb.FirstName = userUpdateReq.FirstName;
-            if (userUpdateReq.LastName != null) userFromDb.LastName = userUpdateReq.LastName;
-            if (!string.IsNullOrEmpty(userUpdateReq.Phone)) userFromDb.Phone = userUpdateReq.Phone;
-            if (userUpdateReq.DateOfBirth != null) userFromDb.DateOfBirth = userUpdateReq.DateOfBirth;
-            if (userUpdateReq.Sex != null) userFromDb.Sex = userUpdateReq.Sex;
-            if (!string.IsNullOrEmpty(userUpdateReq.AvatarUrl)) userFromDb.AvatarUrl = userUpdateReq.AvatarUrl;
-            await _userRepository.UpdateAsync(userFromDb);
-        }
+            User userFromDb = await _userRepository.GetByIdAsync(userId)
+                ?? throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
 
-        public async Task<User?> GetUserByIdAsync(Guid id)
-        {
-            return await _userRepository.GetByIdAsync(id);
+            if (req.FirstName != null) userFromDb.FirstName = req.FirstName;
+            if (req.LastName != null) userFromDb.LastName = req.LastName;
+            if (!string.IsNullOrEmpty(req.Phone)) userFromDb.Phone = req.Phone;
+            if (req.DateOfBirth != null) userFromDb.DateOfBirth = req.DateOfBirth;
+            if (req.Sex != null) userFromDb.Sex = req.Sex;
+            if (!string.IsNullOrEmpty(req.AvatarUrl)) userFromDb.AvatarUrl = req.AvatarUrl;
+            await _userRepository.UpdateAsync(userFromDb);
         }
 
         public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
@@ -595,6 +598,8 @@ namespace Application
             }
         }
 
+        #region document
+
         public async Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, IFormFile file)
         {
             var uploadReq = new UploadImageReq { File = file };
@@ -609,7 +614,7 @@ namespace Application
             try
             {
                 var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidCitizenIdData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -637,13 +642,13 @@ namespace Application
             if (string.IsNullOrEmpty(uploaded.Url))
                 throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
-            var old = await _mediaUow.DriverLicenses.GetByUserId(userId);
+            var old = await _mediaUow.DriverLicenses.GetByUserIdAsync(userId);
 
             await using var trx = await _mediaUow.BeginTransactionAsync();
             try
             {
                 var entity = await _driverService.ProcessDriverLicenseAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.UserMessage.InvalidLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
@@ -666,7 +671,7 @@ namespace Application
         public async Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId)
         {
             var entity = await _citizenService.GetByUserId(userId);
-            if (entity == null) 
+            if (entity == null)
                 throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
             return _mapper.Map<CitizenIdentityRes>(entity);
@@ -675,36 +680,124 @@ namespace Application
         public async Task<DriverLicenseRes?> GetMyDriverLicenseAsync(Guid userId)
         {
             var entity = await _driverService.GetByUserIdAsync(userId);
-            if (entity == null) 
-                throw new NotFoundException(Message.UserMessage.LicenseNotFound);
+            if (entity == null)
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
 
             return _mapper.Map<DriverLicenseRes>(entity);
         }
 
-        public async Task<Guid> CreateAnounymousAccount(CreateUserReq req)
+        public async Task<CitizenIdentityRes> UpdateCitizenIdentityAsync(Guid userId, UpdateCitizenIdentityReq req)
         {
-            var user = await _userRepository.GetByPhoneAsync(req.Phone);
-            if (user != null)
-            {
-                var rentalContract = _rentalContractRepository.GetByCustomerAsync(user.Id);
-                if (rentalContract != null)
-                {
-                    throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
-                }
-                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
-            }
-            user = _mapper.Map<User>(req);
-            Guid userId;
-            do
-            {
-                userId = Guid.NewGuid();
-            } while (await _userRepository.GetByIdAsync(userId) != null);
-            user.Id = userId;
-            await _userRepository.AddAsync(user);
-            return userId;
+            var entity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
+            if (entity == null)
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
+
+            if (!string.IsNullOrWhiteSpace(req.Number) && req.Number != entity.Number)
+                await VerifyUniqueNumberAsync.VerifyUniqueIdentityNumberAsync(req.Number, userId, _citizenIdentityRepository);
+
+            if (!string.IsNullOrWhiteSpace(req.Number)) entity.Number = req.Number.Trim();
+            if (!string.IsNullOrWhiteSpace(req.FullName)) entity.FullName = req.FullName.Trim();
+            if (!string.IsNullOrWhiteSpace(req.Nationality)) entity.Nationality = req.Nationality.Trim();
+            if (req.DateOfBirth.HasValue) entity.DateOfBirth = req.DateOfBirth.Value;
+            if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _citizenIdentityRepository.UpdateAsync(entity);
+            return _mapper.Map<CitizenIdentityRes>(entity);
         }
 
-        public async Task<UserProfileViewRes> GetUserByPhoneAsync(string phone)
+        public async Task<DriverLicenseRes> UpdateDriverLicenseAsync(Guid userId, UpdateDriverLicenseReq req)
+        {
+            var entity = await _driverLicenseRepository.GetByUserIdAsync(userId);
+            if (entity == null)
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
+
+            if (!string.IsNullOrWhiteSpace(req.Number) && req.Number != entity.Number)
+                await VerifyUniqueNumberAsync.VerifyUniqueDriverLicenseNumberAsync(req.Number, userId, _driverLicenseRepository);
+
+            if (req.Class.HasValue)
+            {
+                if (!Enum.IsDefined(typeof(LicenseClass), req.Class.Value))
+                    throw new BadRequestException($"Invalid license class: {req.Class.Value}");
+
+                entity.Class = (int)req.Class.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(req.Number)) entity.Number = req.Number.Trim();
+            if (!string.IsNullOrWhiteSpace(req.FullName)) entity.FullName = req.FullName.Trim();
+            if (!string.IsNullOrWhiteSpace(req.Nationality)) entity.Nationality = req.Nationality.Trim();
+            if (req.Sex.HasValue) entity.Sex = req.Sex.Value;
+            if (req.DateOfBirth.HasValue) entity.DateOfBirth = req.DateOfBirth.Value;
+            if (req.ExpiresAt.HasValue) entity.ExpiresAt = req.ExpiresAt.Value;
+
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
+
+            await _driverLicenseRepository.UpdateAsync(entity);
+            return _mapper.Map<DriverLicenseRes>(entity);
+        }
+
+        public async Task DeleteCitizenIdentityAsync(Guid userId)
+        {
+            var citizenIdentity = await _citizenIdentityRepository.GetByUserIdAsync(userId);
+            if (citizenIdentity == null)
+                throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
+
+            if (!string.IsNullOrEmpty(citizenIdentity.ImagePublicId))
+                await _photoService.DeletePhotoAsync(citizenIdentity.ImagePublicId);
+            citizenIdentity.DeletedAt = DateTimeOffset.UtcNow;
+            await _mediaUow.SaveChangesAsync();
+        }
+
+        public async Task DeleteDriverLicenseAsync(Guid userId)
+        {
+            var driverLicense = await _driverLicenseRepository.GetByUserIdAsync(userId);
+            if (driverLicense == null)
+                throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
+
+            if (!string.IsNullOrEmpty(driverLicense.ImagePublicId))
+                await _photoService.DeletePhotoAsync(driverLicense.ImagePublicId);
+            driverLicense.DeletedAt = DateTimeOffset.UtcNow;
+            await _mediaUow.SaveChangesAsync();
+        }
+
+        #endregion document
+
+        #endregion profile
+
+        // ===========================
+        // ===== User Management =====
+        // ===========================
+
+        #region user-management
+
+        public async Task<Guid> CreateAsync(CreateUserReq req)
+        {
+            if (await _userRepository.GetByPhoneAsync(req.Phone) != null)
+            {
+                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
+            }
+            var user = _mapper.Map<User>(req);
+            user.Id = Guid.NewGuid();
+            await _userRepository.AddAsync(user);
+            return user.Id;
+        }
+
+        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
+            string? phone,
+            string? citizenIdNumber,
+            string? driverLicenseNumber)
+        {
+            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users);
+        }
+
+        public async Task<User?> GetByIdAsync(Guid id)
+        {
+            return await _userRepository.GetByIdAsync(id);
+        }
+
+        public async Task<UserProfileViewRes> GetByPhoneAsync(string phone)
         {
             var user = await _userRepository.GetByPhoneAsync(phone);
             if (user == null)
@@ -713,12 +806,6 @@ namespace Application
             }
             var userViewRes = _mapper.Map<UserProfileViewRes>(user);
             return userViewRes;
-        }
-
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            var users = await _userRepository.GetAllAsync();
-            return users;
         }
 
         public async Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber)
@@ -743,38 +830,6 @@ namespace Application
             return userView;
         }
 
-        public async Task<UserProfileViewRes?> SearchUserAsync(
-            string? phone,
-            string? citizenIdNumber,
-            string? driverLicenseNumber)
-        {
-            User? user = null;
-
-            // 1️ Ưu tiên tìm theo số điện thoại
-            if (!string.IsNullOrWhiteSpace(phone))
-            {
-                user = await _userRepository.GetByPhoneAsync(phone);
-                if (user != null)
-                    return _mapper.Map<UserProfileViewRes>(user);
-            }
-
-            // 2️ Nếu không có phone hoặc không tìm thấy => tìm theo CCCD
-            if (!string.IsNullOrWhiteSpace(citizenIdNumber))
-            {
-                var citizen = await _citizenIdentityRepository.GetByIdNumberAsync(citizenIdNumber);
-                if (citizen != null && citizen.User != null)
-                    return _mapper.Map<UserProfileViewRes>(citizen.User);
-            }
-
-            // 3 Nếu không có 2 cái trên => tìm theo GPLX
-            if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
-            {
-                var driver = await _driverLicenseRepository.GetByLicenseNumber(driverLicenseNumber);
-                if (driver != null && driver.User != null)
-                    return _mapper.Map<UserProfileViewRes>(driver.User);
-            }
-
-            return null;
-        }
+        #endregion user-management
     }
 }

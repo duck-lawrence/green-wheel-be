@@ -19,40 +19,89 @@ namespace Infrastructure.Repositories
         {
         }
 
-        public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId)
+        public async Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status)
         {
-            return await _dbContext.RentalContracts.Where(r => r.CustomerId == customerId).ToListAsync();
+            var contracts = _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
+                .Include(x => x.Vehicle)
+                    .ThenInclude(v => v.Model)
+                .Include(x => x.Station)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.InvoiceItems)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.Deposit)
+                .AsQueryable();
+            if (status != null)
+            {
+                contracts = contracts.Where(c => c.Status == status);
+            }
+            return await contracts.ToListAsync();
         }
 
-        public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null)
+        public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
+            string? citizenIdentityNumber = null, string? driverLicenseNumber = null)
         {
-            var rentalContracts = await _dbContext.RentalContracts
-                .Include(x => x.Invoices)
+            var rentalContracts = _dbContext.RentalContracts
+                .Include(x => x.Vehicle)
+                    .ThenInclude(v => v.Model)
+                .Include(x => x.Station)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.InvoiceItems)
+                // .Include(x => x.Invoices)
+                //     .ThenInclude(i => i.Deposit)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.DriverLicense)
-                .ToListAsync();
-            if (!string.IsNullOrEmpty(phone) && status != null)
+                .AsQueryable();
+            if (!string.IsNullOrEmpty(phone))
             {
-                rentalContracts = rentalContracts.Where(rc => rc.Status == status && rc.Customer.Phone == phone).ToList();
-            }else if (!string.IsNullOrEmpty(phone))
-            {
-                rentalContracts = rentalContracts.Where(rc => rc.Customer.Phone == phone).ToList();
-            }else if(status != null)
-            {
-                rentalContracts = rentalContracts.Where(rc => rc.Status == status).ToList();
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.Phone == phone);
             }
-            return rentalContracts;
+            if (status != null)
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Status == status);
+            }
+            if (!string.IsNullOrEmpty(citizenIdentityNumber))
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.CitizenIdentity.Number == citizenIdentityNumber);
+            }
+            if (!string.IsNullOrEmpty(driverLicenseNumber))
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
+            }
+            return await rentalContracts.ToListAsync();
         }
 
         public async Task<bool> HasActiveContractAsync(Guid customerId)
         {
-            return await (_dbContext.RentalContracts.Where(r => r.CustomerId == customerId 
+            return await (_dbContext.RentalContracts.Where(r => r.CustomerId == customerId
             && r.Status != (int)RentalContractStatus.Completed
             && r.Status != (int)RentalContractStatus.Cancelled).FirstOrDefaultAsync()) != null;
         }
 
-        
+        public override async Task<RentalContract?> GetByIdAsync(Guid id)
+        {
+            return await _dbContext.RentalContracts.Where(r => r.Id == id)
+                .Include(x => x.Vehicle)
+                    .ThenInclude(v => v.Model)
+                .Include(x => x.Station)
+                .Include(x => x.Invoices)
+                    .ThenInclude(i => i.InvoiceItems)
+                .Include(x => x.Invoices)
+                    .ThenInclude(i => i.Deposit)
+                .Include(x => x.Customer)
+                    .ThenInclude(u => u.CitizenIdentity)
+                .Include(x => x.Customer)
+                    .ThenInclude(u => u.DriverLicense)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<RentalContract?> GetByCheckListIdAsync(Guid id)
+        {
+            var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
+                .Include(vc => vc.Contract).FirstOrDefaultAsync());
+
+            return vehicleChecklist == null ? null : vehicleChecklist.Contract;
+        }
     }
 }
