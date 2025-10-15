@@ -17,12 +17,12 @@ namespace API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IUserProfileSerivce _userProfileService;
 
-        public UserController(IUserService service
-            , IGoogleCredentialService googleCredentialService
-            )
+        public UserController(IUserService service, IGoogleCredentialService googleCredentialService, IUserProfileSerivce userProfileSerivce)
         {
             _userService = service;
+            _userProfileService = userProfileSerivce;
         }
         [HttpGet]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
@@ -48,7 +48,7 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> UpdateById(Guid id, [FromBody] UserUpdateReq req)
         {
-            await _userService.UpdateAsync(id, req);
+            await _userProfileService.UpdateAsync(id, req);
             return Ok();
         }
 
@@ -59,7 +59,7 @@ namespace API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadCitizenIdById(Guid id, [FromForm] IFormFile file)
         {
-            var citizenIdentity = await _userService.UploadCitizenIdAsync(id, file);
+            var citizenIdentity = await _userProfileService.UploadCitizenIdAsync(id, file);
             return Ok(citizenIdentity);
         }
 
@@ -69,7 +69,7 @@ namespace API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadDriverLicenseById(Guid id, [FromForm] IFormFile file)
         {
-            var driverLisence = await _userService.UploadDriverLicenseAsync(id, file);
+            var driverLisence = await _userProfileService.UploadDriverLicenseAsync(id, file);
             return Ok(driverLisence);
         }
 
@@ -77,7 +77,7 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> UpdateCitizenIdentityById(Guid id, [FromBody] UpdateCitizenIdentityReq req)
         {
-            var result = await _userService.UpdateCitizenIdentityAsync(id, req);
+            var result = await _userProfileService.UpdateCitizenIdentityAsync(id, req);
             return Ok(result);
         }
 
@@ -85,7 +85,7 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> UpdateDriverLicenseById(Guid id, [FromBody] UpdateDriverLicenseReq req)
         {
-            var result = await _userService.UpdateDriverLicenseAsync(id, req);
+            var result = await _userProfileService.UpdateDriverLicenseAsync(id, req);
             return Ok(result);
         }
 
@@ -93,7 +93,7 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> DeleteCitizenIdentityById(Guid id)
         {
-            await _userService.DeleteCitizenIdentityAsync(id);
+            await _userProfileService.DeleteCitizenIdentityAsync(id);
             return Ok();
         }
 
@@ -101,7 +101,7 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> DeleteDriverLicenseById(Guid id)
         {
-            await _userService.DeleteDriverLicenseAsync(id);
+            await _userProfileService.DeleteDriverLicenseAsync(id);
             return Ok();
         }
 

@@ -12,15 +12,16 @@ namespace API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
         private readonly IGoogleCredentialService _googleService;
+        private readonly IUserProfileSerivce _userProfileService;
 
-        public AuthController(IUserService service
-            , IGoogleCredentialService googleCredentialService
-            )
+
+        public AuthController(IAuthService authService, IGoogleCredentialService googleCredentialService, IUserProfileSerivce userProfileService)
         {
-            _userService = service;
+            _authService = authService;
             _googleService = googleCredentialService;
+            _userProfileService = userProfileService;
         }
 
         /*
@@ -33,7 +34,7 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginReq user)
         {
-            var accessToken = await _userService.Login(user);
+            var accessToken = await _authService.Login(user);
             return Ok(new
             {
                 AccessToken = accessToken
@@ -52,7 +53,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.RefreshToken, out var refreshToken))
             {
-                await _userService.Logout(refreshToken);
+                await _authService.Logout(refreshToken);
                 return Ok();
             }
             throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
@@ -68,8 +69,8 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
         {
-            await _userService.CheckDupEmailAsync(email.Email);
-            await _userService.SendOTP(email.Email);
+            await _userProfileService.CheckDupEmailAsync(email.Email);
+            await _authService.SendOTP(email.Email);
             return Ok();
         }
 
@@ -83,7 +84,7 @@ namespace API.Controllers
         [HttpPost("register/verify-otp")]
         public async Task<IActionResult> RegisterVerifyOtp([FromBody] VerifyOTPReq verifyOTPDto)
         {
-            string registerToken = await _userService.VerifyOTP(verifyOTPDto, TokenType.RegisterToken, CookieKeys.RegisterToken);
+            string registerToken = await _authService.VerifyOTP(verifyOTPDto, TokenType.RegisterToken, CookieKeys.RegisterToken);
             return Ok();
         }
 
@@ -100,7 +101,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.RegisterToken, out var registerToken))
             {
-                string accessToken = await _userService.RegisterAsync(registerToken, registerUserDto);
+                string accessToken = await _authService.RegisterAsync(registerToken, registerUserDto);
                 return Ok(new
                 {
                     AccessToken = accessToken
@@ -125,7 +126,7 @@ namespace API.Controllers
             //    return BadRequest(Message.UserMessage.OldPasswordIsRequired);
             //}
             var user = HttpContext.User;
-            await _userService.ChangePassword(user, userChangePasswordDto);
+            await _authService.ChangePassword(user, userChangePasswordDto);
             return Ok();
         }
 
@@ -139,7 +140,7 @@ namespace API.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] SendEmailReq sendEmailRequestDto)
         {
-            await _userService.SendOTP(sendEmailRequestDto.Email);
+            await _authService.SendOTP(sendEmailRequestDto.Email);
             return Ok();
         }
 
@@ -153,7 +154,7 @@ namespace API.Controllers
         [HttpPost("forgot-password/verify-otp")]
         public async Task<IActionResult> ForgotPasswordVerifyOTP([FromBody] VerifyOTPReq verifyOTPDto)
         {
-            await _userService.VerifyOTP(verifyOTPDto, TokenType.ForgotPasswordToken, CookieKeys.ForgotPasswordToken);
+            await _authService.VerifyOTP(verifyOTPDto, TokenType.ForgotPasswordToken, CookieKeys.ForgotPasswordToken);
             return Ok();
         }
 
@@ -169,7 +170,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.ForgotPasswordToken, out var forgotPasswordToken))
             {
-                await _userService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
+                await _authService.ResetPassword(forgotPasswordToken, userChangePasswordDto.Password);
                 return Ok();
             }
             throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
@@ -186,7 +187,7 @@ namespace API.Controllers
         {
             if (Request.Cookies.TryGetValue(CookieKeys.RefreshToken, out var refreshToken))
             {
-                string accessToken = await _userService.RefreshToken(refreshToken, false);
+                string accessToken = await _authService.RefreshToken(refreshToken, false);
                 return Ok(new
                 {
                     AccessToken = accessToken
@@ -204,7 +205,7 @@ namespace API.Controllers
         {
             var payload = await _googleService.VerifyCredential(loginGoogleReqDto.Credential);
 
-            Dictionary<string, string> tokens = await _userService.LoginWithGoogle(payload);
+            Dictionary<string, string> tokens = await _authService.LoginWithGoogle(payload);
             bool needSetPassword = true;
             if (tokens.TryGetValue(TokenType.AccessToken.ToString(), out var token))
             {
