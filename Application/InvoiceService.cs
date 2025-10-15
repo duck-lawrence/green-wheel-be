@@ -145,7 +145,7 @@ namespace Application
             var invoices = await _uow.InvoiceRepository.GetAllInvoicesAsync(pagination);
 
             if (invoices == null || !invoices.Items.Any())
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                return null;
 
             return invoices;
         }

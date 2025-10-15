@@ -47,7 +47,7 @@ namespace Application
         {
             var vehicles = await _vehicleRepository.GetAllAsync();
 
-            return _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles);
+            return _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles) ?? [];
         }
 
         public async Task<VehicleViewRes> GetVehicleById(Guid id)
