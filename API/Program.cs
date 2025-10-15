@@ -89,6 +89,8 @@ namespace API
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             builder.Services.AddScoped<IEmailSerivce, EmailService>();
+            builder.Services.AddScoped<IAuthService, AuthSerivce>();
+            builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();

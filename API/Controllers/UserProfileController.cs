@@ -14,12 +14,11 @@ namespace API.Controllers
     [ApiController]
     public class UserProfileController : ControllerBase
     {
-        private readonly IUserService _userService;
+        private readonly IUserProfileSerivce _userProfileService;
 
-        public UserProfileController(IUserService service
-            , IGoogleCredentialService googleCredentialService)
+        public UserProfileController(IUserProfileSerivce service, IGoogleCredentialService googleCredentialService)
         {
-            _userService = service;
+            _userProfileService = service;
         }
 
         [HttpGet]
@@ -27,7 +26,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetMe()
         {
             var userClaims = HttpContext.User;
-            var userProfileViewRes = await _userService.GetMeAsync(userClaims);
+            var userProfileViewRes = await _userProfileService.GetMeAsync(userClaims);
             return Ok(userProfileViewRes);
         }
 
@@ -36,7 +35,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateMe([FromBody] UserUpdateReq userUpdateReq)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.UpdateAsync(userId, userUpdateReq);
+            await _userProfileService.UpdateAsync(userId, userUpdateReq);
             return Ok();
         }
 
@@ -45,7 +44,7 @@ namespace API.Controllers
         public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq request)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var avatarUrl = await _userService.UploadAvatarAsync(userId, request.File);
+            var avatarUrl = await _userProfileService.UploadAvatarAsync(userId, request.File);
 
             return Ok(new { AvatarUrl = avatarUrl });
         }
@@ -55,7 +54,7 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteAvatar()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteAvatarAsync(userId);
+            await _userProfileService.DeleteAvatarAsync(userId);
 
             return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
@@ -66,7 +65,7 @@ namespace API.Controllers
         public async Task<IActionResult> UploadCitizenId([FromForm] IFormFile file)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UploadCitizenIdAsync(userId, file);
+            var result = await _userProfileService.UploadCitizenIdAsync(userId, file);
             return Ok(result);
         }
 
@@ -77,7 +76,7 @@ namespace API.Controllers
         public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UploadDriverLicenseAsync(userId, file);
+            var result = await _userProfileService.UploadDriverLicenseAsync(userId, file);
             return Ok(result);
         }
 
@@ -86,7 +85,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetMyCitizenIdentity()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.GetMyCitizenIdentityAsync(userId);
+            var result = await _userProfileService.GetMyCitizenIdentityAsync(userId);
             return Ok(result);
         }
 
@@ -95,7 +94,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetMyDriverLicense()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.GetMyDriverLicenseAsync(userId);
+            var result = await _userProfileService.GetMyDriverLicenseAsync(userId);
             return Ok(result);
         }
 
@@ -104,7 +103,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
+            var result = await _userProfileService.UpdateCitizenIdentityAsync(userId, req);
             return Ok(result);
         }
 
@@ -113,7 +112,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
+            var result = await _userProfileService.UpdateDriverLicenseAsync(userId, req);
             return Ok(result);
         }
 
@@ -122,7 +121,7 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteCitizenIdentity()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteCitizenIdentityAsync(userId);
+            await _userProfileService.DeleteCitizenIdentityAsync(userId);
             return Ok();
         }
 
@@ -131,7 +130,7 @@ namespace API.Controllers
         public async Task<IActionResult> DeleteDriverLicense()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteDriverLicenseAsync(userId);
+            await _userProfileService.DeleteDriverLicenseAsync(userId);
             return Ok();
         }
     }
