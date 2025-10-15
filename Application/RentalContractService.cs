@@ -417,13 +417,13 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task CancleRentalContract(Guid id)
+        public async Task CancelRentalContract(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
             if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             if(contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
             {
-                throw new BadRequestException(Message.RentalContractMessage.CanNotCancle);
+                throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
             }
             contract.Status = (int) RentalContractStatus.Cancelled;
             await _uow.RentalContractRepository.UpdateAsync(contract);

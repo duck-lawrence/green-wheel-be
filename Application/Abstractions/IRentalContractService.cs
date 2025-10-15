@@ -21,6 +21,6 @@ namespace Application.Abstractions
         Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
         Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
         Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
-        Task CancleRentalContract(Guid id);
+        Task CancelRentalContract(Guid id);
     }
 }
