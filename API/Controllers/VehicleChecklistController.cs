@@ -68,9 +68,9 @@ namespace API.Controllers
 
         [HttpGet]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> GetByContractId(Guid? contractId)
+        public async Task<IActionResult> GetByContractId(Guid? contractId, int? type)
         {
-            var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId);
+            var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId, type);
             return Ok(checklistsViewRes);
         }
 

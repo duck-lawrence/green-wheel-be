@@ -29,21 +29,25 @@ namespace Infrastructure.Repositories
             return vehicleChecklist;
         }
 
-        public async Task<IEnumerable<VehicleChecklist>?> GetAll(Guid? contractId)
+        public async Task<IEnumerable<VehicleChecklist>?> GetAll(Guid? contractId, int? type)
         {
-            var vehicleChecklists = await _dbContext.VehicleChecklists
+            var vehicleChecklists = _dbContext.VehicleChecklists
                 .Include(vc => vc.VehicleChecklistItems)
                     .ThenInclude(vci => vci.Component)
                 .Include(vc => vc.Vehicle)
                 .Include(vc => vc.Staff)
                     .ThenInclude(s => s.User)
                 .Include(vc => vc.Customer)
-                    .ToListAsync();
-            if(id != null)
+                    .AsQueryable();
+            if(contractId != null)
             {
-                vehicleChecklists = (List<VehicleChecklist>)vehicleChecklists.Where(c => c.ContractId == id);
+                vehicleChecklists = vehicleChecklists.Where(c => c.ContractId == contractId);
             }
-            return vehicleChecklists;
+            if(type != null)
+            {
+                vehicleChecklists = vehicleChecklists.Where(c => c.Type == type);
+            }
+            return await vehicleChecklists.ToListAsync();
         }
 
 
