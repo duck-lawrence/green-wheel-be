@@ -115,7 +115,7 @@ namespace Application
                 ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
 
             if (string.IsNullOrEmpty(model.ImagePublicId))
-                throw new BadRequestException(Message.VehicleModelImageMessage.NoMainImage);
+                throw new BadRequestException(Message.VehicleModelImageMessage.MainImageNotFound);
 
             await _photoService.DeletePhotoAsync(model.ImagePublicId);
 
