@@ -68,10 +68,10 @@ namespace API.Controllers
 
         [HttpGet]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> GetByContractId(Guid id)
+        public async Task<IActionResult> GetByContractId(Guid? contractId)
         {
-            var checklistViewRes = await _vehicleChecklistService.GetByContractIdAsync(id);
-            return Ok(checklistViewRes);
+            var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId);
+            return Ok(checklistsViewRes);
         }
 
         [HttpPost("items/{itemId}/image")]

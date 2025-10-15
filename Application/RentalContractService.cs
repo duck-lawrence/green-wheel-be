@@ -382,6 +382,10 @@ namespace Application
                 templatePath = Path.Combine(basePath, "Templates", "PaymentEmailTemplate.html");
                 body = System.IO.File.ReadAllText(templatePath);
 
+                var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
+                    ?? "http://localhost:3000/";
+                var contractDetailUrl = $"{frontendOrigin}/rental-contracts/{rentalContract.Id}";
+
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
                            .Replace("{BookingId}", rentalContract.Id.ToString())
                            .Replace("{VehicleModelName}", vehicleModel.Name)
@@ -389,8 +393,7 @@ namespace Application
                            .Replace("{StationName}", station.Name)
                            .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
                            .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"))
-                           .Replace("{PaymentLink}", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1")
-                           .Replace("{Deadline}", "....");
+                           .Replace("{PaymentLink}", contractDetailUrl);
             }
             else
             {
