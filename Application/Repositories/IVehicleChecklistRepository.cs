@@ -11,6 +11,6 @@ namespace Application.Repositories
 {
     public interface IVehicleCheckListRepository : IGenericRepository<VehicleChecklist>
     {
-        Task<IEnumerable<VehicleChecklist>?> GetAll(Guid? contractId);
+        Task<IEnumerable<VehicleChecklist>?> GetAll(Guid? contractId, int? type);
     }
 }

@@ -35,7 +35,7 @@ namespace API.Controllers
          * 404 not found
          */
 
-        [HttpPost("process-update")]
+        [HttpPost("payment-callback/momo")]
         public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
@@ -76,36 +76,6 @@ namespace API.Controllers
                 (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Return => await _invoiceService.ProcessReturnInvoice(invoice, paymentReq.FallbackUrl),
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 _ => throw new Exception(),
             };
             return Ok(new { link });

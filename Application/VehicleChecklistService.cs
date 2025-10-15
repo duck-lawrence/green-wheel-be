@@ -226,9 +226,9 @@ namespace Application
             }
         }
 
-        public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId)
+        public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId, int? type)
         {
-            var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId);
+            var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId, type);
             if (vehicleChecklists.IsNullOrEmpty())
             {
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
