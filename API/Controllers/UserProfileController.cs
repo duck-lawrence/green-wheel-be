@@ -42,7 +42,7 @@ namespace API.Controllers
             return Ok();
         }
 
-        [HttpPut("avatar")]
+        [HttpPut("me/avatar")]
         [Authorize]
         public async Task<IActionResult> UploadAvatar([FromForm] UploadImageReq request)
         {
@@ -52,7 +52,7 @@ namespace API.Controllers
             return Ok(new { AvatarUrl = avatarUrl });
         }
 
-        [HttpDelete("avatar")]
+        [HttpDelete("me/avatar")]
         [Authorize]
         public async Task<IActionResult> DeleteAvatar()
         {
@@ -61,7 +61,7 @@ namespace API.Controllers
 
             return Ok(new { Message = Message.CloudinaryMessage.DeleteSuccess });
         }
-        [HttpPut("citizen-identity")]
+        [HttpPut("me/citizen-identity")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -72,7 +72,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpPut("driver-license")]
+        [HttpPut("me/driver-license")]
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
@@ -83,7 +83,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("citizen-identity")]
+        [HttpGet("me/citizen-identity")]
         [Authorize]
         public async Task<IActionResult> GetMyCitizenIdentity()
         {
@@ -92,7 +92,7 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("driver-license")]
+        [HttpGet("me/driver-license")]
         [Authorize]
         public async Task<IActionResult> GetMyDriverLicense()
         {
@@ -102,7 +102,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpPatch("citizen-identity")]
+        [HttpPatch("me/citizen-identity")]
         public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -111,7 +111,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpPatch("driver-license")]
+        [HttpPatch("me/driver-license")]
         public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -120,7 +120,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("citizen-identity")]
+        [HttpDelete("me/citizen-identity")]
         public async Task<IActionResult> DeleteCitizenIdentity()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -129,7 +129,7 @@ namespace API.Controllers
         }
 
         [Authorize]
-        [HttpDelete("driver-license")]
+        [HttpDelete("me/driver-license")]
         public async Task<IActionResult> DeleteDriverLicense()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);

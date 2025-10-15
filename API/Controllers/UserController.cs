@@ -24,103 +24,6 @@ namespace API.Controllers
         {
             _userService = service;
         }
-
-        // ===========================
-        // Profile
-        // ===========================
-
-        #region profile
-
-        
-
-        #region document
-
-        [HttpPut("citizen-identity")]
-        [Authorize]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadCitizenId([FromForm] IFormFile file)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UploadCitizenIdAsync(userId, file);
-            return Ok(result);
-        }
-
-        [HttpPut("driver-license")]
-        [Authorize]
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UploadDriverLicenseAsync(userId, file);
-            return Ok(result);
-        }
-
-        [HttpGet("citizen-identity")]
-        [Authorize]
-        public async Task<IActionResult> GetMyCitizenIdentity()
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.GetMyCitizenIdentityAsync(userId);
-            return Ok(result);
-        }
-
-        [HttpGet("driver-license")]
-        [Authorize]
-        public async Task<IActionResult> GetMyDriverLicense()
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.GetMyDriverLicenseAsync(userId);
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpPatch("citizen-identity")]
-        public async Task<IActionResult> UpdateCitizenIdentity([FromBody] UpdateCitizenIdentityReq req)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UpdateCitizenIdentityAsync(userId, req);
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpPatch("driver-license")]
-        public async Task<IActionResult> UpdateDriverLicense([FromBody] UpdateDriverLicenseReq req)
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userService.UpdateDriverLicenseAsync(userId, req);
-            return Ok(result);
-        }
-
-        [Authorize]
-        [HttpDelete("citizen-identity")]
-        public async Task<IActionResult> DeleteCitizenIdentity()
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteCitizenIdentityAsync(userId);
-            return Ok();
-        }
-
-        [Authorize]
-        [HttpDelete("driver-license")]
-        public async Task<IActionResult> DeleteDriverLicense()
-        {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userService.DeleteDriverLicenseAsync(userId);
-            return Ok();
-        }
-
-        #endregion document
-
-        #endregion profile
-
-        // ===========================
-        // ===== User Management =====
-        // ===========================
-
-        #region user-management
-
         [HttpGet]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> GetAll(
@@ -201,8 +104,6 @@ namespace API.Controllers
             await _userService.DeleteDriverLicenseAsync(id);
             return Ok();
         }
-
-        #endregion user-management
 
         /*
          * Status code

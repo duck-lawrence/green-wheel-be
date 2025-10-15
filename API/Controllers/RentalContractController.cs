@@ -76,7 +76,7 @@ namespace API.Controllers
         * 200: success
         */
         [RoleAuthorize(RoleName.Staff)]
-        [HttpPost("offline")]
+        [HttpPost("manual")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
             var userId = req.CustomerId 

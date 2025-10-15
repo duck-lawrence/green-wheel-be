@@ -42,7 +42,7 @@ namespace API.Controllers
         */
 
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
-        [HttpPatch("{Id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicle([FromRoute] Guid id, UpdateVehicleReq updateVehicleReq)
         {
             await _vehicleService.UpdateVehicleAsync(id, updateVehicleReq);
@@ -57,7 +57,7 @@ namespace API.Controllers
          */
 
         [RoleAuthorize("Admin")]
-        [HttpDelete("{Id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicle([FromRoute] Guid id)
         {
             await _vehicleService.DeleteVehicle(id);
