@@ -38,8 +38,8 @@ namespace Application.Constants
             public const string InvalidUserAge = "user.invalid_user_age";
             public const string InvalidPhone = "user.invalid_phone";
             public const string PhoneIsRequired = "user.phone_require";
-            public const string FirstNameIsRequired = "user.first_name_is_required";
-            public const string LastNameIsRequired = "user.last_name_is_required";
+            public const string FirstNameIsRequired = "user.first_name_require";
+            public const string LastNameIsRequired = "user.last_name_require";
             public const string DateOfBirthIsRequired = "user.date_of_birth_require";
             public const string PhoneAlreadyExist = "user.phone_already_exist";
 
@@ -47,7 +47,7 @@ namespace Application.Constants
             public const string DoNotHavePermission = "user.do_not_have_permission";
 
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
-            public const string OldPasswordIsRequired = "user.old_password_is_required";
+            public const string OldPasswordIsRequired = "user.old_password_require";
 
             //login
             public const string InvalidEmailOrPassword = "user.invalid_email_or_password";
@@ -57,12 +57,11 @@ namespace Application.Constants
             public const string UserNotFound = "user.user_not_found";
 
             //change avatar
-            public const string NotFoundAvatar = "No avatar to delete";
+            public const string NotFoundAvatar = "user.avatar_not_found";
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
 
-            public const string CitizenIdentityUpdated = "user.citizen_identity_updated";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
 
             public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
@@ -75,40 +74,33 @@ namespace Application.Constants
         {
             public const string TooManyRequest = "common.too_many_request";
             public const string UnexpectedError = "common.unexpected_error";
-            public const string ValidationFailed = "common.validation_failed";
-            public const string NotFound = "common.not_found";
-            public const string BadRequest = "common.bad_request";
-            public const string Conflict = "common.conflict";
-            public const string Forbidden = "common.forbidden";
-            public const string DatabaseError = "common.database_error";
         }
 
         public static class VehicleMessage
         {
-            public const string VehicleNotFound = "vehicle.vehicle_not_found";
+            public const string VehicleNotFound = "vehicle.not_found";
             public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
         }
 
         public static class VehicleModelMessage
         {
-            public const string VehicleModelNotFound = "vehicle_model.vehicle_model_not_found";
+            public const string VehicleModelNotFound = "vehicle_model.not_found";
             public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
-            public const string VehicelModelNotFound = "vehicle_model.vehicle_model_not_found";
-            public const string NameIsRequire = "vehicle_model.name_is_require";
-            public const string SeatingCapacityIsRequired = "vehicle_model.seating_capacity_is_require";
+            public const string NameIsRequire = "vehicle_model.name_require";
+            public const string SeatingCapacityIsRequired = "vehicle_model.seating_capacity_require";
             public const string SeatingCapacityCanNotNegative = "vehicle_model.seating_capacity_can_not_negative";
-            public const string NumberOfAirbasIsRequire = "vehicle_model.airbass_is_require";
-            public const string NumberOfAirbasCanNotNegative = "vehicle_model.airbass_can_not_negative";
-            public const string MotorPowerIsRequired = "vehicle_model.mortor_power_is_required";
-            public const string MotorPowerCanNotNegative = "vehicle_model.mortor_power_can_not_negative";
-            public const string BatteryCapacityIsRequired = "vehicle_model.battery_capacity_is_required";
+            public const string NumberOfAirbagIsRequire = "vehicle_model.airbag_require";
+            public const string NumberOfAirbagCanNotNegative = "vehicle_model.airbag_can_not_negative";
+            public const string MotorPowerIsRequired = "vehicle_model.motor_power_require";
+            public const string MotorPowerCanNotNegative = "vehicle_model.motor_power_can_not_negative";
+            public const string BatteryCapacityIsRequired = "vehicle_model.battery_capacity_require";
             public const string BatteryCapacityCanNotNegative = "vehicle_model.battery_capacity_can_not_negative";
-            public const string EcoRangeKmIsRequired = "vehicle_model.eco_range_km_is_required";
+            public const string EcoRangeKmIsRequired = "vehicle_model.eco_range_km_require";
             public const string EcoRangeKmIsCanNotNegative = "vehicle_model.eco_range_km_can_not_negative";
-            public const string SportRangeKmIsRequired = "vehicle_model.sport_rang_km_is_required";
+            public const string SportRangeKmIsRequired = "vehicle_model.sport_rang_km_require";
             public const string SportRangeKmCanNotNegative = "vehicle_model.sport_rang_km_can_not_negative";
-            public const string BrandIdIsRequired = "vehicle_model.brand_id_is_required";
-            public const string SegmentIdIsRequired = "vehicle_model.segment_id_is_required";
+            public const string BrandIdIsRequired = "vehicle_model.brand_id_require";
+            public const string SegmentIdIsRequired = "vehicle_model.segment_id_require";
         }
 
         //change password
@@ -118,18 +110,17 @@ namespace Application.Constants
         {
             public const string NotFoundObjectInFile = "cloudinary.file_not_found";
             public const string InvalidFileType = "cloudinary.invalid_file_type";
-            public const string UploadFailed = "cloudinary.upload_failed";
-            public const string DeleteFailed = "cloudinary.delete_failed";
-            public const string DeleteSuccess = "cloudinary.delete_success";
-            public const string FolderNotFound = "cloudinary.folder_not_found";
-            public const string UploadSuccess = "cloudinary.upload_success";
+            public const string UploadFailed = "failed.upload";
+            public const string DeleteFailed = "failed.delete";
+            public const string DeleteSuccess = "success.delete";
+            public const string UploadSuccess = "success.upload";
         }
 
         //Rental Contract
         public static class RentalContractMessage
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
-            public const string RentalContractNotFound = "rental_contract.rental_contract_not_found";
+            public const string RentalContractNotFound = "rental_contract.not_found";
             public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
             public const string CanNotCancle = "rental_contract.can_not_cancle";
         }
@@ -137,7 +128,7 @@ namespace Application.Constants
         //Station
         public static class StationMessage
         {
-            public const string StationNotFound = "station.station_not_found";
+            public const string StationNotFound = "station.not_found";
         }
 
         public static class MomoMessage
@@ -147,18 +138,17 @@ namespace Application.Constants
             public const string NotHavePermission = "momo.not_have_permission";
             public const string InvalidEndpoint = "momo.invalid_end_point";
             public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
-            public const string PaymentFailed = "momo.payment_failed";
         }
 
         public static class InvoiceMessage
         {
-            public const string InvoiceNotFound = "invoice.invoice_not_found";
+            public const string InvoiceNotFound = "invoice.not_found";
             public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
         }
 
         public static class JsonMessage
         {
-            public const string ParsingFailed = "json.pasing_failed";
+            public const string ParsingFailed = "json.parsing_failed";
         }
 
         public static class VehicleSegmentMessage
@@ -167,14 +157,14 @@ namespace Application.Constants
         }
 
         //VEHICLE IMAGE
-        public static class ModelImageMessage
-        {
-            public const string ModelImageNotFound = "model_image.not_found";
-            public const string InvalidModelId = "model_image.invalid_model_id";
-            public const string UploadFailed = "model_image.upload_failed";
-            public const string DeleteFailed = "model_image.delete_failed";
-            public const string NoFileChosen = "model_image.no_file_chosen";
-        }
+        // public static class ModelImageMessage
+        // {
+        //     public const string ModelImageNotFound = "model_image.not_found";
+        //     public const string InvalidModelId = "model_image.invalid_model_id";
+        //     public const string UploadFailed = "model_image.upload_failed";
+        //     public const string DeleteFailed = "model_image.delete_failed";
+        //     public const string NoFileChosen = "model_image.no_file_chosen";
+        // }
 
         public static class TicketMessage
         {
@@ -183,22 +173,21 @@ namespace Application.Constants
         }
 
         //upload
-        public static class UploadMessage
-        {
-            public const string EmptyFile = "upload.empty_file";
-            public const string InvalidFile = "upload.invalid_file";
-            public const string Failed = "upload.failed";
-        }
+        // public static class UploadMessage
+        // {
+        //     public const string EmptyFile = "upload.empty_file";
+        //     public const string InvalidFile = "upload.invalid_file";
+        //     public const string Failed = "upload.failed";
+        // }
 
         public static class StationFeedbackMessage
         {
             public const string FeedbackNotFound = "station_feedback.not_found";
-            public const string AccessDenied = "station_feedback.access_denied";
         }
 
         public static class VehicleModelImageMessage
         {
-            public const string NoMainImage = "vehicle_model.no_main_image";
+            public const string MainImageNotFound = "vehicle_model_image.main_image_not_found";
         }
 
         public static class VehicleComponentMessage
