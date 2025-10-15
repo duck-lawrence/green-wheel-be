@@ -614,7 +614,7 @@ namespace Application
             try
             {
                 var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
-                    ?? throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
+                    ?? throw new BusinessException(Message.UserMessage.InvalidCitizenIdData);
 
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();

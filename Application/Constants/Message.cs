@@ -61,7 +61,7 @@ namespace Application.Constants
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
-
+            public const string InvalidCitizenIdData = "user.invalid_citizen_identity_data";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
 
             public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
