@@ -63,7 +63,7 @@ namespace Application
             string? driverLicenseNumber)
         {
             var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
-            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users);
+            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users) ?? [];
         }
 
         public async Task<User?> GetByIdAsync(Guid id)

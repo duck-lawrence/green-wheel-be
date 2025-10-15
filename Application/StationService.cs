@@ -24,11 +24,7 @@ namespace Application
         public async Task<IEnumerable<StationViewRes>> GetAllStation()
         {
             var stations = await _stationRepository.GetAllAsync();
-            if(stations == null)
-            {
-                throw new NotFoundException(Message.StationMessage.StationNotFound);
-            }
-            return _mapper.Map<IEnumerable<StationViewRes>>(stations);
+            return _mapper.Map<IEnumerable<StationViewRes>>(stations) ?? [];
         }
     }
 }
