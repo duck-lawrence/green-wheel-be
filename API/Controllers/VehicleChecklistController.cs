@@ -34,7 +34,7 @@ namespace API.Controllers
         {
             var staff = HttpContext.User;
             var id = await _vehicleChecklistService.Create(staff, req);
-            return Ok(new {id});
+            return Ok(new { id });
         }
 
 
@@ -45,11 +45,11 @@ namespace API.Controllers
          * 403 don't have permission
          * 401 unauthorize
          */
-        [HttpPut]
+        [HttpPut("{id}")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req)
+        public async Task<IActionResult> UpdateVehicleChecklist([FromBody] UpdateVehicleChecklistReq req, Guid id)
         {
-            await _vehicleChecklistService.UpdateAsync(req);
+            await _vehicleChecklistService.UpdateAsync(id, req);
             return Ok();
         }
 
@@ -68,7 +68,7 @@ namespace API.Controllers
 
         [HttpGet]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> GetByContractId(Guid? contractId, int? type)
+        public async Task<IActionResult> GetAll(Guid? contractId, int? type)
         {
             var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId, type);
             return Ok(checklistsViewRes);

@@ -14,6 +14,6 @@ namespace Application.Abstractions
         Task<Guid> Create(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req);
         Task<VehicleChecklistViewRes> GetByIdAsync(Guid id);
         Task<IEnumerable<VehicleChecklistViewRes>>GetAll(Guid? contractId, int? type);
-        Task UpdateAsync(UpdateVehicleChecklistReq req);
+        Task UpdateAsync(UpdateVehicleChecklistReq req, Guid id);
     }
 }
