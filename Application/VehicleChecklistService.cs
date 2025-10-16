@@ -5,9 +5,11 @@ using Application.Dtos.VehicleChecklist.Request;
 using Application.Dtos.VehicleChecklist.Respone;
 using Application.Dtos.VehicleChecklistItem.Request;
 using Application.Helpers;
+using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -18,11 +20,15 @@ namespace Application
     {
         private readonly IVehicleChecklistUow _uow;
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
+        private readonly IUserRepository _userRepository;
 
-        public VehicleChecklistService(IVehicleChecklistUow uow, IMapper mapper)
+        public VehicleChecklistService(IVehicleChecklistUow uow, IMapper mapper, IMemoryCache cache, IUserRepository userRepository)
         {
             _uow = uow;
             _mapper = mapper;
+            _cache = cache;
+            _userRepository = userRepository;
         }
 
         
@@ -117,16 +123,7 @@ namespace Application
             return checklist.Id;
         }
 
-        public async Task<VehicleChecklistViewRes> GetByIdAsync(Guid id)
-        {
-            var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
-            if (vehicleChecklist == null)
-            {
-                throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
-            }
-            var checklistViewRes = _mapper.Map<VehicleChecklistViewRes>(vehicleChecklist);
-            return checklistViewRes;
-        }
+        
 
         public async Task UpdateAsync(UpdateVehicleChecklistReq req, Guid id)
         {
@@ -216,11 +213,50 @@ namespace Application
             }
         }
 
-        public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId, int? type)
+        public async Task<VehicleChecklistViewRes> GetByIdAsync(Guid id, ClaimsPrincipal userClaims)
         {
+
+            var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
+            if (vehicleChecklist == null)
+            {
+                throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+            }
+            var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            if (await CheckAuthorize(userId, vehicleChecklist.ContractId) == false)
+            {
+                throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+            }
+            var checklistViewRes = _mapper.Map<VehicleChecklistViewRes>(vehicleChecklist);
+            return checklistViewRes;
+        }
+        public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId, int? type, ClaimsPrincipal userClaims)
+        {
+            var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId, type);
+            if (await CheckAuthorize(userId, contractId)) //nếu là user thì get all theo id
+                throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+
             var checklistsViewRes = _mapper.Map<IEnumerable<VehicleChecklistViewRes>>(vehicleChecklists);
             return checklistsViewRes ?? [];
+        }
+        private async Task<bool> CheckAuthorize(Guid userId, Guid? contractId = null)
+        {
+            var roles = _cache.Get<List<Role>>("AllRoles");
+            var userInDB = await _userRepository.GetByIdAsync(userId);
+            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+            if (userRole == RoleName.Staff)
+            {
+                return true;
+            }
+            else //(userRole == RoleName.Customer
+            {
+                if (contractId != null)
+                {
+                    var contract = await _uow.RentalContractRepository.GetByIdAsync((Guid)contractId);
+                    if (contract.CustomerId == userId) return true;
+                }
+                return false;
+            }
         }
     }
 }

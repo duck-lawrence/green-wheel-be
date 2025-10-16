@@ -199,23 +199,18 @@ namespace Application
         public async Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
-            if (contract == null)
-            {
-                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            }
-            var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId);
-            if (vehicle == null)
-            {
-                throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
-            }
-            var invoice = (await _uow.InvoiceRepository.GetByContractAsync(id)).Where(i => i.Type == (int)InvoiceType.Handover).FirstOrDefault();
-            if(invoice == null)
-            {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
-            }
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id) 
+                ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             
-            if(contract.Status == (int)RentalContractStatus.Active && invoice.Status == (int)InvoiceStatus.Paid)
+            var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId) 
+                ?? throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+
+            var handoverInvoice = (await _uow.InvoiceRepository.GetByContractAsync(id))
+                .Where(i => i.Type == (int)InvoiceType.Handover).FirstOrDefault()
+                    ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+            
+            
+            if(contract.Status == (int)RentalContractStatus.Active && handoverInvoice.Status == (int)InvoiceStatus.Paid)
             {
                 vehicle.Status = (int)VehicleStatus.Rented;
                 await _uow.VehicleRepository.UpdateAsync(vehicle);
@@ -223,12 +218,7 @@ namespace Application
             }
             else
             {
-                invoice.PaidAmount = req.Amount;
-                invoice.PaidAt = DateTimeOffset.UtcNow;
-                invoice.Status = (int)InvoiceStatus.Paid;
-                vehicle.Status = (int)VehicleStatus.Rented;
-                await _uow.VehicleRepository.UpdateAsync(vehicle);
-                await _uow.InvoiceRepository.UpdateAsync(invoice);
+                throw new BusinessException(Message.InvoiceMessage.NotHandoverPayment);
             }
             contract.IsSignedByStaff = req.IsSignedByStaff;
             contract.IsSignedByCustomer = req.IsSignedByCustomer;

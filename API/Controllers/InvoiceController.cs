@@ -65,18 +65,37 @@ namespace API.Controllers
         [HttpPut("{id}/payment")]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            var invoice = await _invoiceService.GetRawInvoiceById(id, true, true); 
+            var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
+            if (invoice.Status == (int)InvoiceStatus.Cancelled || invoice.Status == (int)InvoiceStatus.Paid) 
+                throw new BusinessException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
             {
-                await _invoiceService.CashPayment(invoice);
+                if (paymentReq.Amount == null) throw new BadRequestException(Message.InvoiceMessage.AmountRequired);
+                
+                switch (invoice.Type)
+                {
+                    case (int)InvoiceType.Handover:
+                        await _invoiceService.PayHandoverInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
+                    case (int)InvoiceType.Return:
+                        await _invoiceService.PayReturnInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
+                    case (int)InvoiceType.Reservation:
+                        await _invoiceService.PayReservationInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
+                    default:
+                        throw new Exception(Message.InvoiceMessage.InvalidInvoiceType);
+                       
+                }
+
                 return Ok();
             }
             string link = invoice.Type switch
             {
-                (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice, paymentReq.FallbackUrl),
-                (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice, paymentReq.FallbackUrl),
-                (int)InvoiceType.Return => await _invoiceService.ProcessReturnInvoice(invoice, paymentReq.FallbackUrl),
-                _ => throw new Exception(),
+                (int)InvoiceType.Handover => await _invoiceService.PayHandoverInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Reservation => await _invoiceService.PayReservationInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Return => await _invoiceService.PayReturnInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                _ => throw new Exception(Message.InvoiceMessage.InvalidInvoiceType),
             };
             return Ok(new { link });
         }

@@ -4,6 +4,7 @@ using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.VehicleChecklist.Request;
 using Application.Dtos.VehicleModel.Respone;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,18 +60,20 @@ namespace API.Controllers
          * 404 not found
          */
         [HttpGet("{id}")]
-        [RoleAuthorize(RoleName.Staff)]
+        [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var checklistViewRes = await _vehicleChecklistService.GetByIdAsync(id);
+            var user = HttpContext.User;
+            var checklistViewRes = await _vehicleChecklistService.GetByIdAsync(id, user);
             return Ok(checklistViewRes);
         }
 
         [HttpGet]
-        [RoleAuthorize(RoleName.Staff)]
+        [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
         public async Task<IActionResult> GetAll(Guid? contractId, int? type)
         {
-            var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId, type);
+            var user = HttpContext.User;
+            var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId, type, user);
             return Ok(checklistsViewRes);
         }
 

@@ -144,6 +144,13 @@ namespace Application.Constants
         {
             public const string InvoiceNotFound = "invoice.not_found";
             public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
+
+            public static string AmountRequired = "invoice.amount_required";
+            public static string InvalidAmount = "invoice.invalid_amount";
+
+            public static string NotHandoverPayment = "invoice.not_handover_payment";
+
+            public static string? InvalidInvoiceType = "Invoice.invalid_invoice_type";
         }
 
         public static class JsonMessage
