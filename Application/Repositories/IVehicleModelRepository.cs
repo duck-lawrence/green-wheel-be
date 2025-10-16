@@ -3,13 +3,14 @@ using Domain.Entities;
 
 namespace Application.Repositories
 {
-    public interface IVehicleModelRepository : IGenericRepository<VehicleModel>
+    public interface IVehicleModelRepository : IGenericRepository<Domain.Entities.VehicleModel>
     {
-        Task<IEnumerable<VehicleModelViewRes>> FilterVehicleModelsAsync(Guid stationId,
+        Task<IEnumerable<Dtos.VehicleModel.Respone.VehicleModelViewRes>> FilterVehicleModelsAsync(Guid stationId,
                                                             DateTimeOffset startDate,
                                                             DateTimeOffset endDate,
                                                             Guid? segmentId = null);
-        Task<VehicleModelViewRes> GetByIdAsync(Guid vehicleId, Guid stationId, DateTimeOffset startDate,
+        Task<Dtos.VehicleModel.Respone.VehicleModelViewRes> GetByIdAsync(Guid vehicleId, Guid stationId, DateTimeOffset startDate,
         DateTimeOffset endDate);
+        Task<IEnumerable<Domain.Entities.VehicleModel>> GetAllAsync(string? name, Guid? segmentId);
     }
 }

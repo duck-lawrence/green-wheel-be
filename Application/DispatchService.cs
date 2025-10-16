@@ -57,7 +57,7 @@ namespace Application
             var entity = await _repository.GetByIdAsync(id) ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
             var currentStatus = (DispatchRequestStatus)entity.Status;
             var newStatus = req.status;
-            if (newStatus == DispatchRequestStatus.Approved || newStatus == DispatchRequestStatus.Rejected)
+            if (newStatus == (int)DispatchRequestStatus.Approved || newStatus == (int)DispatchRequestStatus.Rejected)
             {
                 if (entity.ToStationId != currentAdminStationId)
                     throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
@@ -65,9 +65,9 @@ namespace Application
                     throw new BadRequestException(Message.DispatchMessage.OnlyApprovedCanReceive);
 
                 entity.ApprovedAdminId = currentAdminId;
-                entity.Status = (int)newStatus;
+                entity.Status = newStatus;
             }
-            else if (newStatus == DispatchRequestStatus.Received)
+            else if (newStatus == (int)DispatchRequestStatus.Received)
             {
                 if (entity.FromStationId != currentAdminStationId
                     || currentStatus != DispatchRequestStatus.Approved)
@@ -77,7 +77,7 @@ namespace Application
                 await _vehicleRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
                 entity.Status = (int)DispatchRequestStatus.Received;
             }
-            else if (newStatus == DispatchRequestStatus.Cancel)
+            else if (newStatus == (int)DispatchRequestStatus.Cancel)
             {
                 if (entity.FromStationId != currentAdminStationId
                     || currentStatus != DispatchRequestStatus.Pending)

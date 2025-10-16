@@ -9,13 +9,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
-    public class VehicleModelRepository : GenericRepository<VehicleModel>, IVehicleModelRepository
+    public class VehicleModelRepository : GenericRepository<Domain.Entities.VehicleModel>, IVehicleModelRepository
     {
         private readonly IMapper _mapper;
 
         public VehicleModelRepository(IGreenWheelDbContext dbContext, IMapper mapper) : base(dbContext)
         {
             _mapper = mapper;
+        }
+        public async Task<IEnumerable<VehicleModel>> GetAllAsync(string? name, Guid? segmentId)
+        {
+            var models = _dbContext.VehicleModels
+                            .Include(vm => vm.Brand)
+                            .Include(vm => vm.Segment)
+                            .Include(vm => vm.ModelImages)
+                            .Include(vm => vm.Vehicles)
+                            .AsQueryable();
+            if (!string.IsNullOrEmpty(name)) models = models.Where(vm => vm.Name.ToLower().Contains(name.ToLower()));
+            if (segmentId != null) models = models.Where(vm => vm.SegmentId == segmentId);
+            return await models.ToListAsync();
         }
 
         public async Task<IEnumerable<VehicleModelViewRes>> FilterVehicleModelsAsync(

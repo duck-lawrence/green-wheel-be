@@ -66,9 +66,9 @@ namespace API.Controllers
 
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(string? name, Guid? stationId, int? status, string? licensePlate)
         {
-            var vehicle = await _vehicleService.GetAllVehicle();
+            var vehicle = await _vehicleService.GetAllAsync(name, stationId, status, licensePlate);
             return Ok(vehicle);
         }
 

@@ -48,7 +48,7 @@ namespace Application
         private async Task<Guid> CreateVehicleChecklistOutSideContract(Guid staffId, Guid vehicleId, int type)
         {
            
-            var components = await _uow.VehicleRepository.GetVehicleComponentsAsync(vehicleId);
+            var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync(vehicleId);
             if (components == null)
             {
                 throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
@@ -89,7 +89,7 @@ namespace Application
             {
                 throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             }
-            var components = await _uow.VehicleRepository.GetVehicleComponentsAsync((Guid)contract.VehicleId);
+            var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId);
             if (components == null)
             {
                 throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
@@ -233,7 +233,7 @@ namespace Application
         {
             var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId, type);
-            if (await CheckAuthorize(userId, contractId)) //nếu là user thì get all theo id
+            if (await CheckAuthorize(userId, contractId) == false) //nếu là user thì get all theo id
                 throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
 
             var checklistsViewRes = _mapper.Map<IEnumerable<VehicleChecklistViewRes>>(vehicleChecklists);

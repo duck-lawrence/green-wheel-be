@@ -1,5 +1,6 @@
 ﻿using Application.Constants;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,10 @@ namespace Application.Repositories
         Task<Vehicle> GetByLicensePlateAsync(string licensePlate);
 
         Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId);
-
-        Task<IEnumerable<VehicleComponent>> GetVehicleComponentsAsync(Guid vehicleId);
-
         Task<Vehicle?> GetByIdOptionAsync(Guid id, bool includeModel = false);
 
         Task<int> CountVehiclesInStationAsync(Guid[] vehicleIds, Guid stationId);
-
+        Task<IEnumerable<Vehicle>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate);
         Task UpdateStationForDispatchAsync(Guid dispatchId, Guid toStationId);
     }
 }

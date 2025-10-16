@@ -142,6 +142,8 @@
             public const string RentalContractNotFound = "rental_contract.not_found";
             public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
             public const string CanNotCancel = "rental_contract.can_not_cancel";
+
+            public static string ContractAlreadyComplete { get; internal set; }
         }
 
         //Station

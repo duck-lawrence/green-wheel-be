@@ -201,7 +201,7 @@ namespace Application
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id) 
                 ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            
+            if (contract.ActualStartDate != null) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyComplete);
             var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId) 
                 ?? throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
 
@@ -231,11 +231,9 @@ namespace Application
         public async Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
-            if(contract == null)
-            {
-                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            }
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) 
+               ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            if (contract.Status == (int)RentalContractStatus.Completed) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyComplete);
             contract.Status = (int)RentalContractStatus.Completed;
             var actual_end_date = contract.EndDate.AddHours(2); // test
             //var actual_end_date = DateTimeOffset.UtcNow;
@@ -299,6 +297,19 @@ namespace Application
             return returnInvoice.Id;
         }
 
+        public async Task CancelRentalContract(Guid id)
+        {
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
+            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+
+            if (contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
+            {
+                throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
+            }
+            if (contract.Status == (int)RentalContractStatus.Completed) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyComplete);
+            contract.Status = (int)RentalContractStatus.Cancelled;
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+        }
         public async Task UpdateStatusAsync(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
@@ -399,16 +410,6 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task CancelRentalContract(Guid id)
-        {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
-            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            if(contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
-            {
-                throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
-            }
-            contract.Status = (int) RentalContractStatus.Cancelled;
-            await _uow.RentalContractRepository.UpdateAsync(contract);
-        }
+        
     }
 }

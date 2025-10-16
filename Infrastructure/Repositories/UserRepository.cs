@@ -1,7 +1,9 @@
+using Application.Constants;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace Infrastructure.Repositories
 {
@@ -38,6 +40,25 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<IEnumerable<User>> GetAllStaffAsync(string? name, Guid? stationId)
+        {
+            var query = _dbContext.Users
+               .Include(user => user.Role)
+               .Include(user => user.DriverLicense)
+               .Include(user => user.CitizenIdentity)
+               .Include(user => user.Staff)
+                   .ThenInclude(staff => staff.Station)
+                .Where(u => u.Staff != null && u.Role.Name == RoleName.Staff)
+               .AsQueryable()
+               .AsNoTracking();
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(u => u.FirstName.ToLower().Contains(name.ToLower()) ||
+                                    u.LastName.ToLower().Contains(name.ToLower()));
+            if (stationId != null)
+                query = query.Where(u => u.Staff.StationId == stationId);
+            return await query.ToListAsync();
+        } 
 
         public async Task<User?> GetByPhoneAsync(string phone)
         {
