@@ -7,33 +7,55 @@ namespace Infrastructure.Repositories
 {
     public class StaffRepository : IStaffRepository
     {
-        protected readonly IGreenWheelDbContext _dbContext;
+        private readonly IGreenWheelDbContext _dbContext;
 
-        public StaffRepository(GreenWheelDbContext dbContext)
+        public StaffRepository(IGreenWheelDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<int> CountStaffsInStationAsync(Guid[] staffIds, Guid stationId)
-        {
-            return await _dbContext.Staffs.CountAsync(s => staffIds.Contains(s.UserId) && s.StationId == stationId);
-        }
-
         public async Task<Staff?> GetByUserIdAsync(Guid userId)
         {
-            return await _dbContext.Staffs.FirstOrDefaultAsync(s => s.UserId == userId && s.DeletedAt == null);
+            return await _dbContext.Staffs
+                .FirstOrDefaultAsync(s => s.UserId == userId && s.DeletedAt == null);
         }
 
-        public async Task UpdateStationForDispatchAsync(Guid dispatchId, Guid stationId)
+        public async Task<int> CountStaffsInStationAsync(Guid[] staffIds, Guid stationId)
         {
-            var staffId = await _dbContext.DispatchRequestStaffs.Where(x => x.DispatchRequestId == dispatchId).Select(x => x.StaffId).ToListAsync();
+            if (staffIds == null || staffIds.Length == 0)
+                return 0;
 
-            if (staffId != null || staffId.Count == 0) { return; }
-            var staffs = await _dbContext.Staffs.Where(s => staffId.Contains(s.StationId)).ToListAsync();
-            foreach (var x in staffs)
+            return await _dbContext.Staffs
+                .CountAsync(s => staffIds.Contains(s.UserId)
+                                 && s.StationId == stationId
+                                 && s.DeletedAt == null);
+        }
+
+        public async Task UpdateStationForDispatchAsync(Guid dispatchId, Guid toStationId)
+        {
+            // Lấy danh sách staffIds từ bảng dispatch_request_staffs
+            var staffIds = await _dbContext.DispatchRequestStaffs
+                .Where(x => x.DispatchRequestId == dispatchId && x.DeletedAt == null)
+                .Select(x => x.StaffId)
+                .ToListAsync();
+
+            if (staffIds == null || staffIds.Count == 0)
+                return;
+
+            // Lấy staff theo UserId (chính là StaffId)
+            var staffs = await _dbContext.Staffs
+                .Where(s => staffIds.Contains(s.UserId) && s.DeletedAt == null)
+                .ToListAsync();
+
+            if (staffs == null || staffs.Count == 0)
+                return;
+
+            // Cập nhật trạm mới
+            foreach (var s in staffs)
             {
-                x.StationId = stationId;
+                s.StationId = toStationId;
             }
+
             await _dbContext.SaveChangesAsync();
         }
     }

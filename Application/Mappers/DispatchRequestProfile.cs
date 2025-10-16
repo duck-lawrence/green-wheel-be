@@ -32,7 +32,7 @@ namespace Application.Mappers
 
             // UpdateReq -> Entity (dùng khi cần map status trực tiếp)
             CreateMap<UpdateDispatchReq, DispatchRequest>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.status))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }

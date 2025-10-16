@@ -54,30 +54,42 @@ namespace Application
 
         public async Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateDispatchReq req)
         {
-            var entity = await _repository.GetByIdAsync(id) ?? throw new NotFoundException("Dispatch not found");
+            var entity = await _repository.GetByIdAsync(id) ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
             var currentStatus = (DispatchRequestStatus)entity.Status;
-            var newStatus = req.Status;
+            var newStatus = req.status;
             if (newStatus == DispatchRequestStatus.Approved || newStatus == DispatchRequestStatus.Rejected)
             {
-                if (entity.ToStationId != currentAdminStationId || currentStatus != DispatchRequestStatus.Pending)
-                    throw new ForbidenException("Invalid operation.");
+                if (entity.ToStationId != currentAdminStationId)
+                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+                if (currentStatus != DispatchRequestStatus.Pending)
+                    throw new BadRequestException(Message.DispatchMessage.OnlyApprovedCanReceive);
 
                 entity.ApprovedAdminId = currentAdminId;
                 entity.Status = (int)newStatus;
             }
             else if (newStatus == DispatchRequestStatus.Received)
             {
-                if (entity.FromStationId != currentAdminStationId || currentStatus != DispatchRequestStatus.Approved) throw new ForbidenException("Invalid operation.");
+                if (entity.FromStationId != currentAdminStationId
+                    || currentStatus != DispatchRequestStatus.Approved)
+                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+
                 await _staffRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
                 await _vehicleRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
                 entity.Status = (int)DispatchRequestStatus.Received;
             }
             else if (newStatus == DispatchRequestStatus.Cancel)
             {
-                if (entity.FromStationId != currentAdminStationId || currentStatus != DispatchRequestStatus.Pending) throw new ForbidenException("Invalid operation.");
+                if (entity.FromStationId != currentAdminStationId
+                    || currentStatus != DispatchRequestStatus.Pending)
+                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+
                 entity.Status = (int)DispatchRequestStatus.Cancel;
             }
-            else throw new BadRequestException("Invalid status");
+            else
+            {
+                throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
+            }
+
             await _repository.UpdateAsync(entity);
         }
     }
