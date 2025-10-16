@@ -87,6 +87,8 @@ namespace API
             builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
+            builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+            builder.Services.AddScoped<IDispatchRepository, DispatchRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -104,6 +106,7 @@ namespace API
             builder.Services.AddScoped<ITicketService, TicketService>();
             builder.Services.AddScoped<IStationFeedbackService, StationFeedbackService>();
             builder.Services.AddScoped<IChecklistItemImageService, ChecklistItemImageService>();
+            builder.Services.AddScoped<IDispatchRequestService, DispatchService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -118,9 +121,8 @@ namespace API
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
-            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            //configure <-> setting
-            //Momo
+                                                                 //configure <-> setting
+                                                                 //Momo
             builder.Services.Configure<MomoSettings>(builder.Configuration.GetSection("MomoSettings"));
             //JWT
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -204,7 +206,7 @@ namespace API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
-            //app.UseHttpsRedirection();  
+            //app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();
