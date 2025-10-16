@@ -15,6 +15,5 @@ namespace Application.Repositories
             string? citizenIdentity = null, string? driverLicense = null);
         Task<RentalContract?> GetByCheckListIdAsync(Guid id);
 
-
     }
 }
