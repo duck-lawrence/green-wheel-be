@@ -27,14 +27,14 @@ namespace Application
         private readonly IInvoiceUow _uow;
         private readonly IMapper _mapper;
         private readonly IMomoService _momoService;
-        private readonly EmailSettings _emailSettings;
+        private readonly IEmailSerivce _emailService;
 
-        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService, IOptions<EmailSettings> emailSettings)
+        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService, IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce)
         {
             _uow = uow;
             _mapper = mapper;
             _momoService = momoService;
-            _emailSettings = emailSettings.Value;
+            _emailService = emailSerivce;
         }
 
         public async Task CashPayment(Invoice invoice)
@@ -62,7 +62,14 @@ namespace Application
             {
                 throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             }
-            var invoiceViewRes = _mapper.Map<InvoiceViewRes>(invoice);
+            var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId))
+                            .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
+            var reservationFee = 0;
+            if (reservationInvoice != null && reservationInvoice.Status == (int)InvoiceStatus.Paid)
+            {
+                reservationFee = (int)reservationInvoice.Subtotal;
+            }
+            var invoiceViewRes = _mapper.Map<InvoiceViewRes>(invoice, otp => otp.Items["ReservationFee"] = reservationFee);
             return invoiceViewRes;
         }
 
@@ -129,7 +136,7 @@ namespace Application
                      .Replace("{PaymentMethod}", Enum.GetName(typeof(PaymentMethod), invoice.PaymentMethod))
                      .Replace("{InvoiceType}", Enum.GetName(typeof(InvoiceType), invoice.Type))
                      .Replace("{PaidAt}", invoice.PaidAt?.ToString("dd/MM/yyyy HH:mm"));
-                await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
+                await _emailService.SendEmailAsync(customer.Email, subject, body);
             }
         }
 
@@ -138,7 +145,7 @@ namespace Application
             var invoices = await _uow.InvoiceRepository.GetAllInvoicesAsync(pagination);
 
             if (invoices == null || !invoices.Items.Any())
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                return null;
 
             return invoices;
         }

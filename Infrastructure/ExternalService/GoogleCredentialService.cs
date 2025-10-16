@@ -4,7 +4,7 @@ using Application.Constants;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Options;
 
-namespace Application
+namespace Infrastructure.ExternalService
 {
     public class GoogleCredentialService : IGoogleCredentialService
     {

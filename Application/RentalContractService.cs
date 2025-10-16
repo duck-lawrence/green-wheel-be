@@ -2,7 +2,6 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
-using Application.Dtos.Invoice.Response;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
@@ -10,19 +9,9 @@ using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Net.WebSockets;
-using System.Runtime.InteropServices;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace Application
 {
@@ -30,19 +19,26 @@ namespace Application
     {
         private readonly IRentalContractUow _uow;
         private readonly IMapper _mapper;
-        private readonly EmailSettings _emailSettings;
-        public RentalContractService(IRentalContractUow uow, IMapper mapper, IOptions<EmailSettings> emailSettings)
+        private readonly IEmailSerivce _emailService;
+        public RentalContractService(IRentalContractUow uow, IMapper mapper, IOptions<EmailSettings> emailSettings, IEmailSerivce emailService)
         {
             _uow = uow;
             _mapper = mapper;
-            _emailSettings = emailSettings.Value;
+            _emailService = emailService;
         }
 
         public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
             if(contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            return _mapper.Map<RentalContractViewRes>(contract);
+            var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(id))
+                            .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
+            var reservationFee = 0;
+            if(reservationInvoice != null && reservationInvoice.Status == (int)InvoiceStatus.Paid)
+            {
+                reservationFee = (int)reservationInvoice.Subtotal;
+            }
+            return _mapper.Map<RentalContractViewRes>(contract, otp => otp.Items["ReservationFee"] = reservationFee);
         }
         public async Task CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
         {
@@ -242,7 +238,7 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task<InvoiceViewRes?> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
+        public async Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
@@ -256,44 +252,61 @@ namespace Application
             if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             var hours = (actual_end_date - contract.EndDate).TotalHours; //tính thời gian trể
             hours = Double.Ceiling(hours);
-
-            Guid invoiceId = Guid.NewGuid();
-            var invoice = new Invoice()
+            IEnumerable<Invoice> invoices = [];
+            Guid returnInvoiceId = Guid.NewGuid();
+            var returnInvoice = new Invoice()
             {
-                Id = invoiceId,
+                Id = returnInvoiceId,
                 ContractId = contractId,
                 Status = (int)InvoiceStatus.Pending,
                 Tax = Common.Tax.BaseVAT, //10% dạng decimal
-                Notes = $"GreenWheel – Invoice for your order {contractId}"
+                Notes = $"GreenWheel – Invoice for your order {contractId}",
+                Type = (int)InvoiceType.Return  
             };
-            await _uow.InvoiceRepository.AddAsync(invoice);
-            IEnumerable<InvoiceItem> items = []; //tạo trước invoice item
+            invoices = invoices.Append(returnInvoice);
+
+            IEnumerable<InvoiceItem> returnInvoiceItems = []; //tạo trước invoice item
 
             if (hours > Common.Policy.MaxLateHours)
             {
                 //phí trể giờ
-                items = items.Append(new InvoiceItem()
+                returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
                 {
-                    InvoiceId = invoiceId,
+                    InvoiceId = returnInvoiceId,
                     Quantity = (int)hours,
                     UnitPrice = Common.Fee.LateReturn,
                     Type = (int)InvoiceItemType.LateReturn,
                 });
             }
             //phí dọn dẹp
-            items = items.Append(new InvoiceItem()
+            returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
             {
-                InvoiceId = invoiceId,
-                Quantity = (int)hours,
+                InvoiceId = returnInvoiceId,
+                Quantity = 1,
                 UnitPrice = Common.Fee.Cleaning,
                 Type = (int)InvoiceItemType.Cleaning,
             });
-            invoice.Type = (int)InvoiceType.Return;
-            invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
+
+            //tạo hoá đơn refund
+            Guid refundInvoiceId = Guid.NewGuid();
+            var refundInvoice = new Invoice()
+            {
+                Id = returnInvoiceId,
+                ContractId = contractId,
+                Status = (int)InvoiceStatus.Pending,
+                Tax = Common.Tax.NoneVAT, //10% dạng decimal
+                Notes = $"GreenWheel – Invoice for your order {contractId}",
+                Type = (int)InvoiceType.Refund
+            };
+            invoices = invoices.Append(refundInvoice);
+            var deposit = await _uow.DepositRepository.GetByContractIdAsync(contractId);
+            refundInvoice.Subtotal = deposit.Amount;
+            returnInvoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(returnInvoiceItems);
+            await _uow.InvoiceRepository.AddRangeAsync(invoices);
             await _uow.RentalContractRepository.UpdateAsync(contract);
-            await _uow.InvoiceItemRepository.AddRangeAsync(items);
+            await _uow.InvoiceItemRepository.AddRangeAsync(returnInvoiceItems);
             await _uow.SaveChangesAsync();
-            return _mapper.Map<InvoiceViewRes>(invoice);
+            return returnInvoice.Id;
         }
 
         public async Task UpdateStatusAsync(Guid id)
@@ -358,6 +371,10 @@ namespace Application
                 templatePath = Path.Combine(basePath, "Templates", "PaymentEmailTemplate.html");
                 body = System.IO.File.ReadAllText(templatePath);
 
+                var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
+                    ?? "http://localhost:3000/";
+                var contractDetailUrl = $"{frontendOrigin}/rental-contracts/{rentalContract.Id}";
+
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
                            .Replace("{BookingId}", rentalContract.Id.ToString())
                            .Replace("{VehicleModelName}", vehicleModel.Name)
@@ -365,8 +382,7 @@ namespace Application
                            .Replace("{StationName}", station.Name)
                            .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
                            .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"))
-                           .Replace("{PaymentLink}", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=RDdQw4w9WgXcQ&start_radio=1")
-                           .Replace("{Deadline}", "....");
+                           .Replace("{PaymentLink}", contractDetailUrl);
             }
             else
             {
@@ -389,17 +405,17 @@ namespace Application
                            .Replace("{StartDate}", rentalContract.StartDate.ToString("dd/MM/yyyy"))
                            .Replace("{EndDate}", rentalContract.EndDate.ToString("dd/MM/yyyy"));
             }
-             await EmailHelper.SendEmailAsync(_emailSettings, customer.Email, subject, body);
+            await _emailService.SendEmailAsync(customer.Email, subject, body);
             await _uow.SaveChangesAsync();
         }
 
-        public async Task CancleRentalContract(Guid id)
+        public async Task CancelRentalContract(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
             if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             if(contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
             {
-                throw new BadRequestException(Message.RentalContractMessage.CanNotCancle);
+                throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
             }
             contract.Status = (int) RentalContractStatus.Cancelled;
             await _uow.RentalContractRepository.UpdateAsync(contract);

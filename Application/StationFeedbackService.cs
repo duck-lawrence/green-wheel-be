@@ -41,13 +41,13 @@ public class StationFeedbackService : IStationFeedbackService
 
     public async Task<IEnumerable<StationFeedbackRes>> GetByStationIdAsync(Guid stationId)
     {
-        var list = await _repo.FindAsync(f => f.StationId == stationId);
+        var list = await _repo.FindAsync(f => f.StationId == stationId) ?? [];
         return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
     }
 
     public async Task<IEnumerable<StationFeedbackRes>> GetByCustomerIdAsync(Guid customerId)
     {
-        var list = await _repo.FindAsync(f => f.CustomerId == customerId);
+        var list = await _repo.FindAsync(f => f.CustomerId == customerId) ?? [];
         return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
     }
 }

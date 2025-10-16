@@ -17,6 +17,7 @@ using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using AutoMapper;
+using Infrastructure.ExternalService;
 
 namespace API
 {
@@ -89,6 +90,9 @@ namespace API
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             builder.Services.AddScoped<IStaffRepository, StaffRepository>();
             builder.Services.AddScoped<IDispatchRepository, DispatchRepository>();
+            builder.Services.AddScoped<IEmailSerivce, EmailService>();
+            builder.Services.AddScoped<IAuthService, AuthSerivce>();
+            builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
