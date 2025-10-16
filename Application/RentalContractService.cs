@@ -62,39 +62,44 @@ namespace Application
             }
             var station = await _uow.StationRepository.GetByIdAsync(createReq.StationId) ??
                                                         throw new NotFoundException(Message.StationMessage.StationNotFound);
-            var vehicles = await _uow.VehicleRepository.GetVehicles(createReq.StationId,
-                                                        createReq.ModelId) ??
-                                                        throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
-            Vehicle vehicle = null;
-            foreach(var _vehicle in vehicles)
-            {
-                if(_vehicle.Status == (int)VehicleStatus.Available)
-                {
-                    vehicle = _vehicle;
-                    break;
-                }
-                if(_vehicle.Status == (int)VehicleStatus.Unavaible || _vehicle.Status == (int)VehicleStatus.Rented)
-                {
-                    var isOverlap = false;
-                    foreach(var rentalContract in _vehicle.RentalContracts)
-                    {
-                        if(rentalContract.StartDate <= createReq.EndDate.AddDays(10)
-                            && rentalContract.EndDate >= createReq.StartDate.AddDays(-10))
-                        {
-                            isOverlap = true;
-                            break;
-                        } 
-                    }
-                    if (isOverlap == false)
-                    {
-                        vehicle = _vehicle;
-                        break;
-                    }
-                }
-            }
-            if (vehicle == null) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
-            var model = await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId);
+            //var vehicles = await _uow.VehicleRepository.GetVehicles(createReq.StationId,
+            //                                            createReq.ModelId) ??
+            //                                            throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            //Vehicle vehicle = null;
+            //foreach(var _vehicle in vehicles)
+            //{
+            //    if(_vehicle.Status == (int)VehicleStatus.Available)
+            //    {
+            //        vehicle = _vehicle;
+            //        break;
+            //    }
+            //    if(_vehicle.Status == (int)VehicleStatus.Unavaible || _vehicle.Status == (int)VehicleStatus.Rented)
+            //    {
+            //        var isOverlap = false;
+            //        foreach(var rentalContract in _vehicle.RentalContracts)
+            //        {
+            //            if(rentalContract.StartDate <= createReq.EndDate.AddDays(10)
+            //                && rentalContract.EndDate >= createReq.StartDate.AddDays(-10))
+            //            {
+            //                isOverlap = true;
+            //                break;
+            //            } 
+            //        }
+            //        if (isOverlap == false)
+            //        {
+            //            vehicle = _vehicle;
+            //            break;
+            //        }
+            //    }
+            //}
+            //var model = await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId) ??
+            //    throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
 
+            var model = (await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId
+                                    , createReq.StationId, createReq.StartDate, createReq.EndDate));
+            
+            if(model.Vehicles == null || model.Vehicles.Count == 0) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            var vehicle = model.Vehicles.FirstOrDefault();
             var days = (int)Math.Ceiling((createReq.EndDate - createReq.StartDate).TotalDays);
             Guid contractId;
             do

@@ -57,18 +57,18 @@ namespace Infrastructure.Repositories
             var models = await query.ToListAsync();
             foreach (var model in models)
             {
-                 var vehicles = model.Vehicles.Where(v =>
-                    v.StationId == stationId && (
-                        v.Status == (int)VehicleStatus.Available ||
-                        (
-                            (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                            !v.RentalContracts.Any(rc =>
-                                rc.Status == (int)RentalContractStatus.Active &&
-                                startBuffer <= rc.EndDate &&
-                                endBuffer >= rc.StartDate
-                            )
-                        )
-                    ));
+                 var vehicles = model.Vehicles.Where(v => v.StationId == stationId && (
+                                                v.Status == (int)VehicleStatus.Available ||
+                                                (
+                                                (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
+                                                    v.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
+                                                    !v.RentalContracts.Any(rc =>
+                                                        rc.Status == (int)RentalContractStatus.Active &&
+                                                        startBuffer <= rc.EndDate &&
+                                                        endBuffer >= rc.StartDate
+                                                    )
+                                                ) 
+                                            ));
                 model.Vehicles = vehicles.ToList();
                 
             }
@@ -91,6 +91,8 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.RentalContracts)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .AsNoTracking()
+                .AsQueryable()
                 .FirstOrDefaultAsync(vm => vm.Id == id && vm.DeletedAt == null);
 
             if (model == null) return null;
@@ -98,15 +100,16 @@ namespace Infrastructure.Repositories
             var vehicles = model.Vehicles.Where(v => v.StationId == stationId && (
                                                 v.Status == (int)VehicleStatus.Available ||
                                                 (
-                                                    (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
+                                                (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
+                                                    v.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
                                                     !v.RentalContracts.Any(rc =>
                                                         rc.Status == (int)RentalContractStatus.Active &&
                                                         startBuffer <= rc.EndDate &&
                                                         endBuffer >= rc.StartDate
                                                     )
-                                                )
+                                                ) 
                                             ));
-            model.Vehicles = model.Vehicles = vehicles.ToList();
+             model.Vehicles = vehicles.ToList();
 
             return model;
         }
