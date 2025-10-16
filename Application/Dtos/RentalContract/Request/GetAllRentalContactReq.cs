@@ -12,5 +12,6 @@ namespace Application.Dtos.RentalContract.Request
         public string? CitizenIdentityNumber { get; set; }
         public string? Phone { get; set; }
         public int? Status { get; set; }
+        public Guid? checkListId { get; set; }
     }
 }
