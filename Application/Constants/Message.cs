@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Application.Constants
+﻿namespace Application.Constants
 {
     public static class Message
     {
@@ -114,6 +108,31 @@ namespace Application.Constants
             public const string DeleteFailed = "failed.delete";
             public const string DeleteSuccess = "success.delete";
             public const string UploadSuccess = "success.upload";
+        }
+
+        public static class DispatchMessage
+        {
+            public const string NotFound = "dispatch.not_found";
+
+            // Validation khi tạo
+            public const string ToStationMustDifferent = "dispatch.to_station_must_different";
+
+            public const string StaffNotInFromStation = "dispatch.staff_not_in_from_station";
+            public const string VehicleNotInFromStation = "dispatch.vehicle_not_in_from_station";
+
+            // Flow cập nhật trạng thái
+            public const string OnlyPendingCanApproveReject = "dispatch.only_pending_can_approve_reject";
+
+            public const string OnlyApprovedCanReceive = "dispatch.only_approved_can_receive";
+            public const string OnlyPendingCanCancel = "dispatch.only_pending_can_cancel";
+
+            // Quyền
+            public const string MustBeToStationAdminForThisAction = "dispatch.must_be_to_station_admin";
+
+            public const string MustBeFromStationAdminForThisAction = "dispatch.must_be_from_station_admin";
+
+            // Input
+            public const string InvalidStatus = "dispatch.invalid_status";
         }
 
         //Rental Contract

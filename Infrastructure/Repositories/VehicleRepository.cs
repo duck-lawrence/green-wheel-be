@@ -59,6 +59,32 @@ namespace Infrastructure.Repositories
             return await query.FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        
+        public async Task<int> CountVehiclesInStationAsync(Guid[] vehicleIds, Guid stationId)
+        {
+            return await _dbContext.Vehicles.CountAsync(x => vehicleIds.Contains(x.Id) && x.StationId == stationId);
+        }
+
+        public async Task UpdateStationForDispatchAsync(Guid dispatchId, Guid toStationId)
+        {
+            var vehicleIds = await _dbContext.DispatchRequestVehicles
+                .Where(x => x.DispatchRequestId == dispatchId)
+                .Select(x => x.VehicleId)
+                .ToListAsync();
+
+            if (vehicleIds.Count == 0)
+                return;
+
+            var vehicles = await _dbContext.Vehicles
+                .Where(v => vehicleIds.Contains(v.Id))
+                .ToListAsync();
+
+            foreach (var v in vehicles)
+            {
+                v.StationId = toStationId;
+                v.UpdatedAt = DateTimeOffset.UtcNow;
+            }
+
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

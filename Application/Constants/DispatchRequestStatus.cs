@@ -12,5 +12,6 @@ namespace Application.Constants
         Approved = 1,
         Rejected = 2,
         Received = 3,
+        Cancel = 4,
     }
 }
