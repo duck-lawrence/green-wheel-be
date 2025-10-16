@@ -47,17 +47,15 @@ namespace Application
 
         public async Task<IEnumerable<VehicleModelViewRes>> SearchVehicleModel(VehicleFilterReq vehicleFilterReq)
         {
-            return await _vehicleModelRepository.FilterVehicleModelsAsync(vehicleFilterReq.StationId, vehicleFilterReq.StartDate, vehicleFilterReq.EndDate, vehicleFilterReq.SegmentId) ?? [];
+            var vehicleModels = await _vehicleModelRepository.FilterVehicleModelsAsync(vehicleFilterReq.StationId, vehicleFilterReq.StartDate, vehicleFilterReq.EndDate, vehicleFilterReq.SegmentId);
+            return _mapper.Map<IEnumerable<VehicleModelViewRes>>(vehicleModels)  ?? [];
         }
 
         public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate);
-            if (vehicleModelViewRes == null)
-            {
-                throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
-            }
-            return vehicleModelViewRes;
+            var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate)
+            ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+            return _mapper.Map<VehicleModelViewRes>(vehicleModelViewRes);
         }
 
         public async Task<IEnumerable<VehicleModelViewRes>> GetAllAsync(string? name, Guid? segmentId)
