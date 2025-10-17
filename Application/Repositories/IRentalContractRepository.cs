@@ -12,7 +12,7 @@ namespace Application.Repositories
         Task<IEnumerable<RentalContract>> GetByCustomerAsync(Guid customerId, int? status = null);
         Task<bool> HasActiveContractAsync(Guid customerId);
         Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
-            string? citizenIdentity = null, string? driverLicense = null);
+            string? citizenIdentity = null, string? driverLicense = null, Guid? checklistId = null);
         Task<RentalContract?> GetByCheckListIdAsync(Guid id);
 
     }

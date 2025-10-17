@@ -14,7 +14,7 @@ namespace Application.Abstractions
     {
         Task<Guid> CreateVehicleModelAsync(CreateVehicleModelReq createVehicleModelReq);
 
-        Task<IEnumerable<VehicleModelViewRes>> GetAllVehicleModels(VehicleFilterReq vehicleFilterReq);
+        Task<IEnumerable<VehicleModelViewRes>> SearchVehicleModel(VehicleFilterReq vehicleFilterReq);
 
         Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq updateVehicleModelReq);
 
@@ -23,7 +23,8 @@ namespace Application.Abstractions
         Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate, DateTimeOffset endDate);
 
         Task<string> UploadMainImageAsync(Guid modelId, IFormFile file);
-
+        Task<IEnumerable<VehicleModelViewRes>> GetAllAsync(string? name, Guid? segmentId);
         Task DeleteMainImageAsync(Guid modelId);
+
     }
 }

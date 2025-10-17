@@ -35,6 +35,17 @@ namespace API.Controllers
             return Ok(users);
         }
 
+        [HttpGet("staff")]
+        [RoleAuthorize(RoleName.Admin)]
+        public async Task<IActionResult> GetAllStaff(
+           [FromQuery] string? name,
+           [FromQuery] Guid? segmentId
+           )
+        {
+            var users = await _userService.GetAllStaffAsync(name, segmentId);
+            return Ok(users);
+        }
+
         //Create anonymous account
         [HttpPost]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]

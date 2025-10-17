@@ -62,39 +62,44 @@ namespace Application
             }
             var station = await _uow.StationRepository.GetByIdAsync(createReq.StationId) ??
                                                         throw new NotFoundException(Message.StationMessage.StationNotFound);
-            var vehicles = await _uow.VehicleRepository.GetVehicles(createReq.StationId,
-                                                        createReq.ModelId) ??
-                                                        throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
-            Vehicle vehicle = null;
-            foreach(var _vehicle in vehicles)
-            {
-                if(_vehicle.Status == (int)VehicleStatus.Available)
-                {
-                    vehicle = _vehicle;
-                    break;
-                }
-                if(_vehicle.Status == (int)VehicleStatus.Unavaible || _vehicle.Status == (int)VehicleStatus.Rented)
-                {
-                    var isOverlap = false;
-                    foreach(var rentalContract in _vehicle.RentalContracts)
-                    {
-                        if(rentalContract.StartDate <= createReq.EndDate.AddDays(10)
-                            && rentalContract.EndDate >= createReq.StartDate.AddDays(-10))
-                        {
-                            isOverlap = true;
-                            break;
-                        } 
-                    }
-                    if (isOverlap == false)
-                    {
-                        vehicle = _vehicle;
-                        break;
-                    }
-                }
-            }
-            if (vehicle == null) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
-            var model = await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId);
+            //var vehicles = await _uow.VehicleRepository.GetVehicles(createReq.StationId,
+            //                                            createReq.ModelId) ??
+            //                                            throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            //Vehicle vehicle = null;
+            //foreach(var _vehicle in vehicles)
+            //{
+            //    if(_vehicle.Status == (int)VehicleStatus.Available)
+            //    {
+            //        vehicle = _vehicle;
+            //        break;
+            //    }
+            //    if(_vehicle.Status == (int)VehicleStatus.Unavaible || _vehicle.Status == (int)VehicleStatus.Rented)
+            //    {
+            //        var isOverlap = false;
+            //        foreach(var rentalContract in _vehicle.RentalContracts)
+            //        {
+            //            if(rentalContract.StartDate <= createReq.EndDate.AddDays(10)
+            //                && rentalContract.EndDate >= createReq.StartDate.AddDays(-10))
+            //            {
+            //                isOverlap = true;
+            //                break;
+            //            } 
+            //        }
+            //        if (isOverlap == false)
+            //        {
+            //            vehicle = _vehicle;
+            //            break;
+            //        }
+            //    }
+            //}
+            //var model = await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId) ??
+            //    throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
 
+            var model = (await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId
+                                    , createReq.StationId, createReq.StartDate, createReq.EndDate));
+            
+            if(model.Vehicles == null || model.Vehicles.Count == 0) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            var vehicle = model.Vehicles.FirstOrDefault();
             var days = (int)Math.Ceiling((createReq.EndDate - createReq.StartDate).TotalDays);
             Guid contractId;
             do
@@ -184,7 +189,8 @@ namespace Application
 
         public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
         {
-            var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone, req.CitizenIdentityNumber, req.DriverLicenseNumber);
+            var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
+                req.CitizenIdentityNumber, req.DriverLicenseNumber, req.checkListId);
             return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
 
         }
@@ -201,7 +207,7 @@ namespace Application
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id) 
                 ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            
+            if (contract.ActualStartDate != null) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyComplete);
             var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId) 
                 ?? throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
 
@@ -231,11 +237,9 @@ namespace Application
         public async Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid contractId)
         {
             var staffId = staffClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
-            if(contract == null)
-            {
-                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            }
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) 
+               ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+            if (contract.Status == (int)RentalContractStatus.Completed) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyComplete);
             contract.Status = (int)RentalContractStatus.Completed;
             var actual_end_date = contract.EndDate.AddHours(2); // test
             //var actual_end_date = DateTimeOffset.UtcNow;
@@ -299,6 +303,19 @@ namespace Application
             return returnInvoice.Id;
         }
 
+        public async Task CancelRentalContract(Guid id)
+        {
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
+            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+
+            if (contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
+            {
+                throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
+            }
+            if (contract.Status == (int)RentalContractStatus.Completed) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyComplete);
+            contract.Status = (int)RentalContractStatus.Cancelled;
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+        }
         public async Task UpdateStatusAsync(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
@@ -399,16 +416,6 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task CancelRentalContract(Guid id)
-        {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
-            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            if(contract.Status != (int)RentalContractStatus.PaymentPending || contract.Status != (int)RentalContractStatus.RequestPeding)
-            {
-                throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
-            }
-            contract.Status = (int) RentalContractStatus.Cancelled;
-            await _uow.RentalContractRepository.UpdateAsync(contract);
-        }
+        
     }
 }

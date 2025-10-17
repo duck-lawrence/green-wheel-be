@@ -38,16 +38,16 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
-            string? citizenIdentityNumber = null, string? driverLicenseNumber = null)
+            string? citizenIdentityNumber = null, string? driverLicenseNumber = null, Guid? checklistId = null)
         {
             var rentalContracts = _dbContext.RentalContracts
                 .Include(x => x.Vehicle)
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
-                // .Include(x => x.Invoices)
-                //     .ThenInclude(i => i.InvoiceItems)
-                // .Include(x => x.Invoices)
-                //     .ThenInclude(i => i.Deposit)
+                .Include(x => x.HandoverStaff)
+                    .ThenInclude(h => h.User)
+                .Include(x => x.ReturnStaff)
+                    .ThenInclude(h => h.User)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
@@ -69,6 +69,10 @@ namespace Infrastructure.Repositories
             {
                 rentalContracts = rentalContracts.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
             }
+            if(checklistId != null)
+            {
+                rentalContracts = rentalContracts.Where(rc => rc.VehicleChecklists.Any(vc => vc.Id  == checklistId));
+            }
             return await rentalContracts.ToListAsync();
         }
 
@@ -89,6 +93,10 @@ namespace Infrastructure.Repositories
                     .ThenInclude(i => i.InvoiceItems)
                 .Include(x => x.Invoices)
                     .ThenInclude(i => i.Deposit)
+                .Include(x => x.HandoverStaff)
+                    .ThenInclude(h => h.User)
+                .Include(x => x.ReturnStaff)
+                    .ThenInclude(h => h.User)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
@@ -99,7 +107,8 @@ namespace Infrastructure.Repositories
         public async Task<RentalContract?> GetByCheckListIdAsync(Guid id)
         {
             var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
-                .Include(vc => vc.Contract).FirstOrDefaultAsync());
+                .Include(vc => vc.Contract)
+                    .ThenInclude(r => r.Invoices).FirstOrDefaultAsync());
 
             return vehicleChecklist == null ? null : vehicleChecklist.Contract;
         }

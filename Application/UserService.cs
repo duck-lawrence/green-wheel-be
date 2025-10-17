@@ -30,29 +30,32 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly ICitizenIdentityRepository _citizenIdentityRepository;
         private readonly IDriverLicenseRepository _driverLicenseRepository;
+        private readonly IMemoryCache _cache;
 
         public UserService(IUserRepository repository,
              IMapper mapper,
              ICitizenIdentityRepository citizenIdentityRepository,
-             IDriverLicenseRepository driverLicenseRepository
+             IDriverLicenseRepository driverLicenseRepository,
+             IMemoryCache cache
             )
         {
             _userRepository = repository;
             _mapper = mapper;
             _citizenIdentityRepository = citizenIdentityRepository;
             _driverLicenseRepository = driverLicenseRepository;
+            _cache = cache;
         }
-
-
 
         public async Task<Guid> CreateAsync(CreateUserReq req)
         {
-            if (await _userRepository.GetByPhoneAsync(req.Phone) != null)
-            {
+            if (await _userRepository.GetByPhoneAsync(req.Phone) != null) 
                 throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
-            }
+            if(!string.IsNullOrEmpty(req.Email) && await _userRepository.GetByEmailAsync(req.Email) != null)
+                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists);
             var user = _mapper.Map<User>(req);
-            user.Id = Guid.NewGuid();
+            var roles = _cache.Get<List<Role>>("AllRoles");
+            var userRoleId = roles.FirstOrDefault(r => string.Compare(r.Name, req.RoleName, StringComparison.OrdinalIgnoreCase) == 0)!.Id;
+            user.RoleId = userRoleId;
             await _userRepository.AddAsync(user);
             return user.Id;
         }
@@ -104,6 +107,10 @@ namespace Application
             return userView;
         }
 
-
+        public async Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? segmentId)
+        {
+            var staffs = await _userRepository.GetAllStaffAsync(name, segmentId);
+            return _mapper.Map<IEnumerable<UserProfileViewRes>>(staffs) ?? [];
+        }
     }
 }

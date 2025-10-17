@@ -15,6 +15,6 @@ namespace Application.Dtos.User.Request
         public string LastName { get; set; } = null!;
         public int Sex { get; set; }
         public DateTimeOffset DateOfBirth { get; set; }
-        public Guid RoleId { get; set; }
+        public string? RoleName { get; set; }
     }
 }

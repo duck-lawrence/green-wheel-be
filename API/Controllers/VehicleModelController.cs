@@ -26,7 +26,7 @@ namespace API.Controllers
          --400: invalid type
          200: success
          */
-        [RoleAuthorize(RoleName.Admin)]
+        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
         [HttpPost]
         public async Task<IActionResult> CreateVehicleModel([FromBody] CreateVehicleModelReq createVehicleModelReq)
         {
@@ -44,7 +44,7 @@ namespace API.Controllers
          --400: invalid type
          404: not found
          */
-        [RoleAuthorize(RoleName.Admin)]
+        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicleModel([FromRoute] Guid id, UpdateVehicleModelReq updateVehicleModelReq)
         {
@@ -56,10 +56,21 @@ namespace API.Controllers
          200: success
          */
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllVehicleModel([FromQuery] VehicleFilterReq vehicleFilterReq)
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchVehicleModel([FromQuery] VehicleFilterReq vehicleFilterReq)
         {
-            var verhicelModelView = await _vehicleModelService.GetAllVehicleModels(vehicleFilterReq);
+            var verhicelModelView = await _vehicleModelService.SearchVehicleModel(vehicleFilterReq);
+            return Ok(verhicelModelView);
+        }
+
+        /*
+         200: success
+         */
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(string? name, Guid? segmentId)
+        {
+            var verhicelModelView = await _vehicleModelService.GetAllAsync(name, segmentId);
             return Ok(verhicelModelView);
         }
 

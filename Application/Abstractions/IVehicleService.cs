@@ -12,9 +12,10 @@ namespace Application.Abstractions
 
         Task<bool> DeleteVehicle(Guid id);
 
-        Task<IEnumerable<VehicleViewRes>> GetAllVehicle();
+        Task<IEnumerable<VehicleViewRes>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate);
 
         Task<VehicleViewRes> GetVehicleById(Guid id);
+
 
         //Task<Vehicle> GetVehicle(Guid stationId, Guid modelId, DateTimeOffset startDate, DateTimeOffset endDate);
     }

@@ -12,6 +12,6 @@ namespace Application.Dtos.Dispatch.Request
 
     public sealed class UpdateDispatchReq
     {
-        public DispatchRequestStatus status { get; set; }
+        public int status { get; set; }
     }
 }
