@@ -13,7 +13,8 @@ namespace Application.Repositories
         Task<bool> HasActiveContractAsync(Guid customerId);
         Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
             string? citizenIdentity = null, string? driverLicense = null, Guid? checklistId = null);
-        Task<RentalContract?> GetByCheckListIdAsync(Guid id);
+        Task<RentalContract?> GetByChecklistIdAsync(Guid id);
+        Task<IEnumerable<RentalContract>> GetContractsByVehicleId(Guid vehicleId);
 
     }
 }

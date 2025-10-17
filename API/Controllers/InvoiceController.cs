@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using Application.AppExceptions;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace API.Controllers
 {
@@ -19,13 +21,19 @@ namespace API.Controllers
     {
         private readonly IMomoService _momoService;
         private readonly IInvoiceService _invoiceService;
+        private readonly IMemoryCache _cache;
+        private readonly IUserService _userService;
 
         public InvoiceController(IMomoService momoService,
-            IInvoiceService invoiceItemService
+            IInvoiceService invoiceItemService,
+            IMemoryCache cache,
+            IUserService userService
             )
         {
             _momoService = momoService;
             _invoiceService = invoiceItemService;
+            _cache = cache;
+            _userService = userService;
         }
 
         /*
@@ -63,9 +71,21 @@ namespace API.Controllers
          */
 
         [HttpPut("{id}/payment")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
+            //kiểm tra phải hoá đơn của nó không
+            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
+            var roles = _cache.Get<List<Role>>("AllRoles");
+            var userInDB = await _userService.GetByIdAsync(userId);
+            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+            if (userRole == RoleName.Customer)
+            {
+                if (invoice.Contract.CustomerId != userId)
+                    throw new BusinessException(Message.InvoiceMessage.ForbiddenInvoiceAccess);
+            }
+
             if (invoice.Status == (int)InvoiceStatus.Cancelled || invoice.Status == (int)InvoiceStatus.Paid) 
                 throw new BusinessException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)

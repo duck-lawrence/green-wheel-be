@@ -52,28 +52,18 @@ namespace Infrastructure.Repositories
                 .Include(vm => vm.Segment)
                 .AsNoTracking()
                 .AsQueryable();
-            if (segmentId.HasValue)
+            if (segmentId != null)
                 query = query.Where(vm => vm.SegmentId == segmentId.Value);
             var models = await query.ToListAsync();
             foreach (var model in models)
             {
-                 var vehicles = model.Vehicles.Where(v => v.StationId == stationId && (
-                                                v.Status == (int)VehicleStatus.Available ||
-                                                (
-                                                (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                                                    v.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
-                                                    !v.RentalContracts.Any(rc =>
-                                                        rc.Status == (int)RentalContractStatus.Active &&
-                                                        startBuffer <= rc.EndDate &&
-                                                        endBuffer >= rc.StartDate
-                                                    )
-                                                ) 
-                                            ));
+                 var vehicles = model.Vehicles.Where(v => CheckAvailableVehicle(v, stationId, startBuffer, endBuffer));
                 model.Vehicles = vehicles.ToList();
                 
             }
             return models;
         }
+
 
         public async Task<VehicleModel?> GetByIdAsync(
             Guid id,
@@ -97,21 +87,30 @@ namespace Infrastructure.Repositories
 
             if (model == null) return null;
 
-            var vehicles = model.Vehicles.Where(v => v.StationId == stationId && (
-                                                v.Status == (int)VehicleStatus.Available ||
-                                                (
-                                                (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                                                    v.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
-                                                    !v.RentalContracts.Any(rc =>
+            var vehicles = model.Vehicles.Where(v => CheckAvailableVehicle(v, stationId, startBuffer, endBuffer));
+            model.Vehicles = vehicles.ToList();
+
+            return model;
+        }
+        private bool CheckAvailableVehicle(Vehicle vehicle, Guid stationId, DateTimeOffset startBuffer, DateTimeOffset endBuffer)
+        {
+            return vehicle.StationId == stationId
+                    &&
+                    (vehicle.Status == (int)VehicleStatus.Available
+                    ||
+                    ((vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented)) &&
+                                                    vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
+                                                    !vehicle.RentalContracts.Any(rc =>
                                                         rc.Status == (int)RentalContractStatus.Active &&
                                                         startBuffer <= rc.EndDate &&
                                                         endBuffer >= rc.StartDate
                                                     )
-                                                ) 
-                                            ));
-             model.Vehicles = vehicles.ToList();
+                                                     ||
+                                                (
+                                                (vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented) &&
+                                                !vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active)
+                                                ));
 
-            return model;
         }
     }
 }

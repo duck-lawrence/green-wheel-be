@@ -171,9 +171,10 @@
 
             public static string NotHandoverPayment = "invoice.not_handover_payment";
 
-            public static string? InvalidInvoiceType = "Invoice.invalid_invoice_type";
-        }
+            public static string? InvalidInvoiceType = "invoice.invalid_invoice_type";
 
+            public static string ForbiddenInvoiceAccess = "invoice.forbidden_invoice_access";
+        }
         public static class JsonMessage
         {
             public const string ParsingFailed = "json.parsing_failed";

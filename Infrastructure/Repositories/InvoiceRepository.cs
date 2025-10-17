@@ -37,7 +37,10 @@ namespace Infrastructure.Repositories
 
         public async Task<Invoice?> GetByIdOptionAsync(Guid id, bool includeItems = false, bool includeDeposit = false)
         {
-            IQueryable<Invoice> query = _dbContext.Invoices.AsQueryable();
+            IQueryable<Invoice> query = _dbContext.Invoices
+                                        .Include(i => i.Contract)
+                                            .ThenInclude(r => r.Customer)
+                                        .AsQueryable();
             if (includeItems)
             {
                 query = query.Include(i => i.InvoiceItems)

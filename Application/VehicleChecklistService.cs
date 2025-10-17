@@ -134,7 +134,7 @@ namespace Application
             }
             else
             {
-                var contract = await _uow.RentalContractRepository.GetByCheckListIdAsync(id)
+                var contract = await _uow.RentalContractRepository.GetByChecklistIdAsync(id)
                     ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
                 await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!);
             }

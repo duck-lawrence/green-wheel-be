@@ -19,5 +19,6 @@ namespace Application.Repositories
         Task<int> CountVehiclesInStationAsync(Guid[] vehicleIds, Guid stationId);
         Task<IEnumerable<Vehicle>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate);
         Task UpdateStationForDispatchAsync(Guid dispatchId, Guid toStationId);
+        //Task GetByIdAsync(Guid? vehicleId);
     }
 }
