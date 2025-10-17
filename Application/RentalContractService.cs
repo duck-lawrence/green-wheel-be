@@ -5,6 +5,7 @@ using Application.Constants;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
+using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
@@ -20,11 +21,15 @@ namespace Application
         private readonly IRentalContractUow _uow;
         private readonly IMapper _mapper;
         private readonly IEmailSerivce _emailService;
-        public RentalContractService(IRentalContractUow uow, IMapper mapper, IOptions<EmailSettings> emailSettings, IEmailSerivce emailService)
+        private readonly IVehicleCheckListRepository _vehicleCheckListRepository;
+        public RentalContractService(IRentalContractUow uow, IMapper mapper,
+            IOptions<EmailSettings> emailSettings, IEmailSerivce emailService,
+            IVehicleCheckListRepository vehicleCheckListRepository)
         {
             _uow = uow;
             _mapper = mapper;
             _emailService = emailService;
+            _vehicleCheckListRepository = vehicleCheckListRepository;
         }
 
         public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
@@ -215,8 +220,14 @@ namespace Application
                 .Where(i => i.Type == (int)InvoiceType.Handover).FirstOrDefault()
                     ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             
-            
-            if(contract.Status == (int)RentalContractStatus.Active && handoverInvoice.Status == (int)InvoiceStatus.Paid)
+            if(contract.VehicleChecklists == null || contract.VehicleChecklists.Count == 0)
+            {
+                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+            }
+            var handoverChecklist = contract.VehicleChecklists.Where(c => c.Type == (int)VehicleChecklistType.Handover).FirstOrDefault()
+                ?? throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+
+            if (contract.Status == (int)RentalContractStatus.Active && handoverInvoice.Status == (int)InvoiceStatus.Paid)
             {
                 vehicle.Status = (int)VehicleStatus.Rented;
                 await _uow.VehicleRepository.UpdateAsync(vehicle);

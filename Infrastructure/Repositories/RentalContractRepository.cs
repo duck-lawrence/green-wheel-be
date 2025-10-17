@@ -3,13 +3,6 @@ using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.WebSockets;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Infrastructure.Repositories
 {
@@ -104,7 +97,7 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<RentalContract?> GetByCheckListIdAsync(Guid id)
+        public async Task<RentalContract?> GetByChecklistIdAsync(Guid id)
         {
             var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
                 .Include(vc => vc.Contract)
