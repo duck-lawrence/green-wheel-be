@@ -1,0 +1,49 @@
+﻿<<div style="font-family:Segoe UI, Arial, sans-serif; font-size:16px; color:#1f2937; line-height:1.6; background-color:#f9fafb; padding:40px;">
+    <div style="max-width:600px; background-color:#ffffff; margin:auto; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.08); padding:36px 48px; color:black">
+
+        <h1 style="color:#00c63e; text-align: center; margin-top: 0;">
+            GreenWheel
+        </h1>
+        <h2 style="color:#e11d48; font-size:24px; text-align:center; margin-bottom:24px;">
+            Your Rental Contract Has Been Canceled
+        </h2>
+
+        <p style="font-size:16px; margin-bottom:20px;">
+            Dear <b>{CustomerName}</b>,
+        </p>
+
+        <p style="font-size:16px; margin-bottom:20px;">
+            We regret to inform you that your rental contract <b>#{ContractCode}</b> has been <b style="color:red">canceled</b>
+            because another customer has <b>successfully paid for the same vehicle</b> before your payment was completed.
+        </p>
+
+        <ul style="font-size:16px; line-height:1.7; list-style-type:none; padding-left:0; background-color:#f3f4f6; border-radius:10px; padding:16px; margin-bottom:20px;">
+            <li style="margin-bottom:4px; color:black;"><b>Vehicle:</b> {VehicleName}</li>
+            <li style="margin-bottom:4px; color:black;"><b>Station:</b> {StationName}</li>
+            <li style="margin-bottom:4px; color:black;"><b>Rental Period:</b> {StartDate} → {EndDate}</li>
+        </ul>
+
+        <p style="font-size:15px; margin-bottom:20px;">
+            You can book another available vehicle at any <b style="color:#00c63e;">GreenWheel</b> station.<br>
+            We recommend completing your payment promptly to secure your booking next time.
+        </p>
+
+        <!-- CTA Button -->
+        <div style="text-align:center;">
+            <a href="{BookingLink}"
+               style="display:inline-block; margin-top:20px; background-color:#00c63e; color:#ffffff; text-decoration:none;
+                padding:14px 32px; border-radius:8px; font-size:15px; font-weight:600;">
+                Book Another Vehicle
+            </a>
+        </div>
+
+        <p style="font-size:16px; color:#1f2937; margin-top:32px;">
+            Best regards,<br />
+            <b>The HYCAT Team</b>
+        </p>
+        <p style="font-size:16px; color:black; text-align:center; margin-top:24px;">
+            This is an automated confirmation email. Please do not reply directly.
+        </p>
+
+    </div>
+</div>

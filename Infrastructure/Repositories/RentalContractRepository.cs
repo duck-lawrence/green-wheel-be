@@ -3,6 +3,7 @@ using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
+using System.Formats.Asn1;
 
 namespace Infrastructure.Repositories
 {
@@ -18,10 +19,10 @@ namespace Infrastructure.Repositories
                 .Include(x => x.Vehicle)
                     .ThenInclude(v => v.Model)
                 .Include(x => x.Station)
-                // .Include(x => x.Invoices)
-                //     .ThenInclude(i => i.InvoiceItems)
-                // .Include(x => x.Invoices)
-                //     .ThenInclude(i => i.Deposit)
+                 .Include(x => x.HandoverStaff)
+                    .ThenInclude(h => h.User)
+                .Include(x => x.ReturnStaff)
+                    .ThenInclude(h => h.User)
                 .AsQueryable();
             if (status != null)
             {
@@ -104,6 +105,18 @@ namespace Infrastructure.Repositories
                     .ThenInclude(r => r.Invoices).FirstOrDefaultAsync());
 
             return vehicleChecklist == null ? null : vehicleChecklist.Contract;
+        }
+
+        public async Task<IEnumerable<RentalContract>> GetContractsByVehicleId(Guid vehicleId)
+        {
+            var list = await _dbContext.RentalContracts.Where(c => c.VehicleId == vehicleId)
+                    .Include(r => r.Customer)
+                    .Include(r => r.Vehicle)
+                        .ThenInclude(v => v.Model)
+                    .Include(r => r.Station)
+                    .ToListAsync();
+            Console.WriteLine("haha");
+            return list;
         }
     }
 }
