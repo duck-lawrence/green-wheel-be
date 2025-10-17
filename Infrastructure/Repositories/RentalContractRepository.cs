@@ -87,6 +87,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(i => i.InvoiceItems)
                 .Include(x => x.Invoices)
                     .ThenInclude(i => i.Deposit)
+                .Include(x => x.VehicleChecklists)
                 .Include(x => x.HandoverStaff)
                     .ThenInclude(h => h.User)
                 .Include(x => x.ReturnStaff)

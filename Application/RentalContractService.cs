@@ -223,13 +223,11 @@ namespace Application
                 .Where(i => i.Type == (int)InvoiceType.Handover).FirstOrDefault()
                     ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
             
-            if(contract.VehicleChecklists == null || contract.VehicleChecklists.Count == 0)
+            if(contract.VehicleChecklists == null ||
+                !contract.VehicleChecklists.Any(c => c.Type == (int)VehicleChecklistType.Handover))
             {
                  throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
             }
-            var handoverChecklist = contract.VehicleChecklists.Where(c => c.Type == (int)VehicleChecklistType.Handover).FirstOrDefault()
-                ?? throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
-
             if (contract.Status == (int)RentalContractStatus.Active && handoverInvoice.Status == (int)InvoiceStatus.Paid)
             {
                 vehicle.Status = (int)VehicleStatus.Rented;

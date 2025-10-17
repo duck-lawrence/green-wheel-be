@@ -183,14 +183,14 @@ namespace Application
 
                 if(itemReq.Status != (int)DamageStatus.Good && checklist.Type == (int)VehicleChecklistType.Return)
                 {
-                    Guid invoiceItemId = Guid.NewGuid();
                     var invoiceItem = new InvoiceItem()
                     {
-                        Id = invoiceItemId,
-                        InvoiceId = (Guid)returnInvoice.Id!,
+                        Id = Guid.NewGuid(),
+                        InvoiceId = returnInvoice.Id,
                         Quantity = 1,
                         UnitPrice = DamageCompensationHelper.CalculateCompensation(existingItem.Component.DamageFee, itemReq.Status),
                         Type = (int)InvoiceItemType.Damage,
+                        ChecklistItemId = itemReq.Id
                     };
                     invoiceItems = invoiceItems.Append(invoiceItem);
                 }
@@ -205,7 +205,7 @@ namespace Application
             {
                 //nếu vô đc trong này thì chắc chắn đã lấy đc return Invoice ở trên rồi
                 returnInvoice!.Subtotal = returnInvoice.Subtotal + InvoiceHelper.CalculateSubTotalAmount(invoiceItems);
-                await _uow.InvoiceRepository.AddAsync(returnInvoice);
+                // await _uow.InvoiceRepository.AddAsync(returnInvoice);
                 await _uow.InvoiceItemRepository.AddRangeAsync(invoiceItems);
             }
         }
