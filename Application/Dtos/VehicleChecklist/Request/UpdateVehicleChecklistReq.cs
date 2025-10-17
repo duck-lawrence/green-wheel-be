@@ -12,6 +12,5 @@ namespace Application.Dtos.VehicleChecklist.Request
         public bool IsSignedByStaff { get; set; }
         public bool IsSignedByCustomer { get; set; }
         public IEnumerable<UpdateChecklistItemReq> ChecklistItems { get; set; }
-        public Guid? ReturnInvoiceId { get; set; }
     }
 }

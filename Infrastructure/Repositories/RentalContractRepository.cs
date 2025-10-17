@@ -107,7 +107,8 @@ namespace Infrastructure.Repositories
         public async Task<RentalContract?> GetByCheckListIdAsync(Guid id)
         {
             var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
-                .Include(vc => vc.Contract).FirstOrDefaultAsync());
+                .Include(vc => vc.Contract)
+                    .ThenInclude(r => r.Invoices).FirstOrDefaultAsync());
 
             return vehicleChecklist == null ? null : vehicleChecklist.Contract;
         }

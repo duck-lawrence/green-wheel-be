@@ -84,16 +84,12 @@ namespace Application
 
         private async Task<Guid> CreateVehicleChecklistInSideContract(Guid staffId, Guid contractId, int type)
         {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId);
-            if(contract == null)
-            {
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) ??
                 throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            }
-            var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId);
-            if (components == null)
-            {
-                throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
-            }
+            
+            var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId)
+            ?? throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
+            
             Guid checkListId = Guid.NewGuid();
             
             var checklist = new VehicleChecklist()
@@ -138,8 +134,9 @@ namespace Application
             }
             else
             {
-                var contract = await _uow.RentalContractRepository.GetByCheckListIdAsync(id);
-                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!, req.ReturnInvoiceId);
+                var contract = await _uow.RentalContractRepository.GetByCheckListIdAsync(id)
+                    ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!);
             }
             checklist.IsSignedByStaff = req.IsSignedByStaff;
             checklist.IsSignedByCustomer = req.IsSignedByCustomer;
@@ -168,13 +165,13 @@ namespace Application
         }
 
         private async Task UpdateVehicleChecklistInsideContractAsync(VehicleChecklist checklist, 
-            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract, Guid? returnInvoiceId)
+            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract)
         {
             Invoice returnInvoice = null;
+
             if(checklist.Type == (int)VehicleChecklistType.Return)
             {
-                returnInvoice = await _uow.InvoiceRepository.GetByIdAsync((Guid)returnInvoiceId!) 
-                    ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);  
+                returnInvoice = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Return).FirstOrDefault();
             }
             IEnumerable<InvoiceItem> invoiceItems = [];
             foreach (var itemReq in checklistReq)
@@ -190,7 +187,7 @@ namespace Application
                     var invoiceItem = new InvoiceItem()
                     {
                         Id = invoiceItemId,
-                        InvoiceId = (Guid)returnInvoiceId!,
+                        InvoiceId = (Guid)returnInvoice.Id!,
                         Quantity = 1,
                         UnitPrice = DamageCompensationHelper.CalculateCompensation(existingItem.Component.DamageFee, itemReq.Status),
                         Type = (int)InvoiceItemType.Damage,
