@@ -127,7 +127,8 @@ namespace Application
             var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
             if (checklist == null)
                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
-            
+            if (checklist.IsSignedByCustomer && checklist.IsSignedByStaff)
+                throw new BusinessException(Message.VehicleChecklistMessage.ThisChecklistAlreadyProcess);
             if(checklist.Type == (int)VehicleChecklistType.OutOfContract)
             {
                 await UpdateVehicleChecklistOutSideContractAsync(checklist, req.ChecklistItems);

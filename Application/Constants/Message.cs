@@ -227,6 +227,8 @@
         public static class VehicleChecklistMessage
         {
             public const string VehicleChecklistNotFound = "vehicle_checklist.not_found";
+
+            public static string ThisChecklistAlreadyProcess = "vehicle_checklist.already_process";
         }
     }
 }

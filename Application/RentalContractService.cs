@@ -253,6 +253,7 @@ namespace Application
                ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             if (contract.Status == (int)RentalContractStatus.Returned) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
             contract.Status = (int)RentalContractStatus.Returned;
+            contract.ReturnStaffId = Guid.Parse(staffId);
             var actualEndDate = contract.EndDate.AddHours(2); // test
             //var actual_end_date = DateTimeOffset.UtcNow;
             if (contract == null) throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);

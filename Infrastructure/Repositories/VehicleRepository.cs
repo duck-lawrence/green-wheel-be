@@ -33,7 +33,7 @@ namespace Infrastructure.Repositories
             return await vehicles.ToListAsync();
         }
 
-        public async Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId)
+        public async Task<IEnumerable<Vehicle>?> GetVehicles (Guid stationId, Guid modelId)
         {
             // Query lọc trực tiếp từ DB (không ToList trước)
             var vehicles = await _dbContext.Vehicles
