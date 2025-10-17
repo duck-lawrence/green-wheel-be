@@ -143,7 +143,7 @@
             public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
             public const string CanNotCancel = "rental_contract.can_not_cancel";
 
-            public static string ContractAlreadyComplete { get; internal set; }
+            public static string ContractAlreadyProcess = "rental_contract.already_returned";
         }
 
         //Station

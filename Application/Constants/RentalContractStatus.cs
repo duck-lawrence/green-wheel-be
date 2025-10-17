@@ -8,11 +8,11 @@ namespace Application.Constants
 {
     public enum RentalContractStatus
     {
-        RequestPeding = 0, 
+        RequestPeding = 0,
         PaymentPending = 1,
         Active = 2,
-        Completed = 3,
-        Cancelled = 4,
-        ConfirmChangeStationPending = 5,
+        Returned = 3,
+        Completed = 4,
+        Cancelled = 5,
     }
 }
