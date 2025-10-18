@@ -9,6 +9,7 @@ using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -51,7 +52,7 @@ namespace Application
             var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync(vehicleId);
             if (components == null)
             {
-                throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
+                throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
             }
             Guid checkListId = Guid.NewGuid(); 
             var checklist = new VehicleChecklist()
@@ -88,7 +89,7 @@ namespace Application
                 throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             
             var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId)
-            ?? throw new NotFoundException(Message.VehicleComponentMessage.ComponentNotFound);
+            ?? throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
             
             Guid checkListId = Guid.NewGuid();
             
@@ -126,7 +127,7 @@ namespace Application
 
             var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
             if (checklist == null)
-                throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
             if (checklist.IsSignedByCustomer && checklist.IsSignedByStaff)
                 throw new BusinessException(Message.VehicleChecklistMessage.ThisChecklistAlreadyProcess);
             if(checklist.Type == (int)VehicleChecklistType.OutOfContract)
@@ -211,13 +212,25 @@ namespace Application
             }
         }
 
+        public async Task UpdateItemsAsync(Guid id, int status, string? notes)
+        {
+            var item = await _uow.VehicleChecklistItemRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.VehicleChecklistItemMessage.NotFound);
+            var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(item.ChecklistId)
+                ?? throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
+            if (checklist.IsSignedByCustomer && checklist.IsSignedByStaff)
+                throw new BusinessException(Message.VehicleChecklistMessage.ThisChecklistAlreadyProcess);
+            item.Status = status;
+            if (!string.IsNullOrEmpty(notes)) item.Notes = notes;
+            await _uow.VehicleChecklistItemRepository.UpdateAsync(item);
+        }
         public async Task<VehicleChecklistViewRes> GetByIdAsync(Guid id, ClaimsPrincipal userClaims)
         {
 
             var vehicleChecklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
             if (vehicleChecklist == null)
             {
-                throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
             }
             var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             if (await CheckAuthorize(userId, vehicleChecklist.ContractId) == false)

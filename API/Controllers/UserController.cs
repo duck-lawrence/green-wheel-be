@@ -35,7 +35,7 @@ namespace API.Controllers
             return Ok(users);
         }
 
-        [HttpGet("staff")]
+        [HttpGet("staffs")]
         [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> GetAllStaff(
            [FromQuery] string? name,

@@ -69,7 +69,7 @@ namespace Application
                 throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
             }
             var station = await _uow.StationRepository.GetByIdAsync(createReq.StationId) ??
-                                                        throw new NotFoundException(Message.StationMessage.StationNotFound);
+                                                        throw new NotFoundException(Message.StationMessage.NotFound);
             //var vehicles = await _uow.VehicleRepository.GetVehicles(createReq.StationId,
             //                                            createReq.ModelId) ??
             //                                            throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
@@ -106,7 +106,7 @@ namespace Application
             var model = (await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId
                                     , createReq.StationId, createReq.StartDate, createReq.EndDate));
             
-            if(model.Vehicles == null || model.Vehicles.Count == 0) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            if(model.Vehicles == null || model.Vehicles.Count == 0) throw new NotFoundException(Message.VehicleMessage.NotFound);
             var vehicle = model.Vehicles.FirstOrDefault();
             var days = (int)Math.Ceiling((createReq.EndDate - createReq.StartDate).TotalDays);
             Guid contractId;
@@ -217,16 +217,16 @@ namespace Application
                 ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
             if (contract.ActualStartDate != null) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
             var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId) 
-                ?? throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+                ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
 
             var handoverInvoice = (await _uow.InvoiceRepository.GetByContractAsync(id))
                 .Where(i => i.Type == (int)InvoiceType.Handover).FirstOrDefault()
-                    ?? throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                    ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
             
             if(contract.VehicleChecklists == null ||
                 !contract.VehicleChecklists.Any(c => c.Type == (int)VehicleChecklistType.Handover))
             {
-                 throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                 throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
             }
             if (contract.Status == (int)RentalContractStatus.Active && handoverInvoice.Status == (int)InvoiceStatus.Paid)
             {

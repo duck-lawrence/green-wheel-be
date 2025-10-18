@@ -107,7 +107,7 @@ namespace Application
                 var invoice = await _uow.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoice == null)
                 {
-                    throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                    throw new NotFoundException(Message.InvoiceMessage.NotFound);
                 }
                 invoice.Status = (int)InvoiceStatus.Paid;
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
@@ -153,7 +153,7 @@ namespace Application
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if (invoice == null)
             {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.NotFound);
             }
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId))
                             .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
@@ -177,7 +177,7 @@ namespace Application
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if (invoice == null)
             {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.NotFound);
             }
             return invoice;
         }

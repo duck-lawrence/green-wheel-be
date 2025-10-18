@@ -38,7 +38,7 @@ namespace Infrastructure.ExternalService
             var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
             {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.NotFound);
             }
             if (invoice.Status == (int)InvoiceStatus.Paid || invoice.Status == (int)InvoiceStatus.Cancelled)
             {

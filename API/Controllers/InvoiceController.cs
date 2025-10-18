@@ -1,17 +1,18 @@
 ﻿using API.Filters;
 using Application;
 using Application.Abstractions;
-using Application.Dtos.Common.Request;
+using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.Momo.Request;
 using Application.Dtos.Payment.Request;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.WebSockets;
-using Application.AppExceptions;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Caching.Memory;
+using StackExchange.Redis;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.WebSockets;
 
 namespace API.Controllers
 {
@@ -47,7 +48,8 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
-            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId.Substring(0, req.OrderId.Length - 7)));
+            var lastDashIndex = req.OrderId.LastIndexOf('-');
+            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId.Substring(0, lastDashIndex)));
             return Ok(new { resultCode = 0, message = "Received" });
         }
 
@@ -77,7 +79,7 @@ namespace API.Controllers
             //kiểm tra phải hoá đơn của nó không
             var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
-            var roles = _cache.Get<List<Role>>("AllRoles");
+            var roles = _cache.Get<List<Domain.Entities.Role>>("AllRoles");
             var userInDB = await _userService.GetByIdAsync(userId);
             var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
             if (userRole == RoleName.Customer)

@@ -27,7 +27,7 @@ namespace Application
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             var item = await _itemRepository.GetByIdAsync(itemId)
-                ?? throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                ?? throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
 
             var uploadResult = await _photoService.UploadPhotoAsync(
                 new UploadImageReq { File = file },
@@ -54,7 +54,7 @@ namespace Application
         public async Task<ChecklistItemImageRes> DeleteChecklistItemImageAsync(Guid itemId)
         {
             var item = await _itemRepository.GetByIdAsync(itemId)
-                ?? throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                ?? throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
 
             if (string.IsNullOrEmpty(item.ImagePublicId))
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);

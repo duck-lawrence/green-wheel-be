@@ -146,7 +146,7 @@ namespace Application
                 ?? throw new Exception(Message.UserMessage.UserNotFound);
 
             if (string.IsNullOrEmpty(user.AvatarPublicId))
-                throw new Exception(Message.UserMessage.NotFoundAvatar);
+                throw new Exception(Message.UserMessage.NotFound);
 
             await _photoService.DeletePhotoAsync(user.AvatarPublicId);
 

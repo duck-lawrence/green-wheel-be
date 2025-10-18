@@ -8,7 +8,7 @@ namespace Application.Dtos.VehicleChecklistItem.Request
 {
     public class UpdateChecklistItemReq
     {
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public int Status { get; set; }
         public string? Notes { get; set; }
     }

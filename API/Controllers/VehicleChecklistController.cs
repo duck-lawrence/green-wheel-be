@@ -3,6 +3,7 @@ using Application;
 using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.VehicleChecklist.Request;
+using Application.Dtos.VehicleChecklistItem.Request;
 using Application.Dtos.VehicleModel.Respone;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
@@ -58,7 +59,22 @@ namespace API.Controllers
          * status code
          * 200 success
          * 404 not found
+         * 403 don't have permission
+         * 401 unauthorize
          */
+        [HttpPut("items/{id}")]
+        [RoleAuthorize(RoleName.Staff)]
+        public async Task<IActionResult> UpdateVehicleChecklistItems(Guid id, UpdateChecklistItemReq req)
+        {
+            await _vehicleChecklistService.UpdateItemsAsync(id, req.Status, req.Notes);
+            return Ok();
+
+        }
+        /*
+            * status code
+            * 200 success
+            * 404 not found
+            */
         [HttpGet("{id}")]
         [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
         public async Task<IActionResult> GetById(Guid id)

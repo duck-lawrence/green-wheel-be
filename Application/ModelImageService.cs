@@ -29,7 +29,7 @@ namespace Application
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             var model = await _uow.VehicleModelRepository.GetByIdAsync(modelId)
-                ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+                ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
 
             var uploadedImages = new List<ModelImage>();
 
@@ -94,7 +94,7 @@ namespace Application
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             var model = await _uow.VehicleModelRepository.GetByIdAsync(modelId)
-                ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+                ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
 
             var mainFile = files.First();
             var galleryFiles = files.Skip(1).ToList();
