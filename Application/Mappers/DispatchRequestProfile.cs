@@ -26,13 +26,13 @@ namespace Application.Mappers
             // CreateReq -> Entity (chỉ map field cần, còn lại service xử lý)
             CreateMap<CreateDispatchReq, DispatchRequest>()
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
-                .ForMember(dest => dest.ToStationId, opt => opt.MapFrom(src => src.ToStationId))
+                .ForMember(dest => dest.ToStationId, opt => opt.MapFrom(src => src.FromStationId))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => (int)DispatchRequestStatus.Pending))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
             // UpdateReq -> Entity (dùng khi cần map status trực tiếp)
             CreateMap<UpdateDispatchReq, DispatchRequest>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.status))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
                 .ForAllOtherMembers(opt => opt.Ignore());
         }
     }

@@ -15,6 +15,6 @@ namespace Application.Dtos.InvoiceItem.Response
         public decimal UnitPrice { get; set; }
         public decimal SubTotal { get; set; }
         public int Type { get; set; } = (int)InvoiceItemType.BaseRental;
-        public ChecklistItemImageRes? ChecklistItem { get; set; } = null;
+        public VehicleChecklistItemViewRes? ChecklistItem { get; set; } = null;
     }
 }

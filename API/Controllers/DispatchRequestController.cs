@@ -31,9 +31,9 @@ namespace API.Controllers
         public async Task<IActionResult> Create([FromBody] CreateDispatchReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var staff = await _staffRepository.GetByUserIdAsync(userId);
-            if (staff == null) throw new ForbidenException("Admin not have any station");
-            var id = _dispatchRequestService.CreateAsync(userId, staff.StationId, req);
+            var staff = await _staffRepository.GetByUserIdAsync(userId)
+                ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+            await _dispatchRequestService.CreateAsync(userId, staff.StationId, req);
             return Ok();
         }
 
@@ -41,8 +41,8 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateStatus([FromRoute] Guid id, [FromBody] UpdateDispatchReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var staff = await _staffRepository.GetByUserIdAsync(userId);
-            if (staff == null) throw new ForbidenException("Admin not have any station");
+            var staff = await _staffRepository.GetByUserIdAsync(userId)
+                ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
             await _dispatchRequestService.UpdateStatusAsync(userId, staff.StationId, id, req);
             return Ok();
         }

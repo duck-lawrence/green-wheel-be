@@ -27,9 +27,9 @@ namespace Application
 
         public async Task<Guid> CreateAsync(Guid adminId, Guid stationId, CreateDispatchReq req)
         {
-            DispatchValidationHelper.EnsureDifferentStations(stationId, req.ToStationId);
-            await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.staffIds, stationId);
-            await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.vehicleIds, stationId);
+            DispatchValidationHelper.EnsureDifferentStations(stationId, req.FromStationId);
+            await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.StaffIds, stationId);
+            await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.VehicleIds, stationId);
             var entity = _mapper.Map<DispatchRequest>(req);
             entity.Id = Guid.NewGuid();
             entity.FromStationId = stationId;
@@ -54,9 +54,10 @@ namespace Application
 
         public async Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateDispatchReq req)
         {
-            var entity = await _repository.GetByIdAsync(id) ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
+            var entity = await _repository.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
             var currentStatus = (DispatchRequestStatus)entity.Status;
-            var newStatus = req.status;
+            var newStatus = req.Status;
             if (newStatus == (int)DispatchRequestStatus.Approved || newStatus == (int)DispatchRequestStatus.Rejected)
             {
                 if (entity.ToStationId != currentAdminStationId)
