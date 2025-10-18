@@ -51,7 +51,7 @@ namespace Infrastructure.ExternalService
                     $"&amount={amount.ToString("0", CultureInfo.InvariantCulture)}" +
                     $"&extraData={""}" +
                     $"&ipnUrl={_momoSettings.IpnUrl}" +
-                    $"&orderId={invoiceId + code}" +
+                    $"&orderId={invoiceId}-{code}" +
                     $"&orderInfo={description}(Invoice ID: {invoiceId})" +
                     $"&partnerCode={_momoSettings.PartnerCode}" +
                     $"&redirectUrl={fallbackUrl}" +
@@ -67,11 +67,12 @@ namespace Infrastructure.ExternalService
                 PartnerCode = _momoSettings.PartnerCode,
                 RequestId = requestId,
                 Amount = amount.ToString("0"),
-                OrderId = invoiceId.ToString() + code.ToString(),
+                OrderId = $"{invoiceId}-{code}",
                 OrderInfo = $"{description}(Invoice ID: {invoiceId})",
                 RedirectUrl = fallbackUrl,
                 IpnUrl = _momoSettings.IpnUrl,
                 RequestType = _momoSettings.RequestType,
+                OrderExpireTime = _momoSettings.OrderExpireTime,
                 ExtraData = "",
                 Lang = _momoSettings.Lang ?? "en",
                 Signature = signature

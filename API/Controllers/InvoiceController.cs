@@ -47,7 +47,7 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
-            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId.Substring(0, req.OrderId.Length - 6)));
+            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId.Substring(0, req.OrderId.Length - 7)));
             return Ok(new { resultCode = 0, message = "Received" });
         }
 
