@@ -36,6 +36,14 @@ namespace Application
             entity.RequestAdminId = adminId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.UpdatedAt = entity.CreatedAt;
+
+            entity.DispatchRequestStaffs = req.staffIds != null
+                ? _mapper.Map<List<DispatchRequestStaff>>(req.staffIds)
+                : new List<DispatchRequestStaff>();
+            entity.DispatchRequestVehicles = req.vehicleIds != null
+                ? _mapper.Map<List<DispatchRequestVehicle>>(req.vehicleIds)
+                : new List<DispatchRequestVehicle>();
+
             await _repository.AddAsync(entity);
             return entity.Id;
         }
@@ -57,39 +65,45 @@ namespace Application
             var entity = await _repository.GetByIdAsync(id) ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
             var currentStatus = (DispatchRequestStatus)entity.Status;
             var newStatus = req.status;
-            if (newStatus == (int)DispatchRequestStatus.Approved || newStatus == (int)DispatchRequestStatus.Rejected)
+            switch (newStatus)
             {
-                if (entity.ToStationId != currentAdminStationId)
-                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
-                if (currentStatus != DispatchRequestStatus.Pending)
-                    throw new BadRequestException(Message.DispatchMessage.OnlyApprovedCanReceive);
+                case DispatchRequestStatus.Approved:
+                case DispatchRequestStatus.Rejected:
+                    DispatchValidationHelper.EnsureCanUpdate(
+                        currentAdminStationId,
+                        entity.ToStationId,
+                        currentStatus,
+                        DispatchRequestStatus.Pending,
+                        Message.UserMessage.DoNotHavePermission,
+                        Message.DispatchMessage.OnlyPendingCanApproveReject);
+                    entity.ApprovedAdminId = currentAdminId;
+                    entity.Status = (int)newStatus;
+                    break;
 
-                entity.ApprovedAdminId = currentAdminId;
-                entity.Status = newStatus;
-            }
-            else if (newStatus == (int)DispatchRequestStatus.Received)
-            {
-                if (entity.FromStationId != currentAdminStationId
-                    || currentStatus != DispatchRequestStatus.Approved)
-                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+                case DispatchRequestStatus.Received:
+                    DispatchValidationHelper.EnsureCanUpdate(
+                        currentAdminStationId,
+                        entity.ToStationId,
+                        currentStatus,
+                        DispatchRequestStatus.Approved,
+                        Message.UserMessage.DoNotHavePermission,
+                        Message.DispatchMessage.OnlyApprovedCanReceive);
+                    break;
 
-                await _staffRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
-                await _vehicleRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
-                entity.Status = (int)DispatchRequestStatus.Received;
-            }
-            else if (newStatus == (int)DispatchRequestStatus.Cancel)
-            {
-                if (entity.FromStationId != currentAdminStationId
-                    || currentStatus != DispatchRequestStatus.Pending)
-                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+                case DispatchRequestStatus.Cancel:
+                    DispatchValidationHelper.EnsureCanUpdate(
+                        currentAdminStationId,
+                        entity.ToStationId,
+                        currentStatus,
+                        DispatchRequestStatus.Pending,
+                        Message.UserMessage.DoNotHavePermission,
+                        Message.DispatchMessage.OnlyPendingCanCancel);
+                    entity.Status = (int)DispatchRequestStatus.Cancel;
+                    break;
 
-                entity.Status = (int)DispatchRequestStatus.Cancel;
+                default:
+                    throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
             }
-            else
-            {
-                throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
-            }
-
             await _repository.UpdateAsync(entity);
         }
     }

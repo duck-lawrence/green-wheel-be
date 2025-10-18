@@ -16,12 +16,20 @@ namespace Application
         private readonly IPhotoService _photoService;
         private readonly IMapper _mapper;
 
-        public ModelImageService(IModelImageUow uow, IPhotoService photoService, IMapper mapper)
+        public ModelImageService(IModelImageUow uow,
+            IPhotoService photoService,
+            IMapper mapper)
         {
             _uow = uow;
             _photoService = photoService;
             _mapper = mapper;
         }
+
+        // =================
+        // Upload img
+        // =================
+
+        #region upload
 
         public async Task<List<VehicleModelImageRes>> UploadModelImagesAsync(Guid modelId, List<IFormFile> files)
         {
@@ -58,33 +66,6 @@ namespace Application
             await _uow.SaveChangesAsync();
 
             return _mapper.Map<List<VehicleModelImageRes>>(uploadedImages);
-        }
-
-        public async Task DeleteModelImagesAsync(Guid modelId, List<Guid> imageIds)
-        {
-            if (imageIds == null || imageIds.Count == 0)
-                throw new BadRequestException(Message.CommonMessage.UnexpectedError);
-
-            var images = await _uow.ModelImageRepository.FindAsync(x =>
-                imageIds.Contains(x.Id) && x.ModelId == modelId);
-
-            if (!images.Any())
-                throw new NotFoundException(Message.CloudinaryMessage.NotFoundObjectInFile);
-
-            foreach (var image in images)
-            {
-                try
-                {
-                    await _photoService.DeletePhotoAsync(image.PublicId);
-                }
-                catch
-                {
-                }
-
-                _uow.ModelImageRepository.Remove(image);
-            }
-
-            await _uow.SaveChangesAsync();
         }
 
         public async Task<(VehicleModelImageRes mainImage, List<VehicleModelImageRes> galleryImages)>
@@ -132,6 +113,38 @@ namespace Application
 
                 throw;
             }
+        }
+
+        #endregion upload
+
+        // =================
+        // Deleted img
+        // =================
+        public async Task DeleteModelImagesAsync(Guid modelId, List<Guid> imageIds)
+        {
+            if (imageIds == null || imageIds.Count == 0)
+                throw new BadRequestException(Message.CommonMessage.UnexpectedError);
+
+            var images = await _uow.ModelImageRepository.FindAsync(x =>
+                imageIds.Contains(x.Id) && x.ModelId == modelId);
+
+            if (!images.Any())
+                throw new NotFoundException(Message.CloudinaryMessage.NotFoundObjectInFile);
+
+            foreach (var image in images)
+            {
+                try
+                {
+                    await _photoService.DeletePhotoAsync(image.PublicId);
+                }
+                catch
+                {
+                }
+
+                _uow.ModelImageRepository.Remove(image);
+            }
+
+            await _uow.SaveChangesAsync();
         }
     }
 }
