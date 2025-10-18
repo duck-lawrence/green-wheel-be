@@ -27,6 +27,6 @@ namespace Application.Abstractions
         Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber);
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
-        Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? segmentId);
+        Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? stationId);
     }
 }

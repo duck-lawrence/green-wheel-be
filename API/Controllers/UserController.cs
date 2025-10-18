@@ -39,10 +39,10 @@ namespace API.Controllers
         [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> GetAllStaff(
            [FromQuery] string? name,
-           [FromQuery] Guid? segmentId
+           [FromQuery] Guid? stationId
            )
         {
-            var users = await _userService.GetAllStaffAsync(name, segmentId);
+            var users = await _userService.GetAllStaffAsync(name, stationId);
             return Ok(users);
         }
 
