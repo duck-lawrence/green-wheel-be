@@ -49,9 +49,9 @@ namespace API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAll(
-            [FromQuery(Name = "from_station_id")] Guid? fromStationId,
-            [FromQuery(Name = "to_station_id")] Guid? toStationId,
-            [FromQuery(Name = "status")] DispatchRequestStatus? status)
+            [FromQuery] Guid? fromStationId,
+            [FromQuery] Guid? toStationId,
+            [FromQuery] DispatchRequestStatus? status)
         {
             var result = await _dispatchRequestService.GetAllAsync(fromStationId, toStationId, status);
             return Ok(result);
