@@ -14,10 +14,13 @@ namespace API.Controllers
     public class VehicleModelController : ControllerBase
     {
         private readonly IVehicleModelService _vehicleModelService;
+        private readonly IModelImageService _modelImageService;
 
-        public VehicleModelController(IVehicleModelService vehicleModelService)
+        public VehicleModelController(IVehicleModelService vehicleModelService,
+            IModelImageService modelImageService)
         {
             _vehicleModelService = vehicleModelService;
+            _modelImageService = modelImageService;
         }
 
         /*
@@ -26,7 +29,8 @@ namespace API.Controllers
          --400: invalid type
          200: success
          */
-        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
+
+        [RoleAuthorize(RoleName.Admin)]
         [HttpPost]
         public async Task<IActionResult> CreateVehicleModel([FromBody] CreateVehicleModelReq createVehicleModelReq)
         {
@@ -44,7 +48,8 @@ namespace API.Controllers
          --400: invalid type
          404: not found
          */
-        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
+
+        [RoleAuthorize(RoleName.Admin)]
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateVehicleModel([FromRoute] Guid id, UpdateVehicleModelReq updateVehicleModelReq)
         {
@@ -93,6 +98,7 @@ namespace API.Controllers
          404: vehicle model not found
          200: success
          */
+
         [RoleAuthorize(RoleName.Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVehicleModel([FromRoute] Guid id)
@@ -100,5 +106,67 @@ namespace API.Controllers
             await _vehicleModelService.DeleteVehicleModleAsync(id);
             return Ok();
         }
+
+        // ---------- SUB-IMAGES (gallery) ----------
+
+        #region SUB-IMAGES (gallery)
+
+        [HttpPost("sub-images")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UploadSubImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
+        {
+            var res = await _modelImageService.UploadModelImagesAsync(modelId, req.Files);
+            return Ok(new { data = res, message = Message.CloudinaryMessage.UploadSuccess });
+        }
+
+        [HttpDelete("sub-images")]
+        [Consumes("application/json")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> DeleteSubImages([FromRoute] Guid modelId, [FromBody] DeleteModelImagesReq req)
+        {
+            await _modelImageService.DeleteModelImagesAsync(modelId, req.ImageIds);
+            return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
+        }
+
+        #endregion SUB-IMAGES (gallery)
+
+        // ---------- MAIN IMAGE ----------
+
+        #region MAIN IMAGE
+
+        [HttpPost("main-image")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UploadMainImage([FromRoute] Guid modelId, [FromForm(Name = "file")] IFormFile file)
+        {
+            var imageUrl = await _vehicleModelService.UploadMainImageAsync(modelId, file);
+            return Ok(new { data = new { modelId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
+        }
+
+        [HttpDelete("main-image")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
+        {
+            await _vehicleModelService.DeleteMainImageAsync(modelId);
+            return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
+        }
+
+        #endregion MAIN IMAGE
+
+        // ---------- MAIN + GALLERY ----------
+
+        #region multiform
+
+        [HttpPost("images")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
+        {
+            var (mainImage, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
+            return Ok(new { data = new { main = mainImage, gallery = galleryImages }, message = Message.CloudinaryMessage.UploadSuccess });
+        }
+
+        #endregion multiform
     }
 }

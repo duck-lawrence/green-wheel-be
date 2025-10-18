@@ -1,5 +1,6 @@
 ﻿using API.Filters;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Ticket.Request;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,14 @@ namespace API.Controllers
             _service = service;
         }
 
+        // ==========
+        // for customer
+        // ==========
+
+        #region customer
+
         [HttpPost]
-        [RoleAuthorize(["Staff", "Customer"])]
+        [RoleAuthorize([RoleName.Admin, RoleName.Customer])]
         public async Task<IActionResult> Create([FromBody] CreateTicketReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -28,7 +35,7 @@ namespace API.Controllers
         }
 
         [HttpGet("me")]
-        [RoleAuthorize("Customer")]
+        [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> GetMyTickets()
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -36,8 +43,16 @@ namespace API.Controllers
             return Ok(data);
         }
 
+        #endregion customer
+
+        // ===================
+        // for staff and admin
+        // ===================
+
+        #region management
+
         [HttpGet]
-        [RoleAuthorize(["Staff", "Admin"])]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> GetAll([FromQuery] PaginationParams pagination)
         {
             var data = await _service.GetAllAsync(pagination);
@@ -45,7 +60,7 @@ namespace API.Controllers
         }
 
         [HttpPatch("{id}")]
-        [RoleAuthorize(["Staff", "Admin"])]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTicketReq req)
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -53,8 +68,10 @@ namespace API.Controllers
             return NoContent();
         }
 
+        #region escalated
+
         [HttpPatch("{id}/escalated-to-admin")]
-        [RoleAuthorize("Staff")]
+        [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> EscalateToAdmin(Guid id)
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -63,11 +80,15 @@ namespace API.Controllers
         }
 
         [HttpGet("escalated")]
-        [RoleAuthorize("Admin")]
+        [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> GetEscalatedTickets([FromQuery] PaginationParams pagination)
         {
             var data = await _service.GetEscalatedTicketsAsync(pagination);
             return Ok(data);
         }
+
+        #endregion escalated
+
+        #endregion management
     }
 }

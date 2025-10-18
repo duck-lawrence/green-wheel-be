@@ -15,11 +15,18 @@ namespace Application
         private readonly ITicketRepository _repo;
         private readonly IMapper _mapper;
 
-        public TicketService(ITicketRepository repo, IMapper mapper)
+        public TicketService(ITicketRepository repo,
+            IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
         }
+
+        // ===============
+        // for customer
+        // ===============
+
+        #region customer
 
         public async Task<Guid> CreateAsync(Guid customerId, CreateTicketReq req)
         {
@@ -36,6 +43,14 @@ namespace Application
             await _repo.AddAsync(ticket);
             return ticket.Id;
         }
+
+        #endregion customer
+
+        // ===============
+        // for staff
+        // ===============
+
+        #region managerment
 
         public async Task EscalateToAdminAsync(Guid id)
         {
@@ -83,5 +98,7 @@ namespace Application
 
             await _repo.UpdateAsync(ticket);
         }
+
+        #endregion managerment
     }
 }
