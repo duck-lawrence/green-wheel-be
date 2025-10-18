@@ -1,5 +1,6 @@
 ﻿using API.Filters;
 using Application.Abstractions;
+using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
@@ -75,14 +76,11 @@ namespace API.Controllers
         * 200: success
         */
         [RoleAuthorize(RoleName.Staff)]
-        [HttpPost("offline")]
+        [HttpPost("manual")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
-            var userId = req.CustomerId;
-            if(userId == null)
-            {
-                return BadRequest(Message.UserMessage.UserIdIsRequired);
-            } 
+            var userId = req.CustomerId 
+                ?? throw new BadRequestException(Message.UserMessage.UserIdIsRequired);
             await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
             return Created();
         }
@@ -124,8 +122,8 @@ namespace API.Controllers
         public async Task<IActionResult> ReturnRentalContract(Guid id)
         {
             var staff = HttpContext.User;
-            var invoiceView = await _rentalContractService.ReturnProcessRentalContractAsync(staff, id);
-            return invoiceView == null ? Ok() : Ok(invoiceView);
+            var returnInvoiceId = await _rentalContractService.ReturnProcessRentalContractAsync(staff, id);
+            return Ok(returnInvoiceId);
         }
 
         [RoleAuthorize(RoleName.Customer)]
@@ -156,13 +154,13 @@ namespace API.Controllers
         /*
          * status code
          * 400 not found
-         * 404 bad request, this contract can not cancle
+         * 404 bad request, this contract can not cancel
          * 200 success
          */
         [RoleAuthorize(RoleName.Customer)]
-        [HttpPut("{id}/cancle")]
-        public async Task<IActionResult> CancleRentalContract(Guid id) {
-            await _rentalContractService.CancleRentalContract(id);
+        [HttpPut("{id}/cancel")]
+        public async Task<IActionResult> CancelRentalContract(Guid id) {
+            await _rentalContractService.CancelRentalContract(id);
             return Ok();
         }
         

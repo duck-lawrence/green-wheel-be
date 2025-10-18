@@ -17,6 +17,7 @@ using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using AutoMapper;
+using Infrastructure.ExternalService;
 
 namespace API
 {
@@ -87,8 +88,7 @@ namespace API
             builder.Services.AddScoped<IVehicleCheckListRepository, VehicleChecklistRepository>();
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
-            builder.Services.AddScoped<IStaffRepository, StaffRepository>();
-            builder.Services.AddScoped<IDispatchRepository, DispatchRepository>();
+            builder.Services.AddScoped<IVehicleComponentRepository, VehicleComponentRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -107,6 +107,11 @@ namespace API
             builder.Services.AddScoped<IStationFeedbackService, StationFeedbackService>();
             builder.Services.AddScoped<IChecklistItemImageService, ChecklistItemImageService>();
             builder.Services.AddScoped<IDispatchRequestService, DispatchService>();
+            builder.Services.AddScoped<IStaffRepository, StaffRepository>();
+            builder.Services.AddScoped<IDispatchRepository, DispatchRepository>();
+            builder.Services.AddScoped<IEmailSerivce, EmailService>();
+            builder.Services.AddScoped<IAuthService, AuthSerivce>();
+            builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client

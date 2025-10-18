@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 using Application.AppExceptions;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace API.Controllers
 {
@@ -19,13 +21,19 @@ namespace API.Controllers
     {
         private readonly IMomoService _momoService;
         private readonly IInvoiceService _invoiceService;
+        private readonly IMemoryCache _cache;
+        private readonly IUserService _userService;
 
         public InvoiceController(IMomoService momoService,
-            IInvoiceService invoiceItemService
+            IInvoiceService invoiceItemService,
+            IMemoryCache cache,
+            IUserService userService
             )
         {
             _momoService = momoService;
             _invoiceService = invoiceItemService;
+            _cache = cache;
+            _userService = userService;
         }
 
         /*
@@ -35,7 +43,7 @@ namespace API.Controllers
          * 404 not found
          */
 
-        [HttpPost("process-update")]
+        [HttpPost("payment-callback/momo")]
         public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
@@ -63,19 +71,51 @@ namespace API.Controllers
          */
 
         [HttpPut("{id}/payment")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
-            var invoice = await _invoiceService.GetRawInvoiceById(id, true, true); 
+            //kiểm tra phải hoá đơn của nó không
+            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
+            var roles = _cache.Get<List<Role>>("AllRoles");
+            var userInDB = await _userService.GetByIdAsync(userId);
+            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+            if (userRole == RoleName.Customer)
+            {
+                if (invoice.Contract.CustomerId != userId)
+                    throw new BusinessException(Message.InvoiceMessage.ForbiddenInvoiceAccess);
+            }
+
+            if (invoice.Status == (int)InvoiceStatus.Cancelled || invoice.Status == (int)InvoiceStatus.Paid) 
+                throw new BusinessException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             if(paymentReq.PaymentMethod == (int)PaymentMethod.Cash)
             {
-                await _invoiceService.CashPayment(invoice);
+                if (paymentReq.Amount == null) throw new BadRequestException(Message.InvoiceMessage.AmountRequired);
+                
+                switch (invoice.Type)
+                {
+                    case (int)InvoiceType.Handover:
+                        await _invoiceService.PayHandoverInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
+                    case (int)InvoiceType.Return:
+                        await _invoiceService.PayReturnInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
+                    case (int)InvoiceType.Reservation:
+                        await _invoiceService.PayReservationInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
+                    default:
+                        throw new Exception(Message.InvoiceMessage.InvalidInvoiceType);
+                       
+                }
+
                 return Ok();
             }
             string link = invoice.Type switch
             {
-                (int)InvoiceType.Handover => await _invoiceService.ProcessHandoverInvoice(invoice, paymentReq.FallbackUrl),
-                (int)InvoiceType.Reservation => await _invoiceService.ProcessReservationInvoice(invoice, paymentReq.FallbackUrl),
-                _ => throw new Exception(),
+                (int)InvoiceType.Handover => await _invoiceService.PayHandoverInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Reservation => await _invoiceService.PayReservationInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Return => await _invoiceService.PayReturnInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                _ => throw new Exception(Message.InvoiceMessage.InvalidInvoiceType),
             };
             return Ok(new { link });
         }

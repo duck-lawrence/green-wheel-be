@@ -5,7 +5,7 @@ using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
 using Application.Repositories;
 
-namespace Application
+namespace Infrastructure.ExternalService
 {
     public class CloudinaryService : IPhotoService
     {

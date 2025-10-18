@@ -28,8 +28,8 @@ namespace Application.Dtos.RentalContract.Respone
         public VehicleViewRes Vehicle { get; set; }
         public UserProfileViewRes Customer { get; set; }
         public StationViewRes Station { get; set; }
-        public Guid? HandoverStaffId { get; set; }
-        public Guid? ReturnStaffId { get; set; }
+        public UserProfileViewRes? HandoverStaff { get; set; }
+        public UserProfileViewRes? ReturnStaff { get; set; }
         public IEnumerable<InvoiceViewRes> Invoices { get; set; }
     }
 }

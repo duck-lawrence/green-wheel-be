@@ -17,8 +17,20 @@ namespace Infrastructure.Repositories
         {
             _mapper = mapper;
         }
+        public async Task<IEnumerable<VehicleModel>> GetAllAsync(string? name, Guid? segmentId)
+        {
+            var models = _dbContext.VehicleModels
+                            .Include(vm => vm.Brand)
+                            .Include(vm => vm.Segment)
+                            .Include(vm => vm.ModelImages)
+                            .Include(vm => vm.Vehicles)
+                            .AsQueryable();
+            if (!string.IsNullOrEmpty(name)) models = models.Where(vm => vm.Name.ToLower().Contains(name.ToLower()));
+            if (segmentId != null) models = models.Where(vm => vm.SegmentId == segmentId);
+            return await models.ToListAsync();
+        }
 
-        public async Task<IEnumerable<VehicleModelViewRes>> FilterVehicleModelsAsync(
+        public async Task<IEnumerable<VehicleModel>> FilterVehicleModelsAsync(
             Guid stationId,
             DateTimeOffset startDate,
             DateTimeOffset endDate,
@@ -34,46 +46,26 @@ namespace Infrastructure.Repositories
             var query = _dbContext.VehicleModels
                 .Include(vm => vm.Vehicles)
                     .ThenInclude(v => v.RentalContracts)
+                .Include(vm => vm.Vehicles)
+                    .ThenInclude(v => v.Station)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
-                .Where(vm => vm.DeletedAt == null);
-
-            if (segmentId.HasValue)
+                .AsNoTracking()
+                .AsQueryable();
+            if (segmentId != null)
                 query = query.Where(vm => vm.SegmentId == segmentId.Value);
-
-            // Dùng ProjectTo để EF tự select đúng cột
-            var models = await query
-                .ProjectTo<VehicleModelViewRes>(_mapper.ConfigurationProvider)
-                .ToListAsync();
-
-            // Bổ sung logic AvailableVehicleCount (AutoMapper không xử lý được)
+            var models = await query.ToListAsync();
             foreach (var model in models)
             {
-                var entity = await _dbContext.VehicleModels
-                    .Include(vm => vm.Vehicles)
-                        .ThenInclude(v => v.RentalContracts)
-                    .FirstAsync(vm => vm.Id == model.Id);
-
-                model.AvailableVehicleCount = entity.Vehicles.Count(v =>
-                    v.StationId == stationId &&
-                    (
-                        v.Status == (int)VehicleStatus.Available ||
-                        (
-                            (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                            !v.RentalContracts
-                                .Where(rc => rc.Status == (int)RentalContractStatus.Active)
-                                .Any(rc =>
-                                    startBuffer < rc.EndDate &&
-                                    endBuffer > rc.StartDate
-                                )
-                        )
-                    ));
+                 var vehicles = model.Vehicles.Where(v => CheckAvailableVehicle(v, stationId, startBuffer, endBuffer));
+                model.Vehicles = vehicles.ToList();
+                
             }
-
             return models;
         }
 
-        public async Task<VehicleModelViewRes?> GetByIdAsync(
+
+        public async Task<VehicleModel?> GetByIdAsync(
             Guid id,
             Guid stationId,
             DateTimeOffset startDate,
@@ -83,34 +75,42 @@ namespace Infrastructure.Repositories
             var endBuffer = endDate.AddDays(10);
 
             // Load model + ảnh + brand + segment
-            var entity = await _dbContext.VehicleModels
+            var model = await _dbContext.VehicleModels
                 .Include(vm => vm.ModelImages)
                 .Include(vm => vm.Vehicles)
                     .ThenInclude(v => v.RentalContracts)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .AsNoTracking()
+                .AsQueryable()
                 .FirstOrDefaultAsync(vm => vm.Id == id && vm.DeletedAt == null);
 
-            if (entity == null) return null;
+            if (model == null) return null;
 
-            var model = _mapper.Map<VehicleModelViewRes>(entity);
-
-            model.AvailableVehicleCount = entity.Vehicles.Count(v =>
-                v.StationId == stationId &&
-                (
-                    v.Status == (int)VehicleStatus.Available ||
-                    (
-                        (v.Status == (int)VehicleStatus.Unavaible || v.Status == (int)VehicleStatus.Rented) &&
-                        !v.RentalContracts
-                            .Where(rc => rc.Status == (int)RentalContractStatus.Active)
-                            .Any(rc =>
-                                startBuffer < rc.EndDate &&
-                                endBuffer > rc.StartDate
-                            )
-                    )
-                ));
+            var vehicles = model.Vehicles.Where(v => CheckAvailableVehicle(v, stationId, startBuffer, endBuffer));
+            model.Vehicles = vehicles.ToList();
 
             return model;
+        }
+        private bool CheckAvailableVehicle(Vehicle vehicle, Guid stationId, DateTimeOffset startBuffer, DateTimeOffset endBuffer)
+        {
+            return vehicle.StationId == stationId
+                    &&
+                    (vehicle.Status == (int)VehicleStatus.Available
+                    ||
+                    ((vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented)) &&
+                                                    vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
+                                                    !vehicle.RentalContracts.Any(rc =>
+                                                        rc.Status == (int)RentalContractStatus.Active &&
+                                                        startBuffer <= rc.EndDate &&
+                                                        endBuffer >= rc.StartDate
+                                                    )
+                                                     ||
+                                                (
+                                                (vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented) &&
+                                                !vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active)
+                                                ));
+
         }
     }
 }

@@ -7,10 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
-    public interface IDepositRepository : IGenericRepository<Deposit>
+    public interface IVehicleComponentRepository : IGenericRepository<VehicleComponent>
     {
-        Task<Deposit?> GetByInvoiceIdAsync(Guid invoiceId);
-        Task<Deposit> GetByContractIdAsync(Guid contractId);
-
+        Task<IEnumerable<VehicleComponent>> GetByVehicleIdAsync(Guid vehicleId);
     }
 }

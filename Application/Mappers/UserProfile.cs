@@ -36,6 +36,18 @@ namespace Application.Mappers
 
             CreateMap<CitizenIdentity, CitizenIdentityRes>()
                 .ForMember(dest => dest.Sex, opt => opt.MapFrom(src => src.Sex.ToString()));
+
+            CreateMap<Staff, UserProfileViewRes>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.User.Id))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
+                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
+                .ForMember(dest => dest.Sex, opt => opt.MapFrom(src => src.User.Sex))
+                .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
+                .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.User.AvatarUrl))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.Phone))
+                .ForMember(dest => dest.LicenseUrl, opt => opt.MapFrom(src => src.User.DriverLicense.ImageUrl))
+                .ForMember(dest => dest.CitizenUrl, opt => opt.MapFrom(src => src.User.CitizenIdentity.ImageUrl));
         }
     }
 }

@@ -18,14 +18,15 @@ namespace Infrastructure.UnitOfWorks
         public IRentalContractRepository RentalContractRepository { get; }
         public IInvoiceRepository InvoiceRepository { get; }
         public IInvoiceItemRepository InvoiceItemRepository { get; }
-
+        public IVehicleComponentRepository VehicleComponentRepository { get; }
         public VehicleChecklistUow(IGreenWheelDbContext context,
             IVehicleChecklistItemRepository vehicleChecklistItemRepository,
             IVehicleCheckListRepository vehicleCheckListRepository,
             IVehicleRepository vehicleRepository,
             IRentalContractRepository rentalContractRepository,
             IInvoiceRepository invoiceRepository,
-            IInvoiceItemRepository invoiceItemRepository)
+            IInvoiceItemRepository invoiceItemRepository,
+            IVehicleComponentRepository vehicleComponentRepository)
         {
             _context = context;
             VehicleChecklistItemRepository = vehicleChecklistItemRepository;
@@ -34,6 +35,7 @@ namespace Infrastructure.UnitOfWorks
             RentalContractRepository = rentalContractRepository;
             InvoiceRepository = invoiceRepository;
             InvoiceItemRepository = invoiceItemRepository;
+            VehicleComponentRepository = vehicleComponentRepository;
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

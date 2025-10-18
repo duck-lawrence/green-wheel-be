@@ -24,11 +24,7 @@ namespace Application
         public async Task<IEnumerable<VehicleSegmentViewRes>> GetAllVehicleSegment()
         {
             var vehicleSegments = await _vehicleSegmentRepository.GetAllAsync();
-            if(vehicleSegments == null)
-            {
-                throw new NotFoundException(Message.VehicleSegmentMessage.VehicleSegmentNotFound);
-            }
-            return _mapper.Map<IEnumerable<VehicleSegmentViewRes>>(vehicleSegments);
+            return _mapper.Map<IEnumerable<VehicleSegmentViewRes>>(vehicleSegments) ?? [];
         }
     }
 }

@@ -19,8 +19,8 @@ namespace Application.Abstractions
         Task<RentalContractViewRes> GetByIdAsync(Guid id);
         Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req);
         Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
-        Task<InvoiceViewRes?> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
+        Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
         Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
-        Task CancleRentalContract(Guid id);
+        Task CancelRentalContract(Guid id);
     }
 }

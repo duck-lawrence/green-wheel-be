@@ -16,23 +16,28 @@ namespace Infrastructure.Repositories
 
         public async Task<Vehicle?> GetByLicensePlateAsync(string licensePlate)
         {
-            return await _dbContext.Vehicles.FirstOrDefaultAsync(x => x.LicensePlate == licensePlate);
+            return await _dbContext.Vehicles
+                .Include(v => v.Model)
+                .FirstOrDefaultAsync(x => x.LicensePlate == licensePlate);
         }
 
-        public async Task<IEnumerable<VehicleComponent>> GetVehicleComponentsAsync(Guid vehicleId)
+       public async Task<IEnumerable<Vehicle>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate)
         {
-            var components = await _dbContext.Vehicles
-                .Where(v => v.Id == vehicleId)
-                .SelectMany(v => v.Model.ModelComponents.Select(mc => mc.Component))
-                .ToListAsync();
-            //lấy ra list linh kiện của xe
-            return components;
+            var vehicles = _dbContext.Vehicles
+                            .Include(v => v.Model)
+                            .AsQueryable();
+            if (!string.IsNullOrEmpty(name)) vehicles = vehicles.Where(v => v.Model.Name.ToLower().Contains(name.ToLower()));
+            if (stationId != null) vehicles = vehicles.Where(v => v.StationId == stationId);
+            if (status != null) vehicles = vehicles.Where(v => v.Status == status);
+            if (!string.IsNullOrEmpty(licensePlate)) vehicles = vehicles.Where(v => v.LicensePlate.ToLower().Contains(licensePlate.ToLower()));
+            return await vehicles.ToListAsync();
         }
 
         public async Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId)
         {
             // Query lọc trực tiếp từ DB (không ToList trước)
             var vehicles = await _dbContext.Vehicles
+                .Include(v => v.Model)
                 .Include(v => v.RentalContracts) //join bảng rentalContracts để lấy xe có hợp đồng
                 .Where
                 (

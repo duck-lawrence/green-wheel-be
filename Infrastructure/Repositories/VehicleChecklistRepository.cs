@@ -20,16 +20,36 @@ namespace Infrastructure.Repositories
         {
             var vehicleChecklist = await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
                 .Include(vc => vc.VehicleChecklistItems)
-                    .ThenInclude(vci => vci.Component).FirstOrDefaultAsync();
+                    .ThenInclude(vci => vci.Component)
+                .Include(vc => vc.Vehicle)
+                .Include(vc => vc.Staff)
+                    .ThenInclude(s => s.User)
+                .Include(vc => vc.Customer)
+                    .FirstOrDefaultAsync();
             return vehicleChecklist;
         }
 
-        public async Task<RentalContract?> GetRentalContractByCheckListIdAsync(Guid id)
+        public async Task<IEnumerable<VehicleChecklist>?> GetAll(Guid? contractId, int? type)
         {
-            var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
-                .Include(vc => vc.Contract).FirstOrDefaultAsync());
-            
-            return vehicleChecklist == null ? null : vehicleChecklist.Contract;
+            var vehicleChecklists = _dbContext.VehicleChecklists
+                .Include(vc => vc.VehicleChecklistItems)
+                    .ThenInclude(vci => vci.Component)
+                .Include(vc => vc.Vehicle)
+                .Include(vc => vc.Staff)
+                    .ThenInclude(s => s.User)
+                .Include(vc => vc.Customer)
+                    .AsQueryable();
+            if(contractId != null)
+            {
+                vehicleChecklists = vehicleChecklists.Where(c => c.ContractId == contractId);
+            }
+            if(type != null)
+            {
+                vehicleChecklists = vehicleChecklists.Where(c => c.Type == type);
+            }
+            return await vehicleChecklists.ToListAsync();
         }
+
+
     }
 }

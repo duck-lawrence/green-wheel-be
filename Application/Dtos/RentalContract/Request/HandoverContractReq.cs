@@ -10,6 +10,5 @@ namespace Application.Dtos.RentalContract.Request
     {
         public bool IsSignedByStaff { get; set; }
         public bool IsSignedByCustomer { get; set; }
-        public decimal? Amount { get; set; } = null;
     }
 }

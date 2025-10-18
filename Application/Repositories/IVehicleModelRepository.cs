@@ -1,15 +1,15 @@
-﻿using Application.Dtos.VehicleModel.Respone;
-using Domain.Entities;
+﻿using Domain.Entities;
 
 namespace Application.Repositories
 {
     public interface IVehicleModelRepository : IGenericRepository<VehicleModel>
     {
-        Task<IEnumerable<VehicleModelViewRes>> FilterVehicleModelsAsync(Guid stationId,
+        Task<IEnumerable<VehicleModel>> FilterVehicleModelsAsync(Guid stationId,
                                                             DateTimeOffset startDate,
                                                             DateTimeOffset endDate,
                                                             Guid? segmentId = null);
-        Task<VehicleModelViewRes> GetByIdAsync(Guid vehicleId, Guid stationId, DateTimeOffset startDate,
+        Task<VehicleModel> GetByIdAsync(Guid Id, Guid stationId, DateTimeOffset startDate,
         DateTimeOffset endDate);
+        Task<IEnumerable<VehicleModel>> GetAllAsync(string? name, Guid? segmentId);
     }
 }

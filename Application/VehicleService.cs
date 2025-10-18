@@ -43,11 +43,11 @@ namespace Application
             return await _vehicleRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<VehicleViewRes>> GetAllVehicle()
+        public async Task<IEnumerable<VehicleViewRes>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate)
         {
-            var vehicles = await _vehicleRepository.GetAllAsync();
+            var vehicles = await _vehicleRepository.GetAllAsync(name, stationId, status, licensePlate);
 
-            return _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles);
+            return _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles) ?? [];
         }
 
         public async Task<VehicleViewRes> GetVehicleById(Guid id)

@@ -10,5 +10,6 @@ namespace Application.Dtos.Payment.Request
     {
         public int PaymentMethod { get; set; }
         public string FallbackUrl { get; set; } = null!;
+        public decimal? Amount { get; set; } = null;
     }
 }

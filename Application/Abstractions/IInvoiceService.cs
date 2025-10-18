@@ -16,12 +16,16 @@ namespace Application.Abstractions
 
         Task<IEnumerable<InvoiceViewRes>?> GetByContractIdAndStatus(Guid? contractId, int? status);
 
-        Task CashPayment(Invoice invoice);
+        Task PayHandoverInvoiceManual(Invoice invoice, decimal amount);
+        Task PayReservationInvoiceManual(Invoice invoice, decimal amount);
+        Task PayReturnInvoiceManual(Invoice invoice, decimal amount);
+        Task<string> PayReservationInvoiceOnline(Invoice invoice, string fallbackUrl);
 
-        Task<string> ProcessReservationInvoice(Invoice invoice, string fallbackUrl);
+        Task<string> PayHandoverInvoiceOnline(Invoice invoice, string fallbackUrl);
 
-        Task<string> ProcessHandoverInvoice(Invoice invoice, string fallbackUrl);
+        Task<string> PayReturnInvoiceOnline(Invoice invoice, string fallbackUrl);
 
         Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
+
     }
 }

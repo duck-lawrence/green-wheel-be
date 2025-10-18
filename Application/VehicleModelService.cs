@@ -34,7 +34,7 @@ namespace Application
             {
                 id = new Guid();
             } while (await _vehicleModelRepository.GetByIdAsync(id) != null);
-            var vehicleModel = _mapper.Map<VehicleModel>(createVehicleModelReq);
+            var vehicleModel = _mapper.Map<Domain.Entities.VehicleModel>(createVehicleModelReq);
             vehicleModel.CreatedAt = vehicleModel.UpdatedAt = DateTimeOffset.UtcNow;
             vehicleModel.DeletedAt = null;
             return await _vehicleModelRepository.AddAsync(vehicleModel);
@@ -45,21 +45,24 @@ namespace Application
             return await _vehicleModelRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<VehicleModelViewRes>> GetAllVehicleModels(VehicleFilterReq vehicleFilterReq)
+        public async Task<IEnumerable<VehicleModelViewRes>> SearchVehicleModel(VehicleFilterReq vehicleFilterReq)
         {
-            return await _vehicleModelRepository.FilterVehicleModelsAsync(vehicleFilterReq.StationId, vehicleFilterReq.StartDate, vehicleFilterReq.EndDate, vehicleFilterReq.SegmentId);
+            var vehicleModels = await _vehicleModelRepository.FilterVehicleModelsAsync(vehicleFilterReq.StationId, vehicleFilterReq.StartDate, vehicleFilterReq.EndDate, vehicleFilterReq.SegmentId);
+            return _mapper.Map<IEnumerable<VehicleModelViewRes>>(vehicleModels)  ?? [];
         }
 
         public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
-            var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate);
-            if (vehicleModelViewRes == null)
-            {
-                throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
-            }
-            return vehicleModelViewRes;
+            var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate)
+            ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+            return _mapper.Map<VehicleModelViewRes>(vehicleModelViewRes);
         }
 
+        public async Task<IEnumerable<VehicleModelViewRes>> GetAllAsync(string? name, Guid? segmentId)
+        {
+            var models = await _uow.VehicleModels.GetAllAsync(name, segmentId);
+            return _mapper.Map<IEnumerable<VehicleModelViewRes>>(models) ?? [];
+        }
         public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq req)
         {
             var model = await _vehicleModelRepository.GetByIdAsync(Id) ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
@@ -115,7 +118,7 @@ namespace Application
                 ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
 
             if (string.IsNullOrEmpty(model.ImagePublicId))
-                throw new BadRequestException(Message.VehicleModelImageMessage.NoMainImage);
+                throw new BadRequestException(Message.VehicleModelImageMessage.MainImageNotFound);
 
             await _photoService.DeletePhotoAsync(model.ImagePublicId);
 
