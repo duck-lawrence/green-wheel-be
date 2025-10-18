@@ -39,13 +39,24 @@ namespace Application
             entity.RequestAdminId = adminId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.UpdatedAt = entity.CreatedAt;
-
-            entity.DispatchRequestStaffs = req.StaffIds != null
-                ? _mapper.Map<List<DispatchRequestStaff>>(req.StaffIds)
-                : [];
-            entity.DispatchRequestVehicles = req.VehicleIds != null
-                ? _mapper.Map<List<DispatchRequestVehicle>>(req.VehicleIds)
-                : [];
+            IEnumerable<DispatchRequestStaff> staffs = [];
+            if (req.StaffIds != null && req.StaffIds.Length > 0)
+            {
+                entity.DispatchRequestStaffs = req.StaffIds.Select(id => new DispatchRequestStaff
+                {
+                    DispatchRequestId = entity.Id,
+                    StaffId = id,
+                }).ToList();
+            }
+            IEnumerable<DispatchRequestVehicle> vehicles = [];
+            if (req.VehicleIds != null && req.VehicleIds.Length > 0)
+            {
+                entity.DispatchRequestVehicles = req.VehicleIds.Select(id => new DispatchRequestVehicle
+                {
+                    DispatchRequestId = entity.Id,
+                    VehicleId = id,
+                }).ToList();
+            }
 
             await _repository.AddAsync(entity);
             return entity.Id;

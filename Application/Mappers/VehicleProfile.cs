@@ -14,8 +14,6 @@ namespace Application.Mappers
         {
             CreateMap<Brand, BrandViewRes>();
             CreateMap<VehicleSegment, VehicleSegmentViewRes>();
-
-           
             CreateMap<CreateVehicleReq, Vehicle>();
             CreateMap<Vehicle, VehicleViewRes>();
         }
