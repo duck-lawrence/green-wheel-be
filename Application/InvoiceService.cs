@@ -295,5 +295,14 @@ namespace Application
             await _uow.InvoiceItemRepository.AddRangeAsync(items);
             await _uow.SaveChangesAsync();
         }
+
+        public async Task UpdateNoteAsync(Guid id, string notes)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
+            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($". {notes}"));
+            await _uow.InvoiceRepository.UpdateAsync(invoice);
+            await _uow.SaveChangesAsync();
+        }
     }
 }

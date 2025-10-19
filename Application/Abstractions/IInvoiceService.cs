@@ -31,7 +31,6 @@ namespace Application.Abstractions
         Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
         Task CreateAsync(CreateInvoiceReq req);
         Task UpdateAsync(Guid invoiceId, UpdateInvoiceReq req);
-
-
+        Task UpdateNoteAsync(Guid id, string notes);
     }
 }

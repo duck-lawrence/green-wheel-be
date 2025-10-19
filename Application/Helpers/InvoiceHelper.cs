@@ -39,7 +39,8 @@ namespace Application.Helpers
             if (items == null || !items.Any() || items.Any(x => x == null))
                 return 0;
             return items.Where(i =>
-            i.Type != (int)InvoiceItemType.LateReturn)
+            i.Type != (int)InvoiceItemType.LateReturn &&
+            i.Type != (int)InvoiceItemType.Refund)
                 .Sum(item => item.UnitPrice * item.Quantity); 
         }
         //hàm này sẽ dùng để tính nội bộ trong này chứ k dùng ở ngoài

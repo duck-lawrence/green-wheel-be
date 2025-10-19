@@ -151,5 +151,12 @@ namespace API.Controllers
             await _invoiceService.UpdateAsync(id, req);
             return Ok();
         }
+
+        [HttpPut("{id}/notes")]
+        public async Task<IActionResult>UpdateInvoiceNotes(Guid id, string notes)
+        {
+            await _invoiceService.UpdateNoteAsync(id, notes);
+            return Ok();
+        }
     }
 }
