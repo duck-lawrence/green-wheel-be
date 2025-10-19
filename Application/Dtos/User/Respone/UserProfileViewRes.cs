@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Role.Respone;
+﻿using Application.Dtos.Role.Response;
 using Application.Dtos.Station.Respone;
 
 namespace Application.Dtos.User.Respone

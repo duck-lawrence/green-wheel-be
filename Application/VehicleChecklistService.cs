@@ -86,7 +86,7 @@ namespace Application
         private async Task<Guid> CreateVehicleChecklistInSideContract(Guid staffId, Guid contractId, int type)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) ??
-                throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+                throw new NotFoundException(Message.RentalContractMessage.NotFound);
             
             var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId)
             ?? throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
@@ -137,7 +137,7 @@ namespace Application
             else
             {
                 var contract = await _uow.RentalContractRepository.GetByChecklistIdAsync(id)
-                    ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+                    ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!);
             }
             checklist.IsSignedByStaff = req.IsSignedByStaff;

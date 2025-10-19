@@ -1,4 +1,4 @@
-namespace Application.Dtos.Role.Respone
+namespace Application.Dtos.Role.Response
 {
     public class RoleViewRes
     {

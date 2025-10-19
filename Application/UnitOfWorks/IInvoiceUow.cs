@@ -12,6 +12,7 @@ namespace Application.UnitOfWorks
         IMomoPaymentLinkRepository MomoPaymentLinkRepository { get; set; }
         IInvoiceRepository InvoiceRepository { get; set; }
         IRentalContractRepository RentalContractRepository { get; set; }
+        IInvoiceItemRepository InvoiceItemRepository { get; set; }
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     
     }
