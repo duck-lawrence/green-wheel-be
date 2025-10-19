@@ -12,7 +12,7 @@ namespace Application.Abstractions
 {
     public interface IDispatchRequestService
     {
-        Task<Guid> CreateAsync(Guid adminId, Guid stationId, CreateDispatchReq req);
+        Task<Guid> CreateAsync(Guid adminId, CreateDispatchReq req);
 
         Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateDispatchReq req);
 
