@@ -265,6 +265,7 @@ namespace Application
                         InvoiceId = invoiceId,
                         Quantity = item.Quantity,
                         UnitPrice = item.UnitPrice,
+                        Description = item.Description,
                         Type = item.Type,
                     });
                 }
