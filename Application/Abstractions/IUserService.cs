@@ -3,6 +3,7 @@ using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.DriverLicense.Response;
+using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Domain.Entities;
@@ -28,5 +29,10 @@ namespace Application.Abstractions
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
         Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? stationId);
+
+        Task DeleteCustomer(Guid id);
+        Task<Guid> CreateStaffAsync(CreateStaffReq req);
+
+
     }
 }

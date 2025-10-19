@@ -49,11 +49,25 @@ namespace Infrastructure.Repositories
         public async Task<DispatchRequest?> GetByIdWithFullInfoAsync(Guid id)
         {
             return await _ctx.DispatchRequests
-                .Include(x => x.FromStation)
-                .Include(x => x.ToStation)
-                .Include(x => x.RequestAdmin)
-                    .ThenInclude(a => a.User)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                        .Include(x => x.FromStation)
+                        .Include(x => x.ToStation)
+                        .Include(x => x.RequestAdmin)
+                            .ThenInclude(a => a.User)
+                        // ---- Thêm include cho staffs ----
+                        .Include(x => x.DispatchRequestStaffs)
+                            .ThenInclude(ds => ds.Staff)
+                                .ThenInclude(s => s.User)
+                        .Include(x => x.DispatchRequestStaffs)
+                            .ThenInclude(ds => ds.Staff)
+                                .ThenInclude(s => s.Station)
+                        // ---- Thêm include cho vehicles ----
+                        .Include(x => x.DispatchRequestVehicles)
+                            .ThenInclude(dv => dv.Vehicle)
+                                .ThenInclude(v => v.Model)
+                        .Include(x => x.DispatchRequestVehicles)
+                            .ThenInclude(dv => dv.Vehicle)
+                                .ThenInclude(v => v.Station)
+                        .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }

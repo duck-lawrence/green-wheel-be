@@ -58,5 +58,14 @@ namespace Infrastructure.Repositories
 
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task AddStaffAsync(Staff staff)
+        {
+            if (staff == null)
+                throw new ArgumentNullException(nameof(staff));
+            staff.UserId = staff.UserId;
+            await _dbContext.Staffs.AddAsync(staff);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

@@ -18,5 +18,7 @@ namespace Application.Repositories
         Task<User?> GetByPhoneAsync(string phone);
 
         Task<IEnumerable<User>> GetAllStaffAsync(string? name, Guid? stationId);
+
+        
     }
 }
