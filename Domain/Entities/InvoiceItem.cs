@@ -7,7 +7,7 @@ namespace Domain.Entities;
 public partial class InvoiceItem : SorfDeletedEntity, IEntity
 {
     public Guid Id { get; set; }
-
+    public string? Description { get; set; } = null;
     public int Quantity { get; set; }
 
     public decimal UnitPrice { get; set; }
@@ -18,7 +18,7 @@ public partial class InvoiceItem : SorfDeletedEntity, IEntity
 
     public DateTimeOffset UpdatedAt { get; set; }
 
-
+    
     public Guid InvoiceId { get; set; }
 
     public Guid? ChecklistItemId { get; set; }

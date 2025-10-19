@@ -116,7 +116,6 @@ namespace Infrastructure.Repositories
                         .ThenInclude(v => v.Model)
                     .Include(r => r.Station)
                     .ToListAsync();
-            Console.WriteLine("haha");
             return list;
         }
     }

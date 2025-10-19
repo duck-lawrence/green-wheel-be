@@ -1,4 +1,4 @@
-using Application.Dtos.Role.Respone;
+using Application.Dtos.Role.Response;
 using AutoMapper;
 using Domain.Entities;
 

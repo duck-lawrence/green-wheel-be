@@ -25,9 +25,9 @@ namespace Application.Helpers
                 
             }
             if(invoice.Type == (int)InvoiceType.Refund)
-            {
-                var itemPentatys = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Penalty);
-                total += _CalculateSubTotalAmount(itemPentatys);
+            { 
+                var refund = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Refund).FirstOrDefault();  
+                total -= _CalculateSubTotalAmount([refund]);
             }
 
             total += invoice.Subtotal + invoice.Subtotal * invoice.Tax; 

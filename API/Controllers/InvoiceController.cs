@@ -4,6 +4,8 @@ using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.Common.Request;
+using Application.Dtos.Invoice.Request;
+using Application.Dtos.InvoiceItem.Request;
 using Application.Dtos.Momo.Request;
 using Application.Dtos.Payment.Request;
 using Domain.Entities;
@@ -132,6 +134,22 @@ namespace API.Controllers
         {
             var result = await _invoiceService.GetAllInvoicesAsync(pagination);
             return Ok(result);
+        }
+
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPost()]
+        public async Task<IActionResult> CreateInvoice(CreateInvoiceReq req)
+        {
+            await _invoiceService.CreateAsync(req);
+            return Created();
+        }
+
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult>UpdateInvoice(Guid id, UpdateInvoiceReq req)
+        {
+            await _invoiceService.UpdateAsync(id, req);
+            return Ok();
         }
     }
 }

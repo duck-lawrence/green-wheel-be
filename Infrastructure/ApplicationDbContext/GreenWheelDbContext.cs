@@ -438,6 +438,9 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("id");
+            entity.Property(e => e.Description)
+                .HasMaxLength(100)
+                .HasColumnName("description");
             entity.Property(e => e.ChecklistItemId).HasColumnName("checklist_item_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysdatetimeoffset())")

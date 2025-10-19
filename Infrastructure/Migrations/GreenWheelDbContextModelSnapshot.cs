@@ -530,6 +530,11 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("description");
+
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("invoice_id");

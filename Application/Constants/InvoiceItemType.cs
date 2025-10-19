@@ -13,6 +13,7 @@ namespace Application.Constants
         LateReturn = 2,
         Cleaning = 3,
         Penalty = 4,
-        Other = 5
+        Refund = 5,
+        Other = 6
     }
 }
