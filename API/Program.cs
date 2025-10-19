@@ -124,11 +124,10 @@ namespace API
             builder.Services.AddScoped<IModelImageUow, ModelImageUow>();
             builder.Services.AddScoped<IVehicleChecklistUow, VehicleChecklistUow>();
             //Mapper
-            //builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
+            builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
                                                                  //configure <-> setting
                                                                  //Momo
-            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             builder.Services.Configure<MomoSettings>(builder.Configuration.GetSection("MomoSettings"));
             //JWT
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
