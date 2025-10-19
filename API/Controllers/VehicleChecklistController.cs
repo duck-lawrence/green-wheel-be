@@ -99,8 +99,8 @@ namespace API.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadChecklistItemImage(Guid itemId, [FromForm(Name = "file")] IFormFile file)
         {
-            var result = await _imageService.UploadChecklistItemImageAsync(itemId, file);
-            return Ok(result);
+            var img = await _imageService.UploadChecklistItemImageAsync(itemId, file);
+            return Ok(new { img });
         }
 
         [HttpDelete("items/{itemId}/image")]

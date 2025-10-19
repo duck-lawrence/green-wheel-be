@@ -28,10 +28,13 @@ VALUES
 
 -- Staffs (gán staff user vào station Hà Nội)
 DECLARE @staffUser UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM users WHERE email='staff@greenwheel.vn');
+DECLARE @adminUser UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM users WHERE email='admin@greenwheel.vn');
 DECLARE @stationHN UNIQUEIDENTIFIER = (SELECT TOP 1 id FROM stations WHERE name LIKE N'%Trạm A%');
 
 INSERT INTO staffs (user_id, station_id)
-VALUES (@staffUser, @stationHN);
+VALUES 
+	(@staffUser, @stationHN),
+	(@adminUser, @stationHN);
 
 -- Brands (VinFast)
 INSERT INTO brands (created_at, updated_at, name, description, country, founded_year)
