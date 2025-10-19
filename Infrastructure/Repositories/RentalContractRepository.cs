@@ -32,7 +32,7 @@ namespace Infrastructure.Repositories
         }
 
         public async Task<IEnumerable<RentalContract>> GetAllAsync(int? status = null, string? phone = null,
-            string? citizenIdentityNumber = null, string? driverLicenseNumber = null, Guid? checklistId = null)
+            string? citizenIdentityNumber = null, string? driverLicenseNumber = null, Guid? stationId = null)
         {
             var rentalContracts = _dbContext.RentalContracts
                 .Include(x => x.Vehicle)
@@ -63,9 +63,9 @@ namespace Infrastructure.Repositories
             {
                 rentalContracts = rentalContracts.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
             }
-            if(checklistId != null)
+            if(stationId != null)
             {
-                rentalContracts = rentalContracts.Where(rc => rc.VehicleChecklists.Any(vc => vc.Id  == checklistId));
+                rentalContracts = rentalContracts.Where(rc => rc.StationId == stationId);
             }
             return await rentalContracts.ToListAsync();
         }

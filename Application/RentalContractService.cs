@@ -198,7 +198,7 @@ namespace Application
         public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
         {
             var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
-                req.CitizenIdentityNumber, req.DriverLicenseNumber, req.checkListId);
+                req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
             return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
 
         }
