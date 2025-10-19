@@ -21,7 +21,7 @@ namespace Application
             _photoService = photoService;
         }
 
-        public async Task<ChecklistItemImageRes> UploadChecklistItemImageAsync(Guid itemId, IFormFile file)
+        public async Task<string> UploadChecklistItemImageAsync(Guid itemId, IFormFile file)
         {
             if (file == null || file.Length == 0)
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
@@ -43,12 +43,7 @@ namespace Application
 
             await _itemRepository.UpdateAsync(item);
 
-            return new ChecklistItemImageRes
-            {
-                ItemId = item.Id,
-                ImageUrl = item.ImageUrl,
-                Message = Message.CloudinaryMessage.UploadSuccess
-            };
+            return item.ImageUrl;
         }
 
         public async Task<ChecklistItemImageRes> DeleteChecklistItemImageAsync(Guid itemId)

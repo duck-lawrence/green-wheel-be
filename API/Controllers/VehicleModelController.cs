@@ -109,8 +109,6 @@ namespace API.Controllers
 
         // ---------- SUB-IMAGES (gallery) ----------
 
-        #region SUB-IMAGES (gallery)
-
         [HttpPost("sub-images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -129,11 +127,7 @@ namespace API.Controllers
             return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        #endregion SUB-IMAGES (gallery)
-
         // ---------- MAIN IMAGE ----------
-
-        #region MAIN IMAGE
 
         [HttpPost("main-image")]
         [Consumes("multipart/form-data")]
@@ -152,12 +146,7 @@ namespace API.Controllers
             return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
         }
 
-        #endregion MAIN IMAGE
-
         // ---------- MAIN + GALLERY ----------
-
-        #region multiform
-
         [HttpPost("images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -166,7 +155,5 @@ namespace API.Controllers
             var (mainImage, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
             return Ok(new { data = new { main = mainImage, gallery = galleryImages }, message = Message.CloudinaryMessage.UploadSuccess });
         }
-
-        #endregion multiform
     }
 }

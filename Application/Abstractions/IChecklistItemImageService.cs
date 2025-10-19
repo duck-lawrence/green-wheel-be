@@ -5,7 +5,7 @@ namespace Application.Abstractions
 {
     public interface IChecklistItemImageService
     {
-        Task<ChecklistItemImageRes> UploadChecklistItemImageAsync(Guid itemId, IFormFile file);
+        Task<string> UploadChecklistItemImageAsync(Guid itemId, IFormFile file);
 
         Task<ChecklistItemImageRes> DeleteChecklistItemImageAsync(Guid itemId);
     }
