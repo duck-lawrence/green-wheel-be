@@ -17,18 +17,21 @@ namespace Infrastructure.UnitOfWorks
         public IInvoiceRepository InvoiceRepository { get ; set ; }
         public IInvoiceItemRepository InvoiceItemRepository { get; set; }
         public IRentalContractRepository RentalContractRepository { get; set; }
+        public IDepositRepository DepositRepository { get; set; }
 
         public InvoiceUow(IGreenWheelDbContext context, 
             IMomoPaymentLinkRepository momoPaymentLink,
             IInvoiceRepository invoiceRepository,
             IRentalContractRepository rentalContractRepository,
-            IInvoiceItemRepository invoiceItemRepository)
+            IInvoiceItemRepository invoiceItemRepository,
+            IDepositRepository depositRepository)
             {
                 _context = context;
                 MomoPaymentLinkRepository = momoPaymentLink;
                 InvoiceRepository = invoiceRepository;
                 RentalContractRepository = rentalContractRepository;
                 InvoiceItemRepository = invoiceItemRepository;
+                DepositRepository = depositRepository;
             }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -40,7 +40,7 @@ namespace Application.Helpers
                 return 0;
             return items.Where(i =>
             i.Type != (int)InvoiceItemType.LateReturn)
-                .Sum(item => item.UnitPrice * item.Quantity);
+                .Sum(item => item.UnitPrice * item.Quantity); 
         }
         //hàm này sẽ dùng để tính nội bộ trong này chứ k dùng ở ngoài
         private static decimal _CalculateSubTotalAmount(IEnumerable<InvoiceItem> items)

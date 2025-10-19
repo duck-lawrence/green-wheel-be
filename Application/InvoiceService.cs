@@ -25,16 +25,14 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IMomoService _momoService;
         private readonly IEmailSerivce _emailService;
-        private readonly IDepositRepository _depositRepository;
 
         public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService,
-            IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce, IDepositRepository depositRepository)
+            IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce)
         {
             _uow = uow;
             _mapper = mapper;
             _momoService = momoService;
             _emailService = emailSerivce;
-            _depositRepository = depositRepository;
         }
 
         public async Task PayHandoverInvoiceManual(Invoice invoice, decimal amount)
@@ -62,9 +60,9 @@ namespace Application
         }
         public async Task PayReservationInvoiceManual(Invoice invoice, decimal amount)
         {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId) 
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId)
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
-            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);             
+            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
             if (amount < amountNeed) throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
             await UpdateCashInvoice(invoice, amount);
             contract.Status = (int)RentalContractStatus.Active;
@@ -74,7 +72,7 @@ namespace Application
         public async Task PayRefundInvoiceManual(Invoice invoice, decimal amount)
         {
             var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
-            if(amountNeed > 0 && amount < amountNeed)
+            if (amountNeed > 0 && amount < amountNeed)
                 throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
             await UpdateCashInvoice(invoice, amount);
             await _uow.SaveChangesAsync();
@@ -131,12 +129,12 @@ namespace Application
         public async Task<string?> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl)
         {
             var amount = InvoiceHelper.CalculateTotalAmount(invoice);
-            if(amount > 0) 
+            if (amount > 0)
             {
                 var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
                 return link;
             }
-            else if(amount == 0)
+            else if (amount == 0)
             {
                 await UpdateCashInvoice(invoice, amount);
                 return null;
@@ -145,7 +143,7 @@ namespace Application
             {
                 throw new BadRequestException(Message.InvoiceMessage.InvalidAmount);
             }
-            
+
         }
 
         public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
@@ -231,7 +229,7 @@ namespace Application
         }
 
         private async Task CancleReservationInvoice(Invoice handoverInvoice)
-        {  
+        {
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(handoverInvoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
             if (reservationInvoice.Status == (int)InvoiceStatus.Pending)
             {
@@ -254,11 +252,11 @@ namespace Application
                 Notes = $"GreenWheel – Invoice for your order {req.ContractId}",
                 Type = req.Type
             };
-            
+
             IEnumerable<InvoiceItem> items = [];
-            if(req.items != null)
+            if (req.items != null)
             {
-                foreach(var item in req.items)
+                foreach (var item in req.items)
                 {
                     items = items.Append(new InvoiceItem()
                     {
@@ -270,11 +268,12 @@ namespace Application
                     });
                 }
             }
-            if(req.Type == (int)InvoiceType.Refund)
+            if (req.Type == (int)InvoiceType.Refund)
             {
                 //xử lí refund cọc
-                var deposit = await _depositRepository.GetByContractIdAsync(req.ContractId)
+                var deposit = await _uow.DepositRepository.GetByContractIdAsync(req.ContractId)
                     ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
+                deposit.Status = (int)DepositStatus.Refunded;
                 var amount = items == null || !items.Any() ? deposit.Amount : 0;
                 items = items.Append(new InvoiceItem()
                 {
@@ -283,8 +282,14 @@ namespace Application
                     UnitPrice = amount,
                     Type = (int)InvoiceItemType.Refund,
                 });
-                if (amount == 0) invoice.Notes.Concat(". Deposit is non-refundable due to business policy violation");
-            }  
+                if (amount == 0)
+                {
+                    invoice.Notes.Concat(". Deposit is non-refundable due to business policy violation");
+                    deposit.Status = (int)DepositStatus.Forfeited;
+                }
+
+                await _uow.DepositRepository.UpdateAsync(deposit);
+            }
             invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
             await _uow.InvoiceRepository.AddAsync(invoice);
             await _uow.InvoiceItemRepository.AddRangeAsync(items);
