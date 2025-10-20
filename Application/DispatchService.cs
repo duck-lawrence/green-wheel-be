@@ -25,38 +25,37 @@ namespace Application
             _staffRepository = staffRepository;
         }
 
-        public async Task<Guid> CreateAsync(Guid adminId, Guid toStationId, CreateDispatchReq req)
+        public async Task<Guid> CreateAsync(Guid adminId, CreateDispatchReq req)
         {
-            DispatchValidationHelper.EnsureDifferentStations(toStationId, req.FromStationId);
+            if (req is null)
+                throw new BadRequestException("Request body cannot be null.");
+
+            // Không cho cùng trạm
+            DispatchValidationHelper.EnsureDifferentStations(req.FromStationId, req.ToStationId);
 
             await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.StaffIds, req.FromStationId);
             await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.VehicleIds, req.FromStationId);
 
             var entity = _mapper.Map<DispatchRequest>(req);
             entity.Id = Guid.NewGuid();
-            entity.FromStationId = req.FromStationId;
-            entity.ToStationId = toStationId;
             entity.RequestAdminId = adminId;
+            entity.Status = (int)DispatchRequestStatus.Pending;
             entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.UpdatedAt = entity.CreatedAt;
-            IEnumerable<DispatchRequestStaff> staffs = [];
-            if (req.StaffIds != null && req.StaffIds.Length > 0)
-            {
+
+            if (req.StaffIds is { Length: > 0 })
                 entity.DispatchRequestStaffs = req.StaffIds.Select(id => new DispatchRequestStaff
                 {
                     DispatchRequestId = entity.Id,
-                    StaffId = id,
+                    StaffId = id
                 }).ToList();
-            }
-            IEnumerable<DispatchRequestVehicle> vehicles = [];
-            if (req.VehicleIds != null && req.VehicleIds.Length > 0)
-            {
+
+            if (req.VehicleIds is { Length: > 0 })
                 entity.DispatchRequestVehicles = req.VehicleIds.Select(id => new DispatchRequestVehicle
                 {
                     DispatchRequestId = entity.Id,
-                    VehicleId = id,
+                    VehicleId = id
                 }).ToList();
-            }
 
             await _repository.AddAsync(entity);
             return entity.Id;

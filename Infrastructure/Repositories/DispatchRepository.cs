@@ -19,8 +19,12 @@ namespace Infrastructure.Repositories
             var query = _ctx.DispatchRequests
                 .Include(x => x.FromStation)
                 .Include(x => x.ToStation)
-                .Include(x => x.RequestAdmin)
-                    .ThenInclude(a => a.User)
+                .Include(x => x.RequestAdmin).ThenInclude(a => a.User)
+                .Include(x => x.ApprovedAdmin).ThenInclude(a => a.User)
+                .Include(x => x.DispatchRequestStaffs)
+                    .ThenInclude(s => s.Staff).ThenInclude(u => u.User)
+                .Include(x => x.DispatchRequestVehicles)
+                    .ThenInclude(v => v.Vehicle).ThenInclude(vm => vm.Model)
                 .AsQueryable();
 
             if (status.HasValue)
@@ -53,7 +57,15 @@ namespace Infrastructure.Repositories
                 .Include(x => x.ToStation)
                 .Include(x => x.RequestAdmin)
                     .ThenInclude(a => a.User)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .Include(x => x.ApprovedAdmin)
+                    .ThenInclude(a => a.User)
+                .Include(x => x.DispatchRequestStaffs)
+                    .ThenInclude(s => s.Staff)
+                        .ThenInclude(u => u.User)
+                .Include(x => x.DispatchRequestVehicles)
+                    .ThenInclude(v => v.Vehicle)
+                        .ThenInclude(vm => vm.Model)
+                .FirstOrDefaultAsync(x => x.Id == id && x.DeletedAt == null);
         }
     }
 }

@@ -4,6 +4,7 @@ using Application.Constants;
 using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Request;
+using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
@@ -116,6 +117,21 @@ namespace API.Controllers
             return Ok();
         }
 
+        [HttpDelete("{id}")]
+        [RoleAuthorize(RoleName.Admin)]
+        public async Task<IActionResult> DeleteUserById(Guid id)
+        {
+            await _userService.DeleteCustomer(id);
+            return Ok();
+        }
+
+        [HttpPost("create-staff")]
+        [RoleAuthorize(RoleName.Admin)]
+        public async Task<IActionResult> CreateStaff([FromBody] CreateStaffReq req)
+        {
+            var staffId = await _userService.CreateStaffAsync(req);
+            return Ok(new { staffId });
+        }
         /*
          * Status code
          * 200 success

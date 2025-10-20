@@ -1,26 +1,13 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
-using Application.AppSettingConfigurations;
 using Application.Constants;
-using Application.Dtos.CitizenIdentity.Request;
-using Application.Dtos.CitizenIdentity.Response;
-using Application.Dtos.Common.Request;
-using Application.Dtos.DriverLicense.Request;
-using Application.Dtos.DriverLicense.Response;
+using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
-using Application.Helpers;
 using Application.Repositories;
-using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
-using Google.Apis.Auth;
-using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.JsonWebTokens;
-using System.Security.Claims;
 
 namespace Application
 {
@@ -31,12 +18,14 @@ namespace Application
         private readonly ICitizenIdentityRepository _citizenIdentityRepository;
         private readonly IDriverLicenseRepository _driverLicenseRepository;
         private readonly IMemoryCache _cache;
+        private readonly IStaffRepository _staffRepository;
 
         public UserService(IUserRepository repository,
              IMapper mapper,
              ICitizenIdentityRepository citizenIdentityRepository,
              IDriverLicenseRepository driverLicenseRepository,
-             IMemoryCache cache
+             IMemoryCache cache,
+             IStaffRepository staffRepository
             )
         {
             _userRepository = repository;
@@ -44,6 +33,7 @@ namespace Application
             _citizenIdentityRepository = citizenIdentityRepository;
             _driverLicenseRepository = driverLicenseRepository;
             _cache = cache;
+            _staffRepository = staffRepository;
         }
 
         public async Task<Guid> CreateAsync(CreateUserReq req)
@@ -111,6 +101,32 @@ namespace Application
         {
             var staffs = await _userRepository.GetAllStaffAsync(name, stationId);
             return _mapper.Map<IEnumerable<UserProfileViewRes>>(staffs) ?? [];
+        }
+
+        public async Task DeleteCustomer(Guid id)
+        {
+            await _userRepository.DeleteAsync(id);
+        }
+        public async Task<Guid> CreateStaffAsync(CreateStaffReq req)
+        {
+            if (await _userRepository.GetByPhoneAsync(req.Phone) != null)
+                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
+            if (!string.IsNullOrEmpty(req.Email) && await _userRepository.GetByEmailAsync(req.Email) != null)
+                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists);
+
+            var roles = _cache.Get<List<Role>>("AllRoles");
+            var staffRole = roles.FirstOrDefault(r => r.Name.Equals("Staff", StringComparison.OrdinalIgnoreCase))
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+
+            var user = _mapper.Map<User>(req);
+            user.RoleId = staffRole.Id;
+            await _userRepository.AddAsync(user);
+
+            var staff = _mapper.Map<Staff>(req);
+            staff.UserId = user.Id;
+            await _staffRepository.AddStaffAsync(staff);
+
+            return staff.UserId;
         }
     }
 }

@@ -28,13 +28,13 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> Create([FromBody] CreateDispatchReq req)
         {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var staff = await _staffRepository.GetByUserIdAsync(userId)
-                ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
-            await _dispatchRequestService.CreateAsync(userId, staff.StationId, req);
-            return Ok();
+            var adminId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+
+            var dispatchId = await _dispatchRequestService.CreateAsync(adminId, req);
+            return Ok(new { DispatchId = dispatchId });
         }
 
         [HttpPut("{id:guid}")]
