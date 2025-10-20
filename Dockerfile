@@ -8,10 +8,10 @@ COPY Domain/Domain.csproj ./Domain/
 COPY Infrastructure/Infrastructure.csproj ./Infrastructure/
 RUN dotnet restore API/API.csproj --packages /src/.nuget/packages --verbosity minimal
 
-# Copy toàn bộ source code
+# Copy source code
 COPY . .
 
-# Build và publish API project
+# Build and publish API project
 WORKDIR /src/API
 RUN dotnet publish -c Release -o /app/publish
 
@@ -19,13 +19,13 @@ RUN dotnet publish -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-# Copy kết quả publish từ stage build
+# Copy publish result from stage build
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_ENVIRONMENT=Development \
     ASPNETCORE_URLS=http://+:5160
 
-# Expose các port nếu cần
+# Expose port
 EXPOSE 5160
 
 # Start app
