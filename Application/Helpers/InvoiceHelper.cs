@@ -24,13 +24,18 @@ namespace Application.Helpers
                 total += invoice.Deposit.Amount;
                 
             }
-            if(invoice.Type == (int)InvoiceType.Refund)
+
+            total += invoice.Subtotal + invoice.Subtotal * invoice.Tax;
+
+            if (invoice.Type == (int)InvoiceType.Refund)
             { 
                 var refund = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Refund).FirstOrDefault();  
                 total -= _CalculateSubTotalAmount([refund]);
+                if (total < 0 && Math.Abs(invoice.Subtotal) < refund.Quantity * refund.UnitPrice)
+                {
+                    total = 0;
+                }
             }
-
-            total += invoice.Subtotal + invoice.Subtotal * invoice.Tax; 
             return total;
         }
 

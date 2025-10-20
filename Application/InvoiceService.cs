@@ -274,15 +274,14 @@ namespace Application
                 var deposit = await _uow.DepositRepository.GetByContractIdAsync(req.ContractId)
                     ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
                 deposit.Status = (int)DepositStatus.Refunded;
-                var amount = items == null || !items.Any() ? deposit.Amount : 0;
                 items = items.Append(new InvoiceItem()
                 {
                     InvoiceId = invoiceId,
                     Quantity = 1,
-                    UnitPrice = amount,
+                    UnitPrice = deposit.Amount,
                     Type = (int)InvoiceItemType.Refund,
                 });
-                if (amount == 0)
+                if (items == null || !items.Any())
                 {
                     invoice.Notes.Concat(". Deposit is non-refundable due to business policy violation");
                     deposit.Status = (int)DepositStatus.Forfeited;
