@@ -21,6 +21,7 @@ namespace Application.Abstractions
         Task PayHandoverInvoiceManual(Invoice invoice, decimal amount);
         Task PayReservationInvoiceManual(Invoice invoice, decimal amount);
         Task PayReturnInvoiceManual(Invoice invoice, decimal amount);
+        Task PayRefundInvoiceManual(Invoice invoice, decimal amount);
         Task<string> PayReservationInvoiceOnline(Invoice invoice, string fallbackUrl);
 
         Task<string> PayHandoverInvoiceOnline(Invoice invoice, string fallbackUrl);

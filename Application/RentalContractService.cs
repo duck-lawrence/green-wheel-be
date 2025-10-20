@@ -344,79 +344,88 @@ namespace Application
         }
         public async Task UpdateStatusAsync(Guid id)
         {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
-            if(contract == null)
-            {
-                throw new NotFoundException(Message.RentalContractMessage.NotFound);
-            }
-            var invoices = contract.Invoices.Where( i => i.Type == (int)InvoiceType.Reservation || i.Type == (int)InvoiceType.Handover);
-            if(invoices.Any(i => i.Status == (int)InvoiceStatus.Paid && contract.Status == (int)RentalContractStatus.PaymentPending)){
-                contract.Status = (int)RentalContractStatus.Active;
-                var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId!);
-                if(vehicle.Status == (int)VehicleStatus.Available)
-                {
-                    vehicle.Status = (int)VehicleStatus.Unavaible;
-                    await _uow.VehicleRepository.UpdateAsync(vehicle);
-                }
-                var anotherContract = (await _uow.RentalContractRepository.GetContractsByVehicleId(vehicle.Id))
-                                        .Where(c => c.Id != contract.Id
-                                        &&
-                                       ( c.Status == (int)RentalContractStatus.PaymentPending
-                                        ||
-                                        c.Status == (int)RentalContractStatus.RequestPeding));
-                if(anotherContract != null || anotherContract!.Count() != 0)
-                {
-                    var startBuffer = contract.StartDate.AddDays(-10);
-                    var endBuffer = contract.EndDate.AddDays(10);
-                    foreach (var contract_ in anotherContract)
-                    {
-                        if(startBuffer <= contract_.EndDate &&
-                           endBuffer >= contract_.StartDate)
-                        {
-                            contract_.Status = (int)RentalContractStatus.Cancelled;
-                            contract_.Description.Concat(". Booking was canceled as another customer successfully paid for the same vehicle earlier.");
-                            var subject = "[GreenWheel] Your Booking Has Been Canceled";
-                            var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CancelAutoEmailTemplate.html");
-                            var body = System.IO.File.ReadAllText(templatePath);
-                            var customer = contract_.Customer;
-                            var station = contract_.Station;
-                            var model = contract_.Vehicle.Model;
-                            var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                                ?? "http://localhost:3000/";
-                            var contractDetailUrl = $"{frontendOrigin}/vehicle-models";
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
 
-                            body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
-                                       .Replace("{ContractCode}", contract_.Id.ToString())
-                                       .Replace("{VehicleName}", model.Name)
-                                       .Replace("{LisencePlate}", vehicle.LicensePlate)
-                                       .Replace("{StationName}", station.Name)
-                                       .Replace("{StartDate}", contract_.StartDate.ToString("dd/MM/yyyy"))
-                                       .Replace("{EndDate}", contract_.EndDate.ToString("dd/MM/yyyy"))
-                                       .Replace("{BookingLink}", contractDetailUrl);
-                            await _emailService.SendEmailAsync(customer.Email, subject, body);
-                            await _uow.RentalContractRepository.UpdateAsync(contract_);
+            if (contract.Status == (int)RentalContractStatus.PaymentPending)
+            {
+                var invoices = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Reservation || i.Type == (int)InvoiceType.Handover);
+                if (invoices != null && invoices.Any(i => i.Status == (int)InvoiceStatus.Paid && contract.Status == (int)RentalContractStatus.PaymentPending))
+                {
+                    contract.Status = (int)RentalContractStatus.Active;
+                    var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId!)
+                        ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
+                    if (vehicle.Status == (int)VehicleStatus.Available)
+                    {
+                        vehicle.Status = (int)VehicleStatus.Unavaible;
+                        await _uow.VehicleRepository.UpdateAsync(vehicle);
+                    }
+                    var anotherContract = (await _uow.RentalContractRepository.GetContractsByVehicleId(vehicle.Id))
+                                            .Where(c => c.Id != contract.Id
+                                                && (c.Status == (int)RentalContractStatus.PaymentPending 
+                                                    || c.Status == (int)RentalContractStatus.RequestPeding)
+                                            );
+                    if (anotherContract != null && anotherContract.Any())
+                    {
+                        var startBuffer = contract.StartDate.AddDays(-10);
+                        var endBuffer = contract.EndDate.AddDays(10);
+                        foreach (var contract_ in anotherContract)
+                        {
+                            if (startBuffer <= contract_.EndDate &&
+                            endBuffer >= contract_.StartDate)
+                            {
+                                contract_.Status = (int)RentalContractStatus.Cancelled;
+                                contract_.Description += ". Booking was canceled as another customer successfully paid for the same vehicle earlier.";
+                                var subject = "[GreenWheel] Your Booking Has Been Canceled";
+                                var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CancelAutoEmailTemplate.html");
+                                var body = System.IO.File.ReadAllText(templatePath);
+                                var customer = contract_.Customer;
+                                var station = contract_.Station;
+                                var vehicleToCancel = contract_.Vehicle 
+                                    ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
+                                var model = vehicleToCancel.Model;
+
+                                var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
+                                    ?? "http://localhost:3000/";
+                                var contractDetailUrl = $"{frontendOrigin}/vehicle-models";
+
+                                body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
+                                           .Replace("{ContractCode}", contract_.Id.ToString())
+                                           .Replace("{VehicleName}", model.Name)
+                                           .Replace("{LisencePlate}", vehicleToCancel.LicensePlate)
+                                           .Replace("{StationName}", station.Name)
+                                           .Replace("{StartDate}", contract_.StartDate.ToString("dd/MM/yyyy"))
+                                           .Replace("{EndDate}", contract_.EndDate.ToString("dd/MM/yyyy"))
+                                           .Replace("{BookingLink}", contractDetailUrl);
+                                await _emailService.SendEmailAsync(customer.Email, subject, body);
+                                await _uow.RentalContractRepository.UpdateAsync(contract_);
+                            }
                         }
                     }
-                }                             
-                await _uow.RentalContractRepository.UpdateAsync(contract);
-                await _uow.SaveChangesAsync();
+                }
             }
+            else if (contract.Status == (int)RentalContractStatus.Returned)
+            {
+                var invoices = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Refund);
+                if (invoices != null && invoices.Any(i => i.Status == (int)InvoiceStatus.Paid))
+                {
+                    contract.Status = (int)RentalContractStatus.Completed;
+                }
+            }
+            await _uow.RentalContractRepository.UpdateAsync(contract);
+            await _uow.SaveChangesAsync();
         }
-
         
         public async Task VerifyRentalContract(Guid id, bool hasVehicle = true, int? vehicleStatus = null)
         {
-            var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(id);
-            if (rentalContract == null)
-            {
-                throw new NotFoundException(Message.RentalContractMessage.NotFound);
-            }
+            var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(id) 
+                ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
             //Lấy customer
-            var customer = (await _uow.RentalContractRepository.GetAllAsync(new Expression<Func<RentalContract, object>>[]
-            {
-                rc => rc.Customer
-            })).Where(rc => rc.Id == id)
-            .Select(rc => rc.Customer).FirstOrDefault();
+            var customer = (await _uow.RentalContractRepository.GetAllAsync(
+                [rc => rc.Customer]))
+                .Where(rc => rc.Id == id)
+                .Select(rc => rc.Customer).FirstOrDefault();
+
             var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)rentalContract.VehicleId);
             var vehicleModel = await _uow.VehicleModelRepository.GetByIdAsync(vehicle.ModelId);
             var station = await _uow.StationRepository.GetByIdAsync(vehicle.StationId);

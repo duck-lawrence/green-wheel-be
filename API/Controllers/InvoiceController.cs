@@ -107,6 +107,9 @@ namespace API.Controllers
                     case (int)InvoiceType.Reservation:
                         await _invoiceService.PayReservationInvoiceManual(invoice, (decimal)paymentReq.Amount);
                         break;
+                    case (int)InvoiceType.Refund:
+                        await _invoiceService.PayRefundInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
                     default:
                         throw new Exception(Message.InvoiceMessage.InvalidInvoiceType);
                        
@@ -119,6 +122,7 @@ namespace API.Controllers
                 (int)InvoiceType.Handover => await _invoiceService.PayHandoverInvoiceOnline(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Reservation => await _invoiceService.PayReservationInvoiceOnline(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Return => await _invoiceService.PayReturnInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Refund => await _invoiceService.PayRefundInvoiceOnline(invoice, paymentReq.FallbackUrl),
                 _ => throw new Exception(Message.InvoiceMessage.InvalidInvoiceType),
             };
             return Ok(new { link });
