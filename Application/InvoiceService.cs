@@ -148,6 +148,7 @@ namespace Application
 
         public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
         {
+            await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
             if (momoIpnReq.ResultCode == (int)MomoPaymentStatus.Success)
             {
                 var invoice = await _uow.InvoiceRepository.GetByIdAsync(invoiceId);
@@ -166,8 +167,6 @@ namespace Application
                 {
                     await CancleReservationInvoice(invoice);
                 }
-
-                await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
                 await _uow.SaveChangesAsync();
                 var subject = "[GreenWheel] Successfully Payment";
                 var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PaymentSuccessTemplate.html");
