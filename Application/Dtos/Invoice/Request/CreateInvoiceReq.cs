@@ -11,6 +11,6 @@ namespace Application.Dtos.Invoice.Request
     {
         public Guid ContractId { get; set; }
         public int Type { get; set; }
-        public IEnumerable<CreateInvoiceItemReq> items { get; set; } = [];
+        public IEnumerable<CreateInvoiceItemReq> Items { get; set; } = [];
     }
 }

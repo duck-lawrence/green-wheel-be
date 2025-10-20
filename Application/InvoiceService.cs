@@ -254,9 +254,9 @@ namespace Application
             };
 
             IEnumerable<InvoiceItem> items = [];
-            if (req.items != null)
+            if(req.Items != null)
             {
-                foreach (var item in req.items)
+                foreach(var item in req.Items)
                 {
                     items = items.Append(new InvoiceItem()
                     {
