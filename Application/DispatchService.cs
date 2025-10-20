@@ -25,24 +25,38 @@ namespace Application
             _staffRepository = staffRepository;
         }
 
-        public async Task<Guid> CreateAsync(Guid adminId, Guid stationId, CreateDispatchReq req)
+        public async Task<Guid> CreateAsync(Guid adminId, Guid toStationId, CreateDispatchReq req)
         {
-            DispatchValidationHelper.EnsureDifferentStations(stationId, req.ToStationId);
-            await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.staffIds, stationId);
-            await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.vehicleIds, stationId);
+            DispatchValidationHelper.EnsureDifferentStations(toStationId, req.FromStationId);
+
+            await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.StaffIds, req.FromStationId);
+            await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.VehicleIds, req.FromStationId);
+
             var entity = _mapper.Map<DispatchRequest>(req);
             entity.Id = Guid.NewGuid();
-            entity.FromStationId = stationId;
+            entity.FromStationId = req.FromStationId;
+            entity.ToStationId = toStationId;
             entity.RequestAdminId = adminId;
             entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.UpdatedAt = entity.CreatedAt;
-
-            entity.DispatchRequestStaffs = req.staffIds != null
-                ? _mapper.Map<List<DispatchRequestStaff>>(req.staffIds)
-                : new List<DispatchRequestStaff>();
-            entity.DispatchRequestVehicles = req.vehicleIds != null
-                ? _mapper.Map<List<DispatchRequestVehicle>>(req.vehicleIds)
-                : new List<DispatchRequestVehicle>();
+            IEnumerable<DispatchRequestStaff> staffs = [];
+            if (req.StaffIds != null && req.StaffIds.Length > 0)
+            {
+                entity.DispatchRequestStaffs = req.StaffIds.Select(id => new DispatchRequestStaff
+                {
+                    DispatchRequestId = entity.Id,
+                    StaffId = id,
+                }).ToList();
+            }
+            IEnumerable<DispatchRequestVehicle> vehicles = [];
+            if (req.VehicleIds != null && req.VehicleIds.Length > 0)
+            {
+                entity.DispatchRequestVehicles = req.VehicleIds.Select(id => new DispatchRequestVehicle
+                {
+                    DispatchRequestId = entity.Id,
+                    VehicleId = id,
+                }).ToList();
+            }
 
             await _repository.AddAsync(entity);
             return entity.Id;
@@ -62,16 +76,19 @@ namespace Application
 
         public async Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateDispatchReq req)
         {
-            var entity = await _repository.GetByIdAsync(id) ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
+            var entity = await _repository.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
+
             var currentStatus = (DispatchRequestStatus)entity.Status;
-            var newStatus = req.status;
+            var newStatus = (DispatchRequestStatus)req.Status;
+
             switch (newStatus)
             {
                 case DispatchRequestStatus.Approved:
                 case DispatchRequestStatus.Rejected:
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
-                        entity.ToStationId,
+                        entity.FromStationId,
                         currentStatus,
                         DispatchRequestStatus.Pending,
                         Message.UserMessage.DoNotHavePermission,

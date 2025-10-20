@@ -54,7 +54,7 @@ namespace Application
         public async Task<VehicleModelViewRes> GetByIdAsync(Guid id, Guid stationId, DateTimeOffset startDate, DateTimeOffset endDate)
         {
             var vehicleModelViewRes = await _vehicleModelRepository.GetByIdAsync(id, stationId, startDate, endDate)
-            ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+            ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
             return _mapper.Map<VehicleModelViewRes>(vehicleModelViewRes);
         }
 
@@ -65,7 +65,7 @@ namespace Application
         }
         public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq req)
         {
-            var model = await _vehicleModelRepository.GetByIdAsync(Id) ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+            var model = await _vehicleModelRepository.GetByIdAsync(Id) ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
 
             _mapper.Map(req, model);
             model.UpdatedAt = DateTimeOffset.UtcNow;
@@ -79,7 +79,7 @@ namespace Application
                 throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             var model = await _uow.VehicleModels.GetByIdAsync(modelId)
-                ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+                ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
 
             var oldPublicId = model.ImagePublicId;
 
@@ -115,10 +115,10 @@ namespace Application
         public async Task DeleteMainImageAsync(Guid modelId)
         {
             var model = await _uow.VehicleModels.GetByIdAsync(modelId)
-                ?? throw new NotFoundException(Message.VehicleModelMessage.VehicleModelNotFound);
+                ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
 
             if (string.IsNullOrEmpty(model.ImagePublicId))
-                throw new BadRequestException(Message.VehicleModelImageMessage.MainImageNotFound);
+                throw new BadRequestException(Message.VehicleModelImageMessage.NotFound);
 
             await _photoService.DeletePhotoAsync(model.ImagePublicId);
 

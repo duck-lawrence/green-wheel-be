@@ -107,9 +107,9 @@ namespace Application
             return userView;
         }
 
-        public async Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? segmentId)
+        public async Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? stationId)
         {
-            var staffs = await _userRepository.GetAllStaffAsync(name, segmentId);
+            var staffs = await _userRepository.GetAllStaffAsync(name, stationId);
             return _mapper.Map<IEnumerable<UserProfileViewRes>>(staffs) ?? [];
         }
     }

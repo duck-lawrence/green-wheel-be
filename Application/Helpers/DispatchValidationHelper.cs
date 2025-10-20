@@ -21,18 +21,19 @@ namespace Application.Helpers
                 throw new BadRequestException(Message.DispatchMessage.StaffNotInFromStation);
         }
 
-        public static async Task ValidateVehiclesInStationAsync(IVehicleRepository vehicleRepository, Guid[]? vehicleId, Guid stationId)
+        public static async Task ValidateVehiclesInStationAsync(IVehicleRepository vehicleRepository, Guid[]? vehicleId, Guid fromStationId)
         {
             if (vehicleId == null || vehicleId.Length == 0) return;
 
-            var countValidate = await vehicleRepository.CountVehiclesInStationAsync(vehicleId, stationId);
-            if (countValidate != vehicleId.Length)
+            var countValid = await vehicleRepository.CountVehiclesInStationAsync(vehicleId, fromStationId);
+            if (countValid != vehicleId.Length)
                 throw new BadRequestException(Message.DispatchMessage.VehicleNotInFromStation);
         }
 
         public static void EnsureDifferentStations(Guid fromStationId, Guid toStationId)
         {
-            if (fromStationId == toStationId) throw new ForbidenException(Message.DispatchMessage.ToStationMustDifferent);
+            if (fromStationId == toStationId)
+                throw new ForbidenException(Message.DispatchMessage.ToStationMustDifferent);
         }
 
         public static void EnsureCanUpdate(

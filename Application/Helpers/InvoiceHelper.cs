@@ -24,13 +24,18 @@ namespace Application.Helpers
                 total += invoice.Deposit.Amount;
                 
             }
-            if(invoice.Type == (int)InvoiceType.Refund)
-            {
-                var itemPentatys = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Penalty);
-                total += _CalculateSubTotalAmount(itemPentatys);
-            }
 
-            total += invoice.Subtotal + invoice.Subtotal * invoice.Tax; 
+            total += invoice.Subtotal + invoice.Subtotal * invoice.Tax;
+
+            if (invoice.Type == (int)InvoiceType.Refund)
+            { 
+                var refund = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Refund).FirstOrDefault();  
+                total -= _CalculateSubTotalAmount([refund]);
+                if (total < 0 && Math.Abs(invoice.Subtotal) < refund.Quantity * refund.UnitPrice)
+                {
+                    total = 0;
+                }
+            }
             return total;
         }
 
@@ -39,9 +44,9 @@ namespace Application.Helpers
             if (items == null || !items.Any() || items.Any(x => x == null))
                 return 0;
             return items.Where(i =>
-            i.Type != (int)InvoiceItemType.Penalty &&
-            i.Type != (int)InvoiceItemType.LateReturn)
-                .Sum(item => item.UnitPrice * item.Quantity);
+            i.Type != (int)InvoiceItemType.LateReturn &&
+            i.Type != (int)InvoiceItemType.Refund)
+                .Sum(item => item.UnitPrice * item.Quantity); 
         }
         //hàm này sẽ dùng để tính nội bộ trong này chứ k dùng ở ngoài
         private static decimal _CalculateSubTotalAmount(IEnumerable<InvoiceItem> items)

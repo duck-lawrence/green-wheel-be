@@ -15,17 +15,23 @@ namespace Infrastructure.UnitOfWorks
         private readonly IGreenWheelDbContext _context;
         public IMomoPaymentLinkRepository MomoPaymentLinkRepository { get ; set ; }
         public IInvoiceRepository InvoiceRepository { get ; set ; }
+        public IInvoiceItemRepository InvoiceItemRepository { get; set; }
         public IRentalContractRepository RentalContractRepository { get; set; }
+        public IDepositRepository DepositRepository { get; set; }
 
         public InvoiceUow(IGreenWheelDbContext context, 
             IMomoPaymentLinkRepository momoPaymentLink,
             IInvoiceRepository invoiceRepository,
-            IRentalContractRepository rentalContractRepository)
+            IRentalContractRepository rentalContractRepository,
+            IInvoiceItemRepository invoiceItemRepository,
+            IDepositRepository depositRepository)
             {
                 _context = context;
-            MomoPaymentLinkRepository = momoPaymentLink;
+                MomoPaymentLinkRepository = momoPaymentLink;
                 InvoiceRepository = invoiceRepository;
                 RentalContractRepository = rentalContractRepository;
+                InvoiceItemRepository = invoiceItemRepository;
+                DepositRepository = depositRepository;
             }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

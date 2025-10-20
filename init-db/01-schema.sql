@@ -414,6 +414,7 @@ GO
 
 CREATE TABLE [invoice_items] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
+	[description] nvarchar(100),
     [quantity] int NOT NULL DEFAULT 1,
     [unit_price] decimal(10,2) NOT NULL,
     [type] int NOT NULL, -- 0: BaseRental, 1: Damage, 2: LateReturn, 3: Cleaning, 4: Penalty, 5: Other

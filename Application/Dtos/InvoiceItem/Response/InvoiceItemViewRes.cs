@@ -11,10 +11,11 @@ namespace Application.Dtos.InvoiceItem.Response
     public class InvoiceItemViewRes
     {
         public Guid Id { get; set; }
+        public string? Description { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
         public decimal SubTotal { get; set; }
         public int Type { get; set; } = (int)InvoiceItemType.BaseRental;
-        public ChecklistItemImageRes? ChecklistItem { get; set; } = null;
+        public VehicleChecklistItemViewRes? ChecklistItem { get; set; } = null;
     }
 }

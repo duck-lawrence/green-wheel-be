@@ -11,9 +11,10 @@ namespace Application.Mappers
         {
             CreateMap<CreateVehicleModelReq, VehicleModel>();
             //CreateMap<VehicleModel, VehicleModelViewRes>();
-            CreateMap<VehicleModel, VehicleModelViewRes>()
-                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)))
-                .ForMember(dest => dest.AvailableVehicleCount, opt => opt.MapFrom(src => src.Vehicles.Count()));
+
+            //CreateMap<VehicleModel, VehicleModelViewRes>()
+            //    .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)))
+            //    .ForMember(dest => dest.AvailableVehicleCount, opt => opt.MapFrom(src => src.Vehicles.Count()));
             CreateMap<VehicleModel, VehicleModelViewRes>()
                .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Brand))
                .ForMember(dest => dest.Segment, opt => opt.MapFrom(src => src.Segment))

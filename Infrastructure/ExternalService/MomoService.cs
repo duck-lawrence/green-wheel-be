@@ -38,20 +38,20 @@ namespace Infrastructure.ExternalService
             var invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
             {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.NotFound);
             }
             if (invoice.Status == (int)InvoiceStatus.Paid || invoice.Status == (int)InvoiceStatus.Cancelled)
             {
                 throw new BadRequestException(Message.InvoiceMessage.ThisInvoiceWasPaidOrCancel);
             }
             var requestId = DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString();
-
+            var code = GenerateOtpHelper.GenerateOtp(); //giúp orderID k trùng
             var rawData =
                     $"accessKey={_momoSettings.AccessKey}" +
                     $"&amount={amount.ToString("0", CultureInfo.InvariantCulture)}" +
                     $"&extraData={""}" +
                     $"&ipnUrl={_momoSettings.IpnUrl}" +
-                    $"&orderId={invoiceId}" +
+                    $"&orderId={invoiceId}-{code}" +
                     $"&orderInfo={description}(Invoice ID: {invoiceId})" +
                     $"&partnerCode={_momoSettings.PartnerCode}" +
                     $"&redirectUrl={fallbackUrl}" +
@@ -67,11 +67,12 @@ namespace Infrastructure.ExternalService
                 PartnerCode = _momoSettings.PartnerCode,
                 RequestId = requestId,
                 Amount = amount.ToString("0"),
-                OrderId = invoiceId.ToString(),
+                OrderId = $"{invoiceId}-{code}",
                 OrderInfo = $"{description}(Invoice ID: {invoiceId})",
                 RedirectUrl = fallbackUrl,
                 IpnUrl = _momoSettings.IpnUrl,
                 RequestType = _momoSettings.RequestType,
+                OrderExpireTime = _momoSettings.OrderExpireTime,
                 ExtraData = "",
                 Lang = _momoSettings.Lang ?? "en",
                 Signature = signature

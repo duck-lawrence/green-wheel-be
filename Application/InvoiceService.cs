@@ -4,13 +4,17 @@ using Application.AppSettingConfigurations;
 using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
+using Application.Dtos.Invoice.Request;
 using Application.Dtos.Invoice.Response;
+using Application.Dtos.InvoiceItem.Request;
 using Application.Dtos.Momo.Request;
 using Application.Helpers;
+using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 
 namespace Application
@@ -22,7 +26,8 @@ namespace Application
         private readonly IMomoService _momoService;
         private readonly IEmailSerivce _emailService;
 
-        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService, IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce)
+        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService,
+            IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce)
         {
             _uow = uow;
             _mapper = mapper;
@@ -33,7 +38,7 @@ namespace Application
         public async Task PayHandoverInvoiceManual(Invoice invoice, decimal amount)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId)
-                ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
+                ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
             //lấy ra số tiền cần thanh toán (trừ cho reservation invoice nếu đã thanh toán)
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
             var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice)
@@ -55,13 +60,21 @@ namespace Application
         }
         public async Task PayReservationInvoiceManual(Invoice invoice, decimal amount)
         {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId) 
-                ?? throw new NotFoundException(Message.RentalContractMessage.RentalContractNotFound);
-            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);             
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId)
+                ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
+            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
             if (amount < amountNeed) throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
             await UpdateCashInvoice(invoice, amount);
             contract.Status = (int)RentalContractStatus.Active;
             await _uow.RentalContractRepository.UpdateAsync(contract);
+            await _uow.SaveChangesAsync();
+        }
+        public async Task PayRefundInvoiceManual(Invoice invoice, decimal amount)
+        {
+            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
+            if (amountNeed > 0 && amount < amountNeed)
+                throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
+            await UpdateCashInvoice(invoice, amount);
             await _uow.SaveChangesAsync();
         }
         private async Task UpdateCashInvoice(Invoice invoice, decimal amount)
@@ -71,6 +84,19 @@ namespace Application
             invoice.Status = (int)InvoiceStatus.Paid;
             invoice.PaymentMethod = (int)PaymentMethod.Cash;
             await _uow.InvoiceRepository.UpdateAsync(invoice);
+            await _uow.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Guid invoiceId, UpdateInvoiceReq req)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdAsync(invoiceId)
+                ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
+            invoice.PaidAmount = req.Amount;
+            invoice.PaidAt = DateTimeOffset.UtcNow;
+            invoice.Status = (int)InvoiceStatus.Paid;
+            invoice.PaymentMethod = req.PaymentMethod;
+            await _uow.InvoiceRepository.UpdateAsync(invoice);
+            await _uow.SaveChangesAsync();
         }
 
 
@@ -100,6 +126,26 @@ namespace Application
             return link;
         }
 
+        public async Task<string?> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl)
+        {
+            var amount = InvoiceHelper.CalculateTotalAmount(invoice);
+            if (amount > 0)
+            {
+                var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
+                return link;
+            }
+            else if (amount == 0)
+            {
+                await UpdateCashInvoice(invoice, amount);
+                return null;
+            }
+            else
+            {
+                throw new BadRequestException(Message.InvoiceMessage.InvalidAmount);
+            }
+
+        }
+
         public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
         {
             if (momoIpnReq.ResultCode == (int)MomoPaymentStatus.Success)
@@ -107,7 +153,7 @@ namespace Application
                 var invoice = await _uow.InvoiceRepository.GetByIdAsync(invoiceId);
                 if (invoice == null)
                 {
-                    throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                    throw new NotFoundException(Message.InvoiceMessage.NotFound);
                 }
                 invoice.Status = (int)InvoiceStatus.Paid;
                 invoice.PaymentMethod = (int)PaymentMethod.MomoWallet;
@@ -123,7 +169,7 @@ namespace Application
 
                 await _uow.MomoPaymentLinkRepository.RemovePaymentLinkAsync(invoiceId.ToString());
                 await _uow.SaveChangesAsync();
-                var subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
+                var subject = "[GreenWheel] Successfully Payment";
                 var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PaymentSuccessTemplate.html");
                 var body = System.IO.File.ReadAllText(templatePath);
                 var customer = (await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId))!.Customer;
@@ -153,7 +199,7 @@ namespace Application
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if (invoice == null)
             {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.NotFound);
             }
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId))
                             .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
@@ -177,19 +223,85 @@ namespace Application
             var invoice = await _uow.InvoiceRepository.GetByIdOptionAsync(id, includeItems, includeDeposit);
             if (invoice == null)
             {
-                throw new NotFoundException(Message.InvoiceMessage.InvoiceNotFound);
+                throw new NotFoundException(Message.InvoiceMessage.NotFound);
             }
             return invoice;
         }
 
         private async Task CancleReservationInvoice(Invoice handoverInvoice)
-        {  
+        {
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(handoverInvoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
             if (reservationInvoice.Status == (int)InvoiceStatus.Pending)
             {
                 reservationInvoice.Status = (int)InvoiceStatus.Cancelled;
                 await _uow.InvoiceRepository.UpdateAsync(reservationInvoice);
             }
+        }
+
+        public async Task CreateAsync(CreateInvoiceReq req)
+        {
+            var contract = await _uow.RentalContractRepository.GetByIdAsync(req.ContractId)
+                            ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
+            var invoiceId = Guid.NewGuid();
+            var invoice = new Invoice()
+            {
+                Id = invoiceId,
+                ContractId = req.ContractId,
+                Status = (int)InvoiceStatus.Pending,
+                Tax = Common.Tax.NoneVAT, //10% dạng decimal
+                Notes = $"GreenWheel – Invoice for your order {req.ContractId}",
+                Type = req.Type
+            };
+
+            IEnumerable<InvoiceItem> items = [];
+            if(req.Items != null)
+            {
+                foreach(var item in req.Items)
+                {
+                    items = items.Append(new InvoiceItem()
+                    {
+                        InvoiceId = invoiceId,
+                        Quantity = item.Quantity,
+                        UnitPrice = item.UnitPrice,
+                        Description = item.Description,
+                        Type = item.Type,
+                    });
+                }
+            }
+            if (req.Type == (int)InvoiceType.Refund)
+            {
+                //xử lí refund cọc
+                var deposit = await _uow.DepositRepository.GetByContractIdAsync(req.ContractId)
+                    ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
+                deposit.Status = (int)DepositStatus.Refunded;
+                items = items.Append(new InvoiceItem()
+                {
+                    InvoiceId = invoiceId,
+                    Quantity = 1,
+                    UnitPrice = deposit.Amount,
+                    Type = (int)InvoiceItemType.Refund,
+                });
+                if (items == null || !items.Any())
+                {
+                    invoice.Notes.Concat(". Deposit is non-refundable due to business policy violation");
+                    deposit.Status = (int)DepositStatus.Forfeited;
+                }
+
+                await _uow.DepositRepository.UpdateAsync(deposit);
+            }
+            invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
+            await _uow.InvoiceRepository.AddAsync(invoice);
+            await _uow.InvoiceItemRepository.AddRangeAsync(items);
+            await _uow.SaveChangesAsync();
+        }
+
+        public async Task UpdateNoteAsync(Guid id, string notes)
+        {
+            var invoice = await _uow.InvoiceRepository.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
+            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($". {notes}"));
+            await _uow.InvoiceRepository.UpdateAsync(invoice);
+            await _uow.SaveChangesAsync();
         }
     }
 }

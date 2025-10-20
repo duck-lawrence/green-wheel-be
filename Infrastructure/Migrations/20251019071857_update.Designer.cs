@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251011050245_First")]
-    partial class First
+    [Migration("20251019071857_update")]
+    partial class update
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -150,14 +150,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("PK__citizen___3213E83F408A30E8");
 
-                    b.HasIndex(new[] { "UserId" }, "UQ__citizen___B9BE370E481A507A")
+                    b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Number" }, "UQ__citizen___FD291E418DEE80E9")
-                        .IsUnique();
-
-                    b.HasIndex(new[] { "UserId" }, "uq_citizen_identities_user_id")
-                        .IsUnique();
+                    b.HasIndex(new[] { "UserId" }, "idx_citizen_identities_user_id");
 
                     b.ToTable("citizen_identities", (string)null);
                 });
@@ -438,14 +434,10 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id")
                         .HasName("PK__driver_l__3213E83F4D350890");
 
-                    b.HasIndex(new[] { "UserId" }, "UQ__driver_l__B9BE370EAA9A89D5")
+                    b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasIndex(new[] { "Number" }, "UQ__driver_l__FD291E4146A88AD9")
-                        .IsUnique();
-
-                    b.HasIndex(new[] { "UserId" }, "uq_driver_licenses_user_id")
-                        .IsUnique();
+                    b.HasIndex(new[] { "UserId" }, "idx_driver_licenses_user_id");
 
                     b.ToTable("driver_licenses", (string)null);
                 });
@@ -540,6 +532,11 @@ namespace Infrastructure.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("deleted_at");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("description");
 
                     b.Property<Guid>("InvoiceId")
                         .HasColumnType("uniqueidentifier")
@@ -683,10 +680,6 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("(sysdatetimeoffset())");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("deleted_at");
 
                     b.Property<DateTimeOffset>("ExpiresAt")
                         .HasColumnType("datetimeoffset")
@@ -1330,6 +1323,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("(sysdatetimeoffset())");
+
+                    b.Property<decimal>("DamageFee")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("damage_fee");
 
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("datetimeoffset")

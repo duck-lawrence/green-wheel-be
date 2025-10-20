@@ -34,7 +34,7 @@ public class StationFeedbackService : IStationFeedbackService
     {
         var feedback = await _repo.GetByIdAsync(id);
         if (feedback == null || feedback.CustomerId != customerId)
-            throw new Exception(Message.StationFeedbackMessage.FeedbackNotFound);
+            throw new Exception(Message.StationFeedbackMessage.NotFound);
 
         await _repo.DeleteAsync(id);
     }

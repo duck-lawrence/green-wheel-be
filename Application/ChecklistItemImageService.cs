@@ -21,13 +21,13 @@ namespace Application
             _photoService = photoService;
         }
 
-        public async Task<ChecklistItemImageRes> UploadChecklistItemImageAsync(Guid itemId, IFormFile file)
+        public async Task<string> UploadChecklistItemImageAsync(Guid itemId, IFormFile file)
         {
             if (file == null || file.Length == 0)
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
 
             var item = await _itemRepository.GetByIdAsync(itemId)
-                ?? throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                ?? throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
 
             var uploadResult = await _photoService.UploadPhotoAsync(
                 new UploadImageReq { File = file },
@@ -43,18 +43,13 @@ namespace Application
 
             await _itemRepository.UpdateAsync(item);
 
-            return new ChecklistItemImageRes
-            {
-                ItemId = item.Id,
-                ImageUrl = item.ImageUrl,
-                Message = Message.CloudinaryMessage.UploadSuccess
-            };
+            return item.ImageUrl;
         }
 
         public async Task<ChecklistItemImageRes> DeleteChecklistItemImageAsync(Guid itemId)
         {
             var item = await _itemRepository.GetByIdAsync(itemId)
-                ?? throw new NotFoundException(Message.VehicleChecklistMessage.VehicleChecklistNotFound);
+                ?? throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
 
             if (string.IsNullOrEmpty(item.ImagePublicId))
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);

@@ -1,17 +1,20 @@
 ﻿using API.Filters;
 using Application;
 using Application.Abstractions;
-using Application.Dtos.Common.Request;
+using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Invoice.Request;
+using Application.Dtos.InvoiceItem.Request;
 using Application.Dtos.Momo.Request;
 using Application.Dtos.Payment.Request;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.WebSockets;
-using Application.AppExceptions;
-using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Caching.Memory;
+using StackExchange.Redis;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.WebSockets;
 
 namespace API.Controllers
 {
@@ -47,7 +50,8 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
         {
             await _momoService.VerifyMomoIpnReq(req);
-            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId));
+            var lastDashIndex = req.OrderId.LastIndexOf('-');
+            await _invoiceService.UpdateInvoiceMomoPayment(req, Guid.Parse(req.OrderId.Substring(0, lastDashIndex)));
             return Ok(new { resultCode = 0, message = "Received" });
         }
 
@@ -77,7 +81,7 @@ namespace API.Controllers
             //kiểm tra phải hoá đơn của nó không
             var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
-            var roles = _cache.Get<List<Role>>("AllRoles");
+            var roles = _cache.Get<List<Domain.Entities.Role>>("AllRoles");
             var userInDB = await _userService.GetByIdAsync(userId);
             var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
             if (userRole == RoleName.Customer)
@@ -103,6 +107,9 @@ namespace API.Controllers
                     case (int)InvoiceType.Reservation:
                         await _invoiceService.PayReservationInvoiceManual(invoice, (decimal)paymentReq.Amount);
                         break;
+                    case (int)InvoiceType.Refund:
+                        await _invoiceService.PayRefundInvoiceManual(invoice, (decimal)paymentReq.Amount);
+                        break;
                     default:
                         throw new Exception(Message.InvoiceMessage.InvalidInvoiceType);
                        
@@ -115,6 +122,7 @@ namespace API.Controllers
                 (int)InvoiceType.Handover => await _invoiceService.PayHandoverInvoiceOnline(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Reservation => await _invoiceService.PayReservationInvoiceOnline(invoice, paymentReq.FallbackUrl),
                 (int)InvoiceType.Return => await _invoiceService.PayReturnInvoiceOnline(invoice, paymentReq.FallbackUrl),
+                (int)InvoiceType.Refund => await _invoiceService.PayRefundInvoiceOnline(invoice, paymentReq.FallbackUrl),
                 _ => throw new Exception(Message.InvoiceMessage.InvalidInvoiceType),
             };
             return Ok(new { link });
@@ -130,6 +138,29 @@ namespace API.Controllers
         {
             var result = await _invoiceService.GetAllInvoicesAsync(pagination);
             return Ok(result);
+        }
+
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPost()]
+        public async Task<IActionResult> CreateInvoice(CreateInvoiceReq req)
+        {
+            await _invoiceService.CreateAsync(req);
+            return Created();
+        }
+
+        [RoleAuthorize(RoleName.Staff)]
+        [HttpPut("{id}")]
+        public async Task<IActionResult>UpdateInvoice(Guid id, UpdateInvoiceReq req)
+        {
+            await _invoiceService.UpdateAsync(id, req);
+            return Ok();
+        }
+
+        [HttpPut("{id}/notes")]
+        public async Task<IActionResult>UpdateInvoiceNotes(Guid id, string notes)
+        {
+            await _invoiceService.UpdateNoteAsync(id, notes);
+            return Ok();
         }
     }
 }

@@ -51,7 +51,7 @@
             public const string UserNotFound = "user.user_not_found";
 
             //change avatar
-            public const string NotFoundAvatar = "user.avatar_not_found";
+            public const string NotFound = "user.avatar_not_found";
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
@@ -72,13 +72,13 @@
 
         public static class VehicleMessage
         {
-            public const string VehicleNotFound = "vehicle.not_found";
+            public const string NotFound = "vehicle.not_found";
             public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
         }
 
         public static class VehicleModelMessage
         {
-            public const string VehicleModelNotFound = "vehicle_model.not_found";
+            public const string NotFound = "vehicle_model.not_found";
             public const string RentTimeIsNotAvailable = "vehicle_model.rent_time_is_not_available";
             public const string NameIsRequire = "vehicle_model.name_require";
             public const string SeatingCapacityIsRequired = "vehicle_model.seating_capacity_require";
@@ -139,17 +139,17 @@
         public static class RentalContractMessage
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
-            public const string RentalContractNotFound = "rental_contract.not_found";
+            public const string NotFound = "rental_contract.not_found";
             public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
             public const string CanNotCancel = "rental_contract.can_not_cancel";
 
-            public static string ContractAlreadyComplete { get; internal set; }
+            public static string ContractAlreadyProcess = "rental_contract.already_returned";
         }
 
         //Station
         public static class StationMessage
         {
-            public const string StationNotFound = "station.not_found";
+            public const string NotFound = "station.not_found";
         }
 
         public static class MomoMessage
@@ -163,7 +163,7 @@
 
         public static class InvoiceMessage
         {
-            public const string InvoiceNotFound = "invoice.not_found";
+            public const string NotFound = "invoice.not_found";
             public const string ThisInvoiceWasPaidOrCancel = "invoice.this_invoice_was_paid_or_cancel";
 
             public static string AmountRequired = "invoice.amount_required";
@@ -182,7 +182,7 @@
 
         public static class VehicleSegmentMessage
         {
-            public const string VehicleSegmentNotFound = "vehicle_segment.not_found";
+            public const string NotFound = "vehicle_segment.not_found";
         }
 
         //VEHICLE IMAGE
@@ -197,7 +197,7 @@
 
         public static class TicketMessage
         {
-            public const string TicketNotFound = "ticket.not_found";
+            public const string NotFound = "ticket.not_found";
             public const string AlreadyEscalated = "ticket.already_escalated";
         }
 
@@ -211,22 +211,28 @@
 
         public static class StationFeedbackMessage
         {
-            public const string FeedbackNotFound = "station_feedback.not_found";
+            public const string NotFound = "station_feedback.not_found";
         }
 
         public static class VehicleModelImageMessage
         {
-            public const string MainImageNotFound = "vehicle_model_image.main_image_not_found";
+            public const string NotFound = "vehicle_model_image.main_image_not_found";
         }
 
         public static class VehicleComponentMessage
         {
-            public const string ComponentNotFound = "vehicle_component.not_found";
+            public const string NotFound = "vehicle_component.not_found";
         }
 
         public static class VehicleChecklistMessage
         {
-            public const string VehicleChecklistNotFound = "vehicle_checklist.not_found";
+            public const string NotFound = "vehicle_checklist.not_found";
+
+            public static string ThisChecklistAlreadyProcess = "vehicle_checklist.already_process";
+        }
+        public static class VehicleChecklistItemMessage
+        {
+            public const string NotFound = "vehicle_checklist_item.not_found";
         }
     }
 }

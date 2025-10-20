@@ -53,7 +53,7 @@ namespace Application
         public async Task<VehicleViewRes> GetVehicleById(Guid id)
         {
             var vehicle = await _vehicleRepository.GetByIdOptionAsync(id, includeModel: true);
-            if (vehicle == null) throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+            if (vehicle == null) throw new NotFoundException(Message.VehicleMessage.NotFound);
             return _mapper.Map<VehicleViewRes>(vehicle);
         }
 
@@ -68,7 +68,7 @@ namespace Application
             var vehicleFromDb = await _vehicleRepository.GetByIdAsync(Id);
             if (vehicleFromDb == null)
             {
-                throw new NotFoundException(Message.VehicleMessage.VehicleNotFound);
+                throw new NotFoundException(Message.VehicleMessage.NotFound);
             }
             if (updateVehicleReq.LicensePlate != null)
             {
