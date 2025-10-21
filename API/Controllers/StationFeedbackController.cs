@@ -52,7 +52,7 @@ namespace API.Controllers
             return NoContent();
         }
 
-        [HttpGet("me")]
+        [HttpGet]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> GetAllFeedbacks()
         {

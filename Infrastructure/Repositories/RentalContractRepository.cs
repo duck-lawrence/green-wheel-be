@@ -1,4 +1,6 @@
 ﻿using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
@@ -117,6 +119,53 @@ namespace Infrastructure.Repositories
                     .Include(r => r.Station)
                     .ToListAsync();
             return list;
+        }
+
+        public async Task<PageResult<RentalContract>> GetAllByPaginationAsync(
+            int? status = null,
+            string? phone = null,
+            string? citizenIdentityNumber = null,
+            string? driverLicenseNumber = null,
+            Guid? stationId = null,
+            PaginationParams? pagination = null)
+        {
+            var query = _dbContext.RentalContracts
+                .Include(x => x.Vehicle).ThenInclude(v => v.Model)
+                .Include(x => x.Station)
+                .Include(x => x.HandoverStaff).ThenInclude(h => h.User)
+                .Include(x => x.ReturnStaff).ThenInclude(h => h.User)
+                .Include(x => x.Customer).ThenInclude(u => u.CitizenIdentity)
+                .Include(x => x.Customer).ThenInclude(u => u.DriverLicense)
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(phone))
+                query = query.Where(rc => rc.Customer.Phone == phone);
+            if (status != null)
+                query = query.Where(rc => rc.Status == status);
+            if (!string.IsNullOrEmpty(citizenIdentityNumber))
+                query = query.Where(rc => rc.Customer.CitizenIdentity.Number == citizenIdentityNumber);
+            if (!string.IsNullOrEmpty(driverLicenseNumber))
+                query = query.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
+            if (stationId != null)
+                query = query.Where(rc => rc.StationId == stationId);
+
+            var total = await query.CountAsync();
+
+            if (pagination != null)
+            {
+                query = query
+                    .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                    .Take(pagination.PageSize);
+            }
+
+            var items = await query.ToListAsync();
+
+            return new PageResult<RentalContract>(
+                items,
+                pagination?.PageNumber ?? 1,
+                pagination?.PageSize ?? total,
+                total
+            );
         }
     }
 }

@@ -2,6 +2,8 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
@@ -195,13 +197,13 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
-        {
-            var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
-                req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
+        //public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
+        //{
+        //    var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
+        //        req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
+        //    return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
 
-        }
+        //}
 
         public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status)
         {
@@ -491,6 +493,24 @@ namespace Application
             await _uow.SaveChangesAsync();
         }
 
-        
+        public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination)
+        {
+            var pageResult = await _uow.RentalContractRepository.GetAllByPaginationAsync(
+                req.Status,
+                req.Phone,
+                req.CitizenIdentityNumber,
+                req.DriverLicenseNumber,
+                req.StationId,
+                pagination);
+
+            var mapped = _mapper.Map<IEnumerable<RentalContractViewRes>>(pageResult.Items);
+
+            return new PageResult<RentalContractViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
+        }
     }
 }

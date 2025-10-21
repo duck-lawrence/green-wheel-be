@@ -2,6 +2,7 @@
 using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -90,14 +91,22 @@ namespace API.Controllers
         * 404: rentalContract not found
         * 200: success
         */
+        //[RoleAuthorize(RoleName.Staff)]
+        //[HttpGet]
+        //public async Task<IActionResult> GetAll([FromQuery] GetAllRentalContactReq req)
+        //{
+        //    var contractViews = await _rentalContractService.GetAll(req);
+        //    return Ok(contractViews);
+        //}
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllRentalContactReq req)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] GetAllRentalContactReq req,
+            [FromQuery] PaginationParams pagination)
         {
-            var contractViews = await _rentalContractService.GetAll(req);
-            return Ok(contractViews);
+            var result = await _rentalContractService.GetAllByPagination(req, pagination);
+            return Ok(result);
         }
-
         /*
          * Status code
          * 
