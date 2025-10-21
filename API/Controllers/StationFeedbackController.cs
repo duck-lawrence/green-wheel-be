@@ -53,7 +53,6 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> GetAllFeedbacks()
         {
             var data = await _service.GetAllAsync();

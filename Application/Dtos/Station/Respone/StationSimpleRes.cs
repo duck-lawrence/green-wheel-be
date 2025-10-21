@@ -11,5 +11,7 @@ namespace Application.Dtos.Station.Respone
         public Guid Id { get; init; }
         public string Name { get; init; } = default!;
         public string Address { get; init; } = default!;
+
+        public DateTimeOffset createAt { get; set;} 
     }
 }
