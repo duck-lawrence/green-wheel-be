@@ -400,6 +400,9 @@ CREATE TABLE [invoices] (
 
     [paid_at] datetimeoffset,
 
+	[image_url] nvarchar(500),
+    [image_public_id] nvarchar(255),
+
     [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
