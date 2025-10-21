@@ -11,15 +11,18 @@ namespace Application.Helpers
 {
     public static class DispatchValidationHelper
     {
-        public static async Task ValidateStaffsInStationAsync(IStaffRepository staffRepository, Guid[]? staffIds, Guid fromStationId)
+        public static async Task ValidateStaffsInStationAsync(
+            IStaffRepository staffRepository, 
+            Guid[]? staffIds, 
+            Guid expectedStationId)
         {
-            if (staffIds == null || staffIds.Length == 0)
-                return;
+            if (staffIds == null || staffIds.Length == 0) return;
 
-            var countValid = await staffRepository.CountStaffsInStationAsync(staffIds, fromStationId);
+            var countValid = await staffRepository.CountStaffsInStationAsync(staffIds, expectedStationId);
             if (countValid != staffIds.Length)
                 throw new BadRequestException(Message.DispatchMessage.StaffNotInFromStation);
         }
+
 
         public static async Task ValidateVehiclesInStationAsync(IVehicleRepository vehicleRepository, Guid[]? vehicleId, Guid fromStationId)
         {

@@ -1,10 +1,14 @@
-using Application.Dtos.Invoice.Response;
+using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
+using Application.Dtos.DriverLicense.Request;
+using Application.Dtos.DriverLicense.Response;
+using Application.Dtos.Invoice.Request;
+using Application.Dtos.Invoice.Response;
+using Application.Dtos.InvoiceItem.Request;
 using Application.Dtos.Momo.Request;
 using Domain.Entities;
-using Application.Dtos.InvoiceItem.Request;
-using Application.Dtos.Invoice.Request;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.Abstractions
 {
@@ -33,5 +37,7 @@ namespace Application.Abstractions
         Task CreateAsync(CreateInvoiceReq req);
         Task UpdateAsync(Guid invoiceId, UpdateInvoiceReq req);
         Task UpdateNoteAsync(Guid id, string notes);
+        Task<string> UploadImageAsync(Guid invoiceId, IFormFile file);
+        Task DeleteImageAsync(Guid modelId);
     }
 }

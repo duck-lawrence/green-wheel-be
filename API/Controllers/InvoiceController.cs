@@ -162,5 +162,21 @@ namespace API.Controllers
             await _invoiceService.UpdateNoteAsync(id, notes);
             return Ok();
         }
+
+        [HttpPost("image")]
+        [Consumes("multipart/form-data")]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<IActionResult> UploadMainImage([FromRoute] Guid invoiceId, [FromForm(Name = "file")] IFormFile file)
+        {
+            var imageUrl = await _invoiceService.UploadImageAsync(invoiceId, file);
+            return Ok(new { data = new { invoiceId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
+        }
+
+        [HttpDelete("image")]
+        public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
+        {
+            await _invoiceService.DeleteImageAsync(modelId);
+            return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
+        }
     }
 }

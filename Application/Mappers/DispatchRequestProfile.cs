@@ -13,7 +13,6 @@ namespace Application.Mappers
             CreateMap<CreateDispatchReq, DispatchRequest>()
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.FromStationId, opt => opt.MapFrom(src => src.FromStationId))
-                .ForMember(dest => dest.ToStationId, opt => opt.MapFrom(src => src.ToStationId))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => (int)DispatchRequestStatus.Pending))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
