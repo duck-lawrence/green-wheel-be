@@ -832,7 +832,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\Staff\Response\" />
     <Folder Include="Dtos\StationFeedback\Response\" />
     <Folder Include="Dtos\Station\Request\" />
     <Folder Include="Dtos\VehicleSegment\Request\" />
