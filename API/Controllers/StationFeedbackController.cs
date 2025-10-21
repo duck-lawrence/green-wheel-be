@@ -1,5 +1,6 @@
 ﻿using API.Filters;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.StationFeedback.Request;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -49,6 +50,14 @@ namespace API.Controllers
             var customerId = Guid.Parse(User.FindFirst("sid")!.Value);
             await _service.DeleteAsync(id, customerId);
             return NoContent();
+        }
+
+        [HttpGet("me")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> GetAllFeedbacks()
+        {
+            var data = await _service.GetAllAsync();
+            return Ok(data);
         }
     }
 }

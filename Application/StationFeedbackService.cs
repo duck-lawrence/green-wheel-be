@@ -50,4 +50,10 @@ public class StationFeedbackService : IStationFeedbackService
         var list = await _repo.FindAsync(f => f.CustomerId == customerId) ?? [];
         return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
     }
+
+    public async Task<IEnumerable<StationFeedbackRes>> GetAllAsync()
+    {
+        var list = await _repo.GetAllAsync();
+        return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
+    }
 }
