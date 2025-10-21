@@ -462,12 +462,10 @@ namespace Infrastructure.Migrations
                         .HasColumnName("deleted_at");
 
                     b.Property<string>("ImagePublicId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("image_public_id");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("image_url");
 

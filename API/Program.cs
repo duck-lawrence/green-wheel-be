@@ -118,6 +118,7 @@ namespace API
             builder.Services.AddHttpClient<IMomoService, MomoService>();
             builder.Services.AddHttpClient<IGeminiService, GeminiService>();
             //UOW
+            builder.Services.AddScoped<IUnitOfwork, UnitOfwork>();
             builder.Services.AddScoped<IRentalContractUow, RentalContractUow>();
             builder.Services.AddScoped<IInvoiceUow, InvoiceUow>();
             builder.Services.AddScoped<IMediaUow, MediaUow>();
