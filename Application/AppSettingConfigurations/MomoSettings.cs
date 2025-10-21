@@ -14,7 +14,7 @@ namespace Application.AppSettingConfigurations
         public string IpnUrl { get; set; }//nơi nhận status
         public string Endpoint { get; set; }//url của momo để nhận req, đang test nên nó sẽ là sandbox
         public string RequestType { get; set; }
-        public string OrderExpireTime { get; set; }
+        public int OrderExpireTime { get; set; }
         public string? Lang { get; set; }
         public int Ttl { get; set; }
     }

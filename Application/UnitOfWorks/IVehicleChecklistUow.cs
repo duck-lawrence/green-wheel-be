@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.UnitOfWorks
 {
-    public interface IVehicleChecklistUow : IDisposable
+    public interface IVehicleChecklistUow : IUnitOfwork
     {
         IVehicleChecklistItemRepository VehicleChecklistItemRepository { get; }
         IVehicleCheckListRepository VehicleChecklistRepository { get; }

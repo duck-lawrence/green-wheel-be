@@ -181,7 +181,6 @@ namespace API.Controllers
          200: refresh token successfully
          401: invalid token
          */
-
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken()
         {

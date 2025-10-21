@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251021023603_update-invoice")]
-    partial class updateinvoice
+    [Migration("20251021041214_update-invoice_")]
+    partial class updateinvoice_
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -465,12 +465,10 @@ namespace Infrastructure.Migrations
                         .HasColumnName("deleted_at");
 
                     b.Property<string>("ImagePublicId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("image_public_id");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("image_url");
 

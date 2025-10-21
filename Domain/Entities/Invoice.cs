@@ -21,9 +21,9 @@ public partial class Invoice : SorfDeletedEntity, IEntity
     public int Status { get; set; }
 
     public int Type { get; set; }
-    public string ImageUrl { get; set; } = null!;
+    public string? ImageUrl { get; set; } = null!;
 
-    public string ImagePublicId { get; set; } = null!;
+    public string? ImagePublicId { get; set; } = null!;
 
     public DateTimeOffset? PaidAt { get; set; }
 

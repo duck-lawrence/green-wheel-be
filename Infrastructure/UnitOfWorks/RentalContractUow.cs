@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.UnitOfWorks
 {
-    public class RentalContractUow : IRentalContractUow
+    public class RentalContractUow : UnitOfwork, IRentalContractUow
     {
-        private readonly IGreenWheelDbContext _context;
 
         public IVehicleRepository VehicleRepository { get; }
         public IRentalContractRepository RentalContractRepository { get; }
@@ -35,9 +34,8 @@ namespace Infrastructure.UnitOfWorks
         IDepositRepository depositRepository,
         IStationRepository stationRepository,
         ICitizenIdentityRepository citizenIdentityRepository,
-        IDriverLicenseRepository driverLicenseRepository)
+        IDriverLicenseRepository driverLicenseRepository) : base(context)
         { 
-            _context = context;
             VehicleRepository = vehicleRepository;
             RentalContractRepository = rentalContractRepository;
             UserRepository = userRepository;
@@ -50,17 +48,5 @@ namespace Infrastructure.UnitOfWorks
             DriverLicenseRepository = driverLicenseRepository;
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        public void Dispose()
-        {
-            if (_context is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
     }
 }
