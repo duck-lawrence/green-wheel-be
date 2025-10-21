@@ -24,15 +24,17 @@ namespace API.Controllers
             _invoiceService = invoiceService;
         }
 
-        /*
-         *status code
-         *400: ivalid signature
-         *401: missing field when generate signature
-         *403: do not have permission
-         *404: not found
-         *500: momo error / duplicate order id
-         *200: success
-         */
+        /// <summary>
+        /// Creates a MoMo payment link for the specified invoice.
+        /// </summary>
+        /// <param name="req">Request containing invoice ID and fallback URL for MoMo payment.</param>
+        /// <returns>Payment link if the creation is successful.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid signature.</response>
+        /// <response code="401">Missing field when generating signature.</response>
+        /// <response code="403">Do not have permission.</response>
+        /// <response code="404">Invoice not found.</response>
+        /// <response code="500">MoMo error or duplicate order ID.</response>
         [RoleAuthorize(RoleName.Staff)]
         [HttpPost]
         public async Task<IActionResult> CreateMomoPayment(CreateMomoPaymentReq req)
