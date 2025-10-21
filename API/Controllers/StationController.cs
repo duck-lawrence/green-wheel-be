@@ -15,11 +15,12 @@ namespace API.Controllers
             _stationSerivce = stationService;
         }
 
-        /*
-         * Status code
-         * 200: success
-         * 404: not found
-         */
+        /// <summary>
+        /// Retrieves all stations available in the system.
+        /// </summary>
+        /// <returns>List of all stations.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">No stations found.</response>
         [HttpGet]
         public async Task<IActionResult> GetAllStation()
         {

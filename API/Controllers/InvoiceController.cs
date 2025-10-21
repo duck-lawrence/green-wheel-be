@@ -1,20 +1,14 @@
 ﻿using API.Filters;
-using Application;
 using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Invoice.Request;
-using Application.Dtos.InvoiceItem.Request;
 using Application.Dtos.Momo.Request;
 using Application.Dtos.Payment.Request;
-using Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using StackExchange.Redis;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.WebSockets;
 
 namespace API.Controllers
 {
@@ -39,12 +33,14 @@ namespace API.Controllers
             _userService = userService;
         }
 
-        /*
-         * status code
-         * 400 invalid signature
-         * 200 success
-         * 404 not found
-         */
+        /// <summary>
+        /// Receives and verifies the MoMo payment callback (IPN) to update invoice status.
+        /// </summary>
+        /// <param name="req">MoMo IPN request containing payment and order information.</param>
+        /// <returns>Result message indicating whether the callback was processed successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid signature.</response>
+        /// <response code="404">Invoice not found.</response>
 
         [HttpPost("payment-callback/momo")]
         public async Task<IActionResult> UpdateInvoiceMomoPayment([FromBody] MomoIpnReq req)
@@ -55,11 +51,13 @@ namespace API.Controllers
             return Ok(new { resultCode = 0, message = "Received" });
         }
 
-        /*
-         * status code
-         * 200 success
-         * 404 invoice not found
-         */
+        /// <summary>
+        /// Retrieves an invoice by its unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the invoice.</param>
+        /// <returns>Invoice details if found.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Invoice not found.</response>
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetInvoiceById(Guid id)
@@ -68,11 +66,15 @@ namespace API.Controllers
             return Ok(invoiceView);
         }
 
-        /*
-         500 invoice type error
-         404 not found
-         200 success
-         */
+        /// <summary>
+        /// Processes payment for the specified invoice based on its type and payment method.
+        /// </summary>
+        /// <param name="id">The unique identifier of the invoice.</param>
+        /// <param name="paymentReq">Payment request containing payment method, amount, and fallback URL.</param>
+        /// <returns>Success message or payment link depending on the payment method.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Invoice not found.</response>
+        /// <response code="500">Invoice type error.</response>
 
         [HttpPut("{id}/payment")]
         [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
@@ -128,9 +130,12 @@ namespace API.Controllers
             return Ok(new { link });
         }
 
-        /*
-         200 success
-         */
+        /// <summary>
+        /// Retrieves all invoices with pagination support.
+        /// </summary>
+        /// <param name="pagination">Pagination parameters for page number and page size.</param>
+        /// <returns>List of invoices with pagination metadata.</returns>
+        /// <response code="200">Success.</response>
 
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
@@ -140,6 +145,14 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Creates a new invoice with the provided information.
+        /// </summary>
+        /// <param name="req">Request containing invoice details such as contract, amount, and type.</param>
+        /// <returns>Information about the created invoice.</returns>
+        /// <response code="201">Invoice created successfully.</response>
+        /// <response code="400">Invalid invoice data.</response>
+        /// <response code="404">Related entity not found (e.g., contract or customer).</response>
         [RoleAuthorize(RoleName.Staff)]
         [HttpPost()]
         public async Task<IActionResult> CreateInvoice(CreateInvoiceReq req)
@@ -148,6 +161,16 @@ namespace API.Controllers
             return Created();
         }
 
+
+        /// <summary>
+        /// Updates an existing invoice with new information.
+        /// </summary>
+        /// <param name="id">The unique identifier of the invoice to update.</param>
+        /// <param name="req">Request containing updated invoice details.</param>
+        /// <returns>Success message if the invoice is updated successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Invoice not found.</response>
+        /// <response code="400">Invalid invoice data.</response>
         [RoleAuthorize(RoleName.Staff)]
         [HttpPut("{id}")]
         public async Task<IActionResult>UpdateInvoice(Guid id, UpdateInvoiceReq req)
@@ -156,6 +179,16 @@ namespace API.Controllers
             return Ok();
         }
 
+
+        /// <summary>
+        /// Updates the notes field of a specific invoice.
+        /// </summary>
+        /// <param name="id">The unique identifier of the invoice to update.</param>
+        /// <param name="notes">The new notes content to be saved.</param>
+        /// <returns>Success message if the notes are updated successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Invoice not found.</response>
+        /// <response code="400">Invalid notes data.</response>
         [HttpPut("{id}/notes")]
         public async Task<IActionResult>UpdateInvoiceNotes(Guid id, string notes)
         {

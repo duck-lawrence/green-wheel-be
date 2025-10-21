@@ -17,6 +17,15 @@ namespace API.Controllers
             _service = service;
         }
 
+        /// <summary>
+        /// Creates a new feedback entry for a specific station from the authenticated customer.
+        /// </summary>
+        /// <param name="req">Request containing station ID, rating, and feedback content.</param>
+        /// <returns>Feedback details if creation is successful.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid feedback data.</response>
+        /// <response code="404">Station not found.</response>
+        /// <response code="404">Station not found.</response>
         [HttpPost]
         [RoleAuthorize("Customer")]
         public async Task<IActionResult> Create([FromBody] StationFeedbackCreateReq req)
@@ -26,13 +35,25 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("station/{stationId}")]
-        public async Task<IActionResult> GetByStationId(Guid stationId)
+        /// <summary>
+        /// Retrieves all feedback entries for a specific station by its unique identifier.
+        /// </summary>
+        /// <param name="stationId">The unique identifier of the station.</param>
+        /// <returns>List of feedback entries related to the specified station.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Station not found or no feedback available.</response>
+        [HttpGet("station/{id}")]
+        public async Task<IActionResult> GetByStationId(Guid id)
         {
-            var data = await _service.GetByStationIdAsync(stationId);
+            var data = await _service.GetByStationIdAsync(id);
             return Ok(data);
         }
 
+        /// <summary>
+        /// Retrieves all feedback entries submitted by the authenticated customer.
+        /// </summary>
+        /// <returns>List of feedbacks created by the current customer.</returns>
+        /// <response code="200">Success.</response>
         [HttpGet("me")]
         [RoleAuthorize("Customer")]
         public async Task<IActionResult> GetMyFeedbacks()
@@ -42,6 +63,13 @@ namespace API.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Deletes a specific feedback entry created by the authenticated customer.
+        /// </summary>
+        /// <param name="id">The unique identifier of the feedback to delete.</param>
+        /// <returns>No content if the feedback is deleted successfully.</returns>
+        /// <response code="204">Success — feedback deleted.</response>
+        /// <response code="403">Forbidden — customer does not have permission to delete this feedback.</response>
         [HttpDelete("{id}")]
         [RoleAuthorize("Customer")]
         public async Task<IActionResult> Delete(Guid id)
