@@ -73,7 +73,7 @@ namespace API.Controllers
 
         [HttpGet("{id}")]
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
-        public async Task<IActionResult> GetById([FromQuery] Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
             var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
             var user = await _userService.GetByIdAsync(userId)
@@ -82,13 +82,13 @@ namespace API.Controllers
                 ?? throw new NotFoundException(Message.UserMessage.NotFound);
             if (user.Role.Name == RoleName.Staff)
             {
-                return user.Role.Name == RoleName.Customer ? Ok(user) : throw new NotFoundException(Message.UserMessage.NotFound);
+                return userFromDb.Role.Name == RoleName.Customer ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
             }
             if (user.Role.Name == RoleName.Admin)
             {
-                return user.Role.Name == RoleName.Customer || user.Role.Name == RoleName.Staff ? Ok(user) : throw new NotFoundException(Message.UserMessage.NotFound);
+                return userFromDb.Role.Name == RoleName.Customer || userFromDb.Role.Name == RoleName.Staff ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission); ;
             }
-            throw new NotFoundException(Message.UserMessage.NotFound);
+            throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
 
         }
 

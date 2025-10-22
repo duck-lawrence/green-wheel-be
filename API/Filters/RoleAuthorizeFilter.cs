@@ -41,7 +41,7 @@ namespace API.Filters
             }
             var roleList = _cache.Get<List<Role>>("AllRoles");
             var userInDB = await userService.GetByIdAsync(Guid.Parse(userId));
-            var userRole = roleList.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+            var userRole = roleList.FirstOrDefault(r => r.Id == userInDB.Role.Id).Name;
 
             if (userRole == null || !_roles.Contains(userRole))
             {
