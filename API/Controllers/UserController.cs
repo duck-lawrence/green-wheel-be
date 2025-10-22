@@ -1,5 +1,7 @@
 ﻿using API.Filters;
+using Application;
 using Application.Abstractions;
+using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.Common.Request;
@@ -9,6 +11,7 @@ using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
@@ -19,11 +22,14 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IUserProfileSerivce _userProfileService;
+        private readonly IMemoryCache _cache;
 
-        public UserController(IUserService service, IGoogleCredentialService googleCredentialService, IUserProfileSerivce userProfileSerivce)
+        public UserController(IUserService service, IGoogleCredentialService googleCredentialService,
+            IUserProfileSerivce userProfileSerivce, IMemoryCache cache)
         {
             _userService = service;
             _userProfileService = userProfileSerivce;
+            _cache = cache;
         }
         /// <summary>
         /// Retrieves all users with optional filters for phone number, citizen ID number, or driver license number.
@@ -69,8 +75,24 @@ namespace API.Controllers
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         public async Task<IActionResult> GetById([FromQuery] Guid id)
         {
-            var userFromDb = await _userService.GetByIdAsync(id);
+            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var user = await _userService.GetByIdAsync(userId)
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+            var userFromDb = await _userService.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+            if (user.Role.Name == RoleName.Staff)
+            {
+                return user.Role.Name == RoleName.Customer ? Ok(user) : throw new NotFoundException(Message.UserMessage.NotFound);
+            }
+            if (user.Role.Name == RoleName.Admin)
+            {
+                return user.Role.Name == RoleName.Customer || user.Role.Name == RoleName.Staff ? Ok(user) : throw new NotFoundException(Message.UserMessage.NotFound);
+            }
+            throw new NotFoundException(Message.UserMessage.NotFound);
+
         }
+
+        
 
         /// <summary>
         /// Creates a new user with the specified information.
