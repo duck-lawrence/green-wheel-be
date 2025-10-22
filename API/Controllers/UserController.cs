@@ -1,5 +1,7 @@
 ﻿using API.Filters;
+using Application;
 using Application.Abstractions;
+using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.Common.Request;
@@ -9,6 +11,7 @@ using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
@@ -19,11 +22,14 @@ namespace API.Controllers
     {
         private readonly IUserService _userService;
         private readonly IUserProfileSerivce _userProfileService;
+        private readonly IMemoryCache _cache;
 
-        public UserController(IUserService service, IGoogleCredentialService googleCredentialService, IUserProfileSerivce userProfileSerivce)
+        public UserController(IUserService service, IGoogleCredentialService googleCredentialService,
+            IUserProfileSerivce userProfileSerivce, IMemoryCache cache)
         {
             _userService = service;
             _userProfileService = userProfileSerivce;
+            _cache = cache;
         }
         /// <summary>
         /// Retrieves all users with optional filters for phone number, citizen ID number, or driver license number.
@@ -39,9 +45,10 @@ namespace API.Controllers
         public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
-            [FromQuery] string? driverLicenseNumber)
+            [FromQuery] string? driverLicenseNumber,
+            [FromQuery] string? roleName)
         {
-            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
             return Ok(users);
         }
 
@@ -63,6 +70,29 @@ namespace API.Controllers
             var users = await _userService.GetAllStaffAsync(name, stationId);
             return Ok(users);
         }
+
+        [HttpGet("{id}")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
+        public async Task<IActionResult> GetById(Guid id)
+        {
+            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var user = await _userService.GetByIdAsync(userId)
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+            var userFromDb = await _userService.GetByIdAsync(id)
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+            if (user.Role.Name == RoleName.Staff)
+            {
+                return userFromDb.Role.Name == RoleName.Customer ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+            }
+            if (user.Role.Name == RoleName.Admin)
+            {
+                return userFromDb.Role.Name == RoleName.Customer || userFromDb.Role.Name == RoleName.Staff ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission); ;
+            }
+            throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+
+        }
+
+        
 
         /// <summary>
         /// Creates a new user with the specified information.

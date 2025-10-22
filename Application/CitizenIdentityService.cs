@@ -89,7 +89,7 @@ namespace Application
         {
             var existing = await _citizenRepo.GetByUserIdAsync(userId);
             if (existing == null)
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.NotFound);
 
             await _citizenRepo.DeleteAsync(existing.Id);
             await _photoService.DeletePhotoAsync(publicId);
@@ -100,7 +100,7 @@ namespace Application
         {
             var existing = await _citizenRepo.GetByIdAsync(identity.Id);
             if (existing == null)
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.NotFound);
 
             identity.UpdatedAt = DateTimeOffset.UtcNow;
             await _citizenRepo.UpdateAsync(identity);

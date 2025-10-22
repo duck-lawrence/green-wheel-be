@@ -48,10 +48,10 @@
 
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
-            public const string UserNotFound = "user.user_not_found";
+            public const string NotFound = "user.user_not_found";
 
             //change avatar
-            public const string NotFound = "user.avatar_not_found";
+            public const string AvatarNotFound = "user.avatar_not_found";
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";

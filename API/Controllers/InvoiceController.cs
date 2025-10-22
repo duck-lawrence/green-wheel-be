@@ -85,7 +85,7 @@ namespace API.Controllers
             var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
             var roles = _cache.Get<List<Domain.Entities.Role>>("AllRoles");
             var userInDB = await _userService.GetByIdAsync(userId);
-            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.Role.Id).Name;
             if (userRole == RoleName.Customer)
             {
                 if (invoice.Contract.CustomerId != userId)
