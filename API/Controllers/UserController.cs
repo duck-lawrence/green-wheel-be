@@ -39,9 +39,10 @@ namespace API.Controllers
         public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
-            [FromQuery] string? driverLicenseNumber)
+            [FromQuery] string? driverLicenseNumber,
+            [FromQuery] string? roleName)
         {
-            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
             return Ok(users);
         }
 
@@ -62,6 +63,13 @@ namespace API.Controllers
         {
             var users = await _userService.GetAllStaffAsync(name, stationId);
             return Ok(users);
+        }
+
+        [HttpGet("{id}")]
+        [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
+        public async Task<IActionResult> GetById([FromQuery] Guid id)
+        {
+            var userFromDb = await _userService.GetByIdAsync(id);
         }
 
         /// <summary>

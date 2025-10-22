@@ -53,9 +53,10 @@ namespace Application
         public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
             string? phone,
             string? citizenIdNumber,
-            string? driverLicenseNumber)
+            string? driverLicenseNumber,
+            string? roleName)
         {
-            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
             return _mapper.Map<IEnumerable<UserProfileViewRes>>(users) ?? [];
         }
 
