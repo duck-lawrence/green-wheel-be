@@ -4,6 +4,7 @@ using Application.Dtos.StationFeedback.Request;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using static System.Collections.Specialized.BitVector32;
 
 public class StationFeedbackService : IStationFeedbackService
 {
@@ -23,7 +24,6 @@ public class StationFeedbackService : IStationFeedbackService
         feedback.CustomerId = customerId;
         feedback.CreatedAt = DateTimeOffset.UtcNow;
         feedback.UpdatedAt = DateTimeOffset.UtcNow;
-
         await _repo.AddAsync(feedback);
 
         var created = await _repo.GetByIdAsync(feedback.Id);

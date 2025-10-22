@@ -10,5 +10,8 @@ namespace Application.Dtos.Vehicle.Respone
     {
         public Guid Id { get; init; }
         public string Name { get; init; } = default!;
+        public string? Description { get; init; }
+        public decimal CostPerDay { get; init; }
+        public decimal DepositFee { get; init; }
     }
 }

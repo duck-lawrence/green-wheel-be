@@ -1,4 +1,5 @@
-﻿using Application.Dtos.VehicleModel.Request;
+﻿using Application.Dtos.Vehicle.Respone;
+using Application.Dtos.VehicleModel.Request;
 using Application.Dtos.VehicleModel.Respone;
 using AutoMapper;
 using Domain.Entities;
@@ -20,6 +21,7 @@ namespace Application.Mappers
                .ForMember(dest => dest.Segment, opt => opt.MapFrom(src => src.Segment))
                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)))
                .ForMember(dest => dest.AvailableVehicleCount, opt => opt.MapFrom(src => src.Vehicles.Count()));
+            CreateMap<VehicleModel, VehicleModelRes>();
         }
     }
 }

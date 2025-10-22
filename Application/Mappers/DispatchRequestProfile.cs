@@ -29,24 +29,16 @@ namespace Application.Mappers
                 .ForMember(dest => dest.ApprovedAdminName,
                     opt => opt.MapFrom(src => src.ApprovedAdmin != null
                         ? src.ApprovedAdmin.User.FirstName + " " + src.ApprovedAdmin.User.LastName
-                        : null))
-                .ForAllOtherMembers(opt => opt.MapAtRuntime());
+                        : null));
+
 
             // Staffs + Vehicles
             CreateMap<DispatchRequestStaff, DispatchRequestStaffRes>();
             CreateMap<DispatchRequestVehicle, DispatchRequestVehicleRes>();
 
-            // Staff / Vehicle / Model / Station
-            CreateMap<Staff, StaffRes>()
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-                .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-                .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
-                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.Phone))
-                .ForMember(dest => dest.Station, opt => opt.MapFrom(src => src.Station));
-
-            CreateMap<Vehicle, VehicleRes>();
-            CreateMap<VehicleModel, VehicleModelRes>();
-            CreateMap<Station, StationSimpleRes>();
+            
+            
+            
 
             ////Entity->Response DTO
             //    CreateMap<DispatchRequest, DispatchRes>()

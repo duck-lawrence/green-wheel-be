@@ -14,5 +14,6 @@ namespace Application.Dtos.StationFeedback.Request
         public Guid StationId { get; set; }
         public Guid CustomerId { get; set; }
         public string CustomerName { get; set; } = string.Empty;
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

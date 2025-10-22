@@ -64,8 +64,8 @@ namespace Application
                     VehicleId = id
                 }).ToList();
 
-            await _repository.AddAsync(entity);
-            return entity.Id;
+            var dispatchId = await _repository.AddAsync(entity);
+            return dispatchId;
         }
 
 
