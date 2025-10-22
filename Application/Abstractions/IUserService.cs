@@ -19,7 +19,7 @@ namespace Application.Abstractions
 
         Task<Guid> CreateAsync(CreateUserReq req);
 
-        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName);
 
         Task<User?> GetByIdAsync(Guid id);
 
