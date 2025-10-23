@@ -167,5 +167,32 @@ namespace Infrastructure.Repositories
                 total
             );
         }
+        public async Task<PageResult<RentalContract>> GetMyContractsAsync(Guid customerId, int? status, PaginationParams pagination)
+        {
+            var query = _dbContext.RentalContracts
+                .Include(rc => rc.Vehicle).ThenInclude(v => v.Model)
+                .Include(rc => rc.Station)
+                .Include(rc => rc.HandoverStaff).ThenInclude(s => s.User)
+                .Include(rc => rc.ReturnStaff).ThenInclude(s => s.User)
+                .Where(rc => rc.CustomerId == customerId);
+
+            if (status != null)
+                query = query.Where(rc => rc.Status == status);
+
+            var total = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(rc => rc.CreatedAt)
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return new PageResult<RentalContract>(
+                items,
+                pagination.PageNumber,
+                pagination.PageSize,
+                total
+            );
+        }
     }
 }

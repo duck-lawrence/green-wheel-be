@@ -135,13 +135,23 @@ namespace API.Controllers
             return Ok(returnInvoiceId);
         }
 
+        //[RoleAuthorize(RoleName.Customer)]
+        //[HttpGet("me")]
+        //public async Task<IActionResult> GetMyContracts([FromQuery] int? status)
+        //{
+        //    var user = HttpContext.User;
+        //    var rentalViews = await _rentalContractService.GetMyContracts(user, status);
+        //    return Ok(rentalViews);
+        //}
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyContracts([FromQuery] int? status)
+        public async Task<IActionResult> GetMyContracts(
+            [FromQuery] int? status,
+            [FromQuery] PaginationParams pagination)
         {
             var user = HttpContext.User;
-            var rentalViews = await _rentalContractService.GetMyContracts(user, status);
-            return Ok(rentalViews);
+            var result = await _rentalContractService.GetMyContractsByPagination(user, status, pagination);
+            return Ok(result);
         }
 
         [Authorize]

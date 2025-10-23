@@ -18,5 +18,6 @@ namespace Application.Repositories
         Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate);
         Task AddRangeAsync(IEnumerable<T> entities);
         void Remove(T entity);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes);
     }
 }

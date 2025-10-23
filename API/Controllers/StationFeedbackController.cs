@@ -19,7 +19,6 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [RoleAuthorize("Customer")]
         public async Task<IActionResult> Create([FromBody] StationFeedbackCreateReq req)
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -35,7 +34,6 @@ namespace API.Controllers
         }
 
         [HttpGet("me")]
-        [RoleAuthorize("Customer")]
         public async Task<IActionResult> GetMyFeedbacks()
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -44,7 +42,6 @@ namespace API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RoleAuthorize("Customer")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var customerId = Guid.Parse(User.FindFirst("sid")!.Value);

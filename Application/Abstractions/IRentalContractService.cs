@@ -19,11 +19,17 @@ namespace Application.Abstractions
          Task VerifyRentalContract(Guid id, bool haveVehicle = true, int? vehicleStatus = null);
         Task UpdateStatusAsync(Guid id);
         Task<RentalContractViewRes> GetByIdAsync(Guid id);
+
         //Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req);
+        Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination);
+
         Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req);
         Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
-        Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
+
+        //Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
+        Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(ClaimsPrincipal user,int? status,PaginationParams pagination);
+
         Task CancelRentalContract(Guid id);
-        Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination);
+        
     }
 }
