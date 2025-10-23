@@ -19,6 +19,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> Create([FromBody] StationFeedbackCreateReq req)
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);

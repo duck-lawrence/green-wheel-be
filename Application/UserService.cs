@@ -1,6 +1,8 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
@@ -50,13 +52,16 @@ namespace Application
             return user.Id;
         }
 
-        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
-            string? phone,
-            string? citizenIdNumber,
-            string? driverLicenseNumber)
+        public async Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
+            string? phone, 
+            string? citizenIdNumber, 
+            string? driverLicenseNumber, 
+            PaginationParams pagination)
         {
-            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
-            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users) ?? [];
+            var pageResult = await _userRepository.GetAllWithPaginationAsync(phone, citizenIdNumber, driverLicenseNumber, pagination);
+            var mapped = _mapper.Map<IEnumerable<UserProfileViewRes>>(pageResult.Items);
+
+            return new PageResult<UserProfileViewRes>(mapped, pageResult.PageNumber, pageResult.PageSize, pageResult.Total);
         }
 
         public async Task<User?> GetByIdAsync(Guid id)

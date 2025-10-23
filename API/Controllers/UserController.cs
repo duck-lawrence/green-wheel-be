@@ -26,13 +26,14 @@ namespace API.Controllers
             _userProfileService = userProfileSerivce;
         }
         [HttpGet]
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
-            [FromQuery] string? driverLicenseNumber)
+            [FromQuery] string? driverLicenseNumber,
+            [FromQuery] PaginationParams pagination)
         {
-            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            var users = await _userService.GetAllWithPaginationAsync(phone, citizenIdNumber, driverLicenseNumber, pagination);
             return Ok(users);
         }
 
