@@ -1,12 +1,15 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application
@@ -49,15 +52,21 @@ namespace Application
             await _userRepository.AddAsync(user);
             return user.Id;
         }
-
-        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
-            string? phone,
-            string? citizenIdNumber,
-            string? driverLicenseNumber,
-            string? roleName)
+        public async Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
+            string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName,
+            PaginationParams pagination)
         {
-            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
-            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users) ?? [];
+            var pageResult = await _userRepository.GetAllWithPaginationAsync(
+                phone, citizenIdNumber, driverLicenseNumber, roleName, pagination);
+
+            var mapped = _mapper.Map<IEnumerable<UserProfileViewRes>>(pageResult.Items);
+
+            return new PageResult<UserProfileViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
         }
 
         public async Task<UserProfileViewRes?> GetByIdAsync(Guid id)

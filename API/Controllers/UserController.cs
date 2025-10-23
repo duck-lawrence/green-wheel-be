@@ -37,18 +37,22 @@ namespace API.Controllers
         /// <param name="phone">Optional filter for the user's phone number.</param>
         /// <param name="citizenIdNumber">Optional filter for the user's citizen ID number.</param>
         /// <param name="driverLicenseNumber">Optional filter for the user's driver license number.</param>
+        /// <param name="roleName">Optional filter for the user's role name.</param>
+        /// <param name="pagination">Optional filter for the pagination.</param>
         /// <returns>List of users matching the specified filters.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No users found matching the given filters.</response>
         [HttpGet]
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
             [FromQuery] string? driverLicenseNumber,
-            [FromQuery] string? roleName)
+            [FromQuery] string? roleName,
+            [FromQuery] PaginationParams pagination)
         {
-            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
+            var users = await _userService.GetAllWithPaginationAsync(
+                phone, citizenIdNumber, driverLicenseNumber, roleName, pagination);
             return Ok(users);
         }
 
@@ -91,9 +95,7 @@ namespace API.Controllers
             throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
 
         }
-
         
-
         /// <summary>
         /// Creates a new user with the specified information.
         /// </summary>

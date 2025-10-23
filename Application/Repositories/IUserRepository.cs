@@ -1,6 +1,8 @@
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
+using Domain.Entities;
 using System;
 using System.Collections;
-using Domain.Entities;
 
 namespace Application.Repositories
 {
@@ -9,7 +11,10 @@ namespace Application.Repositories
         // added: Phương thức get role khi lấy user theo id (Phúc thêm)
         // Mục đích:  response /api/users/me trả về đầy đủ thông tin role,
         // giúp useAuth ở frontend biết chắc user có role “staff”.
-        Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName);
+        //Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+        Task<PageResult<User>> GetAllWithPaginationAsync(
+            string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName,
+            PaginationParams pagination);
 
         Task<User?> GetByIdWithFullInfoAsync(Guid id);
 
