@@ -2,6 +2,7 @@
 using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -104,10 +105,12 @@ namespace API.Controllers
         /// <response code="404">Rental contract not found.</response>
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllRentalContactReq req)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] GetAllRentalContactReq req,
+            [FromQuery] PaginationParams pagination)
         {
-            var contractViews = await _rentalContractService.GetAll(req);
-            return Ok(contractViews);
+            var result = await _rentalContractService.GetAllByPagination(req, pagination);
+            return Ok(result);
         }
 
         /// <summary>
@@ -154,11 +157,13 @@ namespace API.Controllers
         /// <response code="404">No rental contracts found for the customer.</response>
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyContracts([FromQuery] int? status)
+        public async Task<IActionResult> GetMyContracts(
+            [FromQuery] int? status,
+            [FromQuery] PaginationParams pagination)
         {
             var user = HttpContext.User;
-            var rentalViews = await _rentalContractService.GetMyContracts(user, status);
-            return Ok(rentalViews);
+            var result = await _rentalContractService.GetMyContractsByPagination(user, status, pagination);
+            return Ok(result);
         }
 
         /// <summary>

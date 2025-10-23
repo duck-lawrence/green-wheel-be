@@ -12,11 +12,10 @@ public partial class Station : SorfDeletedEntity, IEntity
 
     public string Address { get; set; } = null!;
 
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } 
 
-    public DateTimeOffset UpdatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; } 
 
-   
 
     public virtual ICollection<DispatchRequest> DispatchRequestFromStations { get; set; } = new List<DispatchRequest>();
 

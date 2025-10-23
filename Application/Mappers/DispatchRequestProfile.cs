@@ -1,6 +1,9 @@
 ﻿using Application.Constants;
 using Application.Dtos.Dispatch.Request;
 using Application.Dtos.Dispatch.Response;
+using Application.Dtos.Staff.Response;
+using Application.Dtos.Station.Respone;
+using Application.Dtos.Vehicle.Respone;
 using AutoMapper;
 using Domain.Entities;
 
@@ -13,26 +16,29 @@ namespace Application.Mappers
             CreateMap<CreateDispatchReq, DispatchRequest>()
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.FromStationId, opt => opt.MapFrom(src => src.FromStationId))
-                .ForMember(dest => dest.ToStationId, opt => opt.MapFrom(src => src.ToStationId))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(_ => (int)DispatchRequestStatus.Pending))
                 .ForAllOtherMembers(opt => opt.Ignore());
 
-            CreateMap<DispatchRequestStaff, DispatchRequestStaffRes>()
-                .ForMember(dest => dest.Staff, opt => opt.MapFrom(src => src.Staff));
-
-            CreateMap<DispatchRequestVehicle, DispatchRequestVehicleRes>()
-                .ForMember(dest => dest.Vehicle, opt => opt.MapFrom(src => src.Vehicle));
-            CreateMap<UpdateDispatchReq, DispatchRequest>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (int)src.Status))
-                .ForAllOtherMembers(opt => opt.Ignore());
+            // Entity -> Res
             CreateMap<DispatchRequest, DispatchRes>()
                 .ForMember(dest => dest.FromStationName, opt => opt.MapFrom(src => src.FromStation.Name))
                 .ForMember(dest => dest.ToStationName, opt => opt.MapFrom(src => src.ToStation.Name))
-                .ForMember(dest => dest.RequestAdminName, opt => opt.MapFrom(src => src.RequestAdmin.User.FirstName + " " + src.RequestAdmin.User.LastName))
-                .ForMember(dest => dest.StaffNames, opt => opt.MapFrom(src => src.DispatchRequestStaffs.Select(s => s.Staff.User.FirstName + " " + s.Staff.User.LastName)))
-                .ForMember(dest => dest.VehiclePlates, opt => opt.MapFrom(src => src.DispatchRequestVehicles.Select(v => v.Vehicle.LicensePlate)))
-                .ForAllOtherMembers(opt => opt.MapAtRuntime());
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (DispatchRequestStatus)src.Status))
+                .ForMember(dest => dest.RequestAdminName,
+                    opt => opt.MapFrom(src => src.RequestAdmin.User.FirstName + " " + src.RequestAdmin.User.LastName))
+                .ForMember(dest => dest.ApprovedAdminName,
+                    opt => opt.MapFrom(src => src.ApprovedAdmin != null
+                        ? src.ApprovedAdmin.User.FirstName + " " + src.ApprovedAdmin.User.LastName
+                        : null));
 
+
+            // Staffs + Vehicles
+            CreateMap<DispatchRequestStaff, DispatchRequestStaffRes>();
+            CreateMap<DispatchRequestVehicle, DispatchRequestVehicleRes>();
+
+            
+            
+            
 
             ////Entity->Response DTO
             //    CreateMap<DispatchRequest, DispatchRes>()

@@ -6,10 +6,7 @@ namespace Application.Dtos.Dispatch.Request
     {
         public string? Description { get; set; }
         public Guid FromStationId { get; set; }
-        public Guid ToStationId { get; set; }
         public Guid[]? StaffIds { get; set; }
         public Guid[]? VehicleIds { get; set; }
     }
-
-    
-}
+} 

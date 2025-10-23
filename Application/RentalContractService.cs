@@ -2,6 +2,8 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
@@ -166,19 +168,20 @@ namespace Application
             }
         }
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
-        {
-            var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
-                req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
-        }
+        //public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
+        //{
+        //    var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
+        //        req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
+        //    return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status)
-        {
-            var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
-            var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? [];
-        }
+        //}
+
+        //public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status)
+        //{
+        //    var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+        //    var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
+        //    return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? [];
+        //}
 
         public async Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
         {
@@ -472,5 +475,45 @@ namespace Application
             await _emailService.SendEmailAsync(customer.Email, subject, body);
             await _uow.SaveChangesAsync();
         }
+
+        public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination)
+        {
+            var pageResult = await _uow.RentalContractRepository.GetAllByPaginationAsync(
+                req.Status,
+                req.Phone,
+                req.CitizenIdentityNumber,
+                req.DriverLicenseNumber,
+                req.StationId,
+                pagination);
+
+            var mapped = _mapper.Map<IEnumerable<RentalContractViewRes>>(pageResult.Items);
+
+            return new PageResult<RentalContractViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
+        }
+        public async Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(
+            ClaimsPrincipal user, 
+            int? status, 
+            PaginationParams pagination)
+        {
+            var customerId = Guid.Parse(user.FindFirstValue(JwtRegisteredClaimNames.Sid)!);
+
+            var result = await _uow.RentalContractRepository
+                .GetMyContractsAsync(customerId, status, pagination);
+
+            var mapped = _mapper.Map<IEnumerable<RentalContractViewRes>>(result.Items);
+
+            return new PageResult<RentalContractViewRes>(
+                mapped,
+                result.PageNumber,
+                result.PageSize,
+                result.Total
+            );
+        }
+
     }
 }

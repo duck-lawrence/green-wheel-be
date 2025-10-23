@@ -14,6 +14,7 @@ namespace Application.Mappers
         public StationProfile()
         {
             CreateMap<Station, StationViewRes>();
+            CreateMap<Station, StationSimpleRes>();
         }
     }
 }

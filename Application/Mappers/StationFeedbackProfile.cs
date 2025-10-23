@@ -13,8 +13,11 @@ namespace Application.Mappers
     {
         public StationFeedbackProfile()
         {
-            CreateMap<StationFeedback, StationFeedbackRes>().ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.FirstName));
-            CreateMap<StationFeedbackCreateReq, StationFeedback>();
+            CreateMap<StationFeedback, StationFeedbackRes>()
+            .ForMember(dest => dest.CustomerName,
+                       opt => opt.MapFrom(src => src.Customer.FirstName + " " + src.Customer.LastName))
+            .ForMember(dest => dest.AvatarUrl,
+                       opt => opt.MapFrom(src => src.Customer.AvatarUrl));
         }
     }
 }

@@ -28,10 +28,15 @@ namespace Application
         public async Task<Guid> CreateAsync(Guid adminId, CreateDispatchReq req)
         {
             if (req is null)
-                throw new BadRequestException("Request body cannot be null.");
+                throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
 
-            // Không cho cùng trạm
-            DispatchValidationHelper.EnsureDifferentStations(req.FromStationId, req.ToStationId);
+            // Lấy thông tin staff của admin gửi yêu cầu
+            var adminStaff = await _staffRepository.GetByUserIdAsync(adminId)
+                ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+
+            var toStationId = adminStaff.StationId; 
+
+            DispatchValidationHelper.EnsureDifferentStations(req.FromStationId, toStationId);
 
             await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.StaffIds, req.FromStationId);
             await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.VehicleIds, req.FromStationId);
@@ -39,6 +44,8 @@ namespace Application
             var entity = _mapper.Map<DispatchRequest>(req);
             entity.Id = Guid.NewGuid();
             entity.RequestAdminId = adminId;
+            entity.FromStationId = req.FromStationId;
+            entity.ToStationId = toStationId;
             entity.Status = (int)DispatchRequestStatus.Pending;
             entity.CreatedAt = DateTimeOffset.UtcNow;
             entity.UpdatedAt = entity.CreatedAt;
@@ -57,9 +64,10 @@ namespace Application
                     VehicleId = id
                 }).ToList();
 
-            await _repository.AddAsync(entity);
-            return entity.Id;
+            var dispatchId = await _repository.AddAsync(entity);
+            return dispatchId;
         }
+
 
         public async Task<IEnumerable<DispatchRes>> GetAllAsync(Guid? fromStationId, Guid? toStationId, DispatchRequestStatus? status)
         {
