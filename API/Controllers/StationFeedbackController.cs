@@ -28,6 +28,7 @@ namespace API.Controllers
         /// <response code="404">Station not found.</response>
         /// <response code="404">Station not found.</response>
         [HttpPost]
+        [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> Create([FromBody] StationFeedbackCreateReq req)
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);

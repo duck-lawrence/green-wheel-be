@@ -1,6 +1,8 @@
 ﻿using Application.Constants;
 using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.CitizenIdentity.Response;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.Staff.Request;
@@ -19,7 +21,10 @@ namespace Application.Abstractions
 
         Task<Guid> CreateAsync(CreateUserReq req);
 
-        Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName);
+        //Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+        Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
+    string? phone, string? citizenIdNumber, string? driverLicenseNumber, PaginationParams pagination);
+
 
         Task<UserProfileViewRes?> GetByIdAsync(Guid id);
 

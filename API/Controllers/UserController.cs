@@ -41,14 +41,14 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="404">No users found matching the given filters.</response>
         [HttpGet]
-        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        [RoleAuthorize(RoleName.Admin, RoleName.Staff)]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? phone,
             [FromQuery] string? citizenIdNumber,
             [FromQuery] string? driverLicenseNumber,
-            [FromQuery] string? roleName)
+            [FromQuery] PaginationParams pagination)
         {
-            var users = await _userService.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
+            var users = await _userService.GetAllWithPaginationAsync(phone, citizenIdNumber, driverLicenseNumber, pagination);
             return Ok(users);
         }
 
