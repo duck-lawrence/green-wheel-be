@@ -2,7 +2,7 @@
 
 namespace Application.UnitOfWorks
 {
-    public interface IRentalContractUow : IDisposable
+    public interface IRentalContractUow : IUnitOfwork
     {
         IVehicleRepository VehicleRepository { get; }
         IVehicleModelRepository VehicleModelRepository { get; }

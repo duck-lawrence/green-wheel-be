@@ -53,15 +53,17 @@ namespace Application
         public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
             string? phone,
             string? citizenIdNumber,
-            string? driverLicenseNumber)
+            string? driverLicenseNumber,
+            string? roleName)
         {
-            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber);
+            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
             return _mapper.Map<IEnumerable<UserProfileViewRes>>(users) ?? [];
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
+        public async Task<UserProfileViewRes?> GetByIdAsync(Guid id)
         {
-            return await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
+            return _mapper.Map<UserProfileViewRes>(user);
         }
 
         public async Task<UserProfileViewRes> GetByPhoneAsync(string phone)
@@ -69,7 +71,7 @@ namespace Application
             var user = await _userRepository.GetByPhoneAsync(phone);
             if (user == null)
             {
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.NotFound);
             }
             var userViewRes = _mapper.Map<UserProfileViewRes>(user);
             return userViewRes;
@@ -116,7 +118,7 @@ namespace Application
 
             var roles = _cache.Get<List<Role>>("AllRoles");
             var staffRole = roles.FirstOrDefault(r => r.Name.Equals("Staff", StringComparison.OrdinalIgnoreCase))
-                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+                ?? throw new NotFoundException(Message.UserMessage.AvatarNotFound);
 
             var user = _mapper.Map<User>(req);
             user.RoleId = staffRole.Id;

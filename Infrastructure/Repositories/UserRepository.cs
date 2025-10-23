@@ -2,7 +2,9 @@ using Application.Constants;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using System.Numerics;
 
 namespace Infrastructure.Repositories
@@ -18,7 +20,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber)
+        public async Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName)
         {
             var query = _dbContext.Users
                 .Include(user => user.Role)
@@ -37,7 +39,8 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
                 query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
-
+            if (!string.IsNullOrEmpty(roleName))
+                query = query.Where(u => u.Role.Name.ToLower().Contains(roleName));
             return await query.ToListAsync();
         }
 
@@ -58,8 +61,16 @@ namespace Infrastructure.Repositories
             if (stationId != null)
                 query = query.Where(u => u.Staff.StationId == stationId);
             return await query.ToListAsync();
-        } 
+        }
 
+        public override async Task<User?> GetByIdAsync(Guid id)
+        {
+            var user = await _dbContext.Users.Where(u => u.Id == id)
+               .Include(user => user.Role)
+               .Include(user => user.DriverLicense)
+               .Include(user => user.CitizenIdentity).FirstOrDefaultAsync();
+            return user;
+        }
         public async Task<User?> GetByPhoneAsync(string phone)
         {
             var user = await _dbContext.Users

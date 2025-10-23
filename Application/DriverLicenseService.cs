@@ -53,7 +53,7 @@ namespace Application
         {
             var existing = await _licenseRepo.GetByUserIdAsync(userId);
             if (existing == null)
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.NotFound);
 
             await _licenseRepo.DeleteAsync(existing.Id);
             await _photoService.DeletePhotoAsync(publicId);
@@ -64,7 +64,7 @@ namespace Application
         {
             var existing = await _licenseRepo.GetByIdAsync(license.Id);
             if (existing == null)
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.NotFound);
             if (!Enum.IsDefined(typeof(LicenseClass), license.Class))
                 throw new BadHttpRequestException(Message.UserMessage.InvalidDriverLicenseData);
             license.UpdatedAt = DateTimeOffset.UtcNow;

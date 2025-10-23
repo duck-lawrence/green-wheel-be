@@ -9,7 +9,7 @@ namespace Application.Repositories
         // added: Phương thức get role khi lấy user theo id (Phúc thêm)
         // Mục đích:  response /api/users/me trả về đầy đủ thông tin role,
         // giúp useAuth ở frontend biết chắc user có role “staff”.
-        Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
+        Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName);
 
         Task<User?> GetByIdWithFullInfoAsync(Guid id);
 

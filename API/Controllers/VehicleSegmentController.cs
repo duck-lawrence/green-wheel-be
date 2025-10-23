@@ -16,11 +16,12 @@ namespace API.Controllers
             _vehicleSegmentSerivce = vehicleSegmentSerivce;
         }
 
-        /*
-         * Status code
-         * 200: success
-         * 404: not found
-         */
+        /// <summary>
+        /// Retrieves all vehicle segments available in the system.
+        /// </summary>
+        /// <returns>List of vehicle segments.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">No vehicle segments found.</response>
         [HttpGet]
         public async Task<IActionResult> GetAllVehicleSegment()
         {

@@ -23,12 +23,15 @@ namespace API.Controllers
             _modelImageService = modelImageService;
         }
 
-        /*
-         401: unauthorized
-         403: not have permission
-         --400: invalid type
-         200: success
-         */
+        /// <summary>
+        /// Creates a new vehicle model (admin only).
+        /// </summary>
+        /// <param name="createVehicleModelReq">Request containing vehicle model details such as name, brand, segment, and specifications.</param>
+        /// <returns>The unique identifier of the created vehicle model.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid vehicle model data or type.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="403">Forbidden — user does not have permission to perform this action.</response>
 
         [RoleAuthorize(RoleName.Admin)]
         [HttpPost]
@@ -41,13 +44,17 @@ namespace API.Controllers
             });
         }
 
-        /*
-         401: unauthorized
-         403: not have permission
-         200: success
-         --400: invalid type
-         404: not found
-         */
+        /// <summary>
+        /// Updates an existing vehicle model by its unique identifier (admin only).
+        /// </summary>
+        /// <param name="id">The unique identifier of the vehicle model to update.</param>
+        /// <param name="updateVehicleModelReq">Request containing updated vehicle model details such as name, specifications, or type.</param>
+        /// <returns>Success message if the vehicle model is updated successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid vehicle model data or type.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="403">Forbidden — user does not have permission to perform this action.</response>
+        /// <response code="404">Vehicle model not found.</response>
 
         [RoleAuthorize(RoleName.Admin)]
         [HttpPatch("{id}")]
@@ -57,9 +64,12 @@ namespace API.Controllers
             return Ok();
         }
 
-        /*
-         200: success
-         */
+        /// <summary>
+        /// Searches for vehicle models based on the provided filter criteria.
+        /// </summary>
+        /// <param name="vehicleFilterReq">Request containing filter parameters such as brand, segment, price range, or capacity.</param>
+        /// <returns>List of vehicle models matching the filter criteria.</returns>
+        /// <response code="200">Success.</response>
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchVehicleModel([FromQuery] VehicleFilterReq vehicleFilterReq)
@@ -68,9 +78,13 @@ namespace API.Controllers
             return Ok(verhicelModelView);
         }
 
-        /*
-         200: success
-         */
+        /// <summary>
+    /// Retrieves all vehicle models with optional filters for name and segment.
+    /// </summary>
+    /// <param name="name">Optional filter for the vehicle model name.</param>
+    /// <param name="segmentId">Optional filter for the vehicle segment identifier.</param>
+    /// <returns>List of vehicle models matching the specified filters.</returns>
+    /// <response code="200">Success.</response>
 
         [HttpGet]
         public async Task<IActionResult> GetAll(string? name, Guid? segmentId)
@@ -79,10 +93,17 @@ namespace API.Controllers
             return Ok(verhicelModelView);
         }
 
-        /*
-         200: success
-         404: not found
-         */
+        /// <summary>
+        /// Retrieves detailed information of a specific vehicle model by its unique identifier,
+        /// including availability data for a given station and rental period.
+        /// </summary>
+        /// <param name="id">The unique identifier of the vehicle model.</param>
+        /// <param name="stationId">The unique identifier of the station where the vehicle is located.</param>
+        /// <param name="startDate">The start date of the desired rental period.</param>
+        /// <param name="endDate">The end date of the desired rental period.</param>
+        /// <returns>Detailed vehicle model information with availability data.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Vehicle model not found.</response>
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVehicelModelById([FromRoute] Guid id, Guid stationId,
@@ -92,12 +113,15 @@ namespace API.Controllers
             return Ok(verhicelModelView);
         }
 
-        /*
-         401: unauthorized
-         403: not have permission
-         404: vehicle model not found
-         200: success
-         */
+        /// <summary>
+        /// Deletes a vehicle model by its unique identifier (admin only).
+        /// </summary>
+        /// <param name="id">The unique identifier of the vehicle model to delete.</param>
+        /// <returns>Success message if the vehicle model is deleted successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="403">Forbidden — user does not have permission to perform this action.</response>
+        /// <response code="404">Vehicle model not found.</response>
 
         [RoleAuthorize(RoleName.Admin)]
         [HttpDelete("{id}")]
@@ -108,7 +132,15 @@ namespace API.Controllers
         }
 
         // ---------- SUB-IMAGES (gallery) ----------
-
+        /// <summary>
+        /// Uploads multiple sub-images for a specific vehicle model.
+        /// </summary>
+        /// <param name="modelId">The unique identifier of the vehicle model to which the images belong.</param>
+        /// <param name="req">Request containing one or more image files to upload.</param>
+        /// <returns>List of uploaded image URLs with a success message.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid file format or upload error.</response>
+        /// <response code="404">Vehicle model not found.</response>
         [HttpPost("sub-images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -118,6 +150,15 @@ namespace API.Controllers
             return Ok(new { data = res, message = Message.CloudinaryMessage.UploadSuccess });
         }
 
+        /// <summary>
+        /// Deletes one or more sub-images of a specific vehicle model.
+        /// </summary>
+        /// <param name="modelId">The unique identifier of the vehicle model whose images will be deleted.</param>
+        /// <param name="req">Request containing the list of image identifiers to delete.</param>
+        /// <returns>Success message if the images are deleted successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid request data or image IDs.</response>
+        /// <response code="404">Vehicle model or images not found.</response>
         [HttpDelete("sub-images")]
         [Consumes("application/json")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -128,7 +169,15 @@ namespace API.Controllers
         }
 
         // ---------- MAIN IMAGE ----------
-
+        /// <summary>
+        /// Uploads the main image for a specific vehicle model.
+        /// </summary>
+        /// <param name="modelId">The unique identifier of the vehicle model.</param>
+        /// <param name="file">The image file to be uploaded as the main image.</param>
+        /// <returns>The uploaded main image URL along with a success message.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid file format or upload error.</response>
+        /// <response code="404">Vehicle model not found.</response>
         [HttpPost("main-image")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -138,6 +187,13 @@ namespace API.Controllers
             return Ok(new { data = new { modelId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
         }
 
+        /// <summary>
+        /// Deletes the main image of a specific vehicle model.
+        /// </summary>
+        /// <param name="modelId">The unique identifier of the vehicle model whose main image will be deleted.</param>
+        /// <returns>Success message if the main image is deleted successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">Vehicle model or main image not found.</response>
         [HttpDelete("main-image")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
@@ -147,6 +203,15 @@ namespace API.Controllers
         }
 
         // ---------- MAIN + GALLERY ----------
+        /// <summary>
+        /// Uploads both the main image and gallery images for a specific vehicle model.
+        /// </summary>
+        /// <param name="modelId">The unique identifier of the vehicle model.</param>
+        /// <param name="req">Request containing one or more image files to upload.</param>
+        /// <returns>The uploaded main image and gallery image URLs with a success message.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid file format or upload error.</response>
+        /// <response code="404">Vehicle model not found.</response>
         [HttpPost("images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
