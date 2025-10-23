@@ -254,7 +254,7 @@ namespace API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
-            app.UseMiddleware<RateLimitMiddleware>();
+            // app.UseMiddleware<RateLimitMiddleware>();
             //app.UseHttpsRedirection();
 
             app.UseAuthentication();

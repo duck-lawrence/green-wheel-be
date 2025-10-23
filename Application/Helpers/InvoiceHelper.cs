@@ -31,7 +31,7 @@ namespace Application.Helpers
             { 
                 var refund = invoice.InvoiceItems.Where(it => it.Type == (int)InvoiceItemType.Refund).FirstOrDefault();  
                 total -= _CalculateSubTotalAmount([refund]);
-                if (total < 0 && Math.Abs(invoice.Subtotal) < refund.Quantity * refund.UnitPrice)
+                if (total < 0 && Math.Abs(total) < refund.Quantity * refund.UnitPrice)
                 {
                     total = 0;
                 }

@@ -69,7 +69,7 @@ namespace Application
             await _staffRepository.AddAsync(staff);
             return user.Id;
         }
-        
+
         public async Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
             string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName,
             PaginationParams pagination)
