@@ -40,7 +40,7 @@ namespace Infrastructure.Repositories
             if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
                 query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
             if (!string.IsNullOrEmpty(roleName))
-                query = query.Where(u => u.Role.Name.ToLower().Contains(roleName));
+                query = query.Where(u => u.Role.Name.ToLower().Contains(roleName.ToLower()));
             return await query.ToListAsync();
         }
 
