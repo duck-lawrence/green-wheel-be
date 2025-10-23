@@ -24,13 +24,14 @@ namespace API.Controllers
             _userProfileService = userProfileService;
         }
 
-        /*
-         Status code:
-         200: Login successfully
-         401: Invalid email or password
-         400: Incorrect form of email, email is empty, password < 6 character, password empty
-         */
-
+        /// <summary>
+        /// Authenticates a user and returns an access token if the credentials are valid.
+        /// </summary>
+        /// <param name="user">User login request containing email and password.</param>
+        /// <returns>Access token if login is successful.</returns>
+        /// <response code="200">Login successfully.</response>
+        /// <response code="400">Invalid input format (email/password).</response>
+        /// <response code="401">Invalid email or password.</response>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] UserLoginReq user)
         {
@@ -41,11 +42,12 @@ namespace API.Controllers
             });
         }
 
-        /*
-         Status code
-         200: logout successfully
-         401: Invalid refresh token
-         */
+        /// <summary>
+        /// Logs out the user by invalidating the refresh token.
+        /// </summary>
+        /// <returns>Logout success message if operation is successful.</returns>
+        /// <response code="200">Logout successfully.</response>
+        /// <response code="401">Invalid or expired refresh token.</response>
 
         [Authorize]
         [HttpPost("logout")]
@@ -59,12 +61,14 @@ namespace API.Controllers
             throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
-        /*
-         Status code:
-         200: send email successfully
-         400: incorrect form of email
-         429: send to much request per minutes
-         */
+        /// <summary>
+        /// Sends a verification email to the specified address.
+        /// </summary>
+        /// <param name="request">Email request containing recipient address and other required data.</param>
+        /// <returns>Success message if the email is sent successfully.</returns>
+        /// <response code="200">Send email successfully.</response>
+        /// <response code="400">Incorrect form of email.</response>
+        /// <response code="429">Too many requests per minute.</response>
 
         [HttpPost("register")]
         public async Task<IActionResult> RegisterSendOtp([FromBody] SendEmailReq email)
@@ -74,12 +78,14 @@ namespace API.Controllers
             return Ok();
         }
 
-        /*
-         Status code:
-         200: verify email successfully
-         401: incorrect OTP or this email not have otp, or send to much request
-         400: inccorect from of email or otp is not digit
-         */
+        /// <summary>
+        /// Verifies the OTP code sent to the user's email address.
+        /// </summary>
+        /// <param name="request">Verification request containing email and OTP code.</param>
+        /// <returns>Success message if the email is verified successfully.</returns>
+        /// <response code="200">Verify email successfully.</response>
+        /// <response code="400">Incorrect form of email or OTP is not a valid digit.</response>
+        /// <response code="401">Incorrect OTP, email has no OTP, or too many requests.</response>
 
         [HttpPost("register/verify-otp")]
         public async Task<IActionResult> RegisterVerifyOtp([FromBody] VerifyOTPReq verifyOTPDto)
@@ -88,13 +94,15 @@ namespace API.Controllers
             return Ok();
         }
 
-        /*
-         Status code:
-         400: incorrect form of user info
-         401: invalid token
-         409: email is exists
-         200: register successfully
-         */
+        /// <summary>
+        /// Registers a new user with provided information.
+        /// </summary>
+        /// <param name="request">User registration request containing email, password, and other user details.</param>
+        /// <returns>Success message if the user is registered successfully.</returns>
+        /// <response code="200">Register successfully.</response>
+        /// <response code="400">Incorrect form of user information.</response>
+        /// <response code="401">Invalid or missing token.</response>
+        /// <response code="409">Email already exists.</response>
 
         [HttpPost("register/complete")]
         public async Task<IActionResult> Register([FromBody] UserRegisterReq registerUserDto)
@@ -110,12 +118,14 @@ namespace API.Controllers
             throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
-        /*
-         status code:
-         400: pass is too short, empty password/oldpassword/confirmpassword, confirm password not match
-         401: invalid old password
-         200: change password successfully
-         */
+        /// <summary>
+        /// Changes the user's password after validating the old password.
+        /// </summary>
+        /// <param name="request">Request containing old password, new password, and confirm password.</param>
+        /// <returns>Success message if the password is changed successfully.</returns>
+        /// <response code="200">Change password successfully.</response>
+        /// <response code="400">Password too short, empty fields, or confirm password does not match.</response>
+        /// <response code="401">Invalid old password.</response>
 
         [HttpPut("change-password")]
         [Authorize]
@@ -130,12 +140,14 @@ namespace API.Controllers
             return Ok();
         }
 
-        /*
-         Status code:
-         200: send email successfully
-         400: incorrect form of email
-         429: send to much request per minute
-         */
+        /// <summary>
+        /// Sends a verification or notification email to the specified address.
+        /// </summary>
+        /// <param name="request">Email request containing recipient address and required information.</param>
+        /// <returns>Success message if the email is sent successfully.</returns>
+        /// <response code="200">Send email successfully.</response>
+        /// <response code="400">Incorrect form of email.</response>
+        /// <response code="429">Send too many requests per minute.</response>
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] SendEmailReq sendEmailRequestDto)
@@ -144,12 +156,14 @@ namespace API.Controllers
             return Ok();
         }
 
-        /*
-         Status code:
-         200: verify email successfully
-         401: incorrect OTP or this email not have otp, or send to much request
-         400: incorect from of email or otp is not digit
-         */
+        /// <summary>
+        /// Verifies the OTP code sent to the user's email address.
+        /// </summary>
+        /// <param name="request">Verification request containing email and OTP code.</param>
+        /// <returns>Success message if the email is verified successfully.</returns>
+        /// <response code="200">Verify email successfully.</response>
+        /// <response code="400">Incorrect form of email or OTP is not a valid digit.</response>
+        /// <response code="401">Incorrect OTP, email has no OTP, or too many requests.</response>
 
         [HttpPost("forgot-password/verify-otp")]
         public async Task<IActionResult> ForgotPasswordVerifyOTP([FromBody] VerifyOTPReq verifyOTPDto)
@@ -158,12 +172,14 @@ namespace API.Controllers
             return Ok();
         }
 
-        /*
-         status code:
-         400: password is too short / confirm password does not match
-         200: reset password successfully
-         401: invalid token
-         */
+        /// <summary>
+        /// Resets the user's password using the token stored in cookies.
+        /// </summary>
+        /// <param name="userChangePasswordDto">Request containing the new password and confirm password.</param>
+        /// <returns>Success message if the password is reset successfully.</returns>
+        /// <response code="200">Reset password successfully.</response>
+        /// <response code="400">Password is too short or confirm password does not match.</response>
+        /// <response code="401">Invalid or missing reset token.</response>
 
         [HttpPut("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] UserChangePasswordReq userChangePasswordDto)
@@ -176,12 +192,12 @@ namespace API.Controllers
             throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
-        /*
-         status code:
-         200: refresh token successfully
-         401: invalid token
-         */
-
+        /// <summary>
+        /// Generates a new access token using a valid refresh token from cookies.
+        /// </summary>
+        /// <returns>New access token if the refresh token is valid.</returns>
+        /// <response code="200">Refresh token successfully.</response>
+        /// <response code="401">Invalid or missing refresh token.</response>
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken()
         {
@@ -196,10 +212,13 @@ namespace API.Controllers
             throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
         }
 
-        /*
-         * Status code
-         * 
-         */
+        /// <summary>
+        /// Logs in or registers a user using Google account credentials.
+        /// </summary>
+        /// <param name="loginGoogleReqDto">Request containing Google credential token.</param>
+        /// <returns>Access token and user information if login is successful.</returns>
+        /// <response code="200">Login with Google successfully.</response>
+        /// <response code="401">Invalid Google credential.</response>
         [HttpPost("google")]
         public async Task<IActionResult> LoginWithGoogle([FromBody] LoginGoogleReq loginGoogleReqDto)
         {

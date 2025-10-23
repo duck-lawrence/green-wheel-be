@@ -17,7 +17,7 @@ namespace Application.Dtos.Momo.Request
         public string IpnUrl { get; set; } = "";
         public string RequestType { get; set; } = "payWithMethod";
         public string ExtraData { get; set; } = "";
-        public string OrderExpireTime { get; set; } = "30";
+        public int OrderExpireTime { get; set; } = 30;
         public string Lang { get; set; } = "en";
         public string Signature { get; set; } = "";
     }

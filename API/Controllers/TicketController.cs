@@ -24,7 +24,14 @@ namespace API.Controllers
         // ==========
 
         #region customer
-
+        /// <summary>
+        /// Creates a new support ticket for the authenticated user.
+        /// </summary>
+        /// <param name="req">Request containing ticket title, description, and related information.</param>
+        /// <returns>The unique identifier of the created ticket.</returns>
+        /// <response code="200">Success — ticket created.</response>
+        /// <response code="400">Invalid ticket data.</response>
+        /// <response code="404">Related entity not found (e.g., station or contract).</response>
         [HttpPost]
         [RoleAuthorize([RoleName.Admin, RoleName.Customer])]
         public async Task<IActionResult> Create([FromBody] CreateTicketReq req)
@@ -33,7 +40,12 @@ namespace API.Controllers
             var id = await _service.CreateAsync(userId, req);
             return Ok(new { Id = id });
         }
-
+        /// <summary>
+        /// Retrieves all support tickets created by the authenticated customer.
+        /// </summary>
+        /// <returns>List of tickets submitted by the current customer.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">No tickets found for the customer.</response>
         [HttpGet("me")]
         [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> GetMyTickets()
@@ -50,7 +62,13 @@ namespace API.Controllers
         // ===================
 
         #region management
-
+        /// <summary>
+        /// Retrieves all support tickets with pagination support (for admin and staff roles).
+        /// </summary>
+        /// <param name="pagination">Pagination parameters for page number and page size.</param>
+        /// <returns>List of support tickets with pagination metadata.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="404">No tickets found.</response>
         [HttpGet]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> GetAll([FromQuery] PaginationParams pagination)
@@ -59,6 +77,15 @@ namespace API.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Updates an existing support ticket with new information (for admin and staff roles).
+        /// </summary>
+        /// <param name="id">The unique identifier of the ticket to update.</param>
+        /// <param name="req">Request containing updated ticket details such as status, notes, or assigned staff.</param>
+        /// <returns>No content if the ticket is updated successfully.</returns>
+        /// <response code="204">Success — ticket updated.</response>
+        /// <response code="400">Invalid update data.</response>
+        /// <response code="404">Ticket not found.</response>
         [HttpPatch("{id}")]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTicketReq req)

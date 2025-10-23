@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Infrastructure.ApplicationDbContext
 {
-    public interface IGreenWheelDbContext
+    public interface IGreenWheelDbContext : IAsyncDisposable
     {
         DbSet<Brand> Brands { get; set; }
 

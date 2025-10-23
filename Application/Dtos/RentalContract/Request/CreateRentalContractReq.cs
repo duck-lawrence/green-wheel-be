@@ -13,5 +13,6 @@ namespace Application.Dtos.RentalContract.Request
         public DateTimeOffset StartDate { get; set; }
         public DateTimeOffset EndDate { get; set; }
         public Guid StationId { get; set; }
+        public string? Notes;
     }
 }

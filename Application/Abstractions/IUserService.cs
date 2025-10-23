@@ -22,10 +22,11 @@ namespace Application.Abstractions
         Task<Guid> CreateAsync(CreateUserReq req);
 
         //Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
-        Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, PaginationParams pagination);
+        Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
+    string? phone, string? citizenIdNumber, string? driverLicenseNumber, PaginationParams pagination);
 
 
-        Task<User?> GetByIdAsync(Guid id);
+        Task<UserProfileViewRes?> GetByIdAsync(Guid id);
 
         Task<UserProfileViewRes> GetByPhoneAsync(string phone);
 

@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.UnitOfWorks
 {
-    public class InvoiceUow : IInvoiceUow
+    public class InvoiceUow : UnitOfwork, IInvoiceUow
     {
-        private readonly IGreenWheelDbContext _context;
         public IMomoPaymentLinkRepository MomoPaymentLinkRepository { get ; set ; }
         public IInvoiceRepository InvoiceRepository { get ; set ; }
         public IInvoiceItemRepository InvoiceItemRepository { get; set; }
@@ -24,27 +23,14 @@ namespace Infrastructure.UnitOfWorks
             IInvoiceRepository invoiceRepository,
             IRentalContractRepository rentalContractRepository,
             IInvoiceItemRepository invoiceItemRepository,
-            IDepositRepository depositRepository)
+            IDepositRepository depositRepository) : base(context)
             {
-                _context = context;
                 MomoPaymentLinkRepository = momoPaymentLink;
                 InvoiceRepository = invoiceRepository;
                 RentalContractRepository = rentalContractRepository;
                 InvoiceItemRepository = invoiceItemRepository;
                 DepositRepository = depositRepository;
             }
-
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _context.SaveChangesAsync(cancellationToken);
-        }
-
-        public void Dispose()
-        {
-            if (_context is IDisposable disposable)
-            {
-                disposable.Dispose();
-            }
-        }
     }
 }
+

@@ -48,102 +48,131 @@ namespace Application
         }
         private async Task<Guid> CreateVehicleChecklistOutSideContract(Guid staffId, Guid vehicleId, int type)
         {
-           
-            var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync(vehicleId);
-            if (components == null)
+            await _uow.BeginTransactionAsync();
+            try
             {
-                throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
-            }
-            Guid checkListId = Guid.NewGuid(); 
-            var checklist = new VehicleChecklist()
-            {
-                Id = checkListId,
-                IsSignedByCustomer = false,
-                IsSignedByStaff = false,
-                StaffId = staffId,
-                VehicleId = vehicleId,
-                Type = type
-            };
-            await _uow.VehicleChecklistRepository.AddAsync(checklist);
-            var checklistItems = new List<VehicleChecklistItem>();
-            foreach (var component in components)
-            {
-                Guid checkListItemId = Guid.NewGuid();
-                checklistItems.Add(new VehicleChecklistItem()
+                var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync(vehicleId);
+                if (components == null)
                 {
-                    Id = checkListItemId,
-                    ComponentId = component.Id,
-                    Component = component,
-                    ChecklistId = checkListId
-                });
+                    throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
+                }
+                Guid checkListId = Guid.NewGuid();
+                var checklist = new VehicleChecklist()
+                {
+                    Id = checkListId,
+                    IsSignedByCustomer = false,
+                    IsSignedByStaff = false,
+                    StaffId = staffId,
+                    VehicleId = vehicleId,
+                    Type = type
+                };
+                await _uow.VehicleChecklistRepository.AddAsync(checklist);
+                var checklistItems = new List<VehicleChecklistItem>();
+                foreach (var component in components)
+                {
+                    Guid checkListItemId = Guid.NewGuid();
+                    checklistItems.Add(new VehicleChecklistItem()
+                    {
+                        Id = checkListItemId,
+                        ComponentId = component.Id,
+                        Component = component,
+                        ChecklistId = checkListId
+                    });
+                }
+                await _uow.VehicleChecklistItemRepository.AddRangeAsync(checklistItems);
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+                return checklist.Id;
+               
             }
-            await _uow.VehicleChecklistItemRepository.AddRangeAsync(checklistItems);
-            await _uow.SaveChangesAsync();
-            
-            return checklist.Id;
+            catch (Exception ex)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            } 
         }
 
         private async Task<Guid> CreateVehicleChecklistInSideContract(Guid staffId, Guid contractId, int type)
         {
-            var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) ??
+            await _uow.BeginTransactionAsync();
+            try
+            {
+                var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) ??
                 throw new NotFoundException(Message.RentalContractMessage.NotFound);
-            
-            var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId)
-            ?? throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
-            
-            Guid checkListId = Guid.NewGuid();
-            
-            var checklist = new VehicleChecklist()
-            {
-                Id = checkListId,
-                IsSignedByCustomer = false,
-                IsSignedByStaff = false,
-                StaffId = staffId,
-                CustomerId = contract.CustomerId,
-                VehicleId = (Guid)contract.VehicleId,
-                ContractId = contractId,
-                Type = type
-            };
-            await _uow.VehicleChecklistRepository.AddAsync(checklist);
-            var checklistItems = new List<VehicleChecklistItem>();
-            foreach (var component in components)
-            {
-                checklistItems.Add(new VehicleChecklistItem()
+
+                var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId)
+                ?? throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
+
+                Guid checkListId = Guid.NewGuid();
+
+                var checklist = new VehicleChecklist()
                 {
-                    ComponentId = component.Id,
-                    Component = component,
-                    ChecklistId = checkListId
-                });
+                    Id = checkListId,
+                    IsSignedByCustomer = false,
+                    IsSignedByStaff = false,
+                    StaffId = staffId,
+                    CustomerId = contract.CustomerId,
+                    VehicleId = (Guid)contract.VehicleId,
+                    ContractId = contractId,
+                    Type = type
+                };
+                await _uow.VehicleChecklistRepository.AddAsync(checklist);
+                var checklistItems = new List<VehicleChecklistItem>();
+                foreach (var component in components)
+                {
+                    checklistItems.Add(new VehicleChecklistItem()
+                    {
+                        ComponentId = component.Id,
+                        Component = component,
+                        ChecklistId = checkListId
+                    });
+                }
+                await _uow.VehicleChecklistItemRepository.AddRangeAsync(checklistItems);
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+                return checklist.Id;
             }
-            await _uow.VehicleChecklistItemRepository.AddRangeAsync(checklistItems);
-            await _uow.SaveChangesAsync();
-            return checklist.Id;
+            catch (Exception ex)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
         }
 
         
 
         public async Task UpdateAsync(UpdateVehicleChecklistReq req, Guid id)
         {
-
-            var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
-            if (checklist == null)
-                throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
-            if (checklist.IsSignedByCustomer && checklist.IsSignedByStaff)
-                throw new BusinessException(Message.VehicleChecklistMessage.ThisChecklistAlreadyProcess);
-            if(checklist.Type == (int)VehicleChecklistType.OutOfContract)
+            await _uow.BeginTransactionAsync();
+            try
             {
-                await UpdateVehicleChecklistOutSideContractAsync(checklist, req.ChecklistItems);
-            }
-            else
-            {
-                var contract = await _uow.RentalContractRepository.GetByChecklistIdAsync(id)
-                    ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
-                await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!);
-            }
-            checklist.IsSignedByStaff = req.IsSignedByStaff;
-            checklist.IsSignedByCustomer = req.IsSignedByCustomer;
+                var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
+                if (checklist == null)
+                    throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
+                if (checklist.IsSignedByCustomer && checklist.IsSignedByStaff)
+                    throw new BusinessException(Message.VehicleChecklistMessage.ThisChecklistAlreadyProcess);
+                if (checklist.Type == (int)VehicleChecklistType.OutOfContract)
+                {
+                    await UpdateVehicleChecklistOutSideContractAsync(checklist, req.ChecklistItems);
+                }
+                else
+                {
+                    var contract = await _uow.RentalContractRepository.GetByChecklistIdAsync(id)
+                        ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
+                    await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!);
+                }
+                checklist.IsSignedByStaff = req.IsSignedByStaff;
+                checklist.IsSignedByCustomer = req.IsSignedByCustomer;
 
-            await _uow.SaveChangesAsync();
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
+            
         }
 
         private async Task UpdateVehicleChecklistOutSideContractAsync(VehicleChecklist checklist, 

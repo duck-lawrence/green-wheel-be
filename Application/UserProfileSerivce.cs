@@ -67,7 +67,7 @@ namespace Application
             // Mục đích:  response /api/users/me trả về đầy đủ thông tin role,
             // giúp useAuth ở frontend biết chắc user có role “staff”.
             User? userFromDb = await _userRepository.GetByIdWithFullInfoAsync(userID)
-                ?? throw new NotFoundException(Message.UserMessage.UserNotFound);
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
             return _mapper.Map<UserProfileViewRes>(userFromDb);
         }
 
@@ -80,7 +80,7 @@ namespace Application
                     throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
             }
             User userFromDb = await _userRepository.GetByIdAsync(userId)
-                ?? throw new DirectoryNotFoundException(Message.UserMessage.UserNotFound);
+                ?? throw new DirectoryNotFoundException(Message.UserMessage.NotFound);
 
             if (req.FirstName != null) userFromDb.FirstName = req.FirstName;
             if (req.LastName != null) userFromDb.LastName = req.LastName;
@@ -104,7 +104,7 @@ namespace Application
 
             // 2. Lấy user và nhớ avatar cũ
             var user = await _mediaUow.Users.GetByIdAsync(userId)
-                ?? throw new KeyNotFoundException(Message.UserMessage.UserNotFound);
+                ?? throw new KeyNotFoundException(Message.UserMessage.NotFound);
             var oldPublicId = user.AvatarPublicId;
             var result = await _photoService.UploadPhotoAsync(uploadReq, $"users/{userId}");
 
@@ -143,10 +143,10 @@ namespace Application
         public async Task DeleteAvatarAsync(Guid userId)
         {
             var user = await _userRepository.GetByIdAsync(userId)
-                ?? throw new Exception(Message.UserMessage.UserNotFound);
+                ?? throw new Exception(Message.UserMessage.NotFound);
 
             if (string.IsNullOrEmpty(user.AvatarPublicId))
-                throw new Exception(Message.UserMessage.NotFound);
+                throw new Exception(Message.UserMessage.AvatarNotFound);
 
             await _photoService.DeletePhotoAsync(user.AvatarPublicId);
 

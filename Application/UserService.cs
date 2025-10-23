@@ -9,6 +9,7 @@ using Application.Dtos.User.Respone;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application
@@ -51,22 +52,28 @@ namespace Application
             await _userRepository.AddAsync(user);
             return user.Id;
         }
-
         public async Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
-            string? phone, 
-            string? citizenIdNumber, 
-            string? driverLicenseNumber, 
+            string? phone,
+            string? citizenIdNumber,
+            string? driverLicenseNumber,
             PaginationParams pagination)
         {
             var pageResult = await _userRepository.GetAllWithPaginationAsync(phone, citizenIdNumber, driverLicenseNumber, pagination);
+
             var mapped = _mapper.Map<IEnumerable<UserProfileViewRes>>(pageResult.Items);
 
-            return new PageResult<UserProfileViewRes>(mapped, pageResult.PageNumber, pageResult.PageSize, pageResult.Total);
+            return new PageResult<UserProfileViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
         }
 
-        public async Task<User?> GetByIdAsync(Guid id)
+        public async Task<UserProfileViewRes?> GetByIdAsync(Guid id)
         {
-            return await _userRepository.GetByIdAsync(id);
+            var user = await _userRepository.GetByIdAsync(id);
+            return _mapper.Map<UserProfileViewRes>(user);
         }
 
         public async Task<UserProfileViewRes> GetByPhoneAsync(string phone)
@@ -74,7 +81,7 @@ namespace Application
             var user = await _userRepository.GetByPhoneAsync(phone);
             if (user == null)
             {
-                throw new NotFoundException(Message.UserMessage.UserNotFound);
+                throw new NotFoundException(Message.UserMessage.NotFound);
             }
             var userViewRes = _mapper.Map<UserProfileViewRes>(user);
             return userViewRes;
@@ -121,7 +128,7 @@ namespace Application
 
             var roles = _cache.Get<List<Role>>("AllRoles");
             var staffRole = roles.FirstOrDefault(r => r.Name.Equals("Staff", StringComparison.OrdinalIgnoreCase))
-                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+                ?? throw new NotFoundException(Message.UserMessage.AvatarNotFound);
 
             var user = _mapper.Map<User>(req);
             user.RoleId = staffRole.Id;

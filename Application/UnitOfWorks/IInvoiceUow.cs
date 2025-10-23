@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.UnitOfWorks
 {
-    public interface IInvoiceUow : IDisposable
+    public interface IInvoiceUow : IUnitOfwork
     {
         IMomoPaymentLinkRepository MomoPaymentLinkRepository { get; set; }
         IInvoiceRepository InvoiceRepository { get; set; }

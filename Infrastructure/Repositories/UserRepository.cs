@@ -4,7 +4,9 @@ using Application.Dtos.Common.Response;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 using System.Numerics;
 
 namespace Infrastructure.Repositories
@@ -20,11 +22,9 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
+        //public async Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName);
         public async Task<PageResult<User>> GetAllWithPaginationAsync(
-            string? phone, 
-            string? citizenIdNumber, 
-            string? driverLicenseNumber, 
-            PaginationParams pagination)
+    string? phone, string? citizenIdNumber, string? driverLicenseNumber, PaginationParams pagination)
         {
             var query = _dbContext.Users
                 .Include(user => user.Role)
@@ -72,8 +72,16 @@ namespace Infrastructure.Repositories
             if (stationId != null)
                 query = query.Where(u => u.Staff.StationId == stationId);
             return await query.ToListAsync();
-        } 
+        }
 
+        public override async Task<User?> GetByIdAsync(Guid id)
+        {
+            var user = await _dbContext.Users.Where(u => u.Id == id)
+               .Include(user => user.Role)
+               .Include(user => user.DriverLicense)
+               .Include(user => user.CitizenIdentity).FirstOrDefaultAsync();
+            return user;
+        }
         public async Task<User?> GetByPhoneAsync(string phone)
         {
             var user = await _dbContext.Users
