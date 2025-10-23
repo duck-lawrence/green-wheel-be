@@ -31,6 +31,7 @@ namespace API.Controllers
             _userProfileService = userProfileSerivce;
             _cache = cache;
         }
+
         /// <summary>
         /// Retrieves all users with optional filters for phone number, citizen ID number, or driver license number.
         /// </summary>
@@ -93,9 +94,8 @@ namespace API.Controllers
                 return userFromDb.Role.Name == RoleName.Customer || userFromDb.Role.Name == RoleName.Staff ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission); ;
             }
             throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
-
         }
-        
+
         /// <summary>
         /// Creates a new user with the specified information.
         /// </summary>
@@ -111,6 +111,7 @@ namespace API.Controllers
             var userId = await _userService.CreateAsync(req);
             return Ok(new { userId });
         }
+
         /// <summary>
         /// Updates an existing user's information by their unique identifier.
         /// </summary>
@@ -147,6 +148,7 @@ namespace API.Controllers
             var citizenIdentity = await _userProfileService.UploadCitizenIdAsync(id, file);
             return Ok(citizenIdentity);
         }
+
         /// <summary>
         /// Uploads a driver license image for a specific user.
         /// </summary>
@@ -165,6 +167,7 @@ namespace API.Controllers
             var driverLisence = await _userProfileService.UploadDriverLicenseAsync(id, file);
             return Ok(driverLisence);
         }
+
         /// <summary>
         /// Updates the citizen identity information of a specific user.
         /// </summary>
@@ -182,6 +185,7 @@ namespace API.Controllers
             var result = await _userProfileService.UpdateCitizenIdentityAsync(id, req);
             return Ok(result);
         }
+
         /// <summary>
         /// Updates the driver license information of a specific user.
         /// </summary>
@@ -198,6 +202,7 @@ namespace API.Controllers
             var result = await _userProfileService.UpdateDriverLicenseAsync(id, req);
             return Ok(result);
         }
+
         /// <summary>
         /// Deletes the citizen identity information of a specific user.
         /// </summary>
@@ -212,6 +217,7 @@ namespace API.Controllers
             await _userProfileService.DeleteCitizenIdentityAsync(id);
             return Ok();
         }
+
         /// <summary>
         /// Deletes the driver license information of a specific user.
         /// </summary>
@@ -226,6 +232,7 @@ namespace API.Controllers
             await _userProfileService.DeleteDriverLicenseAsync(id);
             return Ok();
         }
+
         /// <summary>
         /// Deletes a user by their unique identifier (admin only).
         /// </summary>
@@ -241,21 +248,7 @@ namespace API.Controllers
             await _userService.DeleteCustomer(id);
             return Ok();
         }
-        /// <summary>
-        /// Creates a new staff account (admin only).
-        /// </summary>
-        /// <param name="req">Request containing staff information such as name, email, station assignment, and role.</param>
-        /// <returns>The unique identifier of the created staff member.</returns>
-        /// <response code="200">Success — staff created.</response>
-        /// <response code="400">Invalid staff data.</response>
-        /// <response code="409">A staff account with the same email already exists.</response>
-        [HttpPost("create-staff")]
-        [RoleAuthorize(RoleName.Admin)]
-        public async Task<IActionResult> CreateStaff([FromBody] CreateStaffReq req)
-        {
-            var staffId = await _userService.CreateStaffAsync(req);
-            return Ok(new { staffId });
-        }
+
         /*
          * Status code
          * 200 success

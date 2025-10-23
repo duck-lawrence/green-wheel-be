@@ -33,11 +33,9 @@ namespace Application.Abstractions
         Task<UserProfileViewRes> GetByCitizenIdentityAsync(string idNumber);
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
+        
         Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? stationId);
 
         Task DeleteCustomer(Guid id);
-        Task<Guid> CreateStaffAsync(CreateStaffReq req);
-
-
     }
 }

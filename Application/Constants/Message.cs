@@ -58,9 +58,13 @@
             public const string InvalidCitizenIdData = "user.invalid_citizen_identity_data";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
 
+            //Driver License
             public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
             public const string DriverLicenseNotFound = "user.driver_license_not_found";
             public const string DriverLicenseDuplicate = "user.driver_license_duplicate";
+
+            // Staff
+            public const string StationIdIsRequired = "user.station_id_require";
         }
 
         //Common error
