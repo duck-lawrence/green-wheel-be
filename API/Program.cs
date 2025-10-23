@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using AutoMapper;
 using Infrastructure.ExternalService;
+using API.Middlewares;
 
 namespace API
 {
@@ -138,6 +139,8 @@ namespace API
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
             var _jwtSetting = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
             builder.Services.AddJwtTokenValidation(_jwtSetting!);
+            //Ratelimit
+            builder.Services.Configure<RateLimitSettings>(builder.Configuration.GetSection("RateLimitSettings"));
             //Email
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
             //Otp
@@ -216,6 +219,7 @@ namespace API
                 app.UseSwaggerUI();
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
+            app.UseMiddleware<RateLimitMiddleware>();
             //app.UseHttpsRedirection();
 
             app.UseAuthentication();
