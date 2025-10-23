@@ -86,6 +86,7 @@ namespace Application
                     Id = contractId,
                     Description = $"This contract was created by the customer through the online booking system." +
                     $"\r\nThe vehicle will be reserved at {station.Name} from {createReq.StartDate} to {createReq.EndDate}. Customer rented the vehicle for {days} days.",
+                    Notes = createReq.Notes,
                     StartDate = createReq.StartDate,
                     ActualStartDate = null,
                     EndDate = createReq.EndDate,
