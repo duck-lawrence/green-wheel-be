@@ -55,16 +55,26 @@
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
+
             public const string InvalidCitizenIdData = "user.invalid_citizen_identity_data";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
 
             //Driver License
             public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
+
             public const string DriverLicenseNotFound = "user.driver_license_not_found";
             public const string DriverLicenseDuplicate = "user.driver_license_duplicate";
 
             // Staff
             public const string StationIdIsRequired = "user.station_id_require";
+
+            // Bank info
+            public const string BankNameIsRequired = "user.bank_name_require";
+
+            public const string BankAccountNumberIsRequired = "user.bank_account_number_require";
+            public const string InvalidBankAccountNumber = "user.invalid_bank_account_number";
+
+            public const string BankAccountNameIsRequired = "user.bank_account_name_require";
         }
 
         //Common error
@@ -179,6 +189,7 @@
 
             public static string ForbiddenInvoiceAccess = "invoice.forbidden_invoice_access";
         }
+
         public static class JsonMessage
         {
             public const string ParsingFailed = "json.parsing_failed";
@@ -234,6 +245,7 @@
 
             public static string ThisChecklistAlreadyProcess = "vehicle_checklist.already_process";
         }
+
         public static class VehicleChecklistItemMessage
         {
             public const string NotFound = "vehicle_checklist_item.not_found";
