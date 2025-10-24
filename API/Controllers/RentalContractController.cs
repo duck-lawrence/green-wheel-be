@@ -17,15 +17,14 @@ namespace API.Controllers
     [ApiController]
     public class RentalContractController : ControllerBase
     {
-
         private readonly IRentalContractService _rentalContractService;
-        
+
         public RentalContractController(IRentalContractService rentalContractService
             )
         {
             _rentalContractService = rentalContractService;
-            
         }
+
         /// <summary>
         /// Creates a new rental contract for the authenticated customer.
         /// </summary>
@@ -62,7 +61,7 @@ namespace API.Controllers
             await _rentalContractService.VerifyRentalContract(id, req);
             return Ok();
         }
-       
+
         /// <summary>
         /// Creates a new rental contract manually (offline) for a specific customer.
         /// </summary>
@@ -75,7 +74,7 @@ namespace API.Controllers
         [HttpPost("manual")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
-            var userId = req.CustomerId 
+            var userId = req.CustomerId
                 ?? throw new BadRequestException(Message.UserMessage.UserIdIsRequired);
             await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
             return Created();
@@ -84,7 +83,8 @@ namespace API.Controllers
         /// <summary>
         /// Retrieves all rental contracts with optional filtering and pagination.
         /// </summary>
-        /// <param name="req">Request containing filter and pagination parameters.</param>
+        /// <param name="req">Request containing filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of rental contracts that match the specified criteria.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
@@ -114,7 +114,6 @@ namespace API.Controllers
             var staff = HttpContext.User;
             await _rentalContractService.HandoverProcessRentalContractAsync(staff, id, req);
             return Ok();
-
         }
 
         /// <summary>
@@ -191,10 +190,10 @@ namespace API.Controllers
         /// <response code="404">Bad request — this contract cannot be canceled.</response>
         [RoleAuthorize(RoleName.Customer)]
         [HttpPut("{id}/cancel")]
-        public async Task<IActionResult> CancelRentalContract(Guid id) {
+        public async Task<IActionResult> CancelRentalContract(Guid id)
+        {
             await _rentalContractService.CancelRentalContract(id);
             return Ok();
         }
-        
     }
 }

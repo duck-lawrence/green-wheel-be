@@ -24,6 +24,7 @@ namespace API.Controllers
         // ==========
 
         #region customer
+
         /// <summary>
         /// Creates a new support ticket for the authenticated user.
         /// </summary>
@@ -40,18 +41,24 @@ namespace API.Controllers
             var id = await _service.CreateAsync(userId, req);
             return Ok(new { Id = id });
         }
+
         /// <summary>
         /// Retrieves all support tickets created by the authenticated customer.
         /// </summary>
+        /// <param name="status">Status filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of tickets submitted by the current customer.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No tickets found for the customer.</response>
         [HttpGet("me")]
-        [RoleAuthorize(RoleName.Customer)]
-        public async Task<IActionResult> GetMyTickets()
+        [RoleAuthorize([RoleName.Staff, RoleName.Customer])]
+        public async Task<IActionResult> GetMyTickets(
+            [FromQuery] int? status,
+            [FromQuery] PaginationParams pagination
+        )
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var data = await _service.GetByCustomerAsync(userId);
+            var data = await _service.GetByCustomerAsync(userId, status, pagination);
             return Ok(data);
         }
 
@@ -62,18 +69,23 @@ namespace API.Controllers
         // ===================
 
         #region management
+
         /// <summary>
         /// Retrieves all support tickets with pagination support (for admin and staff roles).
         /// </summary>
-        /// <param name="pagination">Pagination parameters for page number and page size.</param>
+        /// <param name="filter">Filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of support tickets with pagination metadata.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No tickets found.</response>
         [HttpGet]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        public async Task<IActionResult> GetAll([FromQuery] PaginationParams pagination)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] TicketFilterParams filter,
+            [FromQuery] PaginationParams pagination
+        )
         {
-            var data = await _service.GetAllAsync(pagination);
+            var data = await _service.GetAllAsync(filter, pagination);
             return Ok(data);
         }
 
@@ -92,7 +104,7 @@ namespace API.Controllers
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _service.UpdateAsync(id, req, staffId);
-            return NoContent();
+            return Ok();
         }
 
         #region escalated
@@ -103,7 +115,7 @@ namespace API.Controllers
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _service.EscalateToAdminAsync(id);
-            return NoContent();
+            return Ok();
         }
 
         [HttpGet("escalated")]
