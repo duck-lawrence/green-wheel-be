@@ -212,7 +212,7 @@ namespace Application
                     await _emailService.SendEmailAsync(customer.Email, subject, body);
                 }
                 await _uow.CommitAsync();
-            }catch(Exception ex)
+            }catch(Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -266,7 +266,7 @@ namespace Application
         private async Task CancleReservationInvoice(Invoice handoverInvoice)
         {
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(handoverInvoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
-            if (reservationInvoice.Status == (int)InvoiceStatus.Pending)
+            if (reservationInvoice!.Status == (int)InvoiceStatus.Pending)
             {
                 reservationInvoice.Status = (int)InvoiceStatus.Cancelled;
                 await _uow.InvoiceRepository.UpdateAsync(reservationInvoice);
@@ -333,7 +333,7 @@ namespace Application
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;

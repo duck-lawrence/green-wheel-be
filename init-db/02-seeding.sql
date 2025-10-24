@@ -10,7 +10,6 @@ VALUES
   ('Staff', 'Station staff'),
   ('Customer', 'Vehicle customer');
 GO
-
 -- ============================================
 -- STATIONS
 -- ============================================

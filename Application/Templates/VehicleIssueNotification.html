@@ -1,0 +1,53 @@
+﻿<div style="font-family:Segoe UI, Arial, sans-serif; font-size:16px; color:#1f2937; line-height:1.6; background-color:#f9fafb; padding:40px;">
+    <div style="max-width:600px; background-color:#ffffff; margin:auto; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.08); padding:36px 48px; color:black">
+
+        <h1 style="color:#00c63e; text-align:center; margin-top:0;">
+            GreenWheel
+        </h1>
+
+        <h2 style="color:#e11d48; font-size:24px; text-align:center; margin-bottom:24px;">
+            Vehicle Issue Detected in Your Booking
+        </h2>
+
+        <p style="font-size:16px; margin-bottom:20px;">
+            Dear <b>{CustomerName}</b>,
+        </p>
+
+        <p style="font-size:16px; margin-bottom:20px;">
+            We regret to inform you that your rental contract <b>#{ContractCode}</b> is currently facing an issue. 
+            The assigned vehicle <b>{VehicleName}</b> has been temporarily <b style="color:red;">unavailable</b> due to unexpected maintenance or repair needs.
+        </p>
+
+        <ul style="font-size:16px; line-height:1.7; list-style-type:none; padding-left:0; background-color:#f3f4f6; border-radius:10px; padding:16px; margin-bottom:20px;">
+            <li style="margin-bottom:4px; color:black;"><b>Vehicle:</b> {VehicleName}</li>
+            <li style="margin-bottom:4px; color:black;"><b>Station:</b> {StationName}</li>
+            <li style="margin-bottom:4px; color:black;"><b>Rental Period:</b> {StartDate} → {EndDate}</li>
+        </ul>
+
+        <p style="font-size:15px; margin-bottom:20px;">
+            Please visit the link below to manage this issue or rebook another vehicle at your convenience.
+        </p>
+
+        <!-- CTA Button -->
+        <div style="text-align:center;">
+            <a href="{ResolveLink}"
+               style="display:inline-block; margin-top:20px; background-color:#00c63e; color:#ffffff; text-decoration:none;
+               padding:14px 32px; border-radius:8px; font-size:15px; font-weight:600;">
+                Resolve Booking Issue
+            </a>
+        </div>
+
+        <p style="font-size:16px; color:#1f2937; margin-top:32px;">
+            We sincerely apologize for the inconvenience and appreciate your understanding.
+        </p>
+
+        <p style="font-size:16px; color:#1f2937; margin-top:20px;">
+            Best regards,<br />
+            <b>The Hycat Team</b>
+        </p>
+
+        <p style="font-size:14px; color:#6b7280; text-align:center; margin-top:24px;">
+            This is an automated notification email. Please do not reply directly.
+        </p>
+    </div>
+</div>

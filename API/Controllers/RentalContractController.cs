@@ -7,24 +7,24 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 
 namespace API.Controllers
 {
+    /// <summary>
+    ///This controller handle for rental contract.
+    /// </summary>
     [Route("api/rental-contracts")]
     [ApiController]
-    public class RentalContractController : ControllerBase
+    public class RentalContractController(IRentalContractService rentalContractService,
+        IVehicleChecklistService vehicleChecklistService) : ControllerBase
     {
 
-        private readonly IRentalContractService _rentalContractService;
-        
-        public RentalContractController(IRentalContractService rentalContractService
-            )
-        {
-            _rentalContractService = rentalContractService;
-            
-        }
+        private readonly IRentalContractService _rentalContractService = rentalContractService;
+        private readonly IVehicleChecklistService _vehicleChecklistService = vehicleChecklistService;
+
         /// <summary>
         /// Creates a new rental contract for the authenticated customer.
         /// </summary>
@@ -205,6 +205,23 @@ namespace API.Controllers
             await _rentalContractService.CancelRentalContract(id);
             return Ok();
         }
+
+        [HttpPut("{id}/change-vehicle")]
+        [RoleAuthorize(RoleName.Staff)]
+        public async Task<IActionResult> ProcessChangeVehicle(Guid id)
+        {
+            await _rentalContractService.ChangeVehicleAsync(id);
+            return Ok();
+        }
+
+        [HttpPut("{id}/customer-confirm")]
+        [RoleAuthorize(RoleName.Customer)]
+        public async Task<IActionResult> ProcessCustomerConfirm(Guid id, int ResolutionOption)
+        {
+            await _rentalContractService.ProcessCustomerConfirm(id, ResolutionOption);
+            return Ok();
+        }
+
         
     }
 }

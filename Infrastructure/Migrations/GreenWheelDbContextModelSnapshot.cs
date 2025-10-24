@@ -1218,6 +1218,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("is_signed_by_staff");
 
+                    b.Property<DateTimeOffset?>("MaintainedUntil")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("maintained_until");
+
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("staff_id");

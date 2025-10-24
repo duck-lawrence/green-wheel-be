@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251021041214_update-invoice_")]
-    partial class updateinvoice_
+    [Migration("20251024084130_update-vehicle-checklist")]
+    partial class updatevehiclechecklist
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1220,6 +1220,10 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsSignedByStaff")
                         .HasColumnType("bit")
                         .HasColumnName("is_signed_by_staff");
+
+                    b.Property<DateTimeOffset?>("MaintainedUntil")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("maintained_until");
 
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier")
