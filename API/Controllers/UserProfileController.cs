@@ -20,6 +20,7 @@ namespace API.Controllers
         {
             _userProfileService = service;
         }
+
         /// <summary>
         /// Retrieves the profile information of the currently authenticated user.
         /// </summary>
@@ -35,6 +36,7 @@ namespace API.Controllers
             var userProfileViewRes = await _userProfileService.GetMeAsync(userClaims);
             return Ok(userProfileViewRes);
         }
+
         /// <summary>
         /// Updates the profile information of the currently authenticated user.
         /// </summary>
@@ -52,6 +54,39 @@ namespace API.Controllers
             await _userProfileService.UpdateAsync(userId, userUpdateReq);
             return Ok();
         }
+
+        /// <summary>
+        /// Updates the bank information of the currently authenticated user.
+        /// </summary>
+        /// <param name="req">Request containing updated bank information.</param>
+        /// <response code="200">Success.</response>
+        /// <response code="400">Invalid profile data.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="404">User not found.</response>
+        [HttpPut("bank-account")]
+        [Authorize]
+        public async Task<IActionResult> UpdateMyBankAccount([FromBody] UpdateBankAccountReq req)
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userProfileService.UpdateBankAccountAsync(userId, req);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Delete the bank information of the currently authenticated user.
+        /// </summary>
+        /// <response code="200">Success.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="404">User not found.</response>
+        [HttpDelete("bank-account")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMyBankAccount()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userProfileService.DeleteBankAccountAsync(userId);
+            return Ok();
+        }
+
         /// <summary>
         /// Uploads or updates the avatar image of the currently authenticated user.
         /// </summary>

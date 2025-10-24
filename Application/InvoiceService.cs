@@ -355,7 +355,7 @@ namespace Application
         {
             var invoice = await _uow.InvoiceRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
-            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($". {notes}"));
+            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($".\n {notes}"));
             await _uow.InvoiceRepository.UpdateAsync(invoice);
             await _uow.SaveChangesAsync();
         }

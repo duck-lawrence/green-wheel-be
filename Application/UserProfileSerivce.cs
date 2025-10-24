@@ -50,11 +50,9 @@ namespace Application
             _driverLicenseRepository = driverLicenseRepository;
         }
 
-
         // ===========================
         // Profile
         // ===========================
-
 
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
@@ -88,6 +86,30 @@ namespace Application
             if (req.DateOfBirth != null) userFromDb.DateOfBirth = req.DateOfBirth;
             if (req.Sex != null) userFromDb.Sex = req.Sex;
             if (!string.IsNullOrEmpty(req.AvatarUrl)) userFromDb.AvatarUrl = req.AvatarUrl;
+            await _userRepository.UpdateAsync(userFromDb);
+        }
+
+        public async Task UpdateBankAccountAsync(Guid userId, UpdateBankAccountReq req)
+        {
+            User userFromDb = await _userRepository.GetByIdAsync(userId)
+                ?? throw new DirectoryNotFoundException(Message.UserMessage.NotFound);
+
+            userFromDb.BankName = req.BankName;
+            userFromDb.BankAccountNumber = req.BankAccountNumber;
+            userFromDb.BankAccountName = req.BankAccountName;
+
+            await _userRepository.UpdateAsync(userFromDb);
+        }
+
+        public async Task DeleteBankAccountAsync(Guid userId)
+        {
+            User userFromDb = await _userRepository.GetByIdAsync(userId)
+                ?? throw new DirectoryNotFoundException(Message.UserMessage.NotFound);
+
+            userFromDb.BankName = null;
+            userFromDb.BankAccountNumber = null;
+            userFromDb.BankAccountName = null;
+
             await _userRepository.UpdateAsync(userFromDb);
         }
 

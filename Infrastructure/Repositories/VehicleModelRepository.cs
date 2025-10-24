@@ -50,6 +50,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Station)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
                 .AsQueryable();
             if (segmentId != null)
@@ -81,8 +82,8 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.RentalContracts)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
-                .AsQueryable()
                 .FirstOrDefaultAsync(vm => vm.Id == id && vm.DeletedAt == null);
 
             if (model == null) return null;
@@ -95,22 +96,19 @@ namespace Infrastructure.Repositories
         private bool CheckAvailableVehicle(Vehicle vehicle, Guid stationId, DateTimeOffset startBuffer, DateTimeOffset endBuffer)
         {
             return vehicle.StationId == stationId
-                    &&
-                    (vehicle.Status == (int)VehicleStatus.Available
-                    ||
-                    ((vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented)) &&
-                                                    vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
-                                                    !vehicle.RentalContracts.Any(rc =>
-                                                        rc.Status == (int)RentalContractStatus.Active &&
-                                                        startBuffer <= rc.EndDate &&
-                                                        endBuffer >= rc.StartDate
-                                                    )
-                                                     ||
-                                                (
-                                                (vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented) &&
-                                                !vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active)
-                                                ));
-
+                && (vehicle.Status == (int)VehicleStatus.Available
+                    || ((vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented)) 
+                    && vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active)
+                    && !vehicle.RentalContracts.Any(rc =>
+                        rc.Status == (int)RentalContractStatus.Active &&
+                        startBuffer <= rc.EndDate &&
+                        endBuffer >= rc.StartDate
+                    )
+                    || (
+                        (vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented) 
+                        && !vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active)
+                    )
+                );
         }
     }
 }

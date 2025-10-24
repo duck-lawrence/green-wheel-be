@@ -41,11 +41,17 @@ CREATE TABLE [users] (
     [email] varchar(255),
     [password] nvarchar(255),
     [phone] varchar(15),
-	[is_google_linked] bit NOT NULL DEFAULT 0,
+    
+    [bank_name] varchar(100),
+    [back_account_name] varchar(200),
+    [bank_account_number] varchar(64),
+
     [sex] int, -- Male, Female
     [date_of_birth] datetimeoffset,
+    
     [avatar_url] nvarchar(500),
     [avatar_public_id] nvarchar(255),
+	[is_google_linked] bit NOT NULL DEFAULT 0,
 
     [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
@@ -303,7 +309,7 @@ GO
 
 CREATE TABLE [rental_contracts] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [description] nvarchar(255) NOT NULL,
+    [description] nvarchar(MAX) NOT NULL,
     [notes] nvarchar(255),
     [start_date] datetimeoffset NOT NULL,
     [actual_start_date] datetimeoffset,

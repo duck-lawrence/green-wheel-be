@@ -4,6 +4,7 @@ using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    partial class GreenWheelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251024044233_snapshot")]
+    partial class snapshot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1007,7 +1010,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("reply");
 
-                    b.Property<Guid?>("RequesterId")
+                    b.Property<Guid>("RequesterId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("requester_id");
 
@@ -1058,18 +1061,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("avatar_url");
-
-                    b.Property<string>("BankAccountName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_account_name");
-
-                    b.Property<string>("BankAccountNumber")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_account_number");
-
-                    b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_name");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -1777,6 +1768,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Requester")
                         .WithMany("Tickets")
                         .HasForeignKey("RequesterId")
+                        .IsRequired()
                         .HasConstraintName("fk_tickets_user");
 
                     b.Navigation("Assignee");
