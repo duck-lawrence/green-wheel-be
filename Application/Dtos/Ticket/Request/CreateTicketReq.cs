@@ -10,5 +10,7 @@ namespace Application.Dtos.Ticket.Request
     {
         public string Title { get; set; } = null!;
         public string Description { get; set; } = null!;
+        public int Type { get; set; }
+        public string ContactInfo { get; set; } = null!;
     }
 }

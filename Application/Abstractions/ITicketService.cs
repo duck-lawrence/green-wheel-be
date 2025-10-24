@@ -7,7 +7,7 @@ namespace Application.Abstractions
 {
     public interface ITicketService
     {
-        Task<Guid> CreateAsync(Guid customerId, CreateTicketReq req);
+        Task<Guid> CreateAsync(Guid? customerId, CreateTicketReq req);
 
         Task<PageResult<TicketRes>> GetAllAsync(PaginationParams pagination);
 

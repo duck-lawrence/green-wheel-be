@@ -28,14 +28,14 @@ namespace Application
 
         #region customer
 
-        public async Task<Guid> CreateAsync(Guid customerId, CreateTicketReq req)
+        public async Task<Guid> CreateAsync(Guid? customerId, CreateTicketReq req)
         {
             var ticket = new Ticket
             {
                 Id = Guid.NewGuid(),
                 Title = req.Title,
                 Description = req.Description,
-                Type = (int)TicketType.CustomerSupport,
+                Type = req.Type ,
                 Status = (int)TicketStatus.Pending,
                 RequesterId = customerId
             };

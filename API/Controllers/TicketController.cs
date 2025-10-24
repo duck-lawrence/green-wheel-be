@@ -33,10 +33,10 @@ namespace API.Controllers
         /// <response code="400">Invalid ticket data.</response>
         /// <response code="404">Related entity not found (e.g., station or contract).</response>
         [HttpPost]
-        [RoleAuthorize([RoleName.Admin, RoleName.Customer])]
         public async Task<IActionResult> Create([FromBody] CreateTicketReq req)
         {
-            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sid);
+            Guid? userId = userIdClaim != null ? Guid.Parse(userIdClaim.Value) : null;
             var id = await _service.CreateAsync(userId, req);
             return Ok(new { Id = id });
         }
