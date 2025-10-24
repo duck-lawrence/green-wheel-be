@@ -63,12 +63,27 @@ namespace API.Controllers
         /// <response code="400">Invalid profile data.</response>
         /// <response code="401">Unauthorized — user is not authenticated.</response>
         /// <response code="404">User not found.</response>
-        [HttpPut("bank-info")]
+        [HttpPut("bank-account")]
         [Authorize]
-        public async Task<IActionResult> UpdateBankInfo([FromBody] UpdateBankInfoReq req)
+        public async Task<IActionResult> UpdateMyBankAccount([FromBody] UpdateBankAccountReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            await _userProfileService.UpdateBankInfoAsync(userId, req);
+            await _userProfileService.UpdateBankAccountAsync(userId, req);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Delete the bank information of the currently authenticated user.
+        /// </summary>
+        /// <response code="200">Success.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="404">User not found.</response>
+        [HttpDelete("bank-account")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMyBankAccount()
+        {
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            await _userProfileService.DeleteBankAccountAsync(userId);
             return Ok();
         }
 

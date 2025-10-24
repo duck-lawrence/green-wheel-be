@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace Application.Validators.User
 {
-    public class UpdateBankInfoReqValidator : AbstractValidator<UpdateBankInfoReq>
+    public class UpdateBankAccountReqValidator : AbstractValidator<UpdateBankAccountReq>
     {
-        public UpdateBankInfoReqValidator()
+        public UpdateBankAccountReqValidator()
         {
             RuleFor(x => x.BankName)
                 .NotEmpty().WithMessage(Message.UserMessage.BankNameIsRequired);

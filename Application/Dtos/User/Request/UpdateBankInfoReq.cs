@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.User.Request
 {
-    public class UpdateBankInfoReq
+    public class UpdateBankAccountReq
     {
         public string BankName { get; set; } = null!;
         public string BankAccountNumber { get; set; } = null!;
