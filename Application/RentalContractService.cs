@@ -401,14 +401,14 @@ namespace Application
             }
         }
         
-        public async Task VerifyRentalContract(Guid id, bool hasVehicle = true, int? vehicleStatus = null)
+        public async Task VerifyRentalContract(ConfirmReq req)
         {
-            var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(id) 
+            var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(req.Id) 
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
             //Lấy customer
             var customer = (await _uow.RentalContractRepository.GetAllAsync(
                 [rc => rc.Customer]))
-                .Where(rc => rc.Id == id)
+                .Where(rc => rc.Id == req.Id)
                 .Select(rc => rc.Customer).FirstOrDefault();
 
             var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)rentalContract.VehicleId);
@@ -423,7 +423,7 @@ namespace Application
             {
                 throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
             }
-            if (hasVehicle)
+            if (req.HasVehicle)
             {
                 rentalContract.Status = (int)RentalContractStatus.PaymentPending;
                 await _uow.RentalContractRepository.UpdateAsync(rentalContract);
@@ -431,7 +431,7 @@ namespace Application
                 var invoice = (await _uow.RentalContractRepository.GetAllAsync(new Expression<Func<RentalContract, object>>[]
                 {
                 rc => rc.Invoices
-                })).Where(rc => rc.Id == id)
+                })).Where(rc => rc.Id == req.Id)
                 .Select(rc => rc.Invoices).FirstOrDefault();
 
                 subject = "[GreenWheel] Confirm Your Booking by Completing Payment";
@@ -461,9 +461,9 @@ namespace Application
                 subject = "[GreenWheel] Vehicle Unavailable, Booking Cancelled";
                 templatePath = Path.Combine(basePath, "Templates", "RejectRentalContractEmailTempate.html");
                 body = System.IO.File.ReadAllText(templatePath);
-                if(vehicleStatus != null)
+                if(req.VehicleStatus != null)
                 {
-                    vehicle.Status = (int)vehicleStatus;
+                    vehicle.Status = (int)req.VehicleStatus;
                     await _uow.VehicleRepository.UpdateAsync(vehicle);
                 }
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)

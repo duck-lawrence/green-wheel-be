@@ -1008,7 +1008,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("reply");
 
-                    b.Property<Guid>("RequesterId")
+                    b.Property<Guid?>("RequesterId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("requester_id");
 
@@ -1766,7 +1766,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Requester")
                         .WithMany("Tickets")
                         .HasForeignKey("RequesterId")
-                        .IsRequired()
                         .HasConstraintName("fk_tickets_user");
 
                     b.Navigation("Assignee");

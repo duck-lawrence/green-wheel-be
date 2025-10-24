@@ -9,6 +9,7 @@ namespace Application.Constants
     public enum TicketType
     {
         CustomerSupport = 0,
-        StaffReport = 1
+        StaffReport = 1,
+        Contact = 2
     }
 }

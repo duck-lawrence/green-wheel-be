@@ -50,33 +50,18 @@ namespace API.Controllers
         /// <summary>
         /// Approves or verifies a rental contract by its unique identifier.
         /// </summary>
-        /// <param name="id">The unique identifier of the rental contract.</param>
+        /// <param name="req">The unique identifier of the rental contract.</param>
         /// <returns>Success message if the rental contract is verified successfully.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
-        [HttpPut("{id}/accept")]
+        [HttpPut("{id}/confirm")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> AcceptRentalContract(Guid id)
+        public async Task<IActionResult> ConfirmRentalContract(ConfirmReq req)
         {
-            await _rentalContractService.VerifyRentalContract(id);
+            await _rentalContractService.VerifyRentalContract(req);
             return Ok();
         }
-
-        /// <summary>
-        /// Rejects a rental contract and updates the vehicle status accordingly.
-        /// </summary>
-        /// <param name="id">The unique identifier of the rental contract.</param>
-        /// <param name="vehicleStatus">The new status of the vehicle after rejection.</param>
-        /// <returns>Success message if the rental contract is rejected successfully.</returns>
-        /// <response code="200">Success.</response>
-        /// <response code="404">Rental contract not found.</response>
-        [HttpPut("{id}/reject")]
-        [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> RejectRentalContract(Guid id, [FromBody] int vehicleStatus)
-        {
-            await _rentalContractService.VerifyRentalContract(id, false, vehicleStatus);
-            return Ok();
-        }
+       
 
         /// <summary>
         /// Creates a new rental contract manually (offline) for a specific customer.

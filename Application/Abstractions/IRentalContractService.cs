@@ -16,7 +16,7 @@ namespace Application.Abstractions
     public interface IRentalContractService
     {
         Task CreateRentalContractAsync(Guid UserID, CreateRentalContractReq createRentalContractReq);
-         Task VerifyRentalContract(Guid id, bool haveVehicle = true, int? vehicleStatus = null);
+         Task VerifyRentalContract(ConfirmReq req);
         Task UpdateStatusAsync(Guid id);
         Task<RentalContractViewRes> GetByIdAsync(Guid id);
 
