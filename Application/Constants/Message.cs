@@ -1,4 +1,6 @@
-﻿namespace Application.Constants
+﻿using Application.Dtos.VehicleChecklist.Request;
+
+namespace Application.Constants
 {
     public static class Message
     {
@@ -12,6 +14,7 @@
             public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
             public const string NotHavePassword = "user.is_google_linked_not_password";
+            public const string NotInputEmail = "user.google_credential_required";
 
             //otp
             public const string InvalidOTP = "user.invalid_otp";
@@ -28,6 +31,7 @@
             public const string InvalidEmail = "user.invalid_email";
             public const string PasswordTooShort = "user.password_too_short";
             public const string PasswordCanNotEmpty = "user.password_can_not_empty";
+            public const string SexIsRequired = "user.sex_can_not_empty";
             public const string ConfirmPasswordIsIncorrect = "user.confirm_password_is_incorrect";
             public const string InvalidUserAge = "user.invalid_user_age";
             public const string InvalidPhone = "user.invalid_phone";
@@ -65,6 +69,8 @@
 
             // Staff
             public const string StationIdIsRequired = "user.station_id_require";
+
+
         }
 
         //Common error
@@ -78,6 +84,9 @@
         {
             public const string NotFound = "vehicle.not_found";
             public const string LicensePlateIsExist = "vehicle.license_plate_is_exist";
+            public const string LicensePlateRequired = "vehicle.license_plate_required";
+            public const string StationIdRequired = "vehicle.station_id_required";
+            public const string ModelIdRequired = "vehicle.model_id_required";
         }
 
         public static class VehicleModelMessage
@@ -99,6 +108,9 @@
             public const string SportRangeKmCanNotNegative = "vehicle_model.sport_rang_km_can_not_negative";
             public const string BrandIdIsRequired = "vehicle_model.brand_id_require";
             public const string SegmentIdIsRequired = "vehicle_model.segment_id_require";
+            public const string ImageIdsRequired = "vehicle_model.image_ids_required";
+            public const string CostDayIdsRequired = "vehicle_model.cost_per_day_invalid";
+            public const string CostIdsRequired = "vehicle_model.deposit_fee_invalid";
         }
 
         //change password
@@ -112,6 +124,8 @@
             public const string DeleteFailed = "failed.delete";
             public const string DeleteSuccess = "success.delete";
             public const string UploadSuccess = "success.upload";
+            public const string FileRequired = "upload.file_required";
+            public const string FileEmpty = "upload.file_empty";
         }
 
         public static class DispatchMessage
@@ -148,6 +162,14 @@
             public const string CanNotCancel = "rental_contract.can_not_cancel";
 
             public static string ContractAlreadyProcess = "rental_contract.already_returned";
+            public const string StartDateMustBeFuture = "rental_contract.start_date_must_be_future";
+            public const string EndDateMustBeAfterStart = "rental_contract.end_date_must_be_after_start";
+            public const string IdRequired = "rental_contract.id_required";
+            public const string VehicleStatusRequired = "rental_contract.vehicle_status_required_when_has_vehicle";
+            public const string InvalidVehicleStatus = "rental_contract.invalid_vehicle_status";
+            public const string ModelIdRequired = "rental_contract.model_id_required";
+            public const string StationIdRequired = "rental_contract.station_id_required";
+            public const string AtLeastOnePartyMustSign = "rental_contract.at_least_one_party_must_sign";
         }
 
         //Station
@@ -203,6 +225,10 @@
         {
             public const string NotFound = "ticket.not_found";
             public const string AlreadyEscalated = "ticket.already_escalated";
+            public const string TitleRequired = "ticket.title_required";
+            public const string DescriptionRequired = "ticket.description_required";
+            public const string InvalidType = "ticket.invalid_type";
+            public const string TitleTooLong = "ticket.title_too_long";
         }
 
         //upload
@@ -216,6 +242,8 @@
         public static class StationFeedbackMessage
         {
             public const string NotFound = "station_feedback.not_found";
+            public const string InvalidRating = "station_feedback.invalid_rating";
+            public const string ContentTooLong = "station_feedback.content_too_long";
         }
 
         public static class VehicleModelImageMessage
@@ -233,10 +261,22 @@
             public const string NotFound = "vehicle_checklist.not_found";
 
             public static string ThisChecklistAlreadyProcess = "vehicle_checklist.already_process";
+
+            internal static string AtLeastOnePartyMustSign(UpdateVehicleChecklistReq req)
+            {
+                throw new NotImplementedException();
+            }
+
+            internal static string InvalidStatus(CreateVehicleChecklistReq req)
+            {
+                throw new NotImplementedException();
+            }
         }
         public static class VehicleChecklistItemMessage
         {
             public const string NotFound = "vehicle_checklist_item.not_found";
+            public const string InvalidStatus = "vehicle_checklist_item.invalid_status";
+            public const string ItemIdRequired = "vehicle_checklist_item.item_id_required";
         }
     }
 }
