@@ -90,7 +90,7 @@ CREATE TABLE [tickets] (
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
-    [requester_id] uniqueidentifier NOT NULL,
+    [requester_id] uniqueidentifier,
     [assignee_id] uniqueidentifier,
 
     CONSTRAINT fk_tickets_user FOREIGN KEY ([requester_id]) REFERENCES [users]([id]),

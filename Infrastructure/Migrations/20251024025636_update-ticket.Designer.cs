@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251021041214_update-invoice_")]
-    partial class updateinvoice_
+    [Migration("20251024025636_update-ticket")]
+    partial class updateticket
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1011,7 +1011,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("reply");
 
-                    b.Property<Guid>("RequesterId")
+                    b.Property<Guid?>("RequesterId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("requester_id");
 
@@ -1769,7 +1769,6 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.User", "Requester")
                         .WithMany("Tickets")
                         .HasForeignKey("RequesterId")
-                        .IsRequired()
                         .HasConstraintName("fk_tickets_user");
 
                     b.Navigation("Assignee");
