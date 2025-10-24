@@ -8,7 +8,6 @@ namespace Application.Dtos.RentalContract.Request
 {
     public class ConfirmReq
     {
-        public Guid Id { get; set; }
         public bool HasVehicle { get; set; }
         public int? VehicleStatus { get; set; } = null;
     }

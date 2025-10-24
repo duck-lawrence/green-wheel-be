@@ -401,14 +401,14 @@ namespace Application
             }
         }
         
-        public async Task VerifyRentalContract(ConfirmReq req)
+        public async Task VerifyRentalContract(Guid id, ConfirmReq req)
         {
-            var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(req.Id) 
+            var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(id) 
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
             //Lấy customer
             var customer = (await _uow.RentalContractRepository.GetAllAsync(
                 [rc => rc.Customer]))
-                .Where(rc => rc.Id == req.Id)
+                .Where(rc => rc.Id == id)
                 .Select(rc => rc.Customer).FirstOrDefault();
 
             var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)rentalContract.VehicleId);
@@ -431,7 +431,7 @@ namespace Application
                 var invoice = (await _uow.RentalContractRepository.GetAllAsync(new Expression<Func<RentalContract, object>>[]
                 {
                 rc => rc.Invoices
-                })).Where(rc => rc.Id == req.Id)
+                })).Where(rc => rc.Id == id)
                 .Select(rc => rc.Invoices).FirstOrDefault();
 
                 subject = "[GreenWheel] Confirm Your Booking by Completing Payment";

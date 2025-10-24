@@ -43,26 +43,26 @@ namespace API.Controllers
             var userID = Guid.Parse(userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString());
             await _rentalContractService.CreateRentalContractAsync(userID, createReq);
             return Created(
-                // rentalContractViewRes
+            // rentalContractViewRes
             );
         }
 
         /// <summary>
         /// Approves or verifies a rental contract by its unique identifier.
         /// </summary>
+        /// <param name="id">The unique identifier of the rental contract.</param>
         /// <param name="req">The unique identifier of the rental contract.</param>
         /// <returns>Success message if the rental contract is verified successfully.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
         [HttpPut("{id}/confirm")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> ConfirmRentalContract(ConfirmReq req)
+        public async Task<IActionResult> ConfirmRentalContract(Guid id, ConfirmReq req)
         {
-            await _rentalContractService.VerifyRentalContract(req);
+            await _rentalContractService.VerifyRentalContract(id, req);
             return Ok();
         }
        
-
         /// <summary>
         /// Creates a new rental contract manually (offline) for a specific customer.
         /// </summary>
