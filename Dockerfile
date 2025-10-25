@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project files (để tối ưu cache)
+# Copy file dự án (để tận dụng cache)
 COPY NuGet.Config ./
 COPY API/API.csproj ./API/
 COPY Application/Application.csproj ./Application/
@@ -17,8 +17,10 @@ RUN dotnet restore API/API.csproj --verbosity minimal
 # Copy toàn bộ source code
 COPY . .
 
-# Build & publish API project (Release mode)
 WORKDIR /src/API
+COPY API/appsettings*.json ./
+
+# Build & publish API project (Release mode)
 RUN dotnet publish -c Release -o /app/publish
 
 # ============================
@@ -32,9 +34,6 @@ COPY --from=build /app/publish .
 
 # Azure App Service yêu cầu port 8080
 ENV ASPNETCORE_URLS=http://+:8080
-
-# Không hard-code môi trường ở đây (Azure sẽ inject)
-# Nếu cần test local, bạn có thể override bằng `-e ASPNETCORE_ENVIRONMENT=Development`
 EXPOSE 8080
 
 # Khởi chạy ứng dụng
