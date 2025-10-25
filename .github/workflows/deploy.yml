@@ -61,6 +61,14 @@ jobs:
               --ingress external --target-port $PORT
           fi
 
+      - name: Configure ACR credentials for Container App
+        run: |
+          az containerapp registry set \
+            -g $RG -n $APP_NAME \
+            --server ${{ env.REGISTRY }} \
+            --username '${{ secrets.ACR_USERNAME }}' \
+            --password '${{ secrets.ACR_PASSWORD }}'
+
       - name: Deploy Container App
         run: |
           set -e
@@ -69,9 +77,6 @@ jobs:
           az containerapp update \
             -g $RG -n $APP_NAME \
             --image "$IMAGE" \
-            --registry-server ${{ env.REGISTRY }} \
-            --registry-username '${{ secrets.ACR_USERNAME }}' \
-            --registry-password '${{ secrets.ACR_PASSWORD }}' \
             --set-env-vars \
               ASPNETCORE_ENVIRONMENT=Production \
               FRONTEND_ORIGIN='${{ secrets.FRONTEND_ORIGIN }}' \
