@@ -223,7 +223,7 @@ namespace Application
                     await _emailService.SendEmailAsync(customer.Email, subject, body);
                 }
                 await _uow.CommitAsync();
-            }catch(Exception ex)
+            }catch(Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -277,7 +277,7 @@ namespace Application
         private async Task CancleReservationInvoice(Invoice handoverInvoice)
         {
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(handoverInvoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
-            if (reservationInvoice.Status == (int)InvoiceStatus.Pending)
+            if (reservationInvoice!.Status == (int)InvoiceStatus.Pending)
             {
                 reservationInvoice.Status = (int)InvoiceStatus.Cancelled;
                 await _uow.InvoiceRepository.UpdateAsync(reservationInvoice);
@@ -320,6 +320,7 @@ namespace Application
                 if (req.Type == (int)InvoiceType.Refund)
                 {
                     //xử lí refund cọc
+                    contract.Status = (int)RentalContractStatus.RefundPending;
                     var deposit = await _uow.DepositRepository.GetByContractIdAsync(req.ContractId)
                         ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
                     deposit.Status = (int)DepositStatus.Refunded;
@@ -337,6 +338,7 @@ namespace Application
                     }
 
                     await _uow.DepositRepository.UpdateAsync(deposit);
+                    await _uow.RentalContractRepository.UpdateAsync(contract);
                 }
                 invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
                 await _uow.InvoiceRepository.AddAsync(invoice);
@@ -344,7 +346,7 @@ namespace Application
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;

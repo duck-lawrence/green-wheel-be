@@ -30,6 +30,7 @@ namespace Application.Abstractions
         Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(ClaimsPrincipal user,int? status,PaginationParams pagination);
 
         Task CancelRentalContract(Guid id);
-        
+        Task ChangeVehicleAsync(Guid id);
+        Task ProcessCustomerConfirm(Guid id, int resolutionOption);
     }
 }

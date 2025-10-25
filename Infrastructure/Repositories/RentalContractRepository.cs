@@ -110,7 +110,7 @@ namespace Infrastructure.Repositories
             return vehicleChecklist == null ? null : vehicleChecklist.Contract;
         }
 
-        public async Task<IEnumerable<RentalContract>> GetContractsByVehicleId(Guid vehicleId)
+        public async Task<IEnumerable<RentalContract>> GetByVehicleIdAsync(Guid vehicleId)
         {
             var list = await _dbContext.RentalContracts.Where(c => c.VehicleId == vehicleId)
                     .Include(r => r.Customer)

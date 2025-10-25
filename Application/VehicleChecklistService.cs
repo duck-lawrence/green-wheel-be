@@ -36,14 +36,14 @@ namespace Application
 
         public async Task<Guid> Create(ClaimsPrincipal userclaims, CreateVehicleChecklistReq req)
         {
-            var staffId = userclaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+            var staffId = userclaims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString();
             if(req.Type != (int)VehicleChecklistType.OutOfContract)
             {
-                return await CreateVehicleChecklistInSideContract(Guid.Parse(staffId), (Guid)req.ContractId, req.Type);
+                return await CreateVehicleChecklistInSideContract(Guid.Parse(staffId), (Guid)req.ContractId!, req.Type);
             }
             else
             {
-                return await CreateVehicleChecklistOutSideContract(Guid.Parse(staffId), (Guid)req.VehicleId, req.Type);
+                return await CreateVehicleChecklistOutSideContract(Guid.Parse(staffId), (Guid)req.VehicleId!, req.Type);
             }
         }
         private async Task<Guid> CreateVehicleChecklistOutSideContract(Guid staffId, Guid vehicleId, int type)
@@ -85,7 +85,7 @@ namespace Application
                 return checklist.Id;
                
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -100,7 +100,7 @@ namespace Application
                 var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId) ??
                 throw new NotFoundException(Message.RentalContractMessage.NotFound);
 
-                var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId)
+                var components = await _uow.VehicleComponentRepository.GetByVehicleIdAsync((Guid)contract.VehicleId!)
                 ?? throw new NotFoundException(Message.VehicleComponentMessage.NotFound);
 
                 Guid checkListId = Guid.NewGuid();
@@ -132,7 +132,7 @@ namespace Application
                 await _uow.CommitAsync();
                 return checklist.Id;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -153,21 +153,28 @@ namespace Application
                     throw new BusinessException(Message.VehicleChecklistMessage.ThisChecklistAlreadyProcess);
                 if (checklist.Type == (int)VehicleChecklistType.OutOfContract)
                 {
-                    await UpdateVehicleChecklistOutSideContractAsync(checklist, req.ChecklistItems);
+                    UpdateHandoverchecklistOrChecklistOutSideAsync(checklist, req.ChecklistItems);
                 }
                 else
                 {
-                    var contract = await _uow.RentalContractRepository.GetByChecklistIdAsync(id)
+                    if (checklist.Type == (int)VehicleChecklistType.Handover)
+                    {
+                        UpdateHandoverchecklistOrChecklistOutSideAsync(checklist, req.ChecklistItems);
+                    }
+                    else if (checklist.Type == (int)VehicleChecklistType.Return)
+                    {
+                        var contract = await _uow.RentalContractRepository.GetByChecklistIdAsync(id)
                         ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
-                    await UpdateVehicleChecklistInsideContractAsync(checklist, req.ChecklistItems, contract!);
-                }
+                        await UpdateReturnChecklistAsync(checklist, req.ChecklistItems, contract, req.MaintainUntil);
+                    }
+                }                
                 checklist.IsSignedByStaff = req.IsSignedByStaff;
                 checklist.IsSignedByCustomer = req.IsSignedByCustomer;
 
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -175,7 +182,7 @@ namespace Application
             
         }
 
-        private async Task UpdateVehicleChecklistOutSideContractAsync(VehicleChecklist checklist, 
+        private void UpdateHandoverchecklistOrChecklistOutSideAsync(VehicleChecklist checklist, 
             IEnumerable<UpdateChecklistItemReq> checklictReq)
         {
             foreach (var itemReq in checklictReq)
@@ -194,16 +201,18 @@ namespace Application
             }
             
         }
-
-        private async Task UpdateVehicleChecklistInsideContractAsync(VehicleChecklist checklist, 
-            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract)
+        private async Task UpdateReturnChecklistAsync(VehicleChecklist checklist,
+            IEnumerable<UpdateChecklistItemReq> checklistReq, RentalContract contract,
+            DateTimeOffset? maintainUntil)
         {
-            Invoice returnInvoice = null;
-
-            if(checklist.Type == (int)VehicleChecklistType.Return)
+            if(maintainUntil != null)
             {
-                returnInvoice = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Return).FirstOrDefault();
+                checklist.MaintainedUntil = maintainUntil;
+                await _uow.VehicleChecklistRepository.UpdateAsync(checklist);
             }
+            Invoice returnInvoice = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Return).FirstOrDefault()!;
+            IEnumerable<VehicleChecklistItem> handoverChecklistItems = (await _uow.VehicleChecklistRepository.GetAll(contract.Id, (int)VehicleChecklistType.Handover))!
+                .FirstOrDefault()!.VehicleChecklistItems;
             IEnumerable<InvoiceItem> invoiceItems = [];
             foreach (var itemReq in checklistReq)
             {
@@ -211,8 +220,9 @@ namespace Application
                     .FirstOrDefault(i => i.Id == itemReq.Id);
 
                 if (existingItem == null) continue;
-
-                if(itemReq.Status != (int)DamageStatus.Good && checklist.Type == (int)VehicleChecklistType.Return)
+                var checkItem = handoverChecklistItems
+                    .FirstOrDefault(i => i.ComponentId == existingItem.ComponentId);
+                if (itemReq.Status >= checkItem!.Status)
                 {
                     var invoiceItem = new InvoiceItem()
                     {
@@ -236,9 +246,18 @@ namespace Application
             {
                 //nếu vô đc trong này thì chắc chắn đã lấy đc return Invoice ở trên rồi
                 returnInvoice!.Subtotal = returnInvoice.Subtotal + InvoiceHelper.CalculateSubTotalAmount(invoiceItems);
-                // await _uow.InvoiceRepository.AddAsync(returnInvoice);
                 await _uow.InvoiceItemRepository.AddRangeAsync(invoiceItems);
             }
+            var anotherContract = (await _uow.RentalContractRepository.GetByVehicleIdAsync((Guid)contract.VehicleId!));
+            anotherContract = anotherContract != null ? anotherContract.Where(c => c.Id != contract.Id
+                    &&
+                    c.Status == (int)RentalContractStatus.Active) 
+                    : null; 
+
+            var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId);
+            vehicle!.Status = anotherContract != null ? (int)VehicleStatus.Unavaible : (int)VehicleStatus.Available;
+            await _uow.VehicleRepository.UpdateAsync(vehicle);
+            
         }
 
         public async Task UpdateItemsAsync(Guid id, int status, string? notes)
@@ -261,7 +280,7 @@ namespace Application
             {
                 throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
             }
-            var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString());
             if (await CheckAuthorize(userId, vehicleChecklist.ContractId) == false)
             {
                 throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
@@ -271,7 +290,7 @@ namespace Application
         }
         public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId, int? type, ClaimsPrincipal userClaims)
         {
-            var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString());
             var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId, type);
             if (await CheckAuthorize(userId, contractId) == false) //nếu là user thì get all theo id
                 throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
@@ -283,7 +302,7 @@ namespace Application
         {
             var roles = _cache.Get<List<Role>>("AllRoles");
             var userInDB = await _userRepository.GetByIdAsync(userId);
-            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.RoleId).Name;
+            var userRole = roles!.FirstOrDefault(r => r.Id == userInDB!.RoleId)!.Name;
             if (userRole == RoleName.Staff)
             {
                 return true;
@@ -293,7 +312,7 @@ namespace Application
                 if (contractId != null)
                 {
                     var contract = await _uow.RentalContractRepository.GetByIdAsync((Guid)contractId);
-                    if (contract.CustomerId == userId) return true;
+                    if (contract!.CustomerId == userId) return true;
                 }
                 return false;
             }
