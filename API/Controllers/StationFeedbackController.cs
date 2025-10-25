@@ -1,5 +1,6 @@
 ﻿using API.Filters;
 using Application.Abstractions;
+using Application.Constants;
 using Application.Dtos.StationFeedback.Request;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
@@ -27,7 +28,7 @@ namespace API.Controllers
         /// <response code="404">Station not found.</response>
         /// <response code="404">Station not found.</response>
         [HttpPost]
-        [RoleAuthorize("Customer")]
+        [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> Create([FromBody] StationFeedbackCreateReq req)
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -55,7 +56,6 @@ namespace API.Controllers
         /// <returns>List of feedbacks created by the current customer.</returns>
         /// <response code="200">Success.</response>
         [HttpGet("me")]
-        [RoleAuthorize("Customer")]
         public async Task<IActionResult> GetMyFeedbacks()
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
@@ -71,12 +71,18 @@ namespace API.Controllers
         /// <response code="204">Success — feedback deleted.</response>
         /// <response code="403">Forbidden — customer does not have permission to delete this feedback.</response>
         [HttpDelete("{id}")]
-        [RoleAuthorize("Customer")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var customerId = Guid.Parse(User.FindFirst("sid")!.Value);
             await _service.DeleteAsync(id, customerId);
             return NoContent();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllFeedbacks()
+        {
+            var data = await _service.GetAllAsync();
+            return Ok(data);
         }
     }
 }

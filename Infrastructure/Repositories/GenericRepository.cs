@@ -109,5 +109,18 @@ namespace Infrastructure.Repositories
 
             await _dbSet.AddRangeAsync(entities);
         }
+        public virtual async Task<IEnumerable<T>> FindAsync(
+            Expression<Func<T, bool>> predicate,
+            params Expression<Func<T, object>>[] includes)
+        {
+            IQueryable<T> query = _dbSet.Where(predicate);
+
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.ToListAsync();
+        }
     }
 }

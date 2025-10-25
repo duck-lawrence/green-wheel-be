@@ -9,7 +9,6 @@ namespace Application.Dtos.Dispatch.Response
 {
     public class DispatchRequestVehicleRes
     {
-        public Guid VehicleId { get; init; }
         public DateTimeOffset CreatedAt { get; init; }
         public VehicleViewRes Vehicle { get; init; } = default!;
     }

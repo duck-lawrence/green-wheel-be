@@ -50,6 +50,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Station)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
                 .AsQueryable();
             if (segmentId != null)
@@ -81,8 +82,8 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.RentalContracts)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
-                .AsQueryable()
                 .FirstOrDefaultAsync(vm => vm.Id == id && vm.DeletedAt == null);
 
             if (model == null) return null;

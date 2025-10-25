@@ -13,6 +13,7 @@ using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
@@ -25,14 +26,24 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IMomoService _momoService;
         private readonly IEmailSerivce _emailService;
+        private readonly IPhotoService _photoService;
+        private readonly IMediaUow _mediaUow;
 
-        public InvoiceService(IInvoiceUow uow, IMapper mapper, IMomoService momoService,
-            IOptions<EmailSettings> emailSettings, IEmailSerivce emailSerivce)
+        public InvoiceService(
+            IInvoiceUow uow, 
+            IMapper mapper, 
+            IMomoService momoService,
+            IOptions<EmailSettings> emailSettings, 
+            IEmailSerivce emailSerivce, 
+            IPhotoService photoService,
+            IMediaUow mediaUow)
         {
             _uow = uow;
             _mapper = mapper;
             _momoService = momoService;
             _emailService = emailSerivce;
+            _photoService = photoService;
+            _mediaUow = mediaUow;
         }
 
         public async Task PayHandoverInvoiceManual(Invoice invoice, decimal amount)
@@ -346,9 +357,52 @@ namespace Application
         {
             var invoice = await _uow.InvoiceRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
-            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($". {notes}"));
+            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($".\n {notes}"));
             await _uow.InvoiceRepository.UpdateAsync(invoice);
             await _uow.SaveChangesAsync();
+        }
+
+        public async Task<string> UploadImageAsync(Guid invoiceId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException(Message.CloudinaryMessage.NotFoundObjectInFile);
+
+            var model = await _uow.InvoiceRepository.GetByIdAsync(invoiceId)
+                ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
+
+            var oldPublicId = model.ImagePublicId;
+
+            var uploadReq = new UploadImageReq { File = file };
+            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, $"invoice/{invoiceId}/main");
+
+            await using var trx = await _mediaUow.BeginTransactionAsync();
+            try
+            {
+                model.ImageUrl = uploaded.Url;
+                model.ImagePublicId = uploaded.PublicID;
+
+                await _uow.InvoiceRepository.UpdateAsync(model);
+                await _uow.SaveChangesAsync();
+                await trx.CommitAsync();
+            }
+            catch
+            {
+                await trx.RollbackAsync();
+                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                throw;
+            }
+
+            if (!string.IsNullOrEmpty(oldPublicId))
+            {
+                try { await _photoService.DeletePhotoAsync(oldPublicId); } catch { }
+            }
+
+            return model.ImageUrl!;
+        }
+
+        public async Task DeleteImageAsync(Guid modelId)
+        {
+            await _photoService.DeletePhotoAsync(modelId.ToString());
         }
     }
 }

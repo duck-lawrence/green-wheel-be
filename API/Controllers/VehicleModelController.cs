@@ -79,13 +79,12 @@ namespace API.Controllers
         }
 
         /// <summary>
-    /// Retrieves all vehicle models with optional filters for name and segment.
-    /// </summary>
-    /// <param name="name">Optional filter for the vehicle model name.</param>
-    /// <param name="segmentId">Optional filter for the vehicle segment identifier.</param>
-    /// <returns>List of vehicle models matching the specified filters.</returns>
-    /// <response code="200">Success.</response>
-
+        /// Retrieves all vehicle models with optional filters for name and segment.
+        /// </summary>
+        /// <param name="name">Optional filter for the vehicle model name.</param>
+        /// <param name="segmentId">Optional filter for the vehicle segment identifier.</param>
+        /// <returns>List of vehicle models matching the specified filters.</returns>
+        /// <response code="200">Success.</response>
         [HttpGet]
         public async Task<IActionResult> GetAll(string? name, Guid? segmentId)
         {
@@ -141,7 +140,7 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
         /// <response code="404">Vehicle model not found.</response>
-        [HttpPost("sub-images")]
+        [HttpPost("{modelId}/sub-images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadSubImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
@@ -159,7 +158,7 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid request data or image IDs.</response>
         /// <response code="404">Vehicle model or images not found.</response>
-        [HttpDelete("sub-images")]
+        [HttpDelete("{modelId}/sub-images")]
         [Consumes("application/json")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> DeleteSubImages([FromRoute] Guid modelId, [FromBody] DeleteModelImagesReq req)
@@ -178,13 +177,13 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
         /// <response code="404">Vehicle model not found.</response>
-        [HttpPost("main-image")]
+        [HttpPost("{modelId}/main-image")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadMainImage([FromRoute] Guid modelId, [FromForm(Name = "file")] IFormFile file)
         {
             var imageUrl = await _vehicleModelService.UploadMainImageAsync(modelId, file);
-            return Ok(new { data = new { modelId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
+            return Ok( new { modelId, imageUrl });
         }
 
         /// <summary>
@@ -194,7 +193,7 @@ namespace API.Controllers
         /// <returns>Success message if the main image is deleted successfully.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Vehicle model or main image not found.</response>
-        [HttpDelete("main-image")]
+        [HttpDelete("{modelId}/main-image")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
         {
@@ -212,13 +211,13 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
         /// <response code="404">Vehicle model not found.</response>
-        [HttpPost("images")]
+        [HttpPost("{modelId}/images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
         {
-            var (mainImage, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
-            return Ok(new { data = new { main = mainImage, gallery = galleryImages }, message = Message.CloudinaryMessage.UploadSuccess });
+            var res = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
+            return Ok(res);
         }
     }
 }

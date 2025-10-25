@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.VehicleModel.Respone
 {
-    public class VehicleModelImageRes
+    public class VehicleModelImagesRes
     {
-        public Guid ModelId { get; set; }
-        public string ImageUrl { get; set; } = null!;
+        public Guid Id { get; set; }
+        public string? ImageUrl { get; set; } = null!;
+        public IEnumerable<string> ImageUrls { get; set; } = Enumerable.Empty<string>();
     }
 }

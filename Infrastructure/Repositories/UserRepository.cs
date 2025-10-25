@@ -1,4 +1,6 @@
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
@@ -20,7 +22,10 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName)
+        //public async Task<IEnumerable<User>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName);
+        public async Task<PageResult<User>> GetAllWithPaginationAsync(
+            string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName,
+            PaginationParams pagination)
         {
             var query = _dbContext.Users
                 .Include(user => user.Role)
@@ -39,9 +44,19 @@ namespace Infrastructure.Repositories
 
             if (!string.IsNullOrWhiteSpace(driverLicenseNumber))
                 query = query.Where(u => u.DriverLicense != null && u.DriverLicense.Number == driverLicenseNumber);
+
             if (!string.IsNullOrEmpty(roleName))
-                query = query.Where(u => u.Role.Name.ToLower().Contains(roleName));
-            return await query.ToListAsync();
+                query = query.Where(u => u.Role.Name.ToLower().Contains(roleName.ToLower()));
+            
+            var total = await query.CountAsync();
+
+            var users = await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return new PageResult<User>(users, pagination.PageNumber, pagination.PageSize, total);
         }
 
         public async Task<IEnumerable<User>> GetAllStaffAsync(string? name, Guid? stationId)

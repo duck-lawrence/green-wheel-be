@@ -9,12 +9,12 @@ namespace Application.Repositories
 {
     public interface IStaffRepository
     {
+        Task<Guid> AddAsync(Staff staff);
+        
         Task<Staff?> GetByUserIdAsync(Guid userId);
 
         Task<int> CountStaffsInStationAsync(Guid[] staffIds, Guid stationId);
 
         Task UpdateStationForDispatchAsync(Guid dispatchId, Guid stationId);
-
-        Task AddStaffAsync(Staff staff);
     }
 }

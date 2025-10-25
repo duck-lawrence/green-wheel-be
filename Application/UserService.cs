@@ -1,12 +1,15 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application
@@ -38,26 +41,50 @@ namespace Application
 
         public async Task<Guid> CreateAsync(CreateUserReq req)
         {
-            if (await _userRepository.GetByPhoneAsync(req.Phone) != null) 
+            if (await _userRepository.GetByPhoneAsync(req.Phone) != null)
                 throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
-            if(!string.IsNullOrEmpty(req.Email) && await _userRepository.GetByEmailAsync(req.Email) != null)
+
+            if (!string.IsNullOrEmpty(req.Email) && await _userRepository.GetByEmailAsync(req.Email) != null)
                 throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists);
+
+            if (req.RoleName != null && req.RoleName != RoleName.Customer && req.StationId == null)
+                throw new BadRequestException(Message.UserMessage.StationIdIsRequired);
+
+            if (string.IsNullOrEmpty(req.RoleName))
+                req.RoleName = RoleName.Customer;
+
             var user = _mapper.Map<User>(req);
             var roles = _cache.Get<List<Role>>("AllRoles");
             var userRoleId = roles.FirstOrDefault(r => string.Compare(r.Name, req.RoleName, StringComparison.OrdinalIgnoreCase) == 0)!.Id;
             user.RoleId = userRoleId;
             await _userRepository.AddAsync(user);
+
+            if (req.RoleName == RoleName.Customer) return user.Id;
+
+            var staff = new Staff
+            {
+                UserId = user.Id,
+                StationId = (Guid)req.StationId,
+            };
+            await _staffRepository.AddAsync(staff);
             return user.Id;
         }
 
-        public async Task<IEnumerable<UserProfileViewRes>> GetAllAsync(
-            string? phone,
-            string? citizenIdNumber,
-            string? driverLicenseNumber,
-            string? roleName)
+        public async Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
+            string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName,
+            PaginationParams pagination)
         {
-            var users = await _userRepository.GetAllAsync(phone, citizenIdNumber, driverLicenseNumber, roleName);
-            return _mapper.Map<IEnumerable<UserProfileViewRes>>(users) ?? [];
+            var pageResult = await _userRepository.GetAllWithPaginationAsync(
+                phone, citizenIdNumber, driverLicenseNumber, roleName, pagination);
+
+            var mapped = _mapper.Map<IEnumerable<UserProfileViewRes>>(pageResult.Items);
+
+            return new PageResult<UserProfileViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
         }
 
         public async Task<UserProfileViewRes?> GetByIdAsync(Guid id)
@@ -108,27 +135,6 @@ namespace Application
         public async Task DeleteCustomer(Guid id)
         {
             await _userRepository.DeleteAsync(id);
-        }
-        public async Task<Guid> CreateStaffAsync(CreateStaffReq req)
-        {
-            if (await _userRepository.GetByPhoneAsync(req.Phone) != null)
-                throw new ConflictDuplicateException(Message.UserMessage.PhoneAlreadyExist);
-            if (!string.IsNullOrEmpty(req.Email) && await _userRepository.GetByEmailAsync(req.Email) != null)
-                throw new ConflictDuplicateException(Message.UserMessage.EmailAlreadyExists);
-
-            var roles = _cache.Get<List<Role>>("AllRoles");
-            var staffRole = roles.FirstOrDefault(r => r.Name.Equals("Staff", StringComparison.OrdinalIgnoreCase))
-                ?? throw new NotFoundException(Message.UserMessage.AvatarNotFound);
-
-            var user = _mapper.Map<User>(req);
-            user.RoleId = staffRole.Id;
-            await _userRepository.AddAsync(user);
-
-            var staff = _mapper.Map<Staff>(req);
-            staff.UserId = user.Id;
-            await _staffRepository.AddStaffAsync(staff);
-
-            return staff.UserId;
         }
     }
 }

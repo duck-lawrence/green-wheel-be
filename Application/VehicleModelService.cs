@@ -91,7 +91,6 @@ namespace Application
             {
                 model.ImageUrl = uploaded.Url;
                 model.ImagePublicId = uploaded.PublicID;
-                model.UpdatedAt = DateTimeOffset.UtcNow;
 
                 await _uow.VehicleModels.UpdateAsync(model);
                 await _uow.SaveChangesAsync();

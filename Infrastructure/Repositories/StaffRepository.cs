@@ -14,6 +14,13 @@ namespace Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<Guid> AddAsync(Staff staff)
+        {
+            await _dbContext.Staffs.AddAsync(staff);
+            await _dbContext.SaveChangesAsync();
+            return staff.UserId;
+        }
+
         public async Task<Staff?> GetByUserIdAsync(Guid userId)
         {
             return await _dbContext.Staffs
@@ -56,15 +63,6 @@ namespace Infrastructure.Repositories
                 s.StationId = toStationId;
             }
 
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public async Task AddStaffAsync(Staff staff)
-        {
-            if (staff == null)
-                throw new ArgumentNullException(nameof(staff));
-            staff.UserId = staff.UserId;
-            await _dbContext.Staffs.AddAsync(staff);
             await _dbContext.SaveChangesAsync();
         }
     }

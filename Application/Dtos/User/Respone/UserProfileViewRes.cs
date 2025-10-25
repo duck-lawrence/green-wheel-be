@@ -13,6 +13,9 @@ namespace Application.Dtos.User.Respone
         public DateTimeOffset? DateOfBirth { get; set; }
         public string? AvatarUrl { get; set; }
         public string? Phone { get; set; }
+        public string? BankName { get; set; }
+        public string? BankAccountNumber { get; set; }
+        public string? BankAccountName { get; set; }
         public string? LicenseUrl { get; set; }
         public string? CitizenUrl { get; set; }
         public RoleViewRes? Role { get; set; }

@@ -2,6 +2,7 @@
 using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.RentalContract.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +43,7 @@ namespace API.Controllers
             var userID = Guid.Parse(userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString());
             await _rentalContractService.CreateRentalContractAsync(userID, createReq);
             return Created(
-                // rentalContractViewRes
+            // rentalContractViewRes
             );
         }
 
@@ -50,30 +51,15 @@ namespace API.Controllers
         /// Approves or verifies a rental contract by its unique identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the rental contract.</param>
+        /// <param name="req">The unique identifier of the rental contract.</param>
         /// <returns>Success message if the rental contract is verified successfully.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
-        [HttpPut("{id}/accept")]
+        [HttpPut("{id}/confirm")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> AcceptRentalContract(Guid id)
+        public async Task<IActionResult> ConfirmRentalContract(Guid id, ConfirmReq req)
         {
-            await _rentalContractService.VerifyRentalContract(id);
-            return Ok();
-        }
-
-        /// <summary>
-        /// Rejects a rental contract and updates the vehicle status accordingly.
-        /// </summary>
-        /// <param name="id">The unique identifier of the rental contract.</param>
-        /// <param name="vehicleStatus">The new status of the vehicle after rejection.</param>
-        /// <returns>Success message if the rental contract is rejected successfully.</returns>
-        /// <response code="200">Success.</response>
-        /// <response code="404">Rental contract not found.</response>
-        [HttpPut("{id}/reject")]
-        [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> RejectRentalContract(Guid id, [FromBody] int vehicleStatus)
-        {
-            await _rentalContractService.VerifyRentalContract(id, false, vehicleStatus);
+            await _rentalContractService.VerifyRentalContract(id, req);
             return Ok();
         }
 
@@ -89,7 +75,7 @@ namespace API.Controllers
         [HttpPost("manual")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
-            var userId = req.CustomerId 
+            var userId = req.CustomerId
                 ?? throw new BadRequestException(Message.UserMessage.UserIdIsRequired);
             await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
             return Created();
@@ -98,16 +84,19 @@ namespace API.Controllers
         /// <summary>
         /// Retrieves all rental contracts with optional filtering and pagination.
         /// </summary>
-        /// <param name="req">Request containing filter and pagination parameters.</param>
+        /// <param name="req">Request containing filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of rental contracts that match the specified criteria.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
         [RoleAuthorize(RoleName.Staff)]
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] GetAllRentalContactReq req)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] GetAllRentalContactReq req,
+            [FromQuery] PaginationParams pagination)
         {
-            var contractViews = await _rentalContractService.GetAll(req);
-            return Ok(contractViews);
+            var result = await _rentalContractService.GetAllByPagination(req, pagination);
+            return Ok(result);
         }
 
         /// <summary>
@@ -126,7 +115,6 @@ namespace API.Controllers
             var staff = HttpContext.User;
             await _rentalContractService.HandoverProcessRentalContractAsync(staff, id, req);
             return Ok();
-
         }
 
         /// <summary>
@@ -154,11 +142,13 @@ namespace API.Controllers
         /// <response code="404">No rental contracts found for the customer.</response>
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
-        public async Task<IActionResult> GetMyContracts([FromQuery] int? status)
+        public async Task<IActionResult> GetMyContracts(
+            [FromQuery] int? status,
+            [FromQuery] PaginationParams pagination)
         {
             var user = HttpContext.User;
-            var rentalViews = await _rentalContractService.GetMyContracts(user, status);
-            return Ok(rentalViews);
+            var result = await _rentalContractService.GetMyContractsByPagination(user, status, pagination);
+            return Ok(result);
         }
 
         /// <summary>
@@ -201,7 +191,8 @@ namespace API.Controllers
         /// <response code="404">Bad request — this contract cannot be canceled.</response>
         [RoleAuthorize(RoleName.Customer)]
         [HttpPut("{id}/cancel")]
-        public async Task<IActionResult> CancelRentalContract(Guid id) {
+        public async Task<IActionResult> CancelRentalContract(Guid id)
+        {
             await _rentalContractService.CancelRentalContract(id);
             return Ok();
         }

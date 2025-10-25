@@ -2,6 +2,8 @@
 using Application.AppExceptions;
 using Application.AppSettingConfigurations;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.RentalContract.Respone;
 using Application.Helpers;
@@ -24,6 +26,7 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IEmailSerivce _emailService;
         private readonly IVehicleCheckListRepository _vehicleCheckListRepository;
+
         public RentalContractService(IRentalContractUow uow, IMapper mapper,
             IOptions<EmailSettings> emailSettings, IEmailSerivce emailService,
             IVehicleCheckListRepository vehicleCheckListRepository)
@@ -37,16 +40,17 @@ namespace Application
         public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id);
-            if(contract == null) throw new NotFoundException(Message.RentalContractMessage.NotFound);
+            if (contract == null) throw new NotFoundException(Message.RentalContractMessage.NotFound);
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(id))
                             .Where(i => i.Type == (int)InvoiceType.Reservation).FirstOrDefault();
             var reservationFee = 0;
-            if(reservationInvoice != null && reservationInvoice.Status == (int)InvoiceStatus.Paid)
+            if (reservationInvoice != null && reservationInvoice.Status == (int)InvoiceStatus.Paid)
             {
                 reservationFee = (int)reservationInvoice.Subtotal;
             }
             return _mapper.Map<RentalContractViewRes>(contract, otp => otp.Items["ReservationFee"] = reservationFee);
         }
+
         public async Task CreateRentalContractAsync(Guid userID, CreateRentalContractReq createReq)
         {
             await _uow.BeginTransactionAsync();
@@ -70,19 +74,20 @@ namespace Application
                     throw new BusinessException(Message.RentalContractMessage.UserAlreadyHaveContract);
                 }
                 var station = await _uow.StationRepository.GetByIdAsync(createReq.StationId) ??
-                                                            throw new NotFoundException(Message.StationMessage.NotFound);
-                var model = (await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId
-                                        , createReq.StationId, createReq.StartDate, createReq.EndDate));
+                    throw new NotFoundException(Message.StationMessage.NotFound);
+
+                var model = await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId,
+                    createReq.StationId, createReq.StartDate, createReq.EndDate);
+
+                if (model.Vehicles == null || model.Vehicles.Count == 0)
+                    throw new NotFoundException(Message.VehicleMessage.NotFound);
+                var vehicle = model.Vehicles.FirstOrDefault()!;
 
                 if (model!.Vehicles == null || model.Vehicles.Count == 0) throw new NotFoundException(Message.VehicleMessage.NotFound);
                 var vehicle = model.Vehicles.FirstOrDefault();
                 var days = (int)Math.Ceiling((createReq.EndDate - createReq.StartDate).TotalDays);
-                Guid contractId;
-                do
-                {
-                    contractId = Guid.NewGuid();
 
-                } while (await _uow.RentalContractRepository.GetByIdAsync(contractId) != null);
+                Guid contractId = Guid.NewGuid();
                 var contract = new RentalContract()
                 {
                     Id = contractId,
@@ -156,31 +161,31 @@ namespace Application
                 handoverInvoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount([baseRentalItem]);
                 reservationInvoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount([reservationRentalItem]);
 
-
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
                 await _uow.BeginTransactionAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
             }
         }
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
-        {
-            var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
-                req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? []; 
-        }
+        //public async Task<IEnumerable<RentalContractViewRes>> GetAll(GetAllRentalContactReq req)
+        //{
+        //    var contracts = await _uow.RentalContractRepository.GetAllAsync(req.Status, req.Phone,
+        //        req.CitizenIdentityNumber, req.DriverLicenseNumber, req.StationId);
+        //    return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? [];
 
-        public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status)
-        {
-            var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
-            var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
-            return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? [];
-        }
+        //}
+
+        //public async Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status)
+        //{
+        //    var userId = userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+        //    var contracts = await _uow.RentalContractRepository.GetByCustomerAsync(Guid.Parse(userId), status);
+        //    return _mapper.Map<IEnumerable<RentalContractViewRes>>(contracts) ?? [];
+        //}
 
         public async Task HandoverProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id, HandoverContractReq req)
         {
@@ -294,7 +299,7 @@ namespace Application
             {
                 await _uow.RollbackAsync();
                 throw;
-            } 
+            }
         }
 
         public async Task CancelRentalContract(Guid id)
@@ -309,6 +314,7 @@ namespace Application
             contract.Status = (int)RentalContractStatus.Cancelled;
             await _uow.RentalContractRepository.UpdateAsync(contract);
         }
+
         public async Task UpdateStatusAsync(Guid id)
         {
             await _uow.BeginTransactionAsync();
@@ -341,8 +347,7 @@ namespace Application
                             var endBuffer = contract.EndDate.AddDays(10);
                             foreach (var contract_ in anotherContract)
                             {
-                                if (startBuffer <= contract_.EndDate &&
-                                endBuffer >= contract_.StartDate)
+                                if (startBuffer <= contract_.EndDate && endBuffer >= contract_.StartDate)
                                 {
                                     await CancelContractAndSendEmail(contract_,
                                      ". Booking was canceled as another customer successfully paid for the same vehicle earlier.");
@@ -370,7 +375,7 @@ namespace Application
             }
         }
         
-        public async Task VerifyRentalContract(Guid id, bool hasVehicle = true, int? vehicleStatus = null)
+        public async Task VerifyRentalContract(Guid id, ConfirmReq req)
         {
             var rentalContract = await _uow.RentalContractRepository.GetByIdAsync(id) 
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
@@ -392,7 +397,7 @@ namespace Application
             {
                 throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
             }
-            if (hasVehicle)
+            if (req.HasVehicle)
             {
                 rentalContract.Status = (int)RentalContractStatus.PaymentPending;
                 await _uow.RentalContractRepository.UpdateAsync(rentalContract);
@@ -424,15 +429,15 @@ namespace Application
             {
                 if (rentalContract.Status == (int)RentalContractStatus.RequestPeding)
                 {
-                    rentalContract.Status = (int) RentalContractStatus.Cancelled;
+                    rentalContract.Status = (int)RentalContractStatus.Cancelled;
                     await _uow.RentalContractRepository.UpdateAsync(rentalContract);
                 }
                 subject = "[GreenWheel] Vehicle Unavailable, Booking Cancelled";
                 templatePath = Path.Combine(basePath, "Templates", "RejectRentalContractEmailTempate.html");
                 body = System.IO.File.ReadAllText(templatePath);
-                if(vehicleStatus != null)
+                if(req.VehicleStatus != null)
                 {
-                    vehicle.Status = (int)vehicleStatus;
+                    vehicle.Status = (int)req.VehicleStatus;
                     await _uow.VehicleRepository.UpdateAsync(vehicle);
                 }
                 body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
@@ -641,6 +646,44 @@ namespace Application
             }
             await _uow.RentalContractRepository.UpdateAsync(contract);
             await _uow.SaveChangesAsync();
+        public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination)
+        {
+            var pageResult = await _uow.RentalContractRepository.GetAllByPaginationAsync(
+                req.Status,
+                req.Phone,
+                req.CitizenIdentityNumber,
+                req.DriverLicenseNumber,
+                req.StationId,
+                pagination);
+
+            var mapped = _mapper.Map<IEnumerable<RentalContractViewRes>>(pageResult.Items);
+
+            return new PageResult<RentalContractViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
+        }
+
+        public async Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(
+            ClaimsPrincipal user,
+            int? status,
+            PaginationParams pagination)
+        {
+            var customerId = Guid.Parse(user.FindFirstValue(JwtRegisteredClaimNames.Sid)!);
+
+            var result = await _uow.RentalContractRepository
+                .GetMyContractsAsync(customerId, status, pagination);
+
+            var mapped = _mapper.Map<IEnumerable<RentalContractViewRes>>(result.Items);
+
+            return new PageResult<RentalContractViewRes>(
+                mapped,
+                result.PageNumber,
+                result.PageSize,
+                result.Total
+            );
         }
     }
 }

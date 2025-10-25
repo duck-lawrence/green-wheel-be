@@ -4,6 +4,7 @@ using Application.Dtos.StationFeedback.Request;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using static System.Collections.Specialized.BitVector32;
 
 public class StationFeedbackService : IStationFeedbackService
 {
@@ -23,7 +24,6 @@ public class StationFeedbackService : IStationFeedbackService
         feedback.CustomerId = customerId;
         feedback.CreatedAt = DateTimeOffset.UtcNow;
         feedback.UpdatedAt = DateTimeOffset.UtcNow;
-
         await _repo.AddAsync(feedback);
 
         var created = await _repo.GetByIdAsync(feedback.Id);
@@ -41,13 +41,20 @@ public class StationFeedbackService : IStationFeedbackService
 
     public async Task<IEnumerable<StationFeedbackRes>> GetByStationIdAsync(Guid stationId)
     {
-        var list = await _repo.FindAsync(f => f.StationId == stationId) ?? [];
+        var list = await _repo.FindAsync(f => f.StationId == stationId, f => f.Customer) ?? [];
         return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
     }
 
     public async Task<IEnumerable<StationFeedbackRes>> GetByCustomerIdAsync(Guid customerId)
     {
-        var list = await _repo.FindAsync(f => f.CustomerId == customerId) ?? [];
+        var list = await _repo.FindAsync(f => f.CustomerId == customerId, f => f.Customer) ?? [];
         return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
     }
+
+    public async Task<IEnumerable<StationFeedbackRes>> GetAllAsync()
+    {
+        var list = await _repo.GetAllAsync([f => f.Customer]);
+        return _mapper.Map<IEnumerable<StationFeedbackRes>>(list);
+    }
+
 }

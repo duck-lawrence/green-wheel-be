@@ -31,7 +31,7 @@ namespace Application
 
         #region upload
 
-        public async Task<List<VehicleModelImageRes>> UploadModelImagesAsync(Guid modelId, List<IFormFile> files)
+        public async Task<VehicleModelImagesRes> UploadModelImagesAsync(Guid modelId, List<IFormFile> files)
         {
             if (files == null || files.Count == 0)
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
@@ -39,37 +39,16 @@ namespace Application
             var model = await _uow.VehicleModelRepository.GetByIdAsync(modelId)
                 ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
 
-            var uploadedImages = new List<ModelImage>();
+            var uploadedImages = await UploadModelImagesHelperAsync(modelId, files);
 
-            foreach (var file in files)
-            {
-                var uploadReq = new UploadImageReq { File = file };
-                var result = await _photoService.UploadPhotoAsync(uploadReq, $"models/{modelId}/gallery");
-
-                if (string.IsNullOrEmpty(result.Url))
-                    throw new BusinessException(Message.CloudinaryMessage.UploadFailed);
-
-                uploadedImages.Add(new ModelImage
-                {
-                    Id = Guid.NewGuid(),
-                    ModelId = modelId,
-                    Url = result.Url,
-                    PublicId = result.PublicID,
-                    CreatedAt = DateTimeOffset.UtcNow,
-                    UpdatedAt = DateTimeOffset.UtcNow
-                });
-            }
-
-            foreach (var img in uploadedImages)
-                await _uow.ModelImageRepository.AddAsync(img);
-
+            model.ModelImages = [.. uploadedImages];
+            await _uow.ModelImageRepository.AddRangeAsync(uploadedImages);
             await _uow.SaveChangesAsync();
 
-            return _mapper.Map<List<VehicleModelImageRes>>(uploadedImages);
+            return _mapper.Map<VehicleModelImagesRes>(model);
         }
 
-        public async Task<(VehicleModelImageRes mainImage, List<VehicleModelImageRes> galleryImages)>
-            UploadAllModelImagesAsync(Guid modelId, List<IFormFile> files)
+        public async Task<VehicleModelImagesRes> UploadAllModelImagesAsync(Guid modelId, List<IFormFile> files)
         {
             if (files == null || files.Count == 0)
                 throw new BadRequestException(Message.CloudinaryMessage.NotFoundObjectInFile);
@@ -91,19 +70,12 @@ namespace Application
                 model.UpdatedAt = DateTimeOffset.UtcNow;
 
                 await _uow.VehicleModelRepository.UpdateAsync(model);
+                var galleryDtos = await UploadModelImagesHelperAsync(modelId, galleryFiles);
+                model.ModelImages = [.. galleryDtos];
                 await _uow.SaveChangesAsync();
-
-                var galleryDtos = await UploadModelImagesAsync(modelId, galleryFiles);
-
                 await trx.CommitAsync();
 
-                var mainDto = new VehicleModelImageRes
-                {
-                    ModelId = model.Id,
-                    ImageUrl = mainUpload.Url
-                };
-
-                return (mainDto, galleryDtos);
+                return _mapper.Map<VehicleModelImagesRes>(model);
             }
             catch
             {
@@ -113,6 +85,34 @@ namespace Application
 
                 throw;
             }
+        }
+
+        private async Task<IEnumerable<ModelImage>> UploadModelImagesHelperAsync(Guid modelId, List<IFormFile> files)
+        {
+            var uploadedImages = new List<ModelImage>();
+
+            foreach (var file in files)
+            {
+                var uploadReq = new UploadImageReq { File = file };
+                var result = await _photoService.UploadPhotoAsync(uploadReq, $"models/{modelId}/gallery");
+
+                if (string.IsNullOrEmpty(result.Url))
+                    throw new BusinessException(Message.CloudinaryMessage.UploadFailed);
+
+                uploadedImages.Add(new ModelImage
+                {
+                    Id = Guid.NewGuid(),
+                    ModelId = modelId,
+                    Url = result.Url,
+                    PublicId = result.PublicID,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                });
+            }
+            await _uow.ModelImageRepository.AddRangeAsync(uploadedImages);
+            await _uow.SaveChangesAsync();
+
+            return uploadedImages;
         }
 
         #endregion upload
