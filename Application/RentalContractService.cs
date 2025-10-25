@@ -79,10 +79,6 @@ namespace Application
                 var model = await _uow.VehicleModelRepository.GetByIdAsync(createReq.ModelId,
                     createReq.StationId, createReq.StartDate, createReq.EndDate);
 
-                if (model.Vehicles == null || model.Vehicles.Count == 0)
-                    throw new NotFoundException(Message.VehicleMessage.NotFound);
-                var vehicle = model.Vehicles.FirstOrDefault()!;
-
                 if (model!.Vehicles == null || model.Vehicles.Count == 0) throw new NotFoundException(Message.VehicleMessage.NotFound);
                 var vehicle = model.Vehicles.FirstOrDefault();
                 var days = (int)Math.Ceiling((createReq.EndDate - createReq.StartDate).TotalDays);
@@ -356,7 +352,7 @@ namespace Application
                         }
                     }
                 }
-                else if (contract.Status == (int)RentalContractStatus.Returned)
+                else if (contract.Status == (int)RentalContractStatus.RefundPending)
                 {
                     var invoices = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Refund);
                     if (invoices != null && invoices.Any(i => i.Status == (int)InvoiceStatus.Paid))
@@ -611,7 +607,7 @@ namespace Application
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
-            if(contract.Status != (int)RentalContractStatus.UnavailableVehicle)
+            if (contract.Status != (int)RentalContractStatus.UnavailableVehicle)
             {
                 throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
             }
@@ -646,6 +642,7 @@ namespace Application
             }
             await _uow.RentalContractRepository.UpdateAsync(contract);
             await _uow.SaveChangesAsync();
+        }
         public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination)
         {
             var pageResult = await _uow.RentalContractRepository.GetAllByPaginationAsync(

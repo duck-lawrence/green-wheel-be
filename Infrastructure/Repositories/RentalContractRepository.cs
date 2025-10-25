@@ -118,7 +118,7 @@ namespace Infrastructure.Repositories
                         .ThenInclude(v => v.Model)
                     .Include(r => r.Station)
                     .ToListAsync();
-            return list;
+            return list ?? [];
         }
 
         public async Task<PageResult<RentalContract>> GetAllByPaginationAsync(
@@ -194,5 +194,6 @@ namespace Infrastructure.Repositories
                 total
             );
         }
+
     }
 }

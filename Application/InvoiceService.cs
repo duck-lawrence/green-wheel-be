@@ -380,10 +380,16 @@ namespace Application
             {
                 model.ImageUrl = uploaded.Url;
                 model.ImagePublicId = uploaded.PublicID;
-
+                if(model.Type == (int)InvoiceType.Refund)
+                {
+                    model.Status = (int)InvoiceStatus.Paid;
+                    model.PaidAt = DateTimeOffset.UtcNow;
+                    model.PaidAmount = InvoiceHelper.CalculateTotalAmount(model);  
+                }
                 await _uow.InvoiceRepository.UpdateAsync(model);
                 await _uow.SaveChangesAsync();
                 await trx.CommitAsync();
+              
             }
             catch
             {
