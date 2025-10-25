@@ -43,7 +43,7 @@ CREATE TABLE [users] (
     [phone] varchar(15),
     
     [bank_name] varchar(100),
-    [back_account_name] varchar(200),
+    [bank_account_name] varchar(200),
     [bank_account_number] varchar(64),
 
     [sex] int, -- Male, Female
@@ -90,13 +90,16 @@ CREATE TABLE [tickets] (
     [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
+    [station_id] uniqueidentifier,
     [requester_id] uniqueidentifier,
     [assignee_id] uniqueidentifier,
 
-    CONSTRAINT fk_tickets_user FOREIGN KEY ([requester_id]) REFERENCES [users]([id]),
-    CONSTRAINT fk_tickets_staff FOREIGN KEY ([assignee_id]) REFERENCES [staffs]([user_id])
+    CONSTRAINT fk_tickets_stations FOREIGN KEY ([station_id]) REFERENCES [stations]([id]),
+    CONSTRAINT fk_tickets_users FOREIGN KEY ([requester_id]) REFERENCES [users]([id]),
+    CONSTRAINT fk_tickets_staffs FOREIGN KEY ([assignee_id]) REFERENCES [staffs]([user_id])
 );
 GO
+CREATE INDEX idx_tickets_station_id ON tickets (station_id);
 CREATE INDEX idx_tickets_requester_id ON tickets (requester_id);
 CREATE INDEX idx_tickets_assignee_id ON tickets (assignee_id);
 GO

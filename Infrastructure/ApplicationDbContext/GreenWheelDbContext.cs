@@ -790,12 +790,12 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
 
             entity.HasOne(d => d.Assignee).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.AssigneeId)
-                .HasConstraintName("fk_tickets_staff");
+                .HasConstraintName("fk_tickets_staffs");
 
             entity.HasOne(d => d.Requester).WithMany(p => p.Tickets)
                 .HasForeignKey(d => d.RequesterId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_tickets_user");
+                .HasConstraintName("fk_tickets_users");
 
             entity.HasQueryFilter(e => e.DeletedAt == null);
         });
