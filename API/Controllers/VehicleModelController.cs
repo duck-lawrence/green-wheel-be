@@ -79,13 +79,12 @@ namespace API.Controllers
         }
 
         /// <summary>
-    /// Retrieves all vehicle models with optional filters for name and segment.
-    /// </summary>
-    /// <param name="name">Optional filter for the vehicle model name.</param>
-    /// <param name="segmentId">Optional filter for the vehicle segment identifier.</param>
-    /// <returns>List of vehicle models matching the specified filters.</returns>
-    /// <response code="200">Success.</response>
-
+        /// Retrieves all vehicle models with optional filters for name and segment.
+        /// </summary>
+        /// <param name="name">Optional filter for the vehicle model name.</param>
+        /// <param name="segmentId">Optional filter for the vehicle segment identifier.</param>
+        /// <returns>List of vehicle models matching the specified filters.</returns>
+        /// <response code="200">Success.</response>
         [HttpGet]
         public async Task<IActionResult> GetAll(string? name, Guid? segmentId)
         {
@@ -184,7 +183,7 @@ namespace API.Controllers
         public async Task<IActionResult> UploadMainImage([FromRoute] Guid modelId, [FromForm(Name = "file")] IFormFile file)
         {
             var imageUrl = await _vehicleModelService.UploadMainImageAsync(modelId, file);
-            return Ok(new { data = new { modelId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
+            return Ok( new { modelId, imageUrl });
         }
 
         /// <summary>
@@ -217,8 +216,8 @@ namespace API.Controllers
         [ApiExplorerSettings(IgnoreApi = true)]
         public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
         {
-            var (mainImage, galleryImages) = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
-            return Ok(new { data = new { main = mainImage, gallery = galleryImages }, message = Message.CloudinaryMessage.UploadSuccess });
+            var res = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
+            return Ok(res);
         }
     }
 }

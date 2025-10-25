@@ -35,7 +35,7 @@ namespace Application
                 Id = Guid.NewGuid(),
                 Title = req.Title,
                 Description = req.Description,
-                Type = req.Type ,
+                Type = req.Type,
                 Status = (int)TicketStatus.Pending,
                 RequesterId = customerId
             };
@@ -61,9 +61,10 @@ namespace Application
             await _repo.UpdateAsync(ticket);
         }
 
-        public async Task<PageResult<TicketRes>> GetAllAsync(PaginationParams pagination)
+        public async Task<PageResult<TicketRes>> GetAllAsync(
+            TicketFilterParams filter, PaginationParams pagination)
         {
-            var page = await _repo.GetAllAsync(pagination);
+            var page = await _repo.GetAllAsync(filter, pagination);
             var data = _mapper.Map<IEnumerable<TicketRes>>(page.Items);
 
             return new PageResult<TicketRes>(data, page.PageNumber, page.PageSize, page.Total);
@@ -76,10 +77,11 @@ namespace Application
             return new PageResult<TicketRes>(data, page.PageNumber, page.PageSize, page.Total);
         }
 
-        public async Task<IEnumerable<TicketRes>> GetByCustomerAsync(Guid customerId)
+        public async Task<PageResult<TicketRes>> GetByCustomerAsync(Guid customerId, int? status, PaginationParams pagination)
         {
-            var items = await _repo.GetByCustomerAsync(customerId);
-            return _mapper.Map<IEnumerable<TicketRes>>(items);
+            var page = await _repo.GetByCustomerAsync(customerId, status, pagination);
+            var data = _mapper.Map<IEnumerable<TicketRes>>(page.Items);
+            return new PageResult<TicketRes>(data, page.PageNumber, page.PageSize, page.Total);
         }
 
         public async Task UpdateAsync(Guid id, UpdateTicketReq req, Guid staffId)

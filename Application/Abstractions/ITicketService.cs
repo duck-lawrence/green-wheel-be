@@ -9,9 +9,9 @@ namespace Application.Abstractions
     {
         Task<Guid> CreateAsync(Guid? customerId, CreateTicketReq req);
 
-        Task<PageResult<TicketRes>> GetAllAsync(PaginationParams pagination);
+        Task<PageResult<TicketRes>> GetAllAsync(TicketFilterParams filter, PaginationParams pagination);
 
-        Task<IEnumerable<TicketRes>> GetByCustomerAsync(Guid customerId);
+        Task<PageResult<TicketRes>> GetByCustomerAsync(Guid customerId, int? status, PaginationParams pagination);
 
         Task UpdateAsync(Guid id, UpdateTicketReq req, Guid staffId);
 
