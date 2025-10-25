@@ -309,6 +309,7 @@ namespace Application
                 if (req.Type == (int)InvoiceType.Refund)
                 {
                     //xử lí refund cọc
+                    contract.Status = (int)RentalContractStatus.RefundPending;
                     var deposit = await _uow.DepositRepository.GetByContractIdAsync(req.ContractId)
                         ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
                     deposit.Status = (int)DepositStatus.Refunded;
@@ -326,6 +327,7 @@ namespace Application
                     }
 
                     await _uow.DepositRepository.UpdateAsync(deposit);
+                    await _uow.RentalContractRepository.UpdateAsync(contract);
                 }
                 invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
                 await _uow.InvoiceRepository.AddAsync(invoice);

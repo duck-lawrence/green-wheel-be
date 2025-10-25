@@ -216,9 +216,9 @@ namespace API.Controllers
 
         [HttpPut("{id}/customer-confirm")]
         [RoleAuthorize(RoleName.Customer)]
-        public async Task<IActionResult> ProcessCustomerConfirm(Guid id, int ResolutionOption)
+        public async Task<IActionResult> ProcessCustomerConfirm(Guid id, CustomerResolutionOptionReq req)
         {
-            await _rentalContractService.ProcessCustomerConfirm(id, ResolutionOption);
+            await _rentalContractService.ProcessCustomerConfirm(id, req.resolutionOption);
             return Ok();
         }
 

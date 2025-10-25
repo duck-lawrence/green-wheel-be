@@ -246,23 +246,18 @@ namespace Application
             {
                 //nếu vô đc trong này thì chắc chắn đã lấy đc return Invoice ở trên rồi
                 returnInvoice!.Subtotal = returnInvoice.Subtotal + InvoiceHelper.CalculateSubTotalAmount(invoiceItems);
-                // await _uow.InvoiceRepository.AddAsync(returnInvoice);
                 await _uow.InvoiceItemRepository.AddRangeAsync(invoiceItems);
             }
-            else
-            {
-                if (checklist.Type == (int)VehicleChecklistType.Return)
-                {
-                    var anotherContract = (await _uow.RentalContractRepository.GetByVehicleIdAsync((Guid)contract.VehicleId!))
-                           .Where(c => c.Id != contract.Id
-                           &&
-                           c.Status == (int)RentalContractStatus.Active);
+            var anotherContract = (await _uow.RentalContractRepository.GetByVehicleIdAsync((Guid)contract.VehicleId!));
+            anotherContract = anotherContract != null ? anotherContract.Where(c => c.Id != contract.Id
+                    &&
+                    c.Status == (int)RentalContractStatus.Active) 
+                    : null; 
 
-                    var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId);
-                    vehicle!.Status = anotherContract != null ? (int)VehicleStatus.Unavaible : (int)VehicleStatus.Available;
-                    await _uow.VehicleRepository.UpdateAsync(vehicle);
-                }
-            }
+            var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId);
+            vehicle!.Status = anotherContract != null ? (int)VehicleStatus.Unavaible : (int)VehicleStatus.Available;
+            await _uow.VehicleRepository.UpdateAsync(vehicle);
+            
         }
 
         public async Task UpdateItemsAsync(Guid id, int status, string? notes)

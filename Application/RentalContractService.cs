@@ -344,31 +344,8 @@ namespace Application
                                 if (startBuffer <= contract_.EndDate &&
                                 endBuffer >= contract_.StartDate)
                                 {
-                                    contract_.Status = (int)RentalContractStatus.Cancelled;
-                                    contract_.Description += ". Booking was canceled as another customer successfully paid for the same vehicle earlier.";
-                                    var subject = "[GreenWheel] Your Booking Has Been Canceled";
-                                    var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CancelAutoEmailTemplate.html");
-                                    var body = System.IO.File.ReadAllText(templatePath);
-                                    var customer = contract_.Customer;
-                                    var station = contract_.Station;
-                                    var vehicleToCancel = contract_.Vehicle
-                                        ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
-                                    var model = vehicleToCancel.Model;
-
-                                    var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                                        ?? "http://localhost:3000/";
-                                    var contractDetailUrl = $"{frontendOrigin}/vehicle-models";
-
-                                    body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
-                                               .Replace("{ContractCode}", contract_.Id.ToString())
-                                               .Replace("{VehicleName}", model.Name)
-                                               .Replace("{LisencePlate}", vehicleToCancel.LicensePlate)
-                                               .Replace("{StationName}", station.Name)
-                                               .Replace("{StartDate}", contract_.StartDate.ToString("dd/MM/yyyy"))
-                                               .Replace("{EndDate}", contract_.EndDate.ToString("dd/MM/yyyy"))
-                                               .Replace("{BookingLink}", contractDetailUrl);
-                                    await _emailService.SendEmailAsync(customer.Email, subject, body);
-                                    await _uow.RentalContractRepository.UpdateAsync(contract_);
+                                    await CancelContractAndSendEmail(contract_,
+                                     ". Booking was canceled as another customer successfully paid for the same vehicle earlier.");
                                 }
                             }
                         }
@@ -476,15 +453,14 @@ namespace Application
 
             if(returnChecklist!.MaintainedUntil != null)
             {
-                 //lấy những hợp đồng có cùng xe với hợp đồng này mà có trạng thái là đang active
-                 var otherContracts = (await _uow.RentalContractRepository.GetByVehicleIdAsync(id))
-                                    .Where(c => c.Status == (int)RentalContractStatus.RequestPeding
-                                    ||
-                                    c.Status == (int)RentalContractStatus.PaymentPending
-                                    ||
-                                    c.Status == (int)RentalContractStatus.Active);
+                //lấy những hợp đồng có cùng xe với hợp đồng này mà có trạng thái là đang active
+                var otherContracts = await _uow.RentalContractRepository.GetByVehicleIdAsync((Guid)contract.VehicleId!);
+                otherContracts = otherContracts != null ? otherContracts.Where(c => c.Id != contract.Id
+                                            && (c.Status == (int)RentalContractStatus.Active
+                                                || c.Status == (int)RentalContractStatus.RequestPeding
+                                                || c.Status == (int)RentalContractStatus.PaymentPending)) : null;
                 //nếu có hợp đồng cùng xe thì tục
-                if(otherContracts != null)
+                if (otherContracts != null)
                 {
                     IEnumerable<RentalContract> flagContract = [];
                     foreach(var contract_ in  otherContracts)
@@ -506,21 +482,20 @@ namespace Application
                                 {
                                     await CancelContractAndSendEmail(contract_,
                                                             ". Booking was canceled because vehicle was maintained");
+                                    
                                 }
                                 else if (contract_.Status == (int)RentalContractStatus.Active)
                                 {
-                                    contract.Status = (int)RentalContractStatus.UnavailableVehicle;
-                                    var model = (await _uow.VehicleModelRepository.GetByIdAsync(contract_.Vehicle!.ModelId
-                                            , contract_.StationId, contract_.StartDate, contract_.EndDate));
-
-                                    if (model!.Vehicles == null || model.Vehicles.Count == 0)
-                                        throw new NotFoundException(Message.VehicleMessage.NotFound);
-                                    var vehicle = model.Vehicles.FirstOrDefault();
+                                    contract_.Status = (int)RentalContractStatus.UnavailableVehicle;
+                                    var model = await _uow.VehicleModelRepository.GetByIdAsync(contract_.Vehicle!.ModelId
+                                            , contract_.StationId, contract_.StartDate, contract_.EndDate)
+                                        ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
+                                    var vehicle = model.Vehicles == null ? null : model.Vehicles.FirstOrDefault();
+                                    contract_.VehicleId = null;
                                     if (vehicle != null)
                                     {
-                                        contract.VehicleId = vehicle.Id;
+                                        contract_.VehicleId = vehicle.Id;
                                     }
-                                    contract.VehicleId = null;
                                     var subject = "[GreenWheel] Issue Detected in Your GreenWheel Rental Contract";
                                     var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "VehicleIssueNotification.html");
                                     var body = System.IO.File.ReadAllText(templatePath);
@@ -564,8 +539,8 @@ namespace Application
                                         Description = "Refund for order {contract_.Id}",
                                         Type = (int)InvoiceItemType.Refund,
                                     };
-                                    var handoverInvoice = contract_.Invoices.FirstOrDefault(i => i.Status == (int)InvoiceType.Handover);
-                                    var reservation = contract_.Invoices.FirstOrDefault(i => i.Status == (int)InvoiceType.Reservation);
+                                    var handoverInvoice = contract_.Invoices.FirstOrDefault(i => i.Type == (int)InvoiceType.Handover);
+                                    var reservation = contract_.Invoices.FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
                                     if(handoverInvoice!.Status == (int)InvoiceStatus.Paid && reservation!.Status == (int)InvoiceStatus.Paid)
                                     {
                                         item.UnitPrice = (decimal)handoverInvoice.PaidAmount! + (decimal)reservation.PaidAmount!;
@@ -627,11 +602,15 @@ namespace Application
             await _uow.RentalContractRepository.UpdateAsync(contract_);
         }
 
-        public async Task ProcessCustomerConfirm(Guid id, int ResolutionOption)
+        public async Task ProcessCustomerConfirm(Guid id, int resolutionOption)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
-            if(ResolutionOption == (int)VehicleIssueResolutionOption.ChangeVehicle)
+            if(contract.Status != (int)RentalContractStatus.UnavailableVehicle)
+            {
+                throw new BadRequestException(Message.RentalContractMessage.ThisRentalContractAlreadyProcess);
+            }
+            if (resolutionOption == (int)VehicleIssueResolutionOption.ChangeVehicle)
             {
                 contract.Status = (int)RentalContractStatus.Active;
             }
@@ -641,9 +620,9 @@ namespace Application
                 //có rồi thì tiếp tục
 
                 //------------
-                contract.Status = (int)RentalContractStatus.Cancelled;
+                contract.Status = (int)RentalContractStatus.RefundPending;
                 var subject = "[GreenWheel] Your Booking Has Been Canceled";
-                var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CancelAutoEmailTemplate.html");
+                var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "RefundEmailTemplate.html");
                 var body = System.IO.File.ReadAllText(templatePath);
                 var customer = contract.Customer;
                 if (customer.Email != null)

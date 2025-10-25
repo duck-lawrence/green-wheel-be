@@ -107,8 +107,8 @@ namespace Infrastructure.Repositories
             //
             //));
             if (vehicle.Status != (int)VehicleStatus.Available
-               || vehicle.Status != (int)VehicleStatus.Unavaible
-               || vehicle.Status != (int)VehicleStatus.Rented)
+               && vehicle.Status != (int)VehicleStatus.Unavaible
+               && vehicle.Status != (int)VehicleStatus.Rented)
                 return false;
 
             if (vehicle.StationId != stationId)

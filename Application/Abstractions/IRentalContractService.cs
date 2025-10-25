@@ -23,6 +23,6 @@ namespace Application.Abstractions
         Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
         Task CancelRentalContract(Guid id);
         Task ChangeVehicleAsync(Guid id);
-        Task ProcessCustomerConfirm(Guid id, int ResolutionOption);
+        Task ProcessCustomerConfirm(Guid id, int resolutionOption);
     }
 }

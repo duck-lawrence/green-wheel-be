@@ -15,6 +15,5 @@ namespace Application.Repositories
             string? citizenIdentity = null, string? driverLicense = null, Guid? checklistId = null);
         Task<RentalContract?> GetByChecklistIdAsync(Guid id);
         Task<IEnumerable<RentalContract>> GetByVehicleIdAsync(Guid vehicleId);
-
     }
 }
