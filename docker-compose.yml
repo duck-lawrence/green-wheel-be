@@ -1,46 +1,46 @@
 services:
-    greenwheel-backend:
-        container_name: greenwheel-backend
-        build:
-            context: .
-            dockerfile: Dockerfile
-        ports:
-            - "5160:5160"
-        env_file:
-            - .env
-        environment:
-            MSSQL_CONNECTION_STRING: Server=mssql,1433;Database=${MSSQL_DB};User Id=${MSSQL_USER};Password=${MSSQL_PASSWORD};TrustServerCertificate=True;
-            REDIS_CONFIGURATION: redis:6379
-        # depends_on:
-        #     - redis
-        #     - mssql
-        volumes:
-            - .:/src
-            - ./logs:/app/logs
-            - ~/.nuget/packages:/root/.nuget/packages
+  greenwheel-backend:
+    container_name: greenwheel-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5160:5160"
+    env_file:
+      - .env
+    environment:
+      MSSQL_CONNECTION_STRING: Server=mssql,1433;Database=${MSSQL_DB};User Id=${MSSQL_USER};Password=${MSSQL_PASSWORD};TrustServerCertificate=True;
+      REDIS_CONFIGURATION: redis:6379
+    # depends_on:
+    #     - redis
+    #     - mssql
+    volumes:
+      - .:/src
+      - ./logs:/app/logs
+      - ~/.nuget/packages:/root/.nuget/packages
 
-    redis:
-        container_name: greenwheel-redis
-        image: redis:7.0
-        ports:
-            - "${REDIS_PORT}:6379"
-        volumes:
-            - greenwheel_redis_data:/data
+  redis:
+    container_name: greenwheel-redis
+    image: redis:7.0
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - greenwheel_redis_data:/data
 
-    mssql:
-        build:
-            context: .
-            dockerfile: mssql.Dockerfile
-        container_name: greenwheel-mssql
-        ports:
-            - "${MSSQL_PORT}:1433"
-        environment:
-            ACCEPT_EULA: "Y"
-            MSSQL_SA_PASSWORD: ${MSSQL_PASSWORD}
-        volumes:
-            - greenwheel_mssql_data:/var/opt/mssql
-            - ./init-db:/init-db
+  mssql:
+    build:
+      context: .
+      dockerfile: mssql.Dockerfile
+    container_name: greenwheel-mssql
+    ports:
+      - "${MSSQL_PORT}:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_PASSWORD}
+    volumes:
+      - greenwheel_mssql_data:/var/opt/mssql
+      - ./init-db:/init-db
 
 volumes:
-    greenwheel_redis_data:
-    greenwheel_mssql_data:
+  greenwheel_redis_data:
+  greenwheel_mssql_data:
