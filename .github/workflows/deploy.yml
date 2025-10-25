@@ -17,46 +17,47 @@ env:
   APP_NAME: greenwheel-backend
   IMAGE_NAME: greenwheel-backend
   PORT: 8080
+  REGISTRY: hycat.azurecr.io # 👈 thêm dòng này (thay bằng login server thật của bạn)
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 🧩 Checkout source
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      # 🔐 Login Azure bằng Service Principal JSON
-      - name: 🔑 Azure Login
+      #  Login Azure bằng Service Principal JSON
+      - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       # 🐳 Lấy thông tin registry ACR
-      - name: 🏗️ Get ACR registry
+      - name: Get ACR registry
         id: acr
         run: |
           REGISTRY=$(az acr show -n ${{ secrets.ACR_NAME }} --query loginServer -o tsv)
           echo "REGISTRY=$REGISTRY" >> $GITHUB_ENV
 
-      # 🔐 Đăng nhập vào ACR
-      - name: 🔐 ACR Login
+      # Đăng nhập vào ACR
+      - name: ACR Login
         run: az acr login -n ${{ secrets.ACR_NAME }}
 
-      # 🧱 Build & push image lên ACR
-      - name: 🐋 Build & Push Image
+      # Build & push image lên ACR
+      - name: Build & Push Image
         run: |
           docker compose -f docker-compose.prod.yml build
           docker tag ${{ env.IMAGE_NAME }}:prod ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       # 🌱 Tạo hoặc cập nhật môi trường Container Apps
-      - name: 🌿 Ensure Container Apps Environment exists
+      - name: Ensure Container Apps Environment exists
         run: |
           az containerapp env show -g $RG -n $ENV_NAME || \
           az containerapp env create -g $RG -n $ENV_NAME -l $LOCATION
 
-      # 🚀 Tạo hoặc cập nhật Container App
-      - name: 🚀 Create or Update Container App
+      # Tạo hoặc cập nhật Container App
+      - name: Create or Update Container App
         run: |
           set -e
           IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
@@ -115,17 +116,17 @@ jobs:
                 ASPNETCORE_ENVIRONMENT=Production
           fi
 
-      # 🔑 Gán quyền ACRPull (nếu lần đầu)
-      - name: 🔐 Grant ACR Pull permission
+      # Gán quyền ACRPull (nếu lần đầu)
+      - name: Grant ACR Pull permission
         continue-on-error: true
         run: |
           MI_PRINCIPAL_ID=$(az containerapp show -g $RG -n $APP_NAME --query identity.principalId -o tsv)
           ACR_ID=$(az acr show -n ${{ secrets.ACR_NAME }} -g $RG --query id -o tsv)
           az role assignment create --assignee $MI_PRINCIPAL_ID --role AcrPull --scope $ACR_ID || true
 
-      # 🌐 Hiển thị URL
-      - name: 🌍 Show app URL
+      # Hiển thị URL
+      - name: Show app URL
         run: |
           FQDN=$(az containerapp show -g $RG -n $APP_NAME --query properties.configuration.ingress.fqdn -o tsv)
-          echo "✅ Deployed successfully!"
-          echo "🌐 URL: https://$FQDN"
+          echo "Deployed successfully!"
+          echo "URL: https://$FQDN"
