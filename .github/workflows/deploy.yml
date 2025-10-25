@@ -26,105 +26,95 @@ jobs:
       - name: Checkout source
         uses: actions/checkout@v4
 
-      #  Login Azure bằng Service Principal JSON
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 🐳 Lấy thông tin registry ACR
       - name: Get ACR registry
         id: acr
         run: |
           REGISTRY=$(az acr show -n ${{ secrets.ACR_NAME }} --query loginServer -o tsv)
           echo "REGISTRY=$REGISTRY" >> $GITHUB_ENV
 
-      # Đăng nhập vào ACR
       - name: ACR Login
         run: az acr login -n ${{ secrets.ACR_NAME }}
 
-      # Build & push image lên ACR
       - name: Build & Push Image
         run: |
           docker compose -f docker-compose.prod.yml build
           docker tag ${{ env.IMAGE_NAME }}:prod ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-      # 🌱 Tạo hoặc cập nhật môi trường Container Apps
       - name: Ensure Container Apps Environment exists
         run: |
           az containerapp env show -g $RG -n $ENV_NAME || \
           az containerapp env create -g $RG -n $ENV_NAME -l $LOCATION
 
-      # Tạo hoặc cập nhật Container App
-      - name: Create or Update Container App
+      - name: Create Container App (if not exists)
         run: |
-          set -e
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
           if ! az containerapp show -g $RG -n $APP_NAME >/dev/null 2>&1; then
             az containerapp create \
               -g $RG -n $APP_NAME \
               --environment $ENV_NAME \
-              --image "$IMAGE" \
-              --ingress external --target-port $PORT \
-              --min-replicas 1 --max-replicas 3 \
+              --image mcr.microsoft.com/dotnet/aspnet:8.0 \
               --system-assigned \
-              --env-vars \
-                ASPNETCORE_ENVIRONMENT=Production \
-                FRONTEND_ORIGIN='${{ secrets.FRONTEND_ORIGIN }}' \
-                MSSQL_CONNECTION_STRING='Server=tcp:${{ secrets.AZURE_SQL_SERVER }},1433;Database=${{ secrets.AZURE_SQL_DB }};User Id=${{ secrets.AZURE_SQL_USER }};Password=${{ secrets.AZURE_SQL_PASSWORD }};TrustServerCertificate=True;' \
-                REDIS_CONFIGURATION='${{ secrets.AZURE_REDIS_HOST }}:6380,password=${{ secrets.AZURE_REDIS_KEY }},ssl=True,abortConnect=False' \
-                JwtSettings__AccessTokenSecret='${{ secrets.JWT_ACCESS_TOKEN_SECRET }}' \
-                JwtSettings__RefreshTokenSecret='${{ secrets.JWT_REFRESH_TOKEN_SECRET }}' \
-                JwtSettings__RegisterTokenSecret='${{ secrets.JWT_REGISTER_TOKEN_SECRET }}' \
-                JwtSettings__ForgotPasswordTokenSecret='${{ secrets.JWT_FORGOT_PASSWORD_TOKEN_SECRET }}' \
-                JwtSettings__SetPasswordTokenSecret='${{ secrets.JWT_SET_PASSWORD_TOKEN_SECRET }}' \
-                EmailSettings__SmtpServer='${{ secrets.EMAIL_SMTP_SERVER }}' \
-                EmailSettings__Port='${{ secrets.EMAIL_PORT }}' \
-                EmailSettings__SenderName='${{ secrets.EMAIL_SENDER_NAME }}' \
-                EmailSettings__SenderEmail='${{ secrets.EMAIL_SENDER_EMAIL }}' \
-                EmailSettings__Username='${{ secrets.EMAIL_USERNAME }}' \
-                EmailSettings__Password='${{ secrets.EMAIL_PASSWORD }}' \
-                CloudinarySettings__CloudName='${{ secrets.CLOUDINARY_CLOUD_NAME }}' \
-                CloudinarySettings__ApiKey='${{ secrets.CLOUDINARY_API_KEY }}' \
-                CloudinarySettings__ApiSecret='${{ secrets.CLOUDINARY_API_SECRET }}' \
-                MomoSettings__PartnerCode='${{ secrets.MOMO_PARTNER_CODE }}' \
-                MomoSettings__AccessKey='${{ secrets.MOMO_ACCESS_KEY }}' \
-                MomoSettings__SecretKey='${{ secrets.MOMO_SECRET_KEY }}' \
-                MomoSettings__IpnUrl='${{ secrets.MOMO_IPN_URL }}' \
-                MomoSettings__Endpoint='${{ secrets.MOMO_ENDPOINT }}' \
-                MomoSettings__RequestType='${{ secrets.MOMO_REQUEST_TYPE }}' \
-                MomoSettings__Lang='${{ secrets.MOMO_LANG }}' \
-                MomoSettings__OrderExpireTime='${{ secrets.MOMO_ORDER_EXPIRE_TIME }}' \
-                MomoSettings__Ttl='${{ secrets.MOMO_TTL }}' \
-                GoogleAuthSettings__ClientID='${{ secrets.GOOGLE_CLIENT_ID }}' \
-                GoogleAuthSettings__ClientSecret='${{ secrets.GOOGLE_CLIENT_SECRET }}' \
-                Gemini__ApiKey='${{ secrets.GEMINI_API_KEY }}' \
-                Gemini__ModelName='${{ secrets.GEMINI_MODEL_NAME }}' \
-                Gemini__ApiBaseUrl='${{ secrets.GEMINI_API_BASE_URL }}' \
-                Gemini__MaxImageBytes='${{ secrets.GEMINI_MAX_IMAGE_BYTES }}' \
-                Gemini__HttpTimeoutSeconds='${{ secrets.GEMINI_HTTP_TIMEOUT_SECONDS }}' \
-                RateLimteSettings__TokenLimit='${{ secrets.RATE_TOKEN_LIMIT }}' \
-                RateLimteSettings__TokensPerPeriod='${{ secrets.RATE_TOKENS_PER_PERIOD }}' \
-                RateLimteSettings__ReplenishmentPeriod='${{ secrets.RATE_REPLENISHMENT_PERIOD }}' \
-                RateLimteSettings__QueueLimit='${{ secrets.RATE_QUEUE_LIMIT }}'
-          else
-            az containerapp update \
-              -g $RG -n $APP_NAME \
-              --image "$IMAGE" \
-              --set-env-vars \
-                ASPNETCORE_ENVIRONMENT=Production
+              --ingress external --target-port $PORT
           fi
 
-      # Gán quyền ACRPull (nếu lần đầu)
       - name: Grant ACR Pull permission
-        continue-on-error: true
         run: |
           MI_PRINCIPAL_ID=$(az containerapp show -g $RG -n $APP_NAME --query identity.principalId -o tsv)
           ACR_ID=$(az acr show -n ${{ secrets.ACR_NAME }} -g $RG --query id -o tsv)
           az role assignment create --assignee $MI_PRINCIPAL_ID --role AcrPull --scope $ACR_ID || true
 
-      # Hiển thị URL
+      - name: Deploy Container App
+        run: |
+          set -e
+          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          az containerapp update \
+            -g $RG -n $APP_NAME \
+            --image "$IMAGE" \
+            --set-env-vars \
+              ASPNETCORE_ENVIRONMENT=Production \
+              FRONTEND_ORIGIN='${{ secrets.FRONTEND_ORIGIN }}' \
+              MSSQL_CONNECTION_STRING='Server=tcp:${{ secrets.AZURE_SQL_SERVER }},1433;Database=${{ secrets.AZURE_SQL_DB }};User Id=${{ secrets.AZURE_SQL_USER }};Password=${{ secrets.AZURE_SQL_PASSWORD }};TrustServerCertificate=True;' \
+              REDIS_CONFIGURATION='${{ secrets.AZURE_REDIS_HOST }}:6380,password=${{ secrets.AZURE_REDIS_KEY }},ssl=True,abortConnect=False' \
+              JwtSettings__AccessTokenSecret='${{ secrets.JWT_ACCESS_TOKEN_SECRET }}' \
+              JwtSettings__RefreshTokenSecret='${{ secrets.JWT_REFRESH_TOKEN_SECRET }}' \
+              JwtSettings__RegisterTokenSecret='${{ secrets.JWT_REGISTER_TOKEN_SECRET }}' \
+              JwtSettings__ForgotPasswordTokenSecret='${{ secrets.JWT_FORGOT_PASSWORD_TOKEN_SECRET }}' \
+              JwtSettings__SetPasswordTokenSecret='${{ secrets.JWT_SET_PASSWORD_TOKEN_SECRET }}' \
+              EmailSettings__SmtpServer='${{ secrets.EMAIL_SMTP_SERVER }}' \
+              EmailSettings__Port='${{ secrets.EMAIL_PORT }}' \
+              EmailSettings__SenderName='${{ secrets.EMAIL_SENDER_NAME }}' \
+              EmailSettings__SenderEmail='${{ secrets.EMAIL_SENDER_EMAIL }}' \
+              EmailSettings__Username='${{ secrets.EMAIL_USERNAME }}' \
+              EmailSettings__Password='${{ secrets.EMAIL_PASSWORD }}' \
+              CloudinarySettings__CloudName='${{ secrets.CLOUDINARY_CLOUD_NAME }}' \
+              CloudinarySettings__ApiKey='${{ secrets.CLOUDINARY_API_KEY }}' \
+              CloudinarySettings__ApiSecret='${{ secrets.CLOUDINARY_API_SECRET }}' \
+              MomoSettings__PartnerCode='${{ secrets.MOMO_PARTNER_CODE }}' \
+              MomoSettings__AccessKey='${{ secrets.MOMO_ACCESS_KEY }}' \
+              MomoSettings__SecretKey='${{ secrets.MOMO_SECRET_KEY }}' \
+              MomoSettings__IpnUrl='${{ secrets.MOMO_IPN_URL }}' \
+              MomoSettings__Endpoint='${{ secrets.MOMO_ENDPOINT }}' \
+              MomoSettings__RequestType='${{ secrets.MOMO_REQUEST_TYPE }}' \
+              MomoSettings__Lang='${{ secrets.MOMO_LANG }}' \
+              MomoSettings__OrderExpireTime='${{ secrets.MOMO_ORDER_EXPIRE_TIME }}' \
+              MomoSettings__Ttl='${{ secrets.MOMO_TTL }}' \
+              GoogleAuthSettings__ClientID='${{ secrets.GOOGLE_CLIENT_ID }}' \
+              GoogleAuthSettings__ClientSecret='${{ secrets.GOOGLE_CLIENT_SECRET }}' \
+              Gemini__ApiKey='${{ secrets.GEMINI_API_KEY }}' \
+              Gemini__ModelName='${{ secrets.GEMINI_MODEL_NAME }}' \
+              Gemini__ApiBaseUrl='${{ secrets.GEMINI_API_BASE_URL }}' \
+              Gemini__MaxImageBytes='${{ secrets.GEMINI_MAX_IMAGE_BYTES }}' \
+              Gemini__HttpTimeoutSeconds='${{ secrets.GEMINI_HTTP_TIMEOUT_SECONDS }}' \
+              RateLimteSettings__TokenLimit='${{ secrets.RATE_TOKEN_LIMIT }}' \
+              RateLimteSettings__TokensPerPeriod='${{ secrets.RATE_TOKENS_PER_PERIOD }}' \
+              RateLimteSettings__ReplenishmentPeriod='${{ secrets.RATE_REPLENISHMENT_PERIOD }}' \
+              RateLimteSettings__QueueLimit='${{ secrets.RATE_QUEUE_LIMIT }}'
+
       - name: Show app URL
         run: |
           FQDN=$(az containerapp show -g $RG -n $APP_NAME --query properties.configuration.ingress.fqdn -o tsv)
