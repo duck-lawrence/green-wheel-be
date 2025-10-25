@@ -22,11 +22,12 @@ public partial class Ticket : SorfDeletedEntity, IEntity
 
     public DateTimeOffset UpdatedAt { get; set; }
 
+    public Guid? StationId { get; set; }
+    public virtual Station? Station { get; set; }
+
     public Guid? RequesterId { get; set; }
+    public virtual User? Requester { get; set; } = null!;
 
     public Guid? AssigneeId { get; set; }
-
     public virtual Staff? Assignee { get; set; }
-
-    public virtual User? Requester { get; set; } = null!;
 }

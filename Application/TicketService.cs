@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
@@ -13,12 +14,14 @@ namespace Application
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _repo;
+        private readonly IUserRepository _userRepo;
         private readonly IMapper _mapper;
 
-        public TicketService(ITicketRepository repo,
+        public TicketService(ITicketRepository repo, IUserRepository userRepo,
             IMapper mapper)
         {
             _repo = repo;
+            _userRepo = userRepo;
             _mapper = mapper;
         }
 
@@ -28,8 +31,13 @@ namespace Application
 
         #region customer
 
-        public async Task<Guid> CreateAsync(Guid? customerId, CreateTicketReq req)
+        public async Task<Guid> CreateAsync(Guid? requesterId, CreateTicketReq req)
         {
+            var requester = requesterId.HasValue
+                ? await _userRepo.GetByIdWithFullInfoAsync(requesterId.Value)
+                    ?? throw new NotFoundException(Message.UserMessage.NotFound)
+                : null;
+
             var ticket = new Ticket
             {
                 Id = Guid.NewGuid(),
@@ -37,7 +45,9 @@ namespace Application
                 Description = req.Description,
                 Type = req.Type,
                 Status = (int)TicketStatus.Pending,
-                RequesterId = customerId
+                StationId = (requester != null && requester.Staff != null)
+                    ? requester.Staff.StationId : null,
+                RequesterId = requesterId
             };
 
             await _repo.AddAsync(ticket);

@@ -4,6 +4,7 @@ using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    partial class GreenWheelDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251025060540_add-station-id-to-tickets")]
+    partial class addstationidtotickets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1234,10 +1237,6 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsSignedByStaff")
                         .HasColumnType("bit")
                         .HasColumnName("is_signed_by_staff");
-
-                    b.Property<DateTimeOffset?>("MaintainedUntil")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("maintained_until");
 
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier")
