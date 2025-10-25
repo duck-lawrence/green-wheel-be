@@ -17,7 +17,7 @@ env:
   APP_NAME: greenwheel-backend
   IMAGE_NAME: greenwheel-backend
   PORT: 8080
-  REGISTRY: hycat.azurecr.io # 👈 thêm dòng này (thay bằng login server thật của bạn)
+  REGISTRY: hycat.azurecr.io
 
 jobs:
   deploy:
