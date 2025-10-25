@@ -36,3 +36,6 @@ services:
 
     volumes:
       - ./logs:/app/logs
+
+    restart: always
+
