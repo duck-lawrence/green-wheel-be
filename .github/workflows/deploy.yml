@@ -17,7 +17,6 @@ env:
   APP_NAME: greenwheel-backend
   IMAGE_NAME: greenwheel-backend
   PORT: 8080
-  REGISTRY: hycat.azurecr.io
 
 jobs:
   deploy:
@@ -62,16 +61,11 @@ jobs:
               --ingress external --target-port $PORT
           fi
 
-      - name: Grant ACR Pull permission
-        run: |
-          MI_PRINCIPAL_ID=$(az containerapp show -g $RG -n $APP_NAME --query identity.principalId -o tsv)
-          ACR_ID=$(az acr show -n ${{ secrets.ACR_NAME }} -g $RG --query id -o tsv)
-          az role assignment create --assignee $MI_PRINCIPAL_ID --role AcrPull --scope $ACR_ID || true
-
       - name: Deploy Container App
         run: |
           set -e
           IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          echo "Deploying image: $IMAGE"
           az containerapp update \
             -g $RG -n $APP_NAME \
             --image "$IMAGE" \
