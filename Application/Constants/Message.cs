@@ -214,6 +214,8 @@
         {
             public const string NotFound = "ticket.not_found";
             public const string AlreadyEscalated = "ticket.already_escalated";
+            public const string AlreadyResolved = "ticket.already_resolved";
+
         }
 
         //upload
