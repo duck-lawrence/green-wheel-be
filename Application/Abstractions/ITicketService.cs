@@ -9,7 +9,7 @@ namespace Application.Abstractions
     {
         Task<Guid> CreateAsync(Guid? customerId, CreateTicketReq req);
 
-        Task<PageResult<TicketRes>> GetAllAsync(TicketFilterParams filter, PaginationParams pagination);
+        Task<PageResult<TicketRes>> GetAllAsync(Guid staffId, TicketFilterParams filter, PaginationParams pagination);
 
         Task<PageResult<TicketRes>> GetByCustomerAsync(Guid customerId, int? status, PaginationParams pagination);
 

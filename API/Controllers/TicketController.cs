@@ -85,7 +85,8 @@ namespace API.Controllers
             [FromQuery] PaginationParams pagination
         )
         {
-            var data = await _service.GetAllAsync(filter, pagination);
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var data = await _service.GetAllAsync(userId, filter, pagination);
             return Ok(data);
         }
 
