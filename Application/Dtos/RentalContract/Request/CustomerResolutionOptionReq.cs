@@ -8,6 +8,6 @@ namespace Application.Dtos.RentalContract.Request
 {
     public class CustomerResolutionOptionReq
     {
-        public int resolutionOption { get; set; }
+        public int ResolutionOption { get; set; }
     }
 }

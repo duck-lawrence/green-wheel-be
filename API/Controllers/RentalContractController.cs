@@ -22,7 +22,6 @@ namespace API.Controllers
     public class RentalContractController(IRentalContractService rentalContractService,
         IVehicleChecklistService vehicleChecklistService) : ControllerBase
     {
-
         private readonly IRentalContractService _rentalContractService = rentalContractService;
         private readonly IVehicleChecklistService _vehicleChecklistService = vehicleChecklistService;
 
@@ -57,7 +56,7 @@ namespace API.Controllers
         /// <response code="404">Rental contract not found.</response>
         [HttpPut("{id}/confirm")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> ConfirmRentalContract(Guid id, ConfirmReq req)
+        public async Task<IActionResult> ConfirmRentalContract(Guid id, [FromBody] ConfirmReq req)
         {
             await _rentalContractService.VerifyRentalContract(id, req);
             return Ok();
@@ -209,10 +208,8 @@ namespace API.Controllers
         [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> ProcessCustomerConfirm(Guid id, CustomerResolutionOptionReq req)
         {
-            await _rentalContractService.ProcessCustomerConfirm(id, req.resolutionOption);
+            await _rentalContractService.ProcessCustomerConfirm(id, req.ResolutionOption);
             return Ok();
         }
-
-        
     }
 }

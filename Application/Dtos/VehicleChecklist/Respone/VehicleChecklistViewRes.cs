@@ -20,6 +20,8 @@ namespace Application.Dtos.VehicleChecklist.Respone
 
         public Guid? ContractId { get; set; }
         public int Type { get; set; }
+        
+        public DateTimeOffset? MaintainedUntil { get; set; }
       
         //public IEnumerable<ChecklistItemImageRes>? VehicleChecklistItems { get; set; }
         public IEnumerable<VehicleChecklistItemViewRes>? VehicleChecklistItems { get; set; }
