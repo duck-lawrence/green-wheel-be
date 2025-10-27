@@ -1,4 +1,6 @@
-﻿using Application.Dtos.Vehicle.Request;
+﻿using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
+using Application.Dtos.Vehicle.Request;
 using Application.Dtos.Vehicle.Respone;
 using Domain.Entities;
 
@@ -12,7 +14,7 @@ namespace Application.Abstractions
 
         Task<bool> DeleteVehicle(Guid id);
 
-        Task<IEnumerable<VehicleViewRes>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate);
+        Task<PageResult<VehicleViewRes>> GetAllAsync(PaginationParams pagination, string? name, Guid? stationId, int? status, string? licensePlate);
 
         Task<VehicleViewRes> GetVehicleById(Guid id);
 

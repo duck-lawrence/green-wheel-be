@@ -14,5 +14,7 @@ namespace Application.Dtos.Vehicle.Respone
         public Guid StationId { get; set; }
         public VehicleModelViewRes Model { get; set; } = null!;
         public int Status {get; set;}
+        public DateTimeOffset UpdatedAt { get; set; }
+
     }
 }

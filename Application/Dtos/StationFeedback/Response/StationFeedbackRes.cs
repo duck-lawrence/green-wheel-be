@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Dtos.StationFeedback.Request
+namespace Application.Dtos.StationFeedback.Response
 {
     public class StationFeedbackRes
     {
