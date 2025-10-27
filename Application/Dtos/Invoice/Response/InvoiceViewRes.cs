@@ -23,6 +23,6 @@ namespace Application.Dtos.Invoice.Response
         public InvoiceStatus Status { get; set; } = InvoiceStatus.Pending;
         public int Type { get; set; }
         public DateTimeOffset? PaidAt { get; set; } = null;
-
+        public string? ImageUrl { get; set; } = null!;
     }
 }

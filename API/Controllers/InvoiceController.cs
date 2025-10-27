@@ -201,13 +201,13 @@ namespace API.Controllers
         /// <response code="200">Image uploaded successfully.</response>
         /// <response code="400">Invalid file or request data.</response>
         /// <response code="404">Invoice not found.</response>
-        [HttpPost("image")]
+        [HttpPut("{id}/image")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> UploadMainImage([FromRoute] Guid invoiceId, [FromForm(Name = "file")] IFormFile file)
+        public async Task<IActionResult> UploadMainImage([FromRoute] Guid id, [FromForm(Name = "file")] IFormFile file)
         {
-            var imageUrl = await _invoiceService.UploadImageAsync(invoiceId, file);
-            return Ok(new { data = new { invoiceId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
+            var imageUrl = await _invoiceService.UploadImageAsync(id, file);
+            return Ok(new { data = new { id, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
         }
 
 
@@ -218,10 +218,10 @@ namespace API.Controllers
         /// <returns>Success message if the image is deleted successfully.</returns>
         /// <response code="200">Image deleted successfully.</response>
         /// <response code="404">Image or model not found.</response>
-        [HttpDelete("image")]
-        public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
+        [HttpDelete("{id}/image")]
+        public async Task<IActionResult> DeleteMainImage([FromRoute] Guid id)
         {
-            await _invoiceService.DeleteImageAsync(modelId);
+            await _invoiceService.DeleteImageAsync(id);
             return Ok(new { message = Message.CloudinaryMessage.DeleteSuccess });
         }
     }
