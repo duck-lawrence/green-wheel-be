@@ -11,21 +11,18 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles all dispatch request operations such as creating, assigning, 
+    /// and managing dispatch requests between staff and users.
+    /// </summary>
     [ApiController]
     [Route("api/dispatch-requests")]
     [RoleAuthorize(RoleName.Admin)]
-    public class DispatchRequestController : ControllerBase
+    public class DispatchRequestController(IDispatchRequestService dispatchRequestService, IUserService userService, IStaffRepository staffRepository) : ControllerBase
     {
-        private readonly IDispatchRequestService _dispatchRequestService;
-        private readonly IUserService _userService;
-        private readonly IStaffRepository _staffRepository;
-
-        public DispatchRequestController(IDispatchRequestService dispatchRequestService, IUserService userService, IStaffRepository staffRepository)
-        {
-            _userService = userService;
-            _dispatchRequestService = dispatchRequestService;
-            _staffRepository = staffRepository;
-        }
+        private readonly IDispatchRequestService _dispatchRequestService = dispatchRequestService;
+        private readonly IUserService _userService = userService;
+        private readonly IStaffRepository _staffRepository = staffRepository;
 
         /// <summary>
         /// Creates a new dispatch request (admin only).

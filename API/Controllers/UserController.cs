@@ -16,21 +16,18 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles user-related operations such as authentication, profile management, 
+    /// and Google account integration.
+    /// </summary>
     [Route("api/users")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController(IUserService service,
+        IUserProfileSerivce userProfileSerivce, IMemoryCache cache) : ControllerBase
     {
-        private readonly IUserService _userService;
-        private readonly IUserProfileSerivce _userProfileService;
-        private readonly IMemoryCache _cache;
-
-        public UserController(IUserService service, IGoogleCredentialService googleCredentialService,
-            IUserProfileSerivce userProfileSerivce, IMemoryCache cache)
-        {
-            _userService = service;
-            _userProfileService = userProfileSerivce;
-            _cache = cache;
-        }
+        private readonly IUserService _userService = service;
+        private readonly IUserProfileSerivce _userProfileService = userProfileSerivce;
+        private readonly IMemoryCache _cache = cache;
 
         /// <summary>
         /// Retrieves all users with optional filters for phone number, citizen ID number, or driver license number.
@@ -76,22 +73,31 @@ namespace API.Controllers
             return Ok(users);
         }
 
+        /// <summary>
+        /// Retrieves a user by their unique identifier. 
+        /// Accessible only to staff and admin roles with role-based permission checks.
+        /// </summary>
+        /// <param name="id">The unique identifier of the user to retrieve.</param>
+        /// <returns>User details if access is allowed and the user exists.</returns>
+        /// <response code="200">User retrieved successfully.</response>
+        /// <response code="403">Access denied. Insufficient role permissions.</response>
+        /// <response code="404">User not found.</response>
         [HttpGet("{id}")]
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString());
             var user = await _userService.GetByIdAsync(userId)
                 ?? throw new NotFoundException(Message.UserMessage.NotFound);
             var userFromDb = await _userService.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.UserMessage.NotFound);
-            if (user.Role.Name == RoleName.Staff)
+            if (user.Role!.Name == RoleName.Staff)
             {
-                return userFromDb.Role.Name == RoleName.Customer ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+                return userFromDb.Role!.Name == RoleName.Customer ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
             }
             if (user.Role.Name == RoleName.Admin)
             {
-                return userFromDb.Role.Name == RoleName.Customer || userFromDb.Role.Name == RoleName.Staff ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission); ;
+                return userFromDb.Role!.Name == RoleName.Customer || userFromDb.Role.Name == RoleName.Staff ? Ok(userFromDb) : throw new ForbidenException(Message.UserMessage.DoNotHavePermission); ;
             }
             throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
         }
@@ -263,7 +269,7 @@ namespace API.Controllers
         //    return Ok(user);
         //}
 
-        ///*
+        //*
         // * Status code
         // * 200 success
         // */

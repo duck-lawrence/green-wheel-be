@@ -7,16 +7,13 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles operations related to station feedback such as creating, viewing, and managing feedback.
+    /// </summary>
     [ApiController]
     [Route("api/station-feedbacks")]
-    public class StationFeedbackController : ControllerBase
+    public class StationFeedbackController(IStationFeedbackService service) : ControllerBase
     {
-        private readonly IStationFeedbackService _service;
-
-        public StationFeedbackController(IStationFeedbackService service)
-        {
-            _service = service;
-        }
 
         /// <summary>
         /// Creates a new feedback entry for a specific station from the authenticated customer.
@@ -32,21 +29,21 @@ namespace API.Controllers
         public async Task<IActionResult> Create([FromBody] StationFeedbackCreateReq req)
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _service.CreateAsync(req, customerId);
+            var result = await service.CreateAsync(req, customerId);
             return Ok(result);
         }
 
         /// <summary>
         /// Retrieves all feedback entries for a specific station by its unique identifier.
         /// </summary>
-        /// <param name="stationId">The unique identifier of the station.</param>
+        /// <param name="id">The unique identifier of the station.</param>
         /// <returns>List of feedback entries related to the specified station.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Station not found or no feedback available.</response>
         [HttpGet("station/{id}")]
         public async Task<IActionResult> GetByStationId(Guid id)
         {
-            var data = await _service.GetByStationIdAsync(id);
+            var data = await service.GetByStationIdAsync(id);
             return Ok(data);
         }
 
@@ -59,7 +56,7 @@ namespace API.Controllers
         public async Task<IActionResult> GetMyFeedbacks()
         {
             var customerId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var data = await _service.GetByCustomerIdAsync(customerId);
+            var data = await service.GetByCustomerIdAsync(customerId);
             return Ok(data);
         }
 
@@ -74,14 +71,19 @@ namespace API.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             var customerId = Guid.Parse(User.FindFirst("sid")!.Value);
-            await _service.DeleteAsync(id, customerId);
+            await service.DeleteAsync(id, customerId);
             return NoContent();
         }
 
+        /// <summary>
+        /// Retrieves all station feedback records.
+        /// </summary>
+        /// <returns>A list of all station feedbacks.</returns>
+        /// <response code="200">Feedbacks retrieved successfully.</response>
         [HttpGet]
         public async Task<IActionResult> GetAllFeedbacks()
         {
-            var data = await _service.GetAllAsync();
+            var data = await service.GetAllAsync();
             return Ok(data);
         }
     }

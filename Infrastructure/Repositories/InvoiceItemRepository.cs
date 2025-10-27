@@ -20,7 +20,7 @@ namespace Infrastructure.Repositories
         {
             return await _dbContext.InvoiceItems
                 .Include(i => i.ChecklistItem)
-                    .ThenInclude(cli => cli.Component)
+                    .ThenInclude(cli => cli == null ? null : cli.Component)
                 .Where(i => i.InvoiceId == invoiceId).ToListAsync();
         }
 

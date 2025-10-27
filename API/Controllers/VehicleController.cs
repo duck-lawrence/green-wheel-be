@@ -6,16 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles vehicle-related operations such as creation, updates, and retrieval.
+    /// </summary>
     [Route("api/vehicles")]
     [ApiController]
-    public class VehicleController : ControllerBase
+    public class VehicleController(IVehicleService vehicleService) : ControllerBase
     {
-        private readonly IVehicleService _vehicleService;
-
-        public VehicleController(IVehicleService vehicleService)
-        {
-            _vehicleService = vehicleService;
-        }
+        private readonly IVehicleService _vehicleService = vehicleService;
 
         /// <summary>
         /// Creates a new vehicle entry in the system (admin only).

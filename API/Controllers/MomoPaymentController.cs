@@ -10,19 +10,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles all MoMo payment operations such as creating payment requests 
+    /// and processing IPN callbacks.
+    /// </summary>
     [Route("api/momo-payment")]
     [ApiController]
-    public class MomoPaymentController : ControllerBase
+    public class MomoPaymentController(IMomoService momoService, IInvoiceService invoiceService) : ControllerBase
     {
-        private readonly IMomoService _momoService;
-        private readonly IInvoiceService _invoiceService;
-
-        
-        public MomoPaymentController(IMomoService momoService, IInvoiceService invoiceService)
-        {
-            _momoService = momoService;
-            _invoiceService = invoiceService;
-        }
+        private readonly IMomoService _momoService = momoService;
+        private readonly IInvoiceService _invoiceService = invoiceService;
 
         /// <summary>
         /// Creates a MoMo payment link for the specified invoice.

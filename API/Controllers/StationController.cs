@@ -4,16 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Manages station-related operations such as listing, creating, and updating stations.
+    /// </summary>
     [Route("api/stations")]
     [ApiController]
-    public class StationController : ControllerBase
+    public class StationController(IStationService stationService) : ControllerBase
     {
-        private readonly IStationService _stationSerivce;
-
-        public StationController(IStationService stationService)
-        {
-            _stationSerivce = stationService;
-        }
+        private readonly IStationService _stationSerivce = stationService;
 
         /// <summary>
         /// Retrieves all stations available in the system.
