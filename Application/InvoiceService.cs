@@ -101,11 +101,29 @@ namespace Application
         }
         public async Task PayRefundInvoiceManual(Invoice invoice, decimal amount)
         {
-            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
-            if (amountNeed > 0 && amount < amountNeed)
-                throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
-            await UpdateCashInvoice(invoice, amount);
-            await _uow.SaveChangesAsync();
+            await _uow.BeginTransactionAsync();
+            try
+            {
+                var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId)
+                   ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
+                if (contract.Status != (int)RentalContractStatus.RefundPending)
+                    throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
+                contract.Status = (int)RentalContractStatus.Completed;
+                await _uow.RentalContractRepository.UpdateAsync(contract);
+                var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
+                if (amountNeed > 0 && amount < amountNeed)
+                    throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
+                await UpdateCashInvoice(invoice, amount);
+               
+                
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
         }
         private async Task UpdateCashInvoice(Invoice invoice, decimal amount)
         {

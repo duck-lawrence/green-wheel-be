@@ -154,10 +154,9 @@
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string NotFound = "rental_contract.not_found";
-            public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
+            public const string ContractAlreadyProcess = "rental_contract.already_process";
             public const string CanNotCancel = "rental_contract.can_not_cancel";
-
-            public static string ContractAlreadyProcess = "rental_contract.already_returned";
+            //public static string ContractAlreadyProcess = "rental_contract.already_returned";
         }
 
         //Station
