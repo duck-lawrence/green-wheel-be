@@ -1,11 +1,13 @@
 ﻿using Application.Abstractions;
+using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.Vehicle.Request;
+using Application.Dtos.Vehicle.Respone;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Application.AppExceptions;
-using Application.Dtos.Vehicle.Respone;
 
 namespace Application
 {
@@ -43,11 +45,18 @@ namespace Application
             return await _vehicleRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<VehicleViewRes>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate)
+        public async Task<PageResult<VehicleViewRes>> GetAllAsync(PaginationParams pagination, string? name, Guid? stationId, int? status, string? licensePlate)
         {
-            var vehicles = await _vehicleRepository.GetAllAsync(name, stationId, status, licensePlate);
+            var vehicles = await _vehicleRepository.GetAllAsync(pagination, name, stationId, status, licensePlate);
 
-            return _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles) ?? [];
+            var mappedItems = _mapper.Map<IEnumerable<VehicleViewRes>>(vehicles.Items);
+
+            return new PageResult<VehicleViewRes>(
+                mappedItems,
+                vehicles.PageNumber,
+                vehicles.PageSize,
+                vehicles.Total
+            );
         }
 
         public async Task<VehicleViewRes> GetVehicleById(Guid id)

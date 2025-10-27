@@ -1,4 +1,6 @@
 ﻿using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System;
@@ -17,7 +19,7 @@ namespace Application.Repositories
         Task<Vehicle?> GetByIdOptionAsync(Guid id, bool includeModel = false);
 
         Task<int> CountVehiclesInStationAsync(Guid[] vehicleIds, Guid stationId);
-        Task<IEnumerable<Vehicle>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate);
+        Task<PageResult<Vehicle>> GetAllAsync(PaginationParams pagination, string? name, Guid? stationId, int? status, string? licensePlate);
         Task UpdateStationForDispatchAsync(Guid dispatchId, Guid toStationId);
         //Task GetByIdAsync(Guid? vehicleId);
     }
