@@ -12,9 +12,6 @@ namespace Application.Dtos.RentalContract.Request
     {
         public ConfirmReqValidator()
         {
-            RuleFor(x => x.Id)
-                .NotEqual(Guid.Empty).WithMessage(Message.RentalContractMessage.StationIdRequired);
-
             RuleFor(x => x.VehicleStatus)
                 .NotNull().WithMessage(Message.RentalContractMessage.InvalidVehicleStatus)
                 .InclusiveBetween(0, 2).WithMessage(Message.RentalContractMessage.InvalidVehicleStatus)
