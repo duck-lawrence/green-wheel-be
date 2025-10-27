@@ -9,19 +9,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Manages vehicle model operations such as creation, updates, and image management.
+    /// </summary>
     [Route("api/vehicle-models")]
     [ApiController]
-    public class VehicleModelController : ControllerBase
+    public class VehicleModelController(IVehicleModelService vehicleModelService,
+        IModelImageService modelImageService) : ControllerBase
     {
-        private readonly IVehicleModelService _vehicleModelService;
-        private readonly IModelImageService _modelImageService;
-
-        public VehicleModelController(IVehicleModelService vehicleModelService,
-            IModelImageService modelImageService)
-        {
-            _vehicleModelService = vehicleModelService;
-            _modelImageService = modelImageService;
-        }
+        private readonly IVehicleModelService _vehicleModelService = vehicleModelService;
+        private readonly IModelImageService _modelImageService = modelImageService;
 
         /// <summary>
         /// Creates a new vehicle model (admin only).

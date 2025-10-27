@@ -24,7 +24,7 @@ namespace Infrastructure.Repositories
         public async Task<int> RevokeRefreshToken(string token)
         {
             
-            RefreshToken tokenFromDB = await GetByRefreshToken(token, false);
+            RefreshToken? tokenFromDB = await GetByRefreshToken(token, false);
             if(tokenFromDB != null)
             {
                 tokenFromDB.IsRevoked = true;

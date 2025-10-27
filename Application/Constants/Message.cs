@@ -2,6 +2,11 @@
 {
     public static class Message
     {
+        public static class RoleMessage
+        {
+            public const string NotFound = "role.not_found";
+        }
+
         //Register
         public static class UserMessage
         {

@@ -5,7 +5,6 @@ using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
-using System.Formats.Asn1;
 
 namespace Infrastructure.Repositories
 {
@@ -19,12 +18,12 @@ namespace Infrastructure.Repositories
         {
             var contracts = _dbContext.RentalContracts.Where(r => r.CustomerId == customerId)
                 .Include(x => x.Vehicle)
-                    .ThenInclude(v => v.Model)
+                    .ThenInclude(v => v == null ? null : v.Model)
                 .Include(x => x.Station)
                  .Include(x => x.HandoverStaff)
-                    .ThenInclude(h => h.User)
+                    .ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.ReturnStaff)
-                    .ThenInclude(h => h.User)
+                    .ThenInclude(h => h == null ? null : h.User)
                 .AsQueryable();
             if (status != null)
             {
@@ -38,12 +37,12 @@ namespace Infrastructure.Repositories
         {
             var rentalContracts = _dbContext.RentalContracts
                 .Include(x => x.Vehicle)
-                    .ThenInclude(v => v.Model)
+                    .ThenInclude(v => v == null ? null : v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.HandoverStaff)
-                    .ThenInclude(h => h.User)
+                    .ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.ReturnStaff)
-                    .ThenInclude(h => h.User)
+                    .ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
@@ -59,11 +58,11 @@ namespace Infrastructure.Repositories
             }
             if (!string.IsNullOrEmpty(citizenIdentityNumber))
             {
-                rentalContracts = rentalContracts.Where(rc => rc.Customer.CitizenIdentity.Number == citizenIdentityNumber);
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.CitizenIdentity!.Number == citizenIdentityNumber);
             }
             if (!string.IsNullOrEmpty(driverLicenseNumber))
             {
-                rentalContracts = rentalContracts.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
+                rentalContracts = rentalContracts.Where(rc => rc.Customer.DriverLicense!.Number == driverLicenseNumber);
             }
             if(stationId != null)
             {
@@ -83,7 +82,7 @@ namespace Infrastructure.Repositories
         {
             return await _dbContext.RentalContracts.Where(r => r.Id == id)
                 .Include(x => x.Vehicle)
-                    .ThenInclude(v => v.Model)
+                    .ThenInclude(v => v == null ? null : v.Model)
                 .Include(x => x.Station)
                 .Include(x => x.Invoices)
                     .ThenInclude(i => i.InvoiceItems)
@@ -91,9 +90,9 @@ namespace Infrastructure.Repositories
                     .ThenInclude(i => i.Deposit)
                 .Include(x => x.VehicleChecklists)
                 .Include(x => x.HandoverStaff)
-                    .ThenInclude(h => h.User)
+                    .ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.ReturnStaff)
-                    .ThenInclude(h => h.User)
+                    .ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
@@ -105,7 +104,7 @@ namespace Infrastructure.Repositories
         {
             var vehicleChecklist = (await _dbContext.VehicleChecklists.Where(vc => vc.Id == id)
                 .Include(vc => vc.Contract)
-                    .ThenInclude(r => r.Invoices).FirstOrDefaultAsync());
+                    .ThenInclude(r => r == null ? null : r.Invoices).FirstOrDefaultAsync());
 
             return vehicleChecklist == null ? null : vehicleChecklist.Contract;
         }
@@ -115,7 +114,7 @@ namespace Infrastructure.Repositories
             var list = await _dbContext.RentalContracts.Where(c => c.VehicleId == vehicleId)
                     .Include(r => r.Customer)
                     .Include(r => r.Vehicle)
-                        .ThenInclude(v => v.Model)
+                        .ThenInclude(v => v == null ? null : v.Model)
                     .Include(r => r.Station)
                     .ToListAsync();
             return list ?? [];
@@ -130,10 +129,10 @@ namespace Infrastructure.Repositories
             PaginationParams? pagination = null)
         {
             var query = _dbContext.RentalContracts
-                .Include(x => x.Vehicle).ThenInclude(v => v.Model)
+                .Include(x => x.Vehicle).ThenInclude(v => v == null ? null : v.Model)
                 .Include(x => x.Station)
-                .Include(x => x.HandoverStaff).ThenInclude(h => h.User)
-                .Include(x => x.ReturnStaff).ThenInclude(h => h.User)
+                .Include(x => x.HandoverStaff).ThenInclude(h => h == null ? null : h.User)
+                .Include(x => x.ReturnStaff).ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.Customer).ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer).ThenInclude(u => u.DriverLicense)
                 .AsQueryable();
@@ -143,9 +142,9 @@ namespace Infrastructure.Repositories
             if (status != null)
                 query = query.Where(rc => rc.Status == status);
             if (!string.IsNullOrEmpty(citizenIdentityNumber))
-                query = query.Where(rc => rc.Customer.CitizenIdentity.Number == citizenIdentityNumber);
+                query = query.Where(rc => rc.Customer.CitizenIdentity!.Number == citizenIdentityNumber);
             if (!string.IsNullOrEmpty(driverLicenseNumber))
-                query = query.Where(rc => rc.Customer.DriverLicense.Number == driverLicenseNumber);
+                query = query.Where(rc => rc.Customer.DriverLicense!.Number == driverLicenseNumber);
             if (stationId != null)
                 query = query.Where(rc => rc.StationId == stationId);
 
@@ -170,10 +169,10 @@ namespace Infrastructure.Repositories
         public async Task<PageResult<RentalContract>> GetMyContractsAsync(Guid customerId, int? status, PaginationParams pagination)
         {
             var query = _dbContext.RentalContracts
-                .Include(rc => rc.Vehicle).ThenInclude(v => v.Model)
+                .Include(rc => rc.Vehicle).ThenInclude(v => v == null ? null : v.Model)
                 .Include(rc => rc.Station)
-                .Include(rc => rc.HandoverStaff).ThenInclude(s => s.User)
-                .Include(rc => rc.ReturnStaff).ThenInclude(s => s.User)
+                .Include(rc => rc.HandoverStaff).ThenInclude(s => s == null ? null : s.User)
+                .Include(rc => rc.ReturnStaff).ThenInclude(s => s == null ? null : s.User)
                 .Where(rc => rc.CustomerId == customerId);
 
             if (status != null)

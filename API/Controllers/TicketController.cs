@@ -8,16 +8,14 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Manages ticket-related operations such as creation, retrieval, and updates.
+    /// </summary>
     [ApiController]
     [Route("api/tickets")]
-    public class TicketController : ControllerBase
+    public class TicketController(ITicketService service) : ControllerBase
     {
-        private readonly ITicketService _service;
-
-        public TicketController(ITicketService service)
-        {
-            _service = service;
-        }
+        private readonly ITicketService _service = service;
 
         // ==========
         // for customer
@@ -109,7 +107,14 @@ namespace API.Controllers
         }
 
         #region escalated
-
+        /// <summary>
+        /// Escalates a specific ticket to the admin for further review or action.
+        /// </summary>
+        /// <param name="id">The unique identifier of the ticket to escalate.</param>
+        /// <returns>Success message if the escalation is completed successfully.</returns>
+        /// <response code="200">Ticket escalated to admin successfully.</response>
+        /// <response code="404">Ticket not found.</response>
+        /// <response code="403">Access denied. Only staff can perform this action.</response>
         [HttpPatch("{id}/escalated-to-admin")]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> EscalateToAdmin(Guid id)
@@ -119,6 +124,13 @@ namespace API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Retrieves all tickets that have been escalated to the admin, with pagination support.
+        /// </summary>
+        /// <param name="pagination">Pagination parameters for filtering and page size.</param>
+        /// <returns>A paginated list of escalated tickets.</returns>
+        /// <response code="200">Escalated tickets retrieved successfully.</response>
+        /// <response code="403">Access denied. Only admins can perform this action.</response>
         [HttpGet("escalated")]
         [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> GetEscalatedTickets([FromQuery] PaginationParams pagination)

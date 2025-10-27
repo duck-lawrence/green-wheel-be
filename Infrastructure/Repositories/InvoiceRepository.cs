@@ -45,7 +45,7 @@ namespace Infrastructure.Repositories
             {
                 query = query.Include(i => i.InvoiceItems)
                     .ThenInclude(i => i.ChecklistItem)
-                        .ThenInclude(cli => cli.Component);
+                        .ThenInclude(cli => cli == null ? null : cli.Component);
             }
             if (includeDeposit)
             {

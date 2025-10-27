@@ -136,6 +136,7 @@ namespace API.Controllers
         /// Retrieves all rental contracts of the authenticated customer, optionally filtered by status.
         /// </summary>
         /// <param name="status">Optional status filter for the rental contracts.</param>
+        /// <param name="pagination">Optional pagination filter for the rental contracts.</param>
         /// <returns>List of the customer's rental contracts.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No rental contracts found for the customer.</response>
@@ -196,6 +197,14 @@ namespace API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Processes a vehicle change request for a specific rental contract.
+        /// </summary>
+        /// <param name="id">The unique identifier of the rental contract.</param>
+        /// <returns>Success message if the vehicle change is processed successfully.</returns>
+        /// <response code="200">Vehicle change processed successfully.</response>
+        /// <response code="404">Rental contract not found.</response>
+        /// <response code="403">Access denied. Only staff can perform this action.</response>
         [HttpPut("{id}/change-vehicle")]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> ProcessChangeVehicle(Guid id)
@@ -204,6 +213,16 @@ namespace API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Handles the customer's confirmation or resolution for a rental contract issue.
+        /// </summary>
+        /// <param name="id">The unique identifier of the rental contract.</param>
+        /// <param name="req">The customer's resolution option request.</param>
+        /// <returns>Success message if the confirmation is processed successfully.</returns>
+        /// <response code="200">Customer confirmation processed successfully.</response>
+        /// <response code="400">Invalid resolution option.</response>
+        /// <response code="404">Rental contract not found.</response>
+        /// <response code="403">User does not have permission to perform this action.</response>
         [HttpPut("{id}/customer-confirm")]
         [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> ProcessCustomerConfirm(Guid id, CustomerResolutionOptionReq req)

@@ -10,16 +10,15 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Manages user profile operations such as retrieving, updating, 
+    /// and linking Google account information.
+    /// </summary>
     [Route("api/me")]
     [ApiController]
-    public class UserProfileController : ControllerBase
+    public class UserProfileController(IUserProfileSerivce service) : ControllerBase
     {
-        private readonly IUserProfileSerivce _userProfileService;
-
-        public UserProfileController(IUserProfileSerivce service, IGoogleCredentialService googleCredentialService)
-        {
-            _userProfileService = service;
-        }
+        private readonly IUserProfileSerivce _userProfileService = service;
 
         /// <summary>
         /// Retrieves the profile information of the currently authenticated user.

@@ -9,8 +9,8 @@ namespace Application.Repositories
 {
     public interface ICitizenIdentityRepository : IGenericRepository<CitizenIdentity>
     {
-        Task<CitizenIdentity> GetByIdNumberAsync(string idNumber);
+        Task<CitizenIdentity?> GetByIdNumberAsync(string idNumber);
 
-        Task<CitizenIdentity> GetByUserIdAsync(Guid userId);
+        Task<CitizenIdentity?> GetByUserIdAsync(Guid userId);
     }
 }
