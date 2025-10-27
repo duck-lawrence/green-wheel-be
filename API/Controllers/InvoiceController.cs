@@ -9,29 +9,23 @@ using Application.Dtos.Payment.Request;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.IdentityModel.Tokens.Jwt;
-
 namespace API.Controllers
 {
+    /// <summary>
+    /// Manages invoice operations such as creation, payment, and retrieval.
+    /// </summary>
     [Route("api/invoices")]
     [ApiController]
-    public class InvoiceController : ControllerBase
+    public class InvoiceController(IMomoService momoService,
+        IInvoiceService invoiceItemService,
+        IMemoryCache cache,
+        IUserService userService
+            ) : ControllerBase
     {
-        private readonly IMomoService _momoService;
-        private readonly IInvoiceService _invoiceService;
-        private readonly IMemoryCache _cache;
-        private readonly IUserService _userService;
-
-        public InvoiceController(IMomoService momoService,
-            IInvoiceService invoiceItemService,
-            IMemoryCache cache,
-            IUserService userService
-            )
-        {
-            _momoService = momoService;
-            _invoiceService = invoiceItemService;
-            _cache = cache;
-            _userService = userService;
-        }
+        private readonly IMomoService _momoService = momoService;
+        private readonly IInvoiceService _invoiceService = invoiceItemService;
+        private readonly IMemoryCache _cache = cache;
+        private readonly IUserService _userService = userService;
 
         /// <summary>
         /// Receives and verifies the MoMo payment callback (IPN) to update invoice status.
@@ -81,11 +75,13 @@ namespace API.Controllers
         public async Task<IActionResult> ProcessPayment(Guid id, [FromBody] PaymentReq paymentReq)
         {
             //kiểm tra phải hoá đơn của nó không
-            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString());
             var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
-            var roles = _cache.Get<List<Domain.Entities.Role>>("AllRoles");
-            var userInDB = await _userService.GetByIdAsync(userId);
-            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.Role.Id).Name;
+            var roles = _cache.Get<List<Domain.Entities.Role>>("AllRoles")
+                ?? throw new NotFoundException(Message.RoleMessage.NotFound);
+            var userInDB = await _userService.GetByIdAsync(userId)
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+            var userRole = roles.FirstOrDefault(r => r.Id == userInDB.Role!.Id)!.Name;
             if (userRole == RoleName.Customer)
             {
                 if (invoice.Contract.CustomerId != userId)
@@ -196,6 +192,15 @@ namespace API.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Uploads the main image for a specific invoice.
+        /// </summary>
+        /// <param name="invoiceId">The unique identifier of the invoice to attach the image to.</param>
+        /// <param name="file">The image file to be uploaded (multipart/form-data).</param>
+        /// <returns>Returns the uploaded image URL and invoice ID if successful.</returns>
+        /// <response code="200">Image uploaded successfully.</response>
+        /// <response code="400">Invalid file or request data.</response>
+        /// <response code="404">Invoice not found.</response>
         [HttpPost("image")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
@@ -205,6 +210,14 @@ namespace API.Controllers
             return Ok(new { data = new { invoiceId, imageUrl }, message = Message.CloudinaryMessage.UploadSuccess });
         }
 
+
+        /// <summary>
+        /// Deletes the main image of a specific invoice model.
+        /// </summary>
+        /// <param name="modelId">The unique identifier of the model whose image will be deleted.</param>
+        /// <returns>Success message if the image is deleted successfully.</returns>
+        /// <response code="200">Image deleted successfully.</response>
+        /// <response code="404">Image or model not found.</response>
         [HttpDelete("image")]
         public async Task<IActionResult> DeleteMainImage([FromRoute] Guid modelId)
         {
