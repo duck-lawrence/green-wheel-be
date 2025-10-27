@@ -11,18 +11,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// This controller manages vehicle checklists.
+    /// </summary>
     [Route("api/vehicle-checklists")]
     [ApiController]
-    public class VehicleChecklistController : ControllerBase
+    public class VehicleChecklistController(IVehicleChecklistService vehicleChecklistService, IChecklistItemImageService imageService) : ControllerBase
     {
-        private readonly IVehicleChecklistService _vehicleChecklistService;
-        private readonly IChecklistItemImageService _imageService;
-
-        public VehicleChecklistController(IVehicleChecklistService vehicleChecklistService, IChecklistItemImageService imageService)
-        {
-            _vehicleChecklistService = vehicleChecklistService;
-            _imageService = imageService;
-        }
+        private readonly IVehicleChecklistService _vehicleChecklistService = vehicleChecklistService;
+        private readonly IChecklistItemImageService _imageService = imageService;
 
         /// <summary>
         /// Creates a new vehicle checklist for a rental contract (staff only).

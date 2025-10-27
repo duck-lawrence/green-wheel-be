@@ -8,21 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles user authentication and Google OAuth login.
+    /// </summary>
     [Route("api/auth")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController(IAuthService authService, IGoogleCredentialService googleCredentialService, IUserProfileSerivce userProfileService) : ControllerBase
     {
-        private readonly IAuthService _authService;
-        private readonly IGoogleCredentialService _googleService;
-        private readonly IUserProfileSerivce _userProfileService;
-
-
-        public AuthController(IAuthService authService, IGoogleCredentialService googleCredentialService, IUserProfileSerivce userProfileService)
-        {
-            _authService = authService;
-            _googleService = googleCredentialService;
-            _userProfileService = userProfileService;
-        }
+        private readonly IAuthService _authService = authService;
+        private readonly IGoogleCredentialService _googleService = googleCredentialService;
+        private readonly IUserProfileSerivce _userProfileService = userProfileService;
 
         /// <summary>
         /// Authenticates a user and returns an access token if the credentials are valid.
@@ -64,7 +59,7 @@ namespace API.Controllers
         /// <summary>
         /// Sends a verification email to the specified address.
         /// </summary>
-        /// <param name="request">Email request containing recipient address and other required data.</param>
+        /// <param name="email">Email request containing recipient address and other required data.</param>
         /// <returns>Success message if the email is sent successfully.</returns>
         /// <response code="200">Send email successfully.</response>
         /// <response code="400">Incorrect form of email.</response>
@@ -81,7 +76,7 @@ namespace API.Controllers
         /// <summary>
         /// Verifies the OTP code sent to the user's email address.
         /// </summary>
-        /// <param name="request">Verification request containing email and OTP code.</param>
+        /// <param name="verifyOTPDto">Verification request containing email and OTP code.</param>
         /// <returns>Success message if the email is verified successfully.</returns>
         /// <response code="200">Verify email successfully.</response>
         /// <response code="400">Incorrect form of email or OTP is not a valid digit.</response>
@@ -97,7 +92,7 @@ namespace API.Controllers
         /// <summary>
         /// Registers a new user with provided information.
         /// </summary>
-        /// <param name="request">User registration request containing email, password, and other user details.</param>
+        /// <param name="registerUserDto">User registration request containing email, password, and other user details.</param>
         /// <returns>Success message if the user is registered successfully.</returns>
         /// <response code="200">Register successfully.</response>
         /// <response code="400">Incorrect form of user information.</response>
@@ -121,7 +116,7 @@ namespace API.Controllers
         /// <summary>
         /// Changes the user's password after validating the old password.
         /// </summary>
-        /// <param name="request">Request containing old password, new password, and confirm password.</param>
+        /// <param name="userChangePasswordDto">Request containing old password, new password, and confirm password.</param>
         /// <returns>Success message if the password is changed successfully.</returns>
         /// <response code="200">Change password successfully.</response>
         /// <response code="400">Password too short, empty fields, or confirm password does not match.</response>
@@ -143,7 +138,7 @@ namespace API.Controllers
         /// <summary>
         /// Sends a verification or notification email to the specified address.
         /// </summary>
-        /// <param name="request">Email request containing recipient address and required information.</param>
+        /// <param name="sendEmailRequestDto">Email request containing recipient address and required information.</param>
         /// <returns>Success message if the email is sent successfully.</returns>
         /// <response code="200">Send email successfully.</response>
         /// <response code="400">Incorrect form of email.</response>
@@ -159,7 +154,7 @@ namespace API.Controllers
         /// <summary>
         /// Verifies the OTP code sent to the user's email address.
         /// </summary>
-        /// <param name="request">Verification request containing email and OTP code.</param>
+        /// <param name="verifyOTPDto">Verification request containing email and OTP code.</param>
         /// <returns>Success message if the email is verified successfully.</returns>
         /// <response code="200">Verify email successfully.</response>
         /// <response code="400">Incorrect form of email or OTP is not a valid digit.</response>

@@ -754,8 +754,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
                     b.Property<DateTimeOffset>("EndDate")
@@ -1012,6 +1011,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("requester_id");
 
+                    b.Property<Guid?>("StationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("station_id");
+
                     b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasColumnName("status");
@@ -1034,6 +1037,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__tickets__3213E83F2FACC57D");
+
+                    b.HasIndex("StationId");
 
                     b.HasIndex(new[] { "AssigneeId" }, "idx_tickets_assignee_id");
 
@@ -1059,6 +1064,18 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("avatar_url");
+
+                    b.Property<string>("BankAccountName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("bank_account_name");
+
+                    b.Property<string>("BankAccountNumber")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("bank_account_number");
+
+                    b.Property<string>("BankName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("bank_name");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -1217,6 +1234,10 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsSignedByStaff")
                         .HasColumnType("bit")
                         .HasColumnName("is_signed_by_staff");
+
+                    b.Property<DateTimeOffset?>("MaintainedUntil")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("maintained_until");
 
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier")
@@ -1761,16 +1782,22 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Staff", "Assignee")
                         .WithMany("Tickets")
                         .HasForeignKey("AssigneeId")
-                        .HasConstraintName("fk_tickets_staff");
+                        .HasConstraintName("fk_tickets_staffs");
 
                     b.HasOne("Domain.Entities.User", "Requester")
                         .WithMany("Tickets")
                         .HasForeignKey("RequesterId")
-                        .HasConstraintName("fk_tickets_user");
+                        .HasConstraintName("fk_tickets_users");
+
+                    b.HasOne("Domain.Entities.Station", "Station")
+                        .WithMany()
+                        .HasForeignKey("StationId");
 
                     b.Navigation("Assignee");
 
                     b.Navigation("Requester");
+
+                    b.Navigation("Station");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

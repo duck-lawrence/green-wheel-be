@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,11 @@ namespace Application.Constants
         public static class Policy
         {
             public const int MaxLateHours = 1;
+        }
+
+        public static class Day
+        {
+            public const int RentalContractBufferDay = 10;
         }
     }
 }

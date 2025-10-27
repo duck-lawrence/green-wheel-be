@@ -14,5 +14,7 @@ namespace Application.Constants
         Returned = 3,
         Completed = 4,
         Cancelled = 5,
+        UnavailableVehicle = 6,
+        RefundPending = 7
     }
 }

@@ -18,7 +18,11 @@ public partial class User : SorfDeletedEntity, IEntity
 
     public string? Phone { get; set; }
 
-    public bool IsGoogleLinked { get; set; }
+    public string? BankName { get; set; }
+
+    public string? BankAccountName { get; set; }
+
+    public string? BankAccountNumber { get; set; }
 
     public int? Sex { get; set; }
 
@@ -27,6 +31,8 @@ public partial class User : SorfDeletedEntity, IEntity
     public string? AvatarUrl { get; set; }
 
     public string? AvatarPublicId { get; set; }
+
+    public bool IsGoogleLinked { get; set; }
 
     public DateTimeOffset CreatedAt { get; set; }
 

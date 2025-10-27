@@ -29,7 +29,10 @@ namespace API
             var builder = WebApplication.CreateBuilder(args);
 
             Env.Load("../.env");
-
+            builder.Configuration
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+            .AddEnvironmentVariables();
             // Frontend Url
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
@@ -94,14 +97,17 @@ namespace API
                               .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
                     });
             });
-            //kết nối DB
-            builder.Services.AddInfrastructue(Environment.GetEnvironmentVariable("MSSQL_CONNECTION_STRING")!);
-            //Cache
+            // Kết nối DB
+            var connectionString = builder.Configuration["MSSQL_CONNECTION_STRING"];
+            builder.Services.AddInfrastructue(connectionString!);
+
+            // Cache
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONFIGURATION")!;
+                options.Configuration = builder.Configuration["REDIS_CONFIGURATION"];
                 options.InstanceName = builder.Configuration["Redis:InstanceName"];
             });
+
             //thêm httpcontextAccessor để lấy context trong service
             builder.Services.AddHttpContextAccessor();
             //Add repositories

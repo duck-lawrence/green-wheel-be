@@ -8,22 +8,21 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Manages ticket-related operations such as creation, retrieval, and updates.
+    /// </summary>
     [ApiController]
     [Route("api/tickets")]
-    public class TicketController : ControllerBase
+    public class TicketController(ITicketService service) : ControllerBase
     {
-        private readonly ITicketService _service;
-
-        public TicketController(ITicketService service)
-        {
-            _service = service;
-        }
+        private readonly ITicketService _service = service;
 
         // ==========
         // for customer
         // ==========
 
         #region customer
+
         /// <summary>
         /// Creates a new support ticket for the authenticated user.
         /// </summary>
@@ -35,23 +34,29 @@ namespace API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateTicketReq req)
         {
-            var user = User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value;
-            var userId = Guid.Parse(user);
+            var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sid);
+            Guid? userId = userIdClaim != null ? Guid.Parse(userIdClaim.Value) : null;
             var id = await _service.CreateAsync(userId, req);
             return Ok(new { Id = id });
         }
+
         /// <summary>
         /// Retrieves all support tickets created by the authenticated customer.
         /// </summary>
+        /// <param name="status">Status filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of tickets submitted by the current customer.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No tickets found for the customer.</response>
         [HttpGet("me")]
-        [RoleAuthorize(RoleName.Customer)]
-        public async Task<IActionResult> GetMyTickets()
+        [RoleAuthorize([RoleName.Staff, RoleName.Customer])]
+        public async Task<IActionResult> GetMyTickets(
+            [FromQuery] int? status,
+            [FromQuery] PaginationParams pagination
+        )
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var data = await _service.GetByCustomerAsync(userId);
+            var data = await _service.GetByCustomerAsync(userId, status, pagination);
             return Ok(data);
         }
 
@@ -62,18 +67,24 @@ namespace API.Controllers
         // ===================
 
         #region management
+
         /// <summary>
         /// Retrieves all support tickets with pagination support (for admin and staff roles).
         /// </summary>
-        /// <param name="pagination">Pagination parameters for page number and page size.</param>
+        /// <param name="filter">Filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of support tickets with pagination metadata.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No tickets found.</response>
         [HttpGet]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        public async Task<IActionResult> GetAll([FromQuery] PaginationParams pagination)
+        public async Task<IActionResult> GetAll(
+            [FromQuery] TicketFilterParams filter,
+            [FromQuery] PaginationParams pagination
+        )
         {
-            var data = await _service.GetAllAsync(pagination);
+            var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
+            var data = await _service.GetAllAsync(userId, filter, pagination);
             return Ok(data);
         }
 
@@ -92,20 +103,34 @@ namespace API.Controllers
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _service.UpdateAsync(id, req, staffId);
-            return NoContent();
+            return Ok();
         }
 
         #region escalated
-
+        /// <summary>
+        /// Escalates a specific ticket to the admin for further review or action.
+        /// </summary>
+        /// <param name="id">The unique identifier of the ticket to escalate.</param>
+        /// <returns>Success message if the escalation is completed successfully.</returns>
+        /// <response code="200">Ticket escalated to admin successfully.</response>
+        /// <response code="404">Ticket not found.</response>
+        /// <response code="403">Access denied. Only staff can perform this action.</response>
         [HttpPatch("{id}/escalated-to-admin")]
         [RoleAuthorize(RoleName.Staff)]
         public async Task<IActionResult> EscalateToAdmin(Guid id)
         {
             var staffId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _service.EscalateToAdminAsync(id);
-            return NoContent();
+            return Ok();
         }
 
+        /// <summary>
+        /// Retrieves all tickets that have been escalated to the admin, with pagination support.
+        /// </summary>
+        /// <param name="pagination">Pagination parameters for filtering and page size.</param>
+        /// <returns>A paginated list of escalated tickets.</returns>
+        /// <response code="200">Escalated tickets retrieved successfully.</response>
+        /// <response code="403">Access denied. Only admins can perform this action.</response>
         [HttpGet("escalated")]
         [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> GetEscalatedTickets([FromQuery] PaginationParams pagination)

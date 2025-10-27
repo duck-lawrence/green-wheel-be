@@ -13,7 +13,7 @@ namespace Application.Repositories
 {
     public interface IVehicleRepository : IGenericRepository<Vehicle>
     {
-        Task<Vehicle> GetByLicensePlateAsync(string licensePlate);
+        Task<Vehicle?> GetByLicensePlateAsync(string licensePlate);
 
         Task<IEnumerable<Vehicle>?> GetVehicles(Guid stationId, Guid modelId);
         Task<Vehicle?> GetByIdOptionAsync(Guid id, bool includeModel = false);

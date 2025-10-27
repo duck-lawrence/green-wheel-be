@@ -7,11 +7,11 @@ namespace Application.Abstractions
 {
     public interface ITicketService
     {
-        Task<Guid> CreateAsync(Guid customerId, CreateTicketReq req);
+        Task<Guid> CreateAsync(Guid? customerId, CreateTicketReq req);
 
-        Task<PageResult<TicketRes>> GetAllAsync(PaginationParams pagination);
+        Task<PageResult<TicketRes>> GetAllAsync(Guid staffId, TicketFilterParams filter, PaginationParams pagination);
 
-        Task<IEnumerable<TicketRes>> GetByCustomerAsync(Guid customerId);
+        Task<PageResult<TicketRes>> GetByCustomerAsync(Guid customerId, int? status, PaginationParams pagination);
 
         Task UpdateAsync(Guid id, UpdateTicketReq req, Guid staffId);
 

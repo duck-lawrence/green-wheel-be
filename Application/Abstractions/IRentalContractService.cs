@@ -16,7 +16,7 @@ namespace Application.Abstractions
     public interface IRentalContractService
     {
         Task CreateRentalContractAsync(Guid UserID, CreateRentalContractReq createRentalContractReq);
-         Task VerifyRentalContract(ConfirmReq req);
+         Task VerifyRentalContract(Guid id, ConfirmReq req);
         Task UpdateStatusAsync(Guid id);
         Task<RentalContractViewRes> GetByIdAsync(Guid id);
 
@@ -30,6 +30,7 @@ namespace Application.Abstractions
         Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(ClaimsPrincipal user,int? status,PaginationParams pagination);
 
         Task CancelRentalContract(Guid id);
-        
+        Task ChangeVehicleAsync(Guid id);
+        Task ProcessCustomerConfirm(Guid id, int resolutionOption);
     }
 }

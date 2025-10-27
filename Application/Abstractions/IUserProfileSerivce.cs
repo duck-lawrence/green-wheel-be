@@ -20,12 +20,15 @@ namespace Application.Abstractions
 
         Task UpdateAsync(Guid userId, UserUpdateReq req);
 
+        Task UpdateBankAccountAsync(Guid userId, UpdateBankAccountReq req);
+        
+        Task DeleteBankAccountAsync(Guid userId);
+
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
 
         Task DeleteAvatarAsync(Guid pulicId);
 
         Task CheckDupEmailAsync(string email);
-
 
         Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, IFormFile file);
 
@@ -42,6 +45,5 @@ namespace Application.Abstractions
         Task DeleteDriverLicenseAsync(Guid userId);
 
         Task DeleteCitizenIdentityAsync(Guid userId);
-
     }
 }

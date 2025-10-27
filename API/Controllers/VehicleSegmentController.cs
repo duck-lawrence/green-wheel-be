@@ -5,16 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Handles operations related to vehicle segments such as listing, creation, and updates.
+    /// </summary>
     [Route("api/vehicle-segments")]
     [ApiController]
-    public class VehicleSegmentController : ControllerBase
+    public class VehicleSegmentController(IVehicleSegmentService vehicleSegmentSerivce) : ControllerBase
     {
-        private readonly IVehicleSegmentService _vehicleSegmentSerivce;
-
-        public VehicleSegmentController(IVehicleSegmentService vehicleSegmentSerivce)
-        {
-            _vehicleSegmentSerivce = vehicleSegmentSerivce;
-        }
+        private readonly IVehicleSegmentService _vehicleSegmentSerivce = vehicleSegmentSerivce;
 
         /// <summary>
         /// Retrieves all vehicle segments available in the system.

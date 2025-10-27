@@ -8,24 +8,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 
 namespace API.Controllers
 {
+    /// <summary>
+    ///This controller handle for rental contract.
+    /// </summary>
     [Route("api/rental-contracts")]
     [ApiController]
-    public class RentalContractController : ControllerBase
+    public class RentalContractController(IRentalContractService rentalContractService,
+        IVehicleChecklistService vehicleChecklistService) : ControllerBase
     {
+        private readonly IRentalContractService _rentalContractService = rentalContractService;
+        private readonly IVehicleChecklistService _vehicleChecklistService = vehicleChecklistService;
 
-        private readonly IRentalContractService _rentalContractService;
-        
-        public RentalContractController(IRentalContractService rentalContractService
-            )
-        {
-            _rentalContractService = rentalContractService;
-            
-        }
         /// <summary>
         /// Creates a new rental contract for the authenticated customer.
         /// </summary>
@@ -43,25 +42,25 @@ namespace API.Controllers
             var userID = Guid.Parse(userClaims.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString());
             await _rentalContractService.CreateRentalContractAsync(userID, createReq);
             return Created(
-                // rentalContractViewRes
+            // rentalContractViewRes
             );
         }
 
         /// <summary>
         /// Approves or verifies a rental contract by its unique identifier.
         /// </summary>
+        /// <param name="id">The unique identifier of the rental contract.</param>
         /// <param name="req">The unique identifier of the rental contract.</param>
         /// <returns>Success message if the rental contract is verified successfully.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
         [HttpPut("{id}/confirm")]
         [RoleAuthorize(RoleName.Staff)]
-        public async Task<IActionResult> ConfirmRentalContract(ConfirmReq req)
+        public async Task<IActionResult> ConfirmRentalContract(Guid id, [FromBody] ConfirmReq req)
         {
-            await _rentalContractService.VerifyRentalContract(req);
+            await _rentalContractService.VerifyRentalContract(id, req);
             return Ok();
         }
-       
 
         /// <summary>
         /// Creates a new rental contract manually (offline) for a specific customer.
@@ -75,7 +74,7 @@ namespace API.Controllers
         [HttpPost("manual")]
         public async Task<IActionResult> CreateRentalContractOffline(CreateRentalContractReq req)
         {
-            var userId = req.CustomerId 
+            var userId = req.CustomerId
                 ?? throw new BadRequestException(Message.UserMessage.UserIdIsRequired);
             await _rentalContractService.CreateRentalContractAsync((Guid)userId, req);
             return Created();
@@ -84,7 +83,8 @@ namespace API.Controllers
         /// <summary>
         /// Retrieves all rental contracts with optional filtering and pagination.
         /// </summary>
-        /// <param name="req">Request containing filter and pagination parameters.</param>
+        /// <param name="req">Request containing filter parameters.</param>
+        /// <param name="pagination">Pagination parameters.</param>
         /// <returns>List of rental contracts that match the specified criteria.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">Rental contract not found.</response>
@@ -114,7 +114,6 @@ namespace API.Controllers
             var staff = HttpContext.User;
             await _rentalContractService.HandoverProcessRentalContractAsync(staff, id, req);
             return Ok();
-
         }
 
         /// <summary>
@@ -137,6 +136,7 @@ namespace API.Controllers
         /// Retrieves all rental contracts of the authenticated customer, optionally filtered by status.
         /// </summary>
         /// <param name="status">Optional status filter for the rental contracts.</param>
+        /// <param name="pagination">Optional pagination filter for the rental contracts.</param>
         /// <returns>List of the customer's rental contracts.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No rental contracts found for the customer.</response>
@@ -191,10 +191,44 @@ namespace API.Controllers
         /// <response code="404">Bad request — this contract cannot be canceled.</response>
         [RoleAuthorize(RoleName.Customer)]
         [HttpPut("{id}/cancel")]
-        public async Task<IActionResult> CancelRentalContract(Guid id) {
+        public async Task<IActionResult> CancelRentalContract(Guid id)
+        {
             await _rentalContractService.CancelRentalContract(id);
             return Ok();
         }
-        
+
+        /// <summary>
+        /// Processes a vehicle change request for a specific rental contract.
+        /// </summary>
+        /// <param name="id">The unique identifier of the rental contract.</param>
+        /// <returns>Success message if the vehicle change is processed successfully.</returns>
+        /// <response code="200">Vehicle change processed successfully.</response>
+        /// <response code="404">Rental contract not found.</response>
+        /// <response code="403">Access denied. Only staff can perform this action.</response>
+        [HttpPut("{id}/change-vehicle")]
+        [RoleAuthorize(RoleName.Staff)]
+        public async Task<IActionResult> ProcessChangeVehicle(Guid id)
+        {
+            await _rentalContractService.ChangeVehicleAsync(id);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Handles the customer's confirmation or resolution for a rental contract issue.
+        /// </summary>
+        /// <param name="id">The unique identifier of the rental contract.</param>
+        /// <param name="req">The customer's resolution option request.</param>
+        /// <returns>Success message if the confirmation is processed successfully.</returns>
+        /// <response code="200">Customer confirmation processed successfully.</response>
+        /// <response code="400">Invalid resolution option.</response>
+        /// <response code="404">Rental contract not found.</response>
+        /// <response code="403">User does not have permission to perform this action.</response>
+        [HttpPut("{id}/customer-confirm")]
+        [RoleAuthorize(RoleName.Customer)]
+        public async Task<IActionResult> ProcessCustomerConfirm(Guid id, CustomerResolutionOptionReq req)
+        {
+            await _rentalContractService.ProcessCustomerConfirm(id, req.ResolutionOption);
+            return Ok();
+        }
     }
 }

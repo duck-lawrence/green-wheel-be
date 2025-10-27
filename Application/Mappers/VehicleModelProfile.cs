@@ -22,6 +22,9 @@ namespace Application.Mappers
                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)))
                .ForMember(dest => dest.AvailableVehicleCount, opt => opt.MapFrom(src => src.Vehicles.Count()));
             CreateMap<VehicleModel, VehicleModelRes>();
+            
+            CreateMap<VehicleModel, VehicleModelImagesRes>()
+                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)));
         }
     }
 }

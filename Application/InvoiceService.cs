@@ -101,11 +101,29 @@ namespace Application
         }
         public async Task PayRefundInvoiceManual(Invoice invoice, decimal amount)
         {
-            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
-            if (amountNeed > 0 && amount < amountNeed)
-                throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
-            await UpdateCashInvoice(invoice, amount);
-            await _uow.SaveChangesAsync();
+            await _uow.BeginTransactionAsync();
+            try
+            {
+                var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId)
+                   ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
+                if (contract.Status != (int)RentalContractStatus.RefundPending)
+                    throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
+                contract.Status = (int)RentalContractStatus.Completed;
+                await _uow.RentalContractRepository.UpdateAsync(contract);
+                var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
+                if (amountNeed > 0 && amount < amountNeed)
+                    throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
+                await UpdateCashInvoice(invoice, amount);
+               
+                
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
         }
         private async Task UpdateCashInvoice(Invoice invoice, decimal amount)
         {
@@ -223,7 +241,7 @@ namespace Application
                     await _emailService.SendEmailAsync(customer.Email, subject, body);
                 }
                 await _uow.CommitAsync();
-            }catch(Exception ex)
+            }catch(Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -277,7 +295,7 @@ namespace Application
         private async Task CancleReservationInvoice(Invoice handoverInvoice)
         {
             var reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(handoverInvoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
-            if (reservationInvoice.Status == (int)InvoiceStatus.Pending)
+            if (reservationInvoice!.Status == (int)InvoiceStatus.Pending)
             {
                 reservationInvoice.Status = (int)InvoiceStatus.Cancelled;
                 await _uow.InvoiceRepository.UpdateAsync(reservationInvoice);
@@ -320,6 +338,7 @@ namespace Application
                 if (req.Type == (int)InvoiceType.Refund)
                 {
                     //xử lí refund cọc
+                    contract.Status = (int)RentalContractStatus.RefundPending;
                     var deposit = await _uow.DepositRepository.GetByContractIdAsync(req.ContractId)
                         ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
                     deposit.Status = (int)DepositStatus.Refunded;
@@ -337,6 +356,7 @@ namespace Application
                     }
 
                     await _uow.DepositRepository.UpdateAsync(deposit);
+                    await _uow.RentalContractRepository.UpdateAsync(contract);
                 }
                 invoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(items);
                 await _uow.InvoiceRepository.AddAsync(invoice);
@@ -344,7 +364,7 @@ namespace Application
                 await _uow.SaveChangesAsync();
                 await _uow.CommitAsync();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _uow.RollbackAsync();
                 throw;
@@ -355,7 +375,7 @@ namespace Application
         {
             var invoice = await _uow.InvoiceRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.InvoiceMessage.NotFound);
-            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($". {notes}"));
+            invoice.Notes = (string)(invoice.Notes == null ? notes : invoice.Notes.Concat($".\n {notes}"));
             await _uow.InvoiceRepository.UpdateAsync(invoice);
             await _uow.SaveChangesAsync();
         }
@@ -378,10 +398,16 @@ namespace Application
             {
                 model.ImageUrl = uploaded.Url;
                 model.ImagePublicId = uploaded.PublicID;
-
+                if(model.Type == (int)InvoiceType.Refund)
+                {
+                    model.Status = (int)InvoiceStatus.Paid;
+                    model.PaidAt = DateTimeOffset.UtcNow;
+                    model.PaidAmount = InvoiceHelper.CalculateTotalAmount(model);  
+                }
                 await _uow.InvoiceRepository.UpdateAsync(model);
                 await _uow.SaveChangesAsync();
                 await trx.CommitAsync();
+              
             }
             catch
             {

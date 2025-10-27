@@ -17,8 +17,8 @@ CREATE TABLE [roles] (
     [name] nvarchar(20) NOT NULL,
     [description] nvarchar(100) NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset
 )
 GO
@@ -28,8 +28,8 @@ CREATE TABLE [stations] (
     [name] nvarchar(100) NOT NULL,
     [address] nvarchar(255) NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset
 )
 GO
@@ -41,14 +41,20 @@ CREATE TABLE [users] (
     [email] varchar(255),
     [password] nvarchar(255),
     [phone] varchar(15),
-	[is_google_linked] bit NOT NULL DEFAULT 0,
+    
+    [bank_name] varchar(100),
+    [bank_account_name] varchar(200),
+    [bank_account_number] varchar(64),
+
     [sex] int, -- Male, Female
     [date_of_birth] datetimeoffset,
+    
     [avatar_url] nvarchar(500),
     [avatar_public_id] nvarchar(255),
+	[is_google_linked] bit NOT NULL DEFAULT 0,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [role_id] uniqueidentifier NOT NULL,
@@ -80,17 +86,20 @@ CREATE TABLE [tickets] (
     [status] INT NOT NULL DEFAULT 0,
     [type] INT NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
+    [station_id] uniqueidentifier,
     [requester_id] uniqueidentifier,
     [assignee_id] uniqueidentifier,
 
-    CONSTRAINT fk_tickets_user FOREIGN KEY ([requester_id]) REFERENCES [users]([id]),
-    CONSTRAINT fk_tickets_staff FOREIGN KEY ([assignee_id]) REFERENCES [staffs]([user_id])
+    CONSTRAINT fk_tickets_stations FOREIGN KEY ([station_id]) REFERENCES [stations]([id]),
+    CONSTRAINT fk_tickets_users FOREIGN KEY ([requester_id]) REFERENCES [users]([id]),
+    CONSTRAINT fk_tickets_staffs FOREIGN KEY ([assignee_id]) REFERENCES [staffs]([user_id])
 );
 GO
+CREATE INDEX idx_tickets_station_id ON tickets (station_id);
 CREATE INDEX idx_tickets_requester_id ON tickets (requester_id);
 CREATE INDEX idx_tickets_assignee_id ON tickets (assignee_id);
 GO
@@ -101,8 +110,8 @@ CREATE TABLE [refresh_tokens] (
     [issued_at] datetimeoffset NOT NULL,
     [expires_at] datetimeoffset NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [is_revoked] bit NOT NULL DEFAULT (0),
     
     [user_id] uniqueidentifier NOT NULL,
@@ -125,8 +134,8 @@ CREATE TABLE [driver_licenses] (
     [image_url] nvarchar(500) NOT NULL,
     [image_public_id] nvarchar(255) NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [user_id] uniqueidentifier NOT NULL,
@@ -148,8 +157,8 @@ CREATE TABLE [citizen_identities] (
     [image_url] nvarchar(500) NOT NULL,
     [image_public_id] nvarchar(255) NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [user_id] uniqueidentifier NOT NULL,
@@ -165,8 +174,8 @@ CREATE TABLE [station_feedbacks] (
     [content] nvarchar(max),
     [rating] int NOT NULL,
     
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [customer_id] uniqueidentifier NOT NULL,
@@ -187,8 +196,8 @@ CREATE TABLE [brands] (
     [country] nvarchar(50) NOT NULL,
     [founded_year] int NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset
 )
 GO
@@ -198,8 +207,8 @@ CREATE TABLE [vehicle_segments] (
     [name] nvarchar(50) NOT NULL,
     [description] nvarchar(255) NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset
 )
 GO
@@ -220,8 +229,8 @@ CREATE TABLE [vehicle_models] (
 	[image_url] nvarchar(500),
     [image_public_id] nvarchar(255),
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [brand_id] uniqueidentifier NOT NULL,
@@ -240,8 +249,8 @@ CREATE TABLE [model_images] (
     [url] nvarchar(500) NOT NULL UNIQUE,
     [public_id] nvarchar(255) NOT NULL,
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [model_id] uniqueidentifier NOT NULL,
@@ -258,16 +267,16 @@ CREATE TABLE [vehicle_components] (
     [description] nvarchar(255) NOT NULL,
     [damage_fee] decimal(18, 2) NOT NULL,
     
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset
 );
 GO
 
 CREATE TABLE [model_components] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [model_id] uniqueidentifier NOT NULL,
@@ -286,8 +295,8 @@ CREATE TABLE [vehicles] (
     [license_plate] nvarchar(15) NOT NULL UNIQUE,
     [status] int NOT NULL DEFAULT 0, -- 0: Available, 1: Unavailable, 2: Pending
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [model_id] uniqueidentifier NOT NULL,
@@ -303,7 +312,7 @@ GO
 
 CREATE TABLE [rental_contracts] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [description] nvarchar(255) NOT NULL,
+    [description] nvarchar(MAX) NOT NULL,
     [notes] nvarchar(255),
     [start_date] datetimeoffset NOT NULL,
     [actual_start_date] datetimeoffset,
@@ -313,8 +322,8 @@ CREATE TABLE [rental_contracts] (
     [is_signed_by_customer] bit NOT NULL DEFAULT (0),
     [status] int NOT NULL DEFAULT 0, -- RequestPending, PaymentPending, Active, Completed, Cancelled
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [vehicle_id] uniqueidentifier,
@@ -343,8 +352,9 @@ CREATE TABLE [vehicle_checklists] (
     [is_signed_by_staff] bit NOT NULL DEFAULT (0),
     [is_signed_by_customer] bit NOT NULL DEFAULT (0),
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [maintained_until] datetimeoffset,
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [staff_id] uniqueidentifier NOT NULL,
@@ -371,8 +381,8 @@ CREATE TABLE [vehicle_checklist_items] (
     [image_url] nvarchar(500),
     [image_public_id] nvarchar(255),
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [component_id] uniqueidentifier NOT NULL,
@@ -403,8 +413,8 @@ CREATE TABLE [invoices] (
 	[image_url] nvarchar(500),
     [image_public_id] nvarchar(255),
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [contract_id] uniqueidentifier NOT NULL,
@@ -422,8 +432,8 @@ CREATE TABLE [invoice_items] (
     [unit_price] decimal(10,2) NOT NULL,
     [type] int NOT NULL, -- 0: BaseRental, 1: Damage, 2: LateReturn, 3: Cleaning, 4: Penalty, 5: Other
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [invoice_id] uniqueidentifier NOT NULL,
@@ -443,8 +453,8 @@ CREATE TABLE [deposits] (
     [refunded_at] datetimeoffset,
     [status] int NOT NULL DEFAULT 0, -- Pending, Paid, Refunded, Forfeited
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [invoice_id] uniqueidentifier UNIQUE NOT NULL,
@@ -459,8 +469,8 @@ CREATE TABLE [dispatch_requests] (
     [description] nvarchar(255),
     [status] int NOT NULL DEFAULT 0, -- Pending, Approved, Rejected, Received
 
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
     
     [request_admin_id] uniqueidentifier NOT NULL,
@@ -482,8 +492,8 @@ GO
 
 CREATE TABLE [dispatch_request_staffs] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [dispatch_request_id] uniqueidentifier NOT NULL,
@@ -499,8 +509,8 @@ GO
 
 CREATE TABLE [dispatch_request_vehicles] (
     [id] uniqueidentifier PRIMARY KEY DEFAULT NEWID(),
-    [created_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
-    [updated_at] DATETIMEOFFSET NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
+    [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [deleted_at] datetimeoffset,
 
     [dispatch_request_id] uniqueidentifier NOT NULL,

@@ -4,6 +4,11 @@ namespace Application.Constants
 {
     public static class Message
     {
+        public static class RoleMessage
+        {
+            public const string NotFound = "role.not_found";
+        }
+
         //Register
         public static class UserMessage
         {
@@ -59,18 +64,26 @@ namespace Application.Constants
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
+
             public const string InvalidCitizenIdData = "user.invalid_citizen_identity_data";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
 
             //Driver License
             public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
+
             public const string DriverLicenseNotFound = "user.driver_license_not_found";
             public const string DriverLicenseDuplicate = "user.driver_license_duplicate";
 
             // Staff
             public const string StationIdIsRequired = "user.station_id_require";
 
+            // Bank info
+            public const string BankNameIsRequired = "user.bank_name_require";
 
+            public const string BankAccountNumberIsRequired = "user.bank_account_number_require";
+            public const string InvalidBankAccountNumber = "user.invalid_bank_account_number";
+
+            public const string BankAccountNameIsRequired = "user.bank_account_name_require";
         }
 
         //Common error
@@ -158,10 +171,8 @@ namespace Application.Constants
         {
             public const string UserAlreadyHaveContract = "rental_contract.user_already_have_contract";
             public const string NotFound = "rental_contract.not_found";
-            public const string ThisRentalContractAlreadyProcess = "rental_contract.already_process";
+            public const string ContractAlreadyProcess = "rental_contract.already_process";
             public const string CanNotCancel = "rental_contract.can_not_cancel";
-
-            public static string ContractAlreadyProcess = "rental_contract.already_returned";
             public const string StartDateMustBeFuture = "rental_contract.start_date_must_be_future";
             public const string EndDateMustBeAfterStart = "rental_contract.end_date_must_be_after_start";
             public const string IdRequired = "rental_contract.id_required";
@@ -201,6 +212,7 @@ namespace Application.Constants
 
             public static string ForbiddenInvoiceAccess = "invoice.forbidden_invoice_access";
         }
+
         public static class JsonMessage
         {
             public const string ParsingFailed = "json.parsing_failed";
@@ -229,6 +241,7 @@ namespace Application.Constants
             public const string DescriptionRequired = "ticket.description_required";
             public const string InvalidType = "ticket.invalid_type";
             public const string TitleTooLong = "ticket.title_too_long";
+            public const string AlreadyResolved = "ticket.already_resolved";
         }
 
         //upload
@@ -272,6 +285,7 @@ namespace Application.Constants
                 throw new NotImplementedException();
             }
         }
+
         public static class VehicleChecklistItemMessage
         {
             public const string NotFound = "vehicle_checklist_item.not_found";

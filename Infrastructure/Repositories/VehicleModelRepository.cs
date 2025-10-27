@@ -39,8 +39,8 @@ namespace Infrastructure.Repositories
             if ((endDate - startDate).TotalHours < 24)
                 throw new ArgumentException(Message.VehicleModelMessage.RentTimeIsNotAvailable);
 
-            var startBuffer = startDate.AddDays(-10);
-            var endBuffer = endDate.AddDays(10);
+            var startBuffer = startDate.AddDays(-Common.Day.RentalContractBufferDay);
+            var endBuffer = endDate.AddDays(Common.Day.RentalContractBufferDay);
 
             // Query cơ bản
             var query = _dbContext.VehicleModels
@@ -50,6 +50,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Station)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
                 .AsQueryable();
             if (segmentId != null)
@@ -57,9 +58,9 @@ namespace Infrastructure.Repositories
             var models = await query.ToListAsync();
             foreach (var model in models)
             {
-                 var vehicles = model.Vehicles.Where(v => CheckAvailableVehicle(v, stationId, startBuffer, endBuffer));
+                var vehicles = model.Vehicles.Where(v => CheckAvailableVehicle(v, stationId, startBuffer, endBuffer));
                 model.Vehicles = vehicles.ToList();
-                
+
             }
             return models;
         }
@@ -71,8 +72,8 @@ namespace Infrastructure.Repositories
             DateTimeOffset startDate,
             DateTimeOffset endDate)
         {
-            var startBuffer = startDate.AddDays(-10);
-            var endBuffer = endDate.AddDays(10);
+            var startBuffer = startDate.AddDays(-Common.Day.RentalContractBufferDay);
+            var endBuffer = endDate.AddDays(Common.Day.RentalContractBufferDay);
 
             // Load model + ảnh + brand + segment
             var model = await _dbContext.VehicleModels
@@ -81,8 +82,8 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.RentalContracts)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
+                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
-                .AsQueryable()
                 .FirstOrDefaultAsync(vm => vm.Id == id && vm.DeletedAt == null);
 
             if (model == null) return null;
@@ -94,23 +95,42 @@ namespace Infrastructure.Repositories
         }
         private bool CheckAvailableVehicle(Vehicle vehicle, Guid stationId, DateTimeOffset startBuffer, DateTimeOffset endBuffer)
         {
-            return vehicle.StationId == stationId
-                    &&
-                    (vehicle.Status == (int)VehicleStatus.Available
-                    ||
-                    ((vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented)) &&
-                                                    vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
-                                                    !vehicle.RentalContracts.Any(rc =>
-                                                        rc.Status == (int)RentalContractStatus.Active &&
-                                                        startBuffer <= rc.EndDate &&
-                                                        endBuffer >= rc.StartDate
-                                                    )
-                                                     ||
-                                                (
-                                                (vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented) &&
-                                                !vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active)
-                                                ));
+            //return vehicle.StationId == stationId
+            //        &&
+            //        (vehicle.Status == (int)VehicleStatus.Available
+            //        ||
+            //        ((vehicle.Status == (int)VehicleStatus.Unavaible || vehicle.Status == (int)VehicleStatus.Rented)) &&
+            //                                        vehicle.RentalContracts.Any(rc => rc.Status == (int)RentalContractStatus.Active) &&
+            //                                        !vehicle.RentalContracts.Any(rc =>
+            //                                            rc.Status == (int)RentalContractStatus.Active &&
+            //                                            startBuffer <= rc.EndDate &&
+            //                                            endBuffer >= rc.StartDate
+            //
+            //));
+            if (vehicle.Status != (int)VehicleStatus.Available
+               && vehicle.Status != (int)VehicleStatus.Unavaible
+               && vehicle.Status != (int)VehicleStatus.Rented)
+                return false;
 
+            if (vehicle.StationId != stationId)
+                return false;
+
+            if (vehicle.Status == (int)VehicleStatus.Available)
+                return true;
+
+            var flagContracts = vehicle.RentalContracts
+                .Where(rc => rc.Status == (int)RentalContractStatus.Active
+                          || rc.Status == (int)RentalContractStatus.Returned
+                          || rc.Status == (int)RentalContractStatus.UnavailableVehicle)
+                .ToList();
+
+            if (!flagContracts.Any())
+                return true;
+
+            bool overlap = flagContracts.Any(rc =>
+                startBuffer <= rc.EndDate && endBuffer >= rc.StartDate
+            );
+            return !overlap;
         }
     }
 }
