@@ -317,5 +317,24 @@ namespace Application
                 return false;
             }
         }
+
+        public async Task CustomerSignVehicleChecklistAsync(Guid id, ClaimsPrincipal user)
+        {
+            if (Guid.TryParse(user.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString(), out Guid userId))
+            {
+                var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
+                if (checklist.Id != userId)
+                {
+                    throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+                }
+                checklist.IsSignedByCustomer = true;
+                await _uow.VehicleChecklistRepository.UpdateAsync(checklist);
+                await _uow.SaveChangesAsync();
+            }
+            else
+            {
+                throw new BadRequestException(Message.UserMessage.Unauthorized);
+            }
+        }
     }
 }
