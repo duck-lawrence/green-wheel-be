@@ -27,7 +27,8 @@ namespace Application.Abstractions
         Task<Guid> ReturnProcessRentalContractAsync(ClaimsPrincipal staffClaims, Guid id);
 
         //Task<IEnumerable<RentalContractViewRes>> GetMyContracts(ClaimsPrincipal userClaims, int? status);
-        Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(ClaimsPrincipal user,int? status,PaginationParams pagination);
+        Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(
+            ClaimsPrincipal user, PaginationParams pagination, int? status, Guid? stationId);
 
         Task CancelRentalContract(Guid id);
         Task ChangeVehicleAsync(Guid id);

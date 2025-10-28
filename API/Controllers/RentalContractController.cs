@@ -136,6 +136,7 @@ namespace API.Controllers
         /// Retrieves all rental contracts of the authenticated customer, optionally filtered by status.
         /// </summary>
         /// <param name="status">Optional status filter for the rental contracts.</param>
+        /// <param name="stationId">Optional stationId filter for the rental contracts.</param>
         /// <param name="pagination">Optional pagination filter for the rental contracts.</param>
         /// <returns>List of the customer's rental contracts.</returns>
         /// <response code="200">Success.</response>
@@ -143,11 +144,12 @@ namespace API.Controllers
         [RoleAuthorize(RoleName.Customer)]
         [HttpGet("me")]
         public async Task<IActionResult> GetMyContracts(
+            [FromQuery] PaginationParams pagination,
             [FromQuery] int? status,
-            [FromQuery] PaginationParams pagination)
+            [FromQuery] Guid? stationId)
         {
             var user = HttpContext.User;
-            var result = await _rentalContractService.GetMyContractsByPagination(user, status, pagination);
+            var result = await _rentalContractService.GetMyContractsByPagination(user, pagination, status, stationId);
             return Ok(result);
         }
 

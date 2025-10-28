@@ -171,7 +171,9 @@ namespace Infrastructure.Repositories
                 total
             );
         }
-        public async Task<PageResult<RentalContract>> GetMyContractsAsync(Guid customerId, int? status, PaginationParams pagination)
+        public async Task<PageResult<RentalContract>> GetMyContractsAsync(
+            Guid customerId, PaginationParams pagination,
+            int? status, Guid? stationId = null)
         {
             var query = _dbContext.RentalContracts
                 .Include(rc => rc.Vehicle).ThenInclude(v => v == null ? null : v.Model)
@@ -183,6 +185,8 @@ namespace Infrastructure.Repositories
 
             if (status != null)
                 query = query.Where(rc => rc.Status == status);
+            if (stationId != null)
+                query = query.Where(rc => rc.StationId == stationId);
 
             var total = await query.CountAsync();
 
