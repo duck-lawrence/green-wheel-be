@@ -29,6 +29,7 @@ namespace Infrastructure.Repositories
         {
             var vehicles = _dbContext.Vehicles
                             .Include(v => v.Model)
+                            .OrderBy(x => x.CreatedAt)
                             .AsQueryable();
             if (!string.IsNullOrEmpty(name)) vehicles = vehicles.Where(v => v.Model.Name.ToLower().Contains(name.ToLower()));
             if (stationId != null) vehicles = vehicles.Where(v => v.StationId == stationId);
@@ -49,6 +50,7 @@ namespace Infrastructure.Repositories
             var vehicles = await _dbContext.Vehicles
                 .Include(v => v.Model)
                 .Include(v => v.RentalContracts) //join bảng rentalContracts để lấy xe có hợp đồng
+                .OrderBy(x => x.CreatedAt)
                 .Where
                 (
                     v => v.StationId == stationId

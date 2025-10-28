@@ -24,6 +24,7 @@ namespace Infrastructure.Repositories
                             .Include(vm => vm.Segment)
                             .Include(vm => vm.ModelImages)
                             .Include(vm => vm.Vehicles)
+                            .OrderBy(x => x.CreatedAt)
                             .AsQueryable();
             if (!string.IsNullOrEmpty(name)) models = models.Where(vm => vm.Name.ToLower().Contains(name.ToLower()));
             if (segmentId != null) models = models.Where(vm => vm.SegmentId == segmentId);

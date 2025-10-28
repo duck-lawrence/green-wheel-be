@@ -152,4 +152,5 @@ namespace API.Controllers
             await _vehicleChecklistService.CustomerSignVehicleChecklistAsync(id, user);
             return Ok();
         }
+    }
 }

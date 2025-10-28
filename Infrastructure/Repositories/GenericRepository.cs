@@ -63,7 +63,7 @@ namespace Infrastructure.Repositories
                              .Cast<T>();
             }
 
-            return await query.ToListAsync();
+            return await query.OrderBy(x => x.CreatedAt).ToListAsync();
         }
 
         public virtual async Task<T?> GetByIdAsync(Guid id)

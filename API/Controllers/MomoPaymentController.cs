@@ -44,7 +44,7 @@ namespace API.Controllers
                 (int)InvoiceType.Handover => await _invoiceService.PayHandoverInvoiceOnline(invoice, req.FallbackUrl),
                 (int)InvoiceType.Reservation => await _invoiceService.PayReservationInvoiceOnline(invoice, req.FallbackUrl),
                 (int)InvoiceType.Return => await _invoiceService.PayReturnInvoiceOnline(invoice, req.FallbackUrl),
-                (int)InvoiceType.Refund => await _invoiceService.PayRefundInvoiceOnline(invoice, req.FallbackUrl),
+                //(int)InvoiceType.Refund => await _invoiceService.PayRefundInvoiceOnline(invoice, req.FallbackUrl),
                 _ => throw new Exception(Message.InvoiceMessage.InvalidInvoiceType),
             };
             return Ok(new { link });
