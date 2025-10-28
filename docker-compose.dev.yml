@@ -5,7 +5,7 @@ services:
     container_name: greenwheel-backend
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dev.Dockerfile
     ports:
       - "5160:5160"
     env_file:
@@ -25,18 +25,15 @@ services:
       # Kết nối tới Redis container
       REDIS_CONFIGURATION: redis:6379
 
-    depends_on:
-      - redis
-      - mssql
+    # depends_on:
+    #   - redis
+    #   - mssql
 
     # Volume mount để hot reload code và lưu log
     volumes:
       - .:/src
       - ./logs:/app/logs
       - ~/.nuget/packages:/root/.nuget/packages
-
-    #Tự khởi động lại khi crash hoặc reboot máy
-    restart: always
 
     # Kiểm tra sức khỏe backend
     healthcheck:
@@ -73,7 +70,11 @@ services:
 
     # Healthcheck đảm bảo SQL đã sẵn sàng
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${MSSQL_PASSWORD} -Q 'SELECT 1' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P ${MSSQL_PASSWORD} -Q 'SELECT 1' || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
