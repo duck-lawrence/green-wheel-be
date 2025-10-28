@@ -11,5 +11,6 @@ namespace Application.Dtos.VehicleComponent.Respone
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
+        public decimal DamageFee { get; set; }
     }
 }

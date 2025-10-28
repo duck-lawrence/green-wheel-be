@@ -649,7 +649,8 @@ namespace Application
                 throw;
             }
         }
-        public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(GetAllRentalContactReq req, PaginationParams pagination)
+        public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(
+            GetAllRentalContactReq req, PaginationParams pagination)
         {
             var pageResult = await _uow.RentalContractRepository.GetAllByPaginationAsync(
                 req.Status,
@@ -671,13 +672,13 @@ namespace Application
 
         public async Task<PageResult<RentalContractViewRes>> GetMyContractsByPagination(
             ClaimsPrincipal user,
-            int? status,
-            PaginationParams pagination)
+            PaginationParams pagination,
+            int? status, Guid? stationId)
         {
             var customerId = Guid.Parse(user.FindFirstValue(JwtRegisteredClaimNames.Sid)!);
 
             var result = await _uow.RentalContractRepository
-                .GetMyContractsAsync(customerId, status, pagination);
+                .GetMyContractsAsync(customerId, pagination, status, stationId);
 
             var mapped = _mapper.Map<IEnumerable<RentalContractViewRes>>(result.Items);
 
