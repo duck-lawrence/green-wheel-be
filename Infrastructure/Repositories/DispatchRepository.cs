@@ -25,6 +25,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(s => s.Staff).ThenInclude(u => u.User)
                 .Include(x => x.DispatchRequestVehicles)
                     .ThenInclude(v => v.Vehicle).ThenInclude(vm => vm.Model)
+                .OrderBy(x => x.CreatedAt)
                 .AsQueryable();
 
             if (status.HasValue)

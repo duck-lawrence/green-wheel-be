@@ -34,6 +34,7 @@ namespace Infrastructure.Repositories
                 .Include(user => user.Staff)
                     .ThenInclude(staff => staff.Station)
                 .AsQueryable()
+                .OrderBy(x => x.CreatedAt)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(phone))
@@ -69,6 +70,7 @@ namespace Infrastructure.Repositories
                    .ThenInclude(staff => staff.Station)
                 .Where(u => u.Staff != null && u.Role.Name == RoleName.Staff)
                .AsQueryable()
+               .OrderBy(x => x.CreatedAt)
                .AsNoTracking();
             if (!string.IsNullOrWhiteSpace(name))
                 query = query.Where(u => u.FirstName.ToLower().Contains(name.ToLower()) ||
@@ -94,6 +96,7 @@ namespace Infrastructure.Repositories
                 .Include(user => user.CitizenIdentity)
                 .Include(user => user.Staff)
                     .ThenInclude(staff => staff.Station)
+                .OrderBy(x => x.CreatedAt)
                 .FirstOrDefaultAsync(x => x.Phone == phone);
             return user;
         }

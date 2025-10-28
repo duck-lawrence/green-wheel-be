@@ -144,6 +144,13 @@ namespace API.Controllers
             return Ok(result);
         }
 
-        
+        [HttpPut("{id}/customer-sign")]
+        [RoleAuthorize(RoleName.Customer)]
+        public async Task<IActionResult> CustomerSignVehicleChecklist(Guid id)
+        {
+            var user = HttpContext.User;
+            await _vehicleChecklistService.CustomerSignVehicleChecklistAsync(id, user);
+            return Ok();
+        }
     }
 }

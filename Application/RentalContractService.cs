@@ -190,7 +190,11 @@ namespace Application
                 var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
                     ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 if (contract.ActualStartDate != null) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
-                var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId)
+                if(contract.StartDate > DateTimeOffset.UtcNow)
+                {
+                    throw new BadRequestException(Message.RentalContractMessage.ContractNotStartYet);
+                }
+                var vehicle = await _uow.VehicleRepository.GetByIdAsync((Guid)contract.VehicleId!)
                     ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
 
                 var handoverInvoice = (await _uow.InvoiceRepository.GetByContractAsync(id))
@@ -238,8 +242,8 @@ namespace Application
                 if (contract.Status == (int)RentalContractStatus.Returned) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
                 contract.Status = (int)RentalContractStatus.Returned;
                 contract.ReturnStaffId = Guid.Parse(staffId);
-                var actualEndDate = contract.EndDate.AddHours(2); // test
-                                                                  //var actual_end_date = DateTimeOffset.UtcNow;
+                //var actualEndDate = contract.EndDate.AddHours(2); // test
+                var actualEndDate = DateTimeOffset.UtcNow;
                 if (contract == null) throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 contract.ActualEndDate = actualEndDate;
                 var hours = (actualEndDate - contract.EndDate).TotalHours; //tính thời gian trể

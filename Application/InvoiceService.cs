@@ -174,33 +174,33 @@ namespace Application
             return link;
         }
 
-        public async Task<string?> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl)
-        {
-            await _uow.BeginTransactionAsync();
-            try
-            {
-                var amount = InvoiceHelper.CalculateTotalAmount(invoice);
-                if (amount > 0)
-                {
-                    var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
-                    return link;
-                }
-                else if (amount == 0)
-                {
-                    await UpdateCashInvoice(invoice, amount);
-                    return null;
-                }
-                else
-                {
-                    throw new BadRequestException(Message.InvoiceMessage.InvalidAmount);
-                }
-            }
-            catch (Exception ex)
-            {
-                await _uow.RollbackAsync();
-                throw;
-            }
-        }
+        //public async Task<string?> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl)
+        //{
+        //    await _uow.BeginTransactionAsync();
+        //    try
+        //    {
+        //        var amount = InvoiceHelper.CalculateTotalAmount(invoice);
+        //        if (amount > 0)
+        //        {
+        //            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
+        //            return link;
+        //        }
+        //        else if (amount == 0)
+        //        {
+        //            await UpdateCashInvoice(invoice, amount);
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            throw new BadRequestException(Message.InvoiceMessage.InvalidAmount);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await _uow.RollbackAsync();
+        //        throw;
+        //    }
+        //}
 
         public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
         {

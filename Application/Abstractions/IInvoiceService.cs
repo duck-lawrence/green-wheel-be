@@ -31,7 +31,7 @@ namespace Application.Abstractions
         Task<string> PayHandoverInvoiceOnline(Invoice invoice, string fallbackUrl);
 
         Task<string> PayReturnInvoiceOnline(Invoice invoice, string fallbackUrl);
-        Task<string> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl);
+        //Task<string> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl);
 
         Task<Invoice> GetRawInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
         Task CreateAsync(CreateInvoiceReq req);

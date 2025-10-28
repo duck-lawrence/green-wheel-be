@@ -38,6 +38,7 @@ namespace Infrastructure.Repositories
                 .Include(vc => vc.Staff)
                     .ThenInclude(s => s.User)
                 .Include(vc => vc.Customer)
+                .OrderBy(x => x.CreatedAt)
                     .AsQueryable();
             if(contractId != null)
             {

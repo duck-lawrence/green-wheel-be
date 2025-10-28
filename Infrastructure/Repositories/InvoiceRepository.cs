@@ -58,6 +58,7 @@ namespace Infrastructure.Repositories
         {
             var query = _dbContext.Invoices
                 .AsNoTracking()
+                .OrderBy(x => x.CreatedAt)
                 .OrderByDescending(i => i.CreatedAt);
 
             var totalCount = await query.CountAsync();
