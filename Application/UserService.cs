@@ -3,13 +3,11 @@ using Application.AppExceptions;
 using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
-using Application.Dtos.Staff.Request;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Application
@@ -64,7 +62,8 @@ namespace Application
             var staff = new Staff
             {
                 UserId = user.Id,
-                StationId = (Guid)req.StationId,
+                //StationId = (Guid)req.StationId,
+                StationId = req.StationId!.Value,
             };
             await _staffRepository.AddAsync(staff);
             return user.Id;
