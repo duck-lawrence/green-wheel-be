@@ -257,5 +257,15 @@
         {
             public const string NotFound = "vehicle_checklist_item.not_found";
         }
+        public static class StatisticMessage
+        {
+            public const string NoCustomerData = "statistic.no_customer_data";
+            public const string NoInvoiceData = "statistic.no_invoice_data";
+            public const string NoVehicleData = "statistic.no_vehicle_data";
+
+            public const string FailedToCalculateRevenue = "statistic.failed_to_calculate_revenue";
+            public const string FailedToCalculateCustomerChange = "statistic.failed_to_calculate_customer_change";
+            public const string FailedToCalculateInvoiceChange = "statistic.failed_to_calculate_invoice_change";
+        }
     }
 }

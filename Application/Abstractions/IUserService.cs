@@ -23,8 +23,11 @@ namespace Application.Abstractions
 
         //Task<IEnumerable<UserProfileViewRes>> GetAllAsync(string? phone, string? citizenIdNumber, string? driverLicenseNumber);
         Task<PageResult<UserProfileViewRes>> GetAllWithPaginationAsync(
-            string? phone, string? citizenIdNumber, string? driverLicenseNumber, string? roleName,
-            PaginationParams pagination);
+            string? phone, 
+            string? citizenIdNumber, 
+            string? driverLicenseNumber, 
+            string? roleName,
+            PaginationParams? pagination);
 
         Task<UserProfileViewRes?> GetByIdAsync(Guid id);
 

@@ -25,6 +25,8 @@ namespace Application.Mappers
             
             CreateMap<VehicleModel, VehicleModelImagesRes>()
                 .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.ModelImages.Select(mi => mi.Url)));
+            CreateMap<UpdateVehicleModelReq, VehicleModel>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }
