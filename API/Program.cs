@@ -152,6 +152,7 @@ namespace API
             builder.Services.AddScoped<IEmailSerivce, EmailService>();
             builder.Services.AddScoped<IAuthService, AuthSerivce>();
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
+            builder.Services.AddScoped<IStatisticService, StatisticService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
