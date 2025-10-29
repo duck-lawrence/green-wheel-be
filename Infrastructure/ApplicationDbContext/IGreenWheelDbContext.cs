@@ -56,7 +56,7 @@ namespace Infrastructure.ApplicationDbContext
         DbSet<VehicleModel> VehicleModels { get; set; }
 
         DbSet<VehicleSegment> VehicleSegments { get; set; }
-
+        DbSet<BusinessVariable> BusinessVariables { get; set; }
         public DbSet<T> Set<T>() where T : class, IEntity;
 
         public EntityEntry<T> Entry<T>(T entity) where T : class;

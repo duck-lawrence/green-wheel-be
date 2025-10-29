@@ -11,6 +11,7 @@ using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
@@ -24,15 +25,17 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IEmailSerivce _emailService;
         private readonly IVehicleCheckListRepository _vehicleCheckListRepository;
+        private readonly IMemoryCache _cache;
 
         public RentalContractService(IRentalContractUow uow, IMapper mapper,
             IOptions<EmailSettings> emailSettings, IEmailSerivce emailService,
-            IVehicleCheckListRepository vehicleCheckListRepository)
+            IVehicleCheckListRepository vehicleCheckListRepository, IMemoryCache cache)
         {
             _uow = uow;
             _mapper = mapper;
             _emailService = emailService;
             _vehicleCheckListRepository = vehicleCheckListRepository;
+            _cache = cache;
         }
 
         public async Task<RentalContractViewRes> GetByIdAsync(Guid id)
@@ -109,12 +112,14 @@ namespace Application
                 Guid handoverInvoiceId = Guid.NewGuid();
                 Guid reservationInvoiceId = Guid.NewGuid();
 
+                var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+                var baseVat = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.BaseVAT)?.Value;
                 var handoverInvoice = new Invoice()
                 {
                     Id = handoverInvoiceId,
                     ContractId = contractId,
                     Status = (int)InvoiceStatus.Pending,
-                    Tax = Common.Tax.BaseVAT, //10% dạng decimal
+                    Tax = (decimal)baseVat!, //10% dạng decimal
                     Type = (int)InvoiceType.Handover,
                     Notes = $"GreenWheel – Invoice for your order {contractId}"
                 };
@@ -246,36 +251,40 @@ namespace Application
                 hours = Double.Ceiling(hours);
                 IEnumerable<Invoice> invoices = [];
                 Guid returnInvoiceId = Guid.NewGuid();
+                var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+                var baseVat = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.BaseVAT)?.Value;
                 var returnInvoice = new Invoice()
                 {
                     Id = returnInvoiceId,
                     ContractId = contractId,
                     Status = (int)InvoiceStatus.Pending,
-                    Tax = Common.Tax.BaseVAT, //10% dạng decimal
+                    Tax = (decimal)baseVat!, //10% dạng decimal
                     Notes = $"GreenWheel – Invoice for your order {contractId}",
                     Type = (int)InvoiceType.Return
                 };
                 invoices = invoices.Append(returnInvoice);
 
                 IEnumerable<InvoiceItem> returnInvoiceItems = []; //tạo trước invoice item
-
-                if (hours > Common.Policy.MaxLateHours)
+                var maxLateReturnHours = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.MaxLateReturnHours)?.Value;
+                var lateReturnFeePerHour = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.LateReturnFeePerHour)?.Value;
+                if (hours > (int)maxLateReturnHours!)
                 {
                     //phí trể giờ
                     returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
                     {
                         InvoiceId = returnInvoiceId,
                         Quantity = (int)hours,
-                        UnitPrice = Common.Fee.LateReturn,
+                        UnitPrice = (decimal)lateReturnFeePerHour!,
                         Type = (int)InvoiceItemType.LateReturn,
                     });
                 }
                 //phí dọn dẹp
+                var cleaningFee = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.CleaningFee)?.Value;
                 returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
                 {
                     InvoiceId = returnInvoiceId,
                     Quantity = 1,
-                    UnitPrice = Common.Fee.Cleaning,
+                    UnitPrice = (decimal)cleaningFee!,
                     Type = (int)InvoiceItemType.Cleaning,
                 });
                 returnInvoice.Subtotal = InvoiceHelper.CalculateSubTotalAmount(returnInvoiceItems);

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251024053655_add-bank-info-to-user-entity")]
-    partial class addbankinfotouserentity
+    [Migration("20251029051722_create-bussiness-variable-table_v2")]
+    partial class createbussinessvariabletable_v2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -75,6 +75,34 @@ namespace Infrastructure.Migrations
                         .HasName("PK__brands__3213E83F059728E8");
 
                     b.ToTable("brands", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.BusinessVariable", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("Key")
+                        .HasColumnType("int")
+                        .HasColumnName("key");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("updated_at");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("business_variables");
                 });
 
             modelBuilder.Entity("Domain.Entities.CitizenIdentity", b =>
@@ -1010,9 +1038,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("reply");
 
-                    b.Property<Guid>("RequesterId")
+                    b.Property<Guid?>("RequesterId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("requester_id");
+
+                    b.Property<Guid?>("StationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("station_id");
 
                     b.Property<int>("Status")
                         .HasColumnType("int")
@@ -1036,6 +1068,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__tickets__3213E83F2FACC57D");
+
+                    b.HasIndex("StationId");
 
                     b.HasIndex(new[] { "AssigneeId" }, "idx_tickets_assignee_id");
 
@@ -1062,13 +1096,13 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("avatar_url");
 
+                    b.Property<string>("BankAccountName")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("bank_account_name");
+
                     b.Property<string>("BankAccountNumber")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("bank_account_number");
-
-                    b.Property<string>("BankHolderName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_holder_name");
 
                     b.Property<string>("BankName")
                         .HasColumnType("nvarchar(max)")
@@ -1231,6 +1265,10 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsSignedByStaff")
                         .HasColumnType("bit")
                         .HasColumnName("is_signed_by_staff");
+
+                    b.Property<DateTimeOffset?>("MaintainedUntil")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("maintained_until");
 
                     b.Property<Guid>("StaffId")
                         .HasColumnType("uniqueidentifier")
@@ -1775,17 +1813,22 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.Staff", "Assignee")
                         .WithMany("Tickets")
                         .HasForeignKey("AssigneeId")
-                        .HasConstraintName("fk_tickets_staff");
+                        .HasConstraintName("fk_tickets_staffs");
 
                     b.HasOne("Domain.Entities.User", "Requester")
                         .WithMany("Tickets")
                         .HasForeignKey("RequesterId")
-                        .IsRequired()
-                        .HasConstraintName("fk_tickets_user");
+                        .HasConstraintName("fk_tickets_users");
+
+                    b.HasOne("Domain.Entities.Station", "Station")
+                        .WithMany()
+                        .HasForeignKey("StationId");
 
                     b.Navigation("Assignee");
 
                     b.Navigation("Requester");
+
+                    b.Navigation("Station");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

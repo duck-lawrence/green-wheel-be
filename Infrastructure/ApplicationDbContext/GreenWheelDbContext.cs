@@ -71,7 +71,7 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
     public virtual DbSet<VehicleModel> VehicleModels { get; set; }
 
     public virtual DbSet<VehicleSegment> VehicleSegments { get; set; }
-
+    public virtual DbSet<BusinessVariable> BusinessVariables { get; set; }
     public DbSet<T> Set<T>() where T : class, IEntity => base.Set<T>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
