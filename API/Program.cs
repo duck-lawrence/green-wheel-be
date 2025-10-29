@@ -159,6 +159,7 @@ namespace API
             builder.Services.AddScoped<IEmailSerivce, EmailService>();
             builder.Services.AddScoped<IAuthService, AuthSerivce>();
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
+            builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -195,7 +196,7 @@ namespace API
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
-            //sử dụng cahce
+            //sử dụng cache
             builder.Services.AddMemoryCache();
 
             //thêm filter cho validation

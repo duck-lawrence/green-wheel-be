@@ -832,12 +832,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\Station\Request\" />
-    <Folder Include="Dtos\VehicleSegment\Request\" />
+    <Content Include="Templates\**\*.*" CopyToOutputDirectory="Always" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Templates\**\*.*" CopyToOutputDirectory="Always" />
+    <Compile Remove="Dtos\Station\Request\**" />
+    <Compile Remove="Dtos\VehicleSegment\Request\**" />
+    <EmbeddedResource Remove="Dtos\Station\Request\**" />
+    <EmbeddedResource Remove="Dtos\VehicleSegment\Request\**" />
+    <None Remove="Dtos\Station\Request\**" />
+    <None Remove="Dtos\VehicleSegment\Request\**" />
   </ItemGroup>
 
 </Project>

@@ -25,5 +25,19 @@ namespace Infrastructure.Repositories
             //lấy ra list linh kiện của xe
             return components;
         }
+        public async Task<IEnumerable<VehicleComponent>> GetAllAsync(Guid? modelId)
+        {
+            var components = await _dbContext.VehicleComponents
+                                    .Include(vc => vc.ModelComponents)
+                                    .ToListAsync();
+            if (modelId != null)
+            {
+                components = components
+                                .Where(vc => vc.ModelComponents
+                                    .Any(mc => mc.ModelId == modelId))
+                                .ToList();
+            }
+            return components;
+        }
     }
 }

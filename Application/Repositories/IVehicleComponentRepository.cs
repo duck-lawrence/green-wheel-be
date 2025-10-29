@@ -9,6 +9,7 @@ namespace Application.Repositories
 {
     public interface IVehicleComponentRepository : IGenericRepository<VehicleComponent>
     {
-        Task<IEnumerable<VehicleComponent>> GetByVehicleIdAsync(Guid vehicleId);
+        Task<IEnumerable<VehicleComponent>> GetByVehicleIdAsync(Guid vehicleId); 
+        Task<IEnumerable<VehicleComponent>> GetAllAsync(Guid? modelId);
     }
 }
