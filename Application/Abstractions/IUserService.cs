@@ -34,7 +34,7 @@ namespace Application.Abstractions
 
         Task<UserProfileViewRes> GetByDriverLicenseAsync(string number);
         
-        Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? stationId);
+        Task<PageResult<UserProfileViewRes>> GetAllStaffAsync(PaginationParams pagination, string? name, Guid? stationId);
 
         Task DeleteCustomer(Guid id);
     }

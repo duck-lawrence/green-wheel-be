@@ -60,7 +60,7 @@ namespace Infrastructure.Repositories
             return new PageResult<User>(users, pagination.PageNumber, pagination.PageSize, total);
         }
 
-        public async Task<IEnumerable<User>> GetAllStaffAsync(string? name, Guid? stationId)
+        public async Task<PageResult<User>> GetAllStaffAsync(PaginationParams pagination, string? name, Guid? stationId)
         {
             var query = _dbContext.Users
                .Include(user => user.Role)
@@ -72,12 +72,22 @@ namespace Infrastructure.Repositories
                .AsQueryable()
                .OrderBy(x => x.CreatedAt)
                .AsNoTracking();
+
             if (!string.IsNullOrWhiteSpace(name))
                 query = query.Where(u => u.FirstName.ToLower().Contains(name.ToLower()) ||
                                     u.LastName.ToLower().Contains(name.ToLower()));
             if (stationId != null)
                 query = query.Where(u => u.Staff.StationId == stationId);
-            return await query.ToListAsync();
+
+            var total = await query.CountAsync();
+
+            var users = await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return new PageResult<User>(users, pagination.PageNumber, pagination.PageSize, total);
         }
 
         public override async Task<User?> GetByIdAsync(Guid id)

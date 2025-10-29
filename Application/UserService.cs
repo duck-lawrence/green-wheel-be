@@ -126,10 +126,17 @@ namespace Application
             return userView;
         }
 
-        public async Task<IEnumerable<UserProfileViewRes>> GetAllStaffAsync(string? name, Guid? stationId)
+        public async Task<PageResult<UserProfileViewRes>> GetAllStaffAsync(PaginationParams pagination, string? name, Guid? stationId)
         {
-            var staffs = await _userRepository.GetAllStaffAsync(name, stationId);
-            return _mapper.Map<IEnumerable<UserProfileViewRes>>(staffs) ?? [];
+            var pageResult = await _userRepository.GetAllStaffAsync(pagination, name, stationId);
+            var mapped = _mapper.Map<IEnumerable<UserProfileViewRes>>(pageResult.Items);
+
+            return new PageResult<UserProfileViewRes>(
+                mapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
         }
 
         public async Task DeleteCustomer(Guid id)

@@ -57,6 +57,7 @@ namespace API.Controllers
         /// <summary>
         /// Retrieves all staff users with optional filters for name and station.
         /// </summary>
+        /// <param name="pagination">Optional filter for the pagination.</param>
         /// <param name="name">Optional filter for the staff member's name.</param>
         /// <param name="stationId">Optional filter for the station the staff is assigned to.</param>
         /// <returns>List of staff members matching the specified filters.</returns>
@@ -65,11 +66,12 @@ namespace API.Controllers
         [HttpGet("staffs")]
         [RoleAuthorize(RoleName.Admin)]
         public async Task<IActionResult> GetAllStaff(
-           [FromQuery] string? name,
-           [FromQuery] Guid? stationId
-           )
+            [FromQuery] PaginationParams pagination,
+            [FromQuery] string? name,
+            [FromQuery] Guid? stationId
+        )
         {
-            var users = await _userService.GetAllStaffAsync(name, stationId);
+            var users = await _userService.GetAllStaffAsync(pagination, name, stationId);
             return Ok(users);
         }
 

@@ -22,7 +22,7 @@ namespace Application.Repositories
 
         Task<User?> GetByPhoneAsync(string phone);
 
-        Task<IEnumerable<User>> GetAllStaffAsync(string? name, Guid? stationId);
+        Task<PageResult<User>> GetAllStaffAsync(PaginationParams pagination, string? name, Guid? stationId);
 
         
     }
