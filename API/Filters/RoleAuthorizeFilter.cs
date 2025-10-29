@@ -39,9 +39,10 @@ namespace API.Filters
             {
                 throw new Exception();
             }
-            var roleList = _cache.Get<List<Role>>("AllRoles");
-            var userInDB = await userService.GetByIdAsync(Guid.Parse(userId));
-            var userRole = roleList.FirstOrDefault(r => r.Id == userInDB.Role.Id).Name;
+            var roleList = _cache!.Get<List<Role>>("AllRoles");
+            var userInDB = await userService.GetByIdAsync(Guid.Parse(userId))
+                ?? throw new NotFoundException(Message.UserMessage.NotFound);
+            var userRole = roleList!.FirstOrDefault(r => r.Id == userInDB.Role!.Id)!.Name;
 
             if (userRole == null || !_roles.Contains(userRole))
             {

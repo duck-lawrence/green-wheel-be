@@ -523,3 +523,14 @@ GO
 CREATE INDEX idx_dispatch_request_vehicles_dispatch_request_id ON dispatch_request_vehicles (dispatch_request_id);
 CREATE INDEX idx_dispatch_request_vehicles_vehicle_id ON dispatch_request_vehicles (vehicle_id);
 GO
+
+CREATE TABLE [business_variables] (
+    [id] UNIQUEIDENTIFIER NOT NULL,
+    [created_at] DATETIMEOFFSET NOT NULL,
+    [updated_at] DATETIMEOFFSET NOT NULL,
+    [key] int NOT NULL,
+    [value] DECIMAL(18,2) NOT NULL,
+    CONSTRAINT [PK_business_variables] PRIMARY KEY ([id])
+);
+
+GO

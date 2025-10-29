@@ -135,6 +135,7 @@ namespace API
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             builder.Services.AddScoped<IVehicleComponentRepository, VehicleComponentRepository>();
+            builder.Services.AddScoped<IBusinessVariableRepository, BusinessVariableRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -242,14 +243,19 @@ namespace API
             //run cache and add list roll to cache
             using (var scope = app.Services.CreateScope())
             {
+                var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
                 var roleRepo = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
                 var roles = await roleRepo.GetAllAsync();
-
-                var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
-                //set cache và đảm bảo nó chạy xuyên suốt app
                 cache.Set("AllRoles", roles, new MemoryCacheEntryOptions
                 {
                     //cache này sẽ tồn tại suốt vòng đời của cache
+                    Priority = CacheItemPriority.NeverRemove
+                });
+                var businessVariableRepo = scope.ServiceProvider.GetRequiredService<IBusinessVariableRepository>();
+                var businessVariables = await businessVariableRepo.GetAllAsync();
+                //set cache và đảm bảo nó chạy xuyên suốt app
+                cache.Set("BusinessVariables", businessVariables, new MemoryCacheEntryOptions
+                {
                     Priority = CacheItemPriority.NeverRemove
                 });
             }
