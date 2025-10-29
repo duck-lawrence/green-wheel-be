@@ -304,7 +304,7 @@ namespace Application
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
-
+            contract.Description += "\r\nThe contract was canceled by the customer.";
             if (contract.Status != (int)RentalContractStatus.PaymentPending && contract.Status != (int)RentalContractStatus.RequestPeding)
             {
                 throw new BadRequestException(Message.RentalContractMessage.CanNotCancel);
@@ -431,6 +431,7 @@ namespace Application
                     if (rentalContract.Status == (int)RentalContractStatus.RequestPeding)
                     {
                         rentalContract.Status = (int)RentalContractStatus.Cancelled;
+                        rentalContract.Description += "\r\nThe contract was canceled by the staff due to vehicle unavailability.";
                         await _uow.RentalContractRepository.UpdateAsync(rentalContract);
                     }
                     subject = "[GreenWheel] Vehicle Unavailable, Booking Cancelled";
@@ -554,7 +555,7 @@ namespace Application
                                                    )
         {
             contract_.Status = (int)RentalContractStatus.Cancelled;
-            contract_.Description += description;
+            contract_.Description += "\r\n" + description;
             var subject = "[GreenWheel] Your Booking Has Been Canceled";
             var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CancelAutoEmailTemplate.html");
             var body = System.IO.File.ReadAllText(templatePath);
