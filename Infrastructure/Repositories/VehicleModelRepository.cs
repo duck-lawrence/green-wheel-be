@@ -27,7 +27,7 @@ namespace Infrastructure.Repositories
                             .Include(vm => vm.Segment)
                             .Include(vm => vm.ModelImages)
                             .Include(vm => vm.Vehicles)
-                            .OrderBy(x => x.CreatedAt)
+                            .OrderByDescending(x => x.CreatedAt)
                             .AsQueryable();
             if (!string.IsNullOrEmpty(name)) models = models.Where(vm => vm.Name.ToLower().Contains(name.ToLower()));
             if (segmentId != null) models = models.Where(vm => vm.SegmentId == segmentId);
@@ -55,7 +55,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.Station)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
-                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
+                .OrderByDescending(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
                 .AsQueryable();
             if (segmentId != null)
@@ -89,7 +89,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(v => v.RentalContracts)
                 .Include(vm => vm.Brand)
                 .Include(vm => vm.Segment)
-                .OrderBy(vm => vm.Vehicles.Min(v => v.Status))
+                .OrderByDescending(vm => vm.Vehicles.Min(v => v.Status))
                 .AsNoTracking()
                 .FirstOrDefaultAsync(vm => vm.Id == id && vm.DeletedAt == null);
 

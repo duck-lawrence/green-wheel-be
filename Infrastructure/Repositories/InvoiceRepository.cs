@@ -19,7 +19,7 @@ namespace Infrastructure.Repositories
         {
             var invoices = await _dbContext.Invoices
                 .Include(i => i.InvoiceItems)
-                .Include(i => i.Contract).ToListAsync();
+                .Include(i => i.Contract).OrderByDescending(i => i.CreatedAt).ToListAsync();
             if (contractId != null)
             {
                 invoices = (List<Invoice>)invoices.Where(i => i.Contract.Id == contractId);
@@ -40,6 +40,7 @@ namespace Infrastructure.Repositories
             IQueryable<Invoice> query = _dbContext.Invoices
                                         .Include(i => i.Contract)
                                             .ThenInclude(r => r.Customer)
+                                         .OrderByDescending(i => i.CreatedAt)
                                         .AsQueryable();
             if (includeItems)
             {
@@ -58,7 +59,6 @@ namespace Infrastructure.Repositories
         {
             var query = _dbContext.Invoices
                 .AsNoTracking()
-                .OrderBy(x => x.CreatedAt)
                 .OrderByDescending(i => i.CreatedAt);
 
             var totalCount = await query.CountAsync();

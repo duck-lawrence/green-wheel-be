@@ -192,7 +192,7 @@ namespace Application
 
         public async Task<VehicleTotalRes?> GetVehicleTotal(Guid? stationId)
         {
-            var vehicle = await _vehicleService.GetAllAsync(null, stationId, null, null);
+            var vehicle = await _vehicleService.GetAllAsync(stationId, null);
             if (vehicle == null || !vehicle.Any())
                 throw new NotFoundException(Message.StatisticMessage.NoVehicleData);
 
@@ -201,7 +201,7 @@ namespace Application
 
             foreach (VehicleStatus status in Enum.GetValues(typeof(VehicleStatus)))
             {
-                var vehiclesByStatus = await _vehicleService.GetAllAsync(null, stationId, (int)status, null);
+                var vehiclesByStatus = await _vehicleService.GetAllAsync(stationId, (int)status);
                 items.Add(new VehicleStatusCountItem((int)status, vehiclesByStatus.Count()));
             }
 

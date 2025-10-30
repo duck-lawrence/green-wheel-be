@@ -18,6 +18,8 @@ namespace Application.Abstractions
 
         Task<VehicleViewRes> GetVehicleById(Guid id);
 
+        Task<IEnumerable<Vehicle>> GetAllAsync(Guid? stationId, int? status);
+
 
         //Task<Vehicle> GetVehicle(Guid stationId, Guid modelId, DateTimeOffset startDate, DateTimeOffset endDate);
     }

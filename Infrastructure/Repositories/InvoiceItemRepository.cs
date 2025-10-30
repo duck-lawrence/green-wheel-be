@@ -21,6 +21,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.InvoiceItems
                 .Include(i => i.ChecklistItem)
                     .ThenInclude(cli => cli == null ? null : cli.Component)
+                .OrderByDescending(i => i.CreatedAt)
                 .Where(i => i.InvoiceId == invoiceId).ToListAsync();
         }
 

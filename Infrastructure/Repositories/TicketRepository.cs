@@ -22,7 +22,6 @@ namespace Infrastructure.Repositories
                 .Include(t => t.Requester) // include User
                 .Include(t => t.Assignee)  // include Staff
                 .OrderByDescending(t => t.CreatedAt)
-                .OrderBy(x => x.CreatedAt)
                 .AsQueryable();
 
             if (filter.Status.HasValue)
@@ -46,7 +45,6 @@ namespace Infrastructure.Repositories
                 .Where(x => x.RequesterId == customerId)
                 .OrderByDescending(x => x.CreatedAt)
                 .Include(x => x.Assignee)
-                .OrderBy(x => x.CreatedAt)
                 .AsQueryable();
 
             if (status.HasValue)
@@ -66,8 +64,7 @@ namespace Infrastructure.Repositories
                 .Where(t => t.Status == (int)TicketStatus.EscalatedToAdmin)
                 .Include(t => t.Requester)
                 .Include(t => t.Assignee)
-                .OrderBy(x => x.CreatedAt)
-                .OrderByDescending(t => t.CreatedAt);
+                .OrderByDescending(x => x.CreatedAt)
 
             var total = await query.CountAsync();
             var items = await query

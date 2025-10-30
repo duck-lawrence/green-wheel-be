@@ -59,6 +59,11 @@ namespace Application
             );
         }
 
+        public async Task<IEnumerable<Vehicle>> GetAllAsync(Guid? stationId, int? status)
+        {
+            return await _vehicleRepository.GetAllAsync(stationId, status) ?? [];
+        }
+
         public async Task<VehicleViewRes> GetVehicleById(Guid id)
         {
             var vehicle = await _vehicleRepository.GetByIdOptionAsync(id, includeModel: true);

@@ -7,6 +7,7 @@ using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
@@ -29,7 +30,7 @@ namespace Infrastructure.Repositories
         {
             var vehicles = _dbContext.Vehicles
                             .Include(v => v.Model)
-                            .OrderBy(x => x.CreatedAt)
+                            .OrderByDescending(x => x.CreatedAt)
                             .AsQueryable();
             if (!string.IsNullOrEmpty(name)) vehicles = vehicles.Where(v => v.Model.Name.ToLower().Contains(name.ToLower()));
             if (stationId != null) vehicles = vehicles.Where(v => v.StationId == stationId);
@@ -50,7 +51,7 @@ namespace Infrastructure.Repositories
             var vehicles = await _dbContext.Vehicles
                 .Include(v => v.Model)
                 .Include(v => v.RentalContracts) //join bảng rentalContracts để lấy xe có hợp đồng
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .Where
                 (
                     v => v.StationId == stationId
@@ -102,6 +103,21 @@ namespace Infrastructure.Repositories
             }
 
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Vehicle>> GetAllAsync(Guid? stationId, int? status)
+        {
+            var query = _dbContext.Vehicles
+                .AsQueryable();
+            if(stationId != null)
+            {
+                query = query.Where(v => v.StationId == stationId);
+            }
+            if(status != null)
+            {
+                query = query.Where(v => v.Status == status);
+            }
+            return await query.ToListAsync();
         }
     }
 }

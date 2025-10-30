@@ -41,7 +41,7 @@ namespace Infrastructure.Repositories
                 .Include(vc => vc.Staff)
                     .ThenInclude(s => s.User)
                 .Include(vc => vc.Customer)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .Where(vc => vc.ContractId == contractId && vc.Type == type)
                     .AsQueryable();
             return await vehicleChecklists.ToListAsync();
@@ -56,17 +56,18 @@ namespace Infrastructure.Repositories
                 .Include(vc => vc.Staff)
                     .ThenInclude(s => s.User)
                 .Include(vc => vc.Customer)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                     .AsQueryable();
             if (contractId != null)
             {
                 vehicleChecklists = vehicleChecklists.Where(c => c.ContractId == contractId);
             }
-            var totalCount = await vehicleChecklists.CountAsync();
             if (type != null)
             {
                 vehicleChecklists = vehicleChecklists.Where(c => c.Type == type);
             }
+
+            var totalCount = await vehicleChecklists.CountAsync();
             var checklists = await vehicleChecklists.ApplyPagination(pagination).ToListAsync();
             return new PageResult<VehicleChecklist>(checklists, pagination.PageNumber, pagination.PageSize, totalCount);
         }

@@ -24,7 +24,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.ReturnStaff)
                     .ThenInclude(h => h == null ? null : h.User)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .AsQueryable();
             if (status != null)
             {
@@ -48,7 +48,7 @@ namespace Infrastructure.Repositories
                     .ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer)
                     .ThenInclude(u => u.DriverLicense)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .AsQueryable();
             if (!string.IsNullOrEmpty(phone))
             {
@@ -119,7 +119,7 @@ namespace Infrastructure.Repositories
                     .Include(r => r.Vehicle)
                         .ThenInclude(v => v == null ? null : v.Model)
                     .Include(r => r.Station)
-                    .OrderBy(x => x.CreatedAt)
+                    .OrderByDescending(x => x.CreatedAt)
                     .ToListAsync();
             return list ?? [];
         }
@@ -139,7 +139,7 @@ namespace Infrastructure.Repositories
                 .Include(x => x.ReturnStaff).ThenInclude(h => h == null ? null : h.User)
                 .Include(x => x.Customer).ThenInclude(u => u.CitizenIdentity)
                 .Include(x => x.Customer).ThenInclude(u => u.DriverLicense)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(phone))
@@ -180,7 +180,7 @@ namespace Infrastructure.Repositories
                 .Include(rc => rc.Station)
                 .Include(rc => rc.HandoverStaff).ThenInclude(s => s == null ? null : s.User)
                 .Include(rc => rc.ReturnStaff).ThenInclude(s => s == null ? null : s.User)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .Where(rc => rc.CustomerId == customerId);
 
             if (status != null)
