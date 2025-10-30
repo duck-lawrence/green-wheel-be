@@ -74,6 +74,34 @@ namespace Infrastructure.Migrations
                     b.ToTable("brands", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.BusinessVariable", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("id");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("Key")
+                        .HasColumnType("int")
+                        .HasColumnName("key");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("updated_at");
+
+                    b.Property<decimal>("Value")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("business_variables");
+                });
+
             modelBuilder.Entity("Domain.Entities.CitizenIdentity", b =>
                 {
                     b.Property<Guid>("Id")

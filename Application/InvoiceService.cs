@@ -97,11 +97,29 @@ namespace Application
         }
         public async Task PayRefundInvoiceManual(Invoice invoice, decimal amount)
         {
-            var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
-            if (amountNeed > 0 && amount < amountNeed)
-                throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
-            await UpdateCashInvoice(invoice, amount);
-            await _uow.SaveChangesAsync();
+            await _uow.BeginTransactionAsync();
+            try
+            {
+                var contract = await _uow.RentalContractRepository.GetByIdAsync(invoice.ContractId)
+                   ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
+                if (contract.Status != (int)RentalContractStatus.RefundPending)
+                    throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
+                contract.Status = (int)RentalContractStatus.Completed;
+                await _uow.RentalContractRepository.UpdateAsync(contract);
+                var amountNeed = InvoiceHelper.CalculateTotalAmount(invoice);
+                if (amountNeed > 0 && amount < amountNeed)
+                    throw new BusinessException(Message.InvoiceMessage.InvalidAmount);
+                await UpdateCashInvoice(invoice, amount);
+               
+                
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
         }
         private async Task UpdateCashInvoice(Invoice invoice, decimal amount)
         {
@@ -152,33 +170,33 @@ namespace Application
             return link;
         }
 
-        public async Task<string?> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl)
-        {
-            await _uow.BeginTransactionAsync();
-            try
-            {
-                var amount = InvoiceHelper.CalculateTotalAmount(invoice);
-                if (amount > 0)
-                {
-                    var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
-                    return link;
-                }
-                else if (amount == 0)
-                {
-                    await UpdateCashInvoice(invoice, amount);
-                    return string.Empty;
-                }
-                else
-                {
-                    throw new BadRequestException(Message.InvoiceMessage.InvalidAmount);
-                }
-            }
-            catch (Exception)
-            {
-                await _uow.RollbackAsync();
-                throw;
-            }
-        }
+        //public async Task<string?> PayRefundInvoiceOnline(Invoice invoice, string fallbackUrl)
+        //{
+        //    await _uow.BeginTransactionAsync();
+        //    try
+        //    {
+        //        var amount = InvoiceHelper.CalculateTotalAmount(invoice);
+        //        if (amount > 0)
+        //        {
+        //            var link = await _momoService.CreatePaymentAsync(amount, invoice.Id, invoice.Notes, fallbackUrl);
+        //            return link;
+        //        }
+        //        else if (amount == 0)
+        //        {
+        //            await UpdateCashInvoice(invoice, amount);
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            throw new BadRequestException(Message.InvoiceMessage.InvalidAmount);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await _uow.RollbackAsync();
+        //        throw;
+        //    }
+        //}
 
         public async Task UpdateInvoiceMomoPayment(MomoIpnReq momoIpnReq, Guid invoiceId)
         {

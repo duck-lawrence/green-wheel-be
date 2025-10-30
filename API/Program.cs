@@ -29,7 +29,10 @@ namespace API
             var builder = WebApplication.CreateBuilder(args);
 
             Env.Load("../.env");
-
+            builder.Configuration
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+            .AddEnvironmentVariables();
             // Frontend Url
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
@@ -94,14 +97,17 @@ namespace API
                               .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
                     });
             });
-            //kết nối DB
-            builder.Services.AddInfrastructue(Environment.GetEnvironmentVariable("MSSQL_CONNECTION_STRING")!);
-            //Cache
+            // Kết nối DB
+            var connectionString = builder.Configuration["MSSQL_CONNECTION_STRING"];
+            builder.Services.AddInfrastructue(connectionString!);
+
+            // Cache
             builder.Services.AddStackExchangeRedisCache(options =>
             {
-                options.Configuration = Environment.GetEnvironmentVariable("REDIS_CONFIGURATION")!;
+                options.Configuration = builder.Configuration["REDIS_CONFIGURATION"];
                 options.InstanceName = builder.Configuration["Redis:InstanceName"];
             });
+
             //thêm httpcontextAccessor để lấy context trong service
             builder.Services.AddHttpContextAccessor();
             //Add repositories
@@ -129,6 +135,8 @@ namespace API
             builder.Services.AddScoped<IVehicleChecklistItemRepository, VehicleChecklistItemRepository>();
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             builder.Services.AddScoped<IVehicleComponentRepository, VehicleComponentRepository>();
+            builder.Services.AddScoped<IBusinessVariableRepository, BusinessVariableRepository>();
+            builder.Services.AddScoped<IModelComponentRepository, ModelComponentRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -153,6 +161,7 @@ namespace API
             builder.Services.AddScoped<IAuthService, AuthSerivce>();
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
             builder.Services.AddScoped<IStatisticService, StatisticService>();
+            builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -165,6 +174,7 @@ namespace API
             builder.Services.AddScoped<IMediaUow, MediaUow>();
             builder.Services.AddScoped<IModelImageUow, ModelImageUow>();
             builder.Services.AddScoped<IVehicleChecklistUow, VehicleChecklistUow>();
+            builder.Services.AddScoped<IVehicleModelUow, VehicleModelUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
@@ -189,7 +199,7 @@ namespace API
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
-            //sử dụng cahce
+            //sử dụng cache
             builder.Services.AddMemoryCache();
 
             //thêm filter cho validation
@@ -237,14 +247,19 @@ namespace API
             //run cache and add list roll to cache
             using (var scope = app.Services.CreateScope())
             {
+                var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
                 var roleRepo = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
                 var roles = await roleRepo.GetAllAsync();
-
-                var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
-                //set cache và đảm bảo nó chạy xuyên suốt app
                 cache.Set("AllRoles", roles, new MemoryCacheEntryOptions
                 {
                     //cache này sẽ tồn tại suốt vòng đời của cache
+                    Priority = CacheItemPriority.NeverRemove
+                });
+                var businessVariableRepo = scope.ServiceProvider.GetRequiredService<IBusinessVariableRepository>();
+                var businessVariables = await businessVariableRepo.GetAllAsync();
+                //set cache và đảm bảo nó chạy xuyên suốt app
+                cache.Set("BusinessVariables", businessVariables, new MemoryCacheEntryOptions
+                {
                     Priority = CacheItemPriority.NeverRemove
                 });
             }

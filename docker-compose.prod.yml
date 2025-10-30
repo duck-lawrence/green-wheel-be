@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  greenwheel-backend:
+    container_name: greenwheel-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: greenwheel-backend:prod
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+      # Kết nối tới Azure SQL Database (thay giá trị thật)
+      MSSQL_CONNECTION_STRING: >
+        Server=tcp:${AZURE_SQL_SERVER},1433;
+        Database=${AZURE_SQL_DB};
+        User Id=${AZURE_SQL_USER};
+        Password=${AZURE_SQL_PASSWORD};
+        TrustServerCertificate=True;
+
+      # Kết nối tới Azure Redis Cache (có SSL và password)
+      REDIS_CONFIGURATION: >
+        ${AZURE_REDIS_HOST}:6380,
+        password=${AZURE_REDIS_KEY},
+        ssl=True,
+        abortConnect=False
+
+      # Các biến khác nếu cần
+      Logging__LogLevel__Default: Information
+      Logging__LogLevel__Microsoft: Warning
+      Logging__LogLevel__Microsoft.Hosting.Lifetime: Information
+
+    volumes:
+      - ./logs:/app/logs
+
+    restart: always
+

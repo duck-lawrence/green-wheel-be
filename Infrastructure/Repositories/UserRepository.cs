@@ -34,6 +34,7 @@ namespace Infrastructure.Repositories
                 .Include(user => user.Staff)
                     .ThenInclude(staff => staff.Station)
                 .AsQueryable()
+                .OrderBy(x => x.CreatedAt)
                 .AsNoTracking();
 
             if (!string.IsNullOrWhiteSpace(phone))
@@ -59,7 +60,7 @@ namespace Infrastructure.Repositories
             return new PageResult<User>(users, pagination.PageNumber, pagination.PageSize, total);
         }
 
-        public async Task<IEnumerable<User>> GetAllStaffAsync(string? name, Guid? stationId)
+        public async Task<PageResult<User>> GetAllStaffAsync(PaginationParams pagination, string? name, Guid? stationId)
         {
             var query = _dbContext.Users
                .Include(user => user.Role)
@@ -69,13 +70,24 @@ namespace Infrastructure.Repositories
                    .ThenInclude(staff => staff.Station)
                 .Where(u => u.Staff != null && u.Role.Name == RoleName.Staff)
                .AsQueryable()
+               .OrderBy(x => x.CreatedAt)
                .AsNoTracking();
+
             if (!string.IsNullOrWhiteSpace(name))
                 query = query.Where(u => u.FirstName.ToLower().Contains(name.ToLower()) ||
                                     u.LastName.ToLower().Contains(name.ToLower()));
             if (stationId != null)
                 query = query.Where(u => u.Staff.StationId == stationId);
-            return await query.ToListAsync();
+
+            var total = await query.CountAsync();
+
+            var users = await query
+                .OrderByDescending(u => u.CreatedAt)
+                .Skip((pagination.PageNumber - 1) * pagination.PageSize)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            return new PageResult<User>(users, pagination.PageNumber, pagination.PageSize, total);
         }
 
         public override async Task<User?> GetByIdAsync(Guid id)
@@ -94,6 +106,7 @@ namespace Infrastructure.Repositories
                 .Include(user => user.CitizenIdentity)
                 .Include(user => user.Staff)
                     .ThenInclude(staff => staff.Station)
+                .OrderBy(x => x.CreatedAt)
                 .FirstOrDefaultAsync(x => x.Phone == phone);
             return user;
         }

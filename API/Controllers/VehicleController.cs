@@ -1,6 +1,7 @@
 ﻿using API.Filters;
 using Application.Abstractions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.Vehicle.Request;
 using Microsoft.AspNetCore.Mvc;
 
@@ -86,9 +87,9 @@ namespace API.Controllers
         /// <response code="403">Forbidden — user does not have permission to perform this action.</response>
         [RoleAuthorize(RoleName.Staff, RoleName.Admin)]
         [HttpGet]
-        public async Task<IActionResult> GetAll(string? name, Guid? stationId, int? status, string? licensePlate)
+        public async Task<IActionResult> GetAll([FromQuery] PaginationParams pagination, string? name, Guid? stationId, int? status, string? licensePlate)
         {
-            var vehicle = await _vehicleService.GetAllAsync(name, stationId, status, licensePlate);
+            var vehicle = await _vehicleService.GetAllAsync(pagination, name, stationId, status, licensePlate); 
             return Ok(vehicle);
         }
 

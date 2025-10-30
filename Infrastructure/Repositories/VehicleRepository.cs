@@ -1,10 +1,14 @@
 ﻿using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.VehicleModel.Respone;
+using Application.Helpers;
 using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Infrastructure.Repositories
 {
@@ -21,16 +25,23 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.LicensePlate == licensePlate);
         }
 
-       public async Task<IEnumerable<Vehicle>> GetAllAsync(string? name, Guid? stationId, int? status, string? licensePlate)
+       public async Task<PageResult<Vehicle>> GetAllAsync(PaginationParams pagination, string? name, Guid? stationId, int? status, string? licensePlate)
         {
             var vehicles = _dbContext.Vehicles
                             .Include(v => v.Model)
+                            .OrderBy(x => x.CreatedAt)
                             .AsQueryable();
             if (!string.IsNullOrEmpty(name)) vehicles = vehicles.Where(v => v.Model.Name.ToLower().Contains(name.ToLower()));
             if (stationId != null) vehicles = vehicles.Where(v => v.StationId == stationId);
             if (status != null) vehicles = vehicles.Where(v => v.Status == status);
             if (!string.IsNullOrEmpty(licensePlate)) vehicles = vehicles.Where(v => v.LicensePlate.ToLower().Contains(licensePlate.ToLower()));
-            return await vehicles.ToListAsync();
+
+            var totalCount = await vehicles.CountAsync();
+
+            var listItem = await vehicles.ApplyPagination(pagination)
+                .ToListAsync();
+
+            return new PageResult<Vehicle>(listItem, pagination.PageNumber, pagination.PageSize, totalCount);
         }
 
         public async Task<IEnumerable<Vehicle>?> GetVehicles (Guid stationId, Guid modelId)
@@ -39,6 +50,7 @@ namespace Infrastructure.Repositories
             var vehicles = await _dbContext.Vehicles
                 .Include(v => v.Model)
                 .Include(v => v.RentalContracts) //join bảng rentalContracts để lấy xe có hợp đồng
+                .OrderBy(x => x.CreatedAt)
                 .Where
                 (
                     v => v.StationId == stationId

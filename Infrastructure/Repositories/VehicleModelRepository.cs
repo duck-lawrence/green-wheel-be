@@ -6,16 +6,19 @@ using AutoMapper.QueryableExtensions;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Infrastructure.Repositories
 {
     public class VehicleModelRepository : GenericRepository<VehicleModel>, IVehicleModelRepository
     {
         private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
-        public VehicleModelRepository(IGreenWheelDbContext dbContext, IMapper mapper) : base(dbContext)
+        public VehicleModelRepository(IGreenWheelDbContext dbContext, IMapper mapper, IMemoryCache cache) : base(dbContext)
         {
             _mapper = mapper;
+            _cache = cache;
         }
         public async Task<IEnumerable<VehicleModel>> GetAllAsync(string? name, Guid? segmentId)
         {
@@ -24,6 +27,7 @@ namespace Infrastructure.Repositories
                             .Include(vm => vm.Segment)
                             .Include(vm => vm.ModelImages)
                             .Include(vm => vm.Vehicles)
+                            .OrderBy(x => x.CreatedAt)
                             .AsQueryable();
             if (!string.IsNullOrEmpty(name)) models = models.Where(vm => vm.Name.ToLower().Contains(name.ToLower()));
             if (segmentId != null) models = models.Where(vm => vm.SegmentId == segmentId);
@@ -38,9 +42,10 @@ namespace Infrastructure.Repositories
         {
             if ((endDate - startDate).TotalHours < 24)
                 throw new ArgumentException(Message.VehicleModelMessage.RentTimeIsNotAvailable);
-
-            var startBuffer = startDate.AddDays(-Common.Day.RentalContractBufferDay);
-            var endBuffer = endDate.AddDays(Common.Day.RentalContractBufferDay);
+            var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+            var bufferDay = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.RentalContractBufferDay)?.Value;
+            var startBuffer = startDate.AddDays(-(int)bufferDay!);
+            var endBuffer = endDate.AddDays((int)bufferDay!);
 
             // Query cơ bản
             var query = _dbContext.VehicleModels
@@ -72,8 +77,10 @@ namespace Infrastructure.Repositories
             DateTimeOffset startDate,
             DateTimeOffset endDate)
         {
-            var startBuffer = startDate.AddDays(-Common.Day.RentalContractBufferDay);
-            var endBuffer = endDate.AddDays(Common.Day.RentalContractBufferDay);
+            var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+            var bufferDay = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.RentalContractBufferDay)?.Value;
+            var startBuffer = startDate.AddDays(-(int)bufferDay!);
+            var endBuffer = endDate.AddDays((int)bufferDay!);
 
             // Load model + ảnh + brand + segment
             var model = await _dbContext.VehicleModels

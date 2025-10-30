@@ -148,3 +148,12 @@ VALUES
  DATEADD(DAY, -2, SYSDATETIMEOFFSET()), DATEADD(DAY, -1, SYSDATETIMEOFFSET()),
  5, 0, 0, @vehC, @customerUser, @handoverStaff, @adminA2, @stationA3);
 GO
+
+INSERT INTO business_variables (id, created_at, updated_at, [key], [value]) VALUES
+(NEWID(), SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), 0, 10000),   -- LateReturnFee
+(NEWID(), SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), 1, 10000),   -- CleaningFee
+(NEWID(), SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), 2, 0.1),      -- BaseVAT (10%)
+(NEWID(), SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), 3, 1),        -- MaxLateReturnHours
+(NEWID(), SYSDATETIMEOFFSET(), SYSDATETIMEOFFSET(), 4, 10);       -- RentalContractBufferDay
+
+GO

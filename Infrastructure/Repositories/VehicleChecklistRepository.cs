@@ -1,4 +1,7 @@
-﻿using Application.Repositories;
+﻿using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
+using Application.Helpers;
+using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +32,7 @@ namespace Infrastructure.Repositories
             return vehicleChecklist;
         }
 
-        public async Task<IEnumerable<VehicleChecklist>?> GetAll(Guid? contractId, int? type)
+        public async Task<IEnumerable<VehicleChecklist>?> GetByContractAndType(Guid contractId, int type)
         {
             var vehicleChecklists = _dbContext.VehicleChecklists
                 .Include(vc => vc.VehicleChecklistItems)
@@ -38,16 +41,34 @@ namespace Infrastructure.Repositories
                 .Include(vc => vc.Staff)
                     .ThenInclude(s => s.User)
                 .Include(vc => vc.Customer)
+                .OrderBy(x => x.CreatedAt)
+                .Where(vc => vc.ContractId == contractId && vc.Type == type)
                     .AsQueryable();
-            if(contractId != null)
+            return await vehicleChecklists.ToListAsync();
+        }
+
+        public async Task<PageResult<VehicleChecklist>> GetAllPagination(Guid? contractId, int? type, PaginationParams pagination)
+        {
+            var vehicleChecklists = _dbContext.VehicleChecklists
+                .Include(vc => vc.VehicleChecklistItems)
+                    .ThenInclude(vci => vci.Component)
+                .Include(vc => vc.Vehicle)
+                .Include(vc => vc.Staff)
+                    .ThenInclude(s => s.User)
+                .Include(vc => vc.Customer)
+                .OrderBy(x => x.CreatedAt)
+                    .AsQueryable();
+            if (contractId != null)
             {
                 vehicleChecklists = vehicleChecklists.Where(c => c.ContractId == contractId);
             }
-            if(type != null)
+            var totalCount = await vehicleChecklists.CountAsync();
+            if (type != null)
             {
                 vehicleChecklists = vehicleChecklists.Where(c => c.Type == type);
             }
-            return await vehicleChecklists.ToListAsync();
+            var checklists = await vehicleChecklists.ApplyPagination(pagination).ToListAsync();
+            return new PageResult<VehicleChecklist>(checklists, pagination.PageNumber, pagination.PageSize, totalCount);
         }
 
 
