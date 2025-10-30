@@ -17,7 +17,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace API.Controllers
 {
     /// <summary>
-    /// Handles user-related operations such as authentication, profile management, 
+    /// Handles user-related operations such as authentication, profile management,
     /// and Google account integration.
     /// </summary>
     [Route("api/users")]
@@ -76,7 +76,7 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Retrieves a user by their unique identifier. 
+        /// Retrieves a user by their unique identifier.
         /// Accessible only to staff and admin roles with role-based permission checks.
         /// </summary>
         /// <param name="id">The unique identifier of the user to retrieve.</param>
@@ -141,7 +141,7 @@ namespace API.Controllers
         /// Uploads a citizen identity image for a specific user.
         /// </summary>
         /// <param name="id">The unique identifier of the user.</param>
-        /// <param name="file">The image file of the citizen identity card to upload.</param>
+        /// <param name="req">Request containing one or more image files to upload.</param>
         /// <returns>Uploaded citizen identity information.</returns>
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
@@ -151,9 +151,9 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadCitizenIdById(Guid id, [FromForm] IFormFile file)
+        public async Task<IActionResult> UploadCitizenIdById(Guid id, [FromForm] UploadImagesReq req)
         {
-            var citizenIdentity = await _userProfileService.UploadCitizenIdAsync(id, file);
+            var citizenIdentity = await _userProfileService.UploadCitizenIdAsync(id, req);
             return Ok(citizenIdentity);
         }
 
@@ -161,7 +161,7 @@ namespace API.Controllers
         /// Uploads a driver license image for a specific user.
         /// </summary>
         /// <param name="id">The unique identifier of the user.</param>
-        /// <param name="file">The image file of the driver license to upload.</param>
+        /// <param name="req">Request containing one or more image files to upload.</param>
         /// <returns>Uploaded driver license information.</returns>
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
@@ -170,9 +170,9 @@ namespace API.Controllers
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadDriverLicenseById(Guid id, [FromForm] IFormFile file)
+        public async Task<IActionResult> UploadDriverLicenseById(Guid id, [FromForm] UploadImagesReq req)
         {
-            var driverLisence = await _userProfileService.UploadDriverLicenseAsync(id, file);
+            var driverLisence = await _userProfileService.UploadDriverLicenseAsync(id, req);
             return Ok(driverLisence);
         }
 
