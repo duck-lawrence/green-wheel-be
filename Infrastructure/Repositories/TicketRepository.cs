@@ -64,7 +64,7 @@ namespace Infrastructure.Repositories
                 .Where(t => t.Status == (int)TicketStatus.EscalatedToAdmin)
                 .Include(t => t.Requester)
                 .Include(t => t.Assignee)
-                .OrderByDescending(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt);
 
             var total = await query.CountAsync();
             var items = await query

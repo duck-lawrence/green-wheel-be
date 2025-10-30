@@ -22,10 +22,10 @@ public partial class DriverLicense : SorfDeletedEntity, IEntity
 
     public DateTimeOffset ExpiresAt { get; set; }
 
-    public string ImageUrl { get; set; } = null!;
-
-    public string ImagePublicId { get; set; } = null!;
-
+    public string FrontImageUrl { get; set; } = null!;
+    public string FrontImagePublicId { get; set; } = null!;
+    public string BackImageUrl { get; set; } = null!;
+    public string BackImagePublicId { get; set; } = null!;
     public DateTimeOffset CreatedAt { get; set; }
 
     public DateTimeOffset UpdatedAt { get; set; }

@@ -209,9 +209,9 @@ namespace Application
                 await trx.CommitAsync();
 
                 // Sau commit: xóa ảnh cũ
-                if (!string.IsNullOrEmpty(old?.ImagePublicId))
+                if (!string.IsNullOrEmpty(old?.FrontImagePublicId))
                 {
-                    try { await _photoService.DeletePhotoAsync(old.ImagePublicId); } catch { }
+                    try { await _photoService.DeletePhotoAsync(old.FrontImagePublicId); } catch { }
                 }
 
                 return _mapper.Map<CitizenIdentityRes>(entity);
@@ -242,9 +242,9 @@ namespace Application
                 await _mediaUow.SaveChangesAsync();
                 await trx.CommitAsync();
 
-                if (!string.IsNullOrEmpty(old?.ImagePublicId))
+                if (!string.IsNullOrEmpty(old?.FrontImagePublicId))
                 {
-                    try { await _photoService.DeletePhotoAsync(old.ImagePublicId); } catch { }
+                    try { await _photoService.DeletePhotoAsync(old.FrontImagePublicId); } catch { }
                 }
 
                 return _mapper.Map<DriverLicenseRes>(entity);
@@ -332,8 +332,8 @@ namespace Application
             if (citizenIdentity == null)
                 throw new NotFoundException(Message.UserMessage.CitizenIdentityNotFound);
 
-            if (!string.IsNullOrEmpty(citizenIdentity.ImagePublicId))
-                await _photoService.DeletePhotoAsync(citizenIdentity.ImagePublicId);
+            if (!string.IsNullOrEmpty(citizenIdentity.FrontImagePublicId))
+                await _photoService.DeletePhotoAsync(citizenIdentity.FrontImagePublicId);
             citizenIdentity.DeletedAt = DateTimeOffset.UtcNow;
             await _mediaUow.SaveChangesAsync();
         }
@@ -344,8 +344,8 @@ namespace Application
             if (driverLicense == null)
                 throw new NotFoundException(Message.UserMessage.DriverLicenseNotFound);
 
-            if (!string.IsNullOrEmpty(driverLicense.ImagePublicId))
-                await _photoService.DeletePhotoAsync(driverLicense.ImagePublicId);
+            if (!string.IsNullOrEmpty(driverLicense.FrontImagePublicId))
+                await _photoService.DeletePhotoAsync(driverLicense.FrontImagePublicId);
             driverLicense.DeletedAt = DateTimeOffset.UtcNow;
             await _mediaUow.SaveChangesAsync();
         }

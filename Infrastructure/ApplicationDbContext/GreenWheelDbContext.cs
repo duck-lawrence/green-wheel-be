@@ -144,10 +144,10 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.FullName)
                 .HasMaxLength(100)
                 .HasColumnName("full_name");
-            entity.Property(e => e.ImagePublicId)
+            entity.Property(e => e.FrontImagePublicId)
                 .HasMaxLength(255)
                 .HasColumnName("image_public_id");
-            entity.Property(e => e.ImageUrl)
+            entity.Property(e => e.FrontImageUrl)
                 .HasMaxLength(500)
                 .HasColumnName("image_url");
             entity.Property(e => e.Nationality)
@@ -353,10 +353,10 @@ public partial class GreenWheelDbContext : DbContext, IGreenWheelDbContext
             entity.Property(e => e.FullName)
                 .HasMaxLength(100)
                 .HasColumnName("full_name");
-            entity.Property(e => e.ImagePublicId)
+            entity.Property(e => e.FrontImagePublicId)
                 .HasMaxLength(255)
                 .HasColumnName("image_public_id");
-            entity.Property(e => e.ImageUrl)
+            entity.Property(e => e.FrontImageUrl)
                 .HasMaxLength(500)
                 .HasColumnName("image_url");
             entity.Property(e => e.Nationality)

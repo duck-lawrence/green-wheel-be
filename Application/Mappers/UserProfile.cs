@@ -16,9 +16,9 @@ namespace Application.Mappers
         {
             CreateMap<User, UserProfileViewRes>()
                 .ForMember(dest => dest.LicenseUrl,
-                    opt => opt.MapFrom(src => src.DriverLicense != null ? src.DriverLicense.ImageUrl : null))
+                    opt => opt.MapFrom(src => src.DriverLicense != null ? src.DriverLicense.FrontImageUrl : null))
                 .ForMember(dest => dest.CitizenUrl,
-                    opt => opt.MapFrom(src => src.CitizenIdentity != null ? src.CitizenIdentity.ImageUrl : null))
+                    opt => opt.MapFrom(src => src.CitizenIdentity != null ? src.CitizenIdentity.FrontImageUrl : null))
                 .ForMember(dest => dest.Station,
                     opt => opt.MapFrom(src => src.Staff != null ? src.Staff.Station : null))
                 .ForMember(dest => dest.NeedSetPassword,
@@ -46,8 +46,8 @@ namespace Application.Mappers
                 .ForMember(dest => dest.DateOfBirth, opt => opt.MapFrom(src => src.User.DateOfBirth))
                 .ForMember(dest => dest.AvatarUrl, opt => opt.MapFrom(src => src.User.AvatarUrl))
                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.Phone))
-                .ForMember(dest => dest.LicenseUrl, opt => opt.MapFrom(src => src.User.DriverLicense.ImageUrl))
-                .ForMember(dest => dest.CitizenUrl, opt => opt.MapFrom(src => src.User.CitizenIdentity.ImageUrl));
+                .ForMember(dest => dest.LicenseUrl, opt => opt.MapFrom(src => src.User.DriverLicense.FrontImageUrl))
+                .ForMember(dest => dest.CitizenUrl, opt => opt.MapFrom(src => src.User.CitizenIdentity.FrontImageUrl));
             CreateMap<UserProfileViewRes, CustomerRes>();
         }
     }

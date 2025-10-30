@@ -131,8 +131,10 @@ CREATE TABLE [driver_licenses] (
     [sex] int NOT NULL DEFAULT 0, -- Male, Female
     [date_of_birth] datetimeoffset NOT NULL,
     [expires_at] datetimeoffset NOT NULL,
-    [image_url] nvarchar(500) NOT NULL,
-    [image_public_id] nvarchar(255) NOT NULL,
+    [front_image_url] nvarchar(500) NOT NULL,
+    [front_image_public_id] nvarchar(255) NOT NULL,
+	[back_image_url] nvarchar(500) NOT NULL,
+    [back_image_public_id] nvarchar(255) NOT NULL,
 
     [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
@@ -154,8 +156,10 @@ CREATE TABLE [citizen_identities] (
     [sex] int NOT NULL DEFAULT 0, -- Male, Female
     [date_of_birth] datetimeoffset NOT NULL,
     [expires_at] datetimeoffset NOT NULL,
-    [image_url] nvarchar(500) NOT NULL,
-    [image_public_id] nvarchar(255) NOT NULL,
+    [front_image_url] nvarchar(500) NOT NULL,
+    [front_image_public_id] nvarchar(255) NOT NULL,
+	[back_image_url] nvarchar(500) NOT NULL,
+    [back_image_public_id] nvarchar(255) NOT NULL,
 
     [created_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),
     [updated_at] datetimeoffset NOT NULL DEFAULT SYSDATETIMEOFFSET(),

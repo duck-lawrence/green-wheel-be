@@ -65,8 +65,8 @@ namespace Application
                 Sex = ParseSex(dto.Sex),
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
-                ImageUrl = imageUrl,
-                ImagePublicId = publicId,
+                FrontImageUrl = imageUrl,
+                FrontImagePublicId = publicId,
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 
