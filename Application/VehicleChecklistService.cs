@@ -1,6 +1,8 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
 using Application.Dtos.VehicleChecklist.Request;
 using Application.Dtos.VehicleChecklist.Respone;
 using Application.Dtos.VehicleChecklistItem.Request;
@@ -211,7 +213,7 @@ namespace Application
                 await _uow.VehicleChecklistRepository.UpdateAsync(checklist);
             }
             Invoice returnInvoice = contract.Invoices.Where(i => i.Type == (int)InvoiceType.Return).FirstOrDefault()!;
-            IEnumerable<VehicleChecklistItem> handoverChecklistItems = (await _uow.VehicleChecklistRepository.GetAll(contract.Id, (int)VehicleChecklistType.Handover))!
+            IEnumerable<VehicleChecklistItem> handoverChecklistItems = (await _uow.VehicleChecklistRepository.GetByContractAndType(contract.Id, (int)VehicleChecklistType.Handover))!
                 .FirstOrDefault()!.VehicleChecklistItems;
             IEnumerable<InvoiceItem> invoiceItems = [];
             foreach (var itemReq in checklistReq)
@@ -288,15 +290,20 @@ namespace Application
             var checklistViewRes = _mapper.Map<VehicleChecklistViewRes>(vehicleChecklist);
             return checklistViewRes;
         }
-        public async Task<IEnumerable<VehicleChecklistViewRes>> GetAll(Guid? contractId, int? type, ClaimsPrincipal userClaims)
+        public async Task<PageResult<VehicleChecklistViewRes>> GetAllPagination(Guid? contractId, int? type, ClaimsPrincipal userClaims, PaginationParams pagination)
         {
             var userId = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString());
-            var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAll(contractId, type);
             if (await CheckAuthorize(userId, contractId) == false) //nếu là user thì get all theo id
                 throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
+            var vehicleChecklists = await _uow.VehicleChecklistRepository.GetAllPagination(contractId, type, pagination);
 
-            var checklistsViewRes = _mapper.Map<IEnumerable<VehicleChecklistViewRes>>(vehicleChecklists);
-            return checklistsViewRes ?? [];
+            var checklistsViewRes = _mapper.Map<IEnumerable<VehicleChecklistViewRes>>(vehicleChecklists.Items);
+            return new PageResult<VehicleChecklistViewRes>(
+                checklistsViewRes,
+                vehicleChecklists.PageNumber,
+                vehicleChecklists.PageSize,
+                vehicleChecklists.Total
+            );
         }
         private async Task<bool> CheckAuthorize(Guid userId, Guid? contractId = null)
         {

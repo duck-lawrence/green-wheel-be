@@ -1,4 +1,7 @@
-﻿using Application.Repositories;
+﻿using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
+using Application.Helpers;
+using Application.Repositories;
 using Domain.Entities;
 using Infrastructure.ApplicationDbContext;
 using Microsoft.EntityFrameworkCore;
@@ -26,20 +29,25 @@ namespace Infrastructure.Repositories
             //lấy ra list linh kiện của xe
             return components;
         }
-        public async Task<IEnumerable<VehicleComponent>> GetAllAsync(Guid? modelId)
+        public async Task<PageResult<VehicleComponent>> GetAllAsync(Guid? modelId, PaginationParams pagination)
         {
-            var components = await _dbContext.VehicleComponents
+            var query = _dbContext.VehicleComponents
                                     .Include(vc => vc.ModelComponents)
-                                    .ToListAsync();
+                                    .AsQueryable();
+                                    //.ToListAsync();
+
             if (modelId != null)
             {
-                components = components
-                                .Where(vc => vc.ModelComponents
-                                    .Any(mc => mc.ModelId == modelId))
-                                .OrderBy(c => c.CreatedAt)
-                                .ToList();
+                query = query
+                        .Where(vc => vc.ModelComponents
+                            .Any(mc => mc.ModelId == modelId))
+                        .OrderBy(c => c.CreatedAt);
             }
-            return components;
+            var totalCount = await query.CountAsync();
+            var components = await query
+                            .ApplyPagination(pagination)
+                            .ToListAsync();
+            return new PageResult<VehicleComponent>(components, pagination.PageNumber, pagination.PageSize, totalCount);
         }
     }
 }

@@ -1,11 +1,15 @@
 ﻿using Application.Abstractions;
 using Application.AppExceptions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
+using Application.Dtos.Common.Response;
+using Application.Dtos.RentalContract.Respone;
 using Application.Dtos.VehicleComponent.Request;
 using Application.Dtos.VehicleComponent.Respone;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,10 +40,16 @@ namespace Application
             await _vehicleComponentRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<VehicleComponentViewRes>> GetAllAsync(Guid? id)
+        public async Task<PageResult<VehicleComponentViewRes>> GetAllAsync(Guid? id, PaginationParams pagination)
         {
-            var vehicleComponents = await  _vehicleComponentRepository.GetAllAsync(id);
-            return _mapper.Map<IEnumerable<VehicleComponentViewRes>>(vehicleComponents) ?? [];
+            var pageResult = await  _vehicleComponentRepository.GetAllAsync(id, pagination);
+            var itemsMapped = _mapper.Map<IEnumerable<VehicleComponentViewRes>>(pageResult.Items);
+            return new PageResult<VehicleComponentViewRes>(
+                itemsMapped,
+                pageResult.PageNumber,
+                pageResult.PageSize,
+                pageResult.Total
+            );
         }
 
         public async Task<VehicleComponentViewRes> GetByIdAsync(Guid id)

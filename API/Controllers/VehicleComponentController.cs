@@ -1,6 +1,7 @@
 ﻿using API.Filters;
 using Application.Abstractions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.VehicleComponent.Request;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,13 +23,14 @@ namespace API.Controllers
         /// </summary>
         /// <returns>The unique identifier of the created dispatch request.</returns>
         /// <param name="modelId">Vehicle model id</param>
+        /// <param name="pagination">pagination options</param>
         /// <response code="200">Success.</response>
         /// <response code="401">Unauthorized — user is not authenticated.</response>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery]Guid? modelId)
+        public async Task<IActionResult> GetAll([FromQuery]Guid? modelId, [FromQuery] PaginationParams pagination)
         {
 
-            var vehicleComponents = await _vehicleComponentService.GetAllAsync(modelId);
+            var vehicleComponents = await _vehicleComponentService.GetAllAsync(modelId, pagination);
             return Ok(vehicleComponents);
         }
 
