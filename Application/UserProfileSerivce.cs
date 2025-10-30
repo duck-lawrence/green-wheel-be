@@ -189,11 +189,18 @@ namespace Application
             }
         }
 
-        public async Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, IFormFile file)
+        public async Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, UploadImagesReq req)
         {
-            var uploadReq = new UploadImageReq { File = file };
-            var uploaded = await _photoService.UploadPhotoAsync(uploadReq, "citizen-ids");
-            if (string.IsNullOrEmpty(uploaded.Url))
+            if (req.Files.Count != 2)
+            {
+                throw new BadRequestException(Message.UserMessage.InvalidCitizenIdentityImagesAmount);
+            }
+
+            var frontUploadReq = new UploadImageReq { File = req.Files[0] };
+            var frontUploaded = await _photoService.UploadPhotoAsync(frontUploadReq, "citizen-ids-front");
+            var backUploadReq = new UploadImageReq { File = req.Files[1] };
+            var backUploaded = await _photoService.UploadPhotoAsync(backUploadReq, "citizen-ids-back");
+            if (string.IsNullOrEmpty(frontUploaded.Url) || string.IsNullOrEmpty(backUploaded.Url))
                 throw new InvalidOperationException(Message.CloudinaryMessage.UploadFailed);
 
             // Lấy bản ghi cũ (nếu có)
@@ -202,7 +209,8 @@ namespace Application
             await using var trx = await _mediaUow.BeginTransactionAsync();
             try
             {
-                var entity = await _citizenService.ProcessCitizenIdentityAsync(userId, uploaded.Url, uploaded.PublicID)
+                var entity = await _citizenService.ProcessCitizenIdentityAsync(userId,
+                    frontUploaded.Url, frontUploaded.PublicID, backUploaded.Url, backUploaded.PublicID)
                     ?? throw new BusinessException(Message.UserMessage.InvalidCitizenIdData);
 
                 await _mediaUow.SaveChangesAsync();
@@ -219,7 +227,7 @@ namespace Application
             catch
             {
                 await trx.RollbackAsync();
-                try { await _photoService.DeletePhotoAsync(uploaded.PublicID); } catch { }
+                try { await _photoService.DeletePhotoAsync(frontUploaded.PublicID); } catch { }
                 throw;
             }
         }

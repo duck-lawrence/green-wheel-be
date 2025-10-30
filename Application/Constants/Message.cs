@@ -13,8 +13,8 @@ namespace Application.Constants
         public static class UserMessage
         {
             //auth
-            public const string MissingToken = "user.missing_token";
 
+            public const string MissingToken = "user.missing_token";
             public const string InvalidAccessToken = "user.invalid_access_token";
             public const string InvalidRefreshToken = "user.invalid_refresh_token";
             public const string UserIdIsRequired = "user.user_id_is_required";
@@ -22,6 +22,7 @@ namespace Application.Constants
             public const string NotInputEmail = "user.google_credential_required";
 
             //otp
+
             public const string InvalidOTP = "user.invalid_otp";
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
             public const string OTPMustHave6Digits = "user.otp_must_have_6_digits";
@@ -29,6 +30,7 @@ namespace Application.Constants
             public const string AttemptOtp = "user.attemp_otp";
 
             //register
+
             public const string EmailAlreadyExists = "user.email_already_exists";
             public const string EmailIsRequired = "user.email_require";
             public const string InvalidEmail = "user.invalid_email";
@@ -45,46 +47,48 @@ namespace Application.Constants
             public const string PhoneAlreadyExist = "user.phone_already_exist";
 
             //change password
-            public const string DoNotHavePermission = "user.do_not_have_permission";
 
+            public const string DoNotHavePermission = "user.do_not_have_permission";
             public const string OldPasswordIsIncorrect = "user.old_password_is_incorrect";
             public const string OldPasswordIsRequired = "user.old_password_require";
 
             //login
-            public const string InvalidEmailOrPassword = "user.invalid_email_or_password";
 
+            public const string InvalidEmailOrPassword = "user.invalid_email_or_password";
             public const string Unauthorized = "user.unauthorized";
             public const string InvalidToken = "user.invalid_token";
             public const string NotFound = "user.user_not_found";
 
             //change avatar
+
             public const string AvatarNotFound = "user.avatar_not_found";
 
             //Citizen Identity
+
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
             public const string CitizenIdentityNumberIsRequired = "user.citizen_identity_number_require";
             public const string InvalidCitizenIdData = "user.invalid_citizen_identity_data";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
+            public const string InvalidCitizenIdentityImagesAmount = "user.invalid_citizen_identity_images_amount";
 
             //Driver License
-            public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
 
+            public const string InvalidDriverLicenseData = "user.invalid_driver_license_data";
             public const string DriverLicenseNotFound = "user.driver_license_not_found";
             public const string DriverLicenseDuplicate = "user.driver_license_duplicate";
+            public const string InvalidDriverLicenseImagesAmount = "user.invalid_driver_license_images_amount";
 
             // Staff
             public const string StationIdIsRequired = "user.station_id_require";
 
             // Bank info
-            public const string BankNameIsRequired = "user.bank_name_require";
 
+            public const string BankNameIsRequired = "user.bank_name_require";
             public const string BankAccountNumberIsRequired = "user.bank_account_number_require";
             public const string InvalidBankAccountNumber = "user.invalid_bank_account_number";
             public const string BankAccountNameIsRequired = "user.bank_account_name_require";
 
-            public static string FullNameIsRequired = "user.full_name_require";
-
-
+            public const string FullNameIsRequired = "user.full_name_require";
         }
 
         //Common error
@@ -224,8 +228,6 @@ namespace Application.Constants
 
             public static string ForbiddenInvoiceAccess = "invoice.forbidden_invoice_access";
 
-            
-
             public static string InvalidUnitPrice = "invoice_item.invalid_unit_price";
 
             public static string InvalidQuantity = "invoice_item.invalid_quantity";
@@ -313,6 +315,7 @@ namespace Application.Constants
             public const string InvalidStatus = "vehicle_checklist_item.invalid_status";
             public const string ItemIdRequired = "vehicle_checklist_item.item_id_required";
         }
+
         public static class StatisticMessage
         {
             public const string NoCustomerData = "statistic.no_customer_data";

@@ -47,9 +47,10 @@ namespace Application
         public async Task<CitizenIdentity?> GetByUserId(Guid userId)
             => await _citizenRepo.GetByUserIdAsync(userId);
 
-        public async Task<CitizenIdentity?> ProcessCitizenIdentityAsync(Guid userId, string imageUrl, string publicId)
+        public async Task<CitizenIdentity?> ProcessCitizenIdentityAsync(Guid userId,
+            string frontImageUrl, string frontPublicId, string backImageUrl, string backPublicId)
         {
-            var dto = await _geminiService.ExtractCitizenIdAsync(imageUrl);
+            var dto = await _geminiService.ExtractCitizenIdAsync(frontImageUrl);
             if (dto == null)
                 throw new BusinessException(Message.UserMessage.InvalidCitizenIdData);
 
@@ -65,8 +66,10 @@ namespace Application
                 Sex = ParseSex(dto.Sex),
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
-                FrontImageUrl = imageUrl,
-                FrontImagePublicId = publicId,
+                FrontImageUrl = frontImageUrl,
+                FrontImagePublicId = frontPublicId,
+                BackImageUrl = backImageUrl,
+                BackImagePublicId=backPublicId,
                 UpdatedAt = DateTimeOffset.UtcNow
             };
 

@@ -2,6 +2,7 @@
 using Application;
 using Application.Abstractions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.VehicleModel.Request;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -140,7 +141,7 @@ namespace API.Controllers
         [HttpPost("{modelId}/sub-images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> UploadSubImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
+        public async Task<IActionResult> UploadSubImages([FromRoute] Guid modelId, [FromForm] UploadImagesReq req)
         {
             var res = await _modelImageService.UploadModelImagesAsync(modelId, req.Files);
             return Ok(new { data = res, message = Message.CloudinaryMessage.UploadSuccess });
@@ -180,7 +181,7 @@ namespace API.Controllers
         public async Task<IActionResult> UploadMainImage([FromRoute] Guid modelId, [FromForm(Name = "file")] IFormFile file)
         {
             var imageUrl = await _vehicleModelService.UploadMainImageAsync(modelId, file);
-            return Ok( new { modelId, imageUrl });
+            return Ok(new { modelId, imageUrl });
         }
 
         /// <summary>
@@ -211,7 +212,7 @@ namespace API.Controllers
         [HttpPost("{modelId}/images")]
         [Consumes("multipart/form-data")]
         [ApiExplorerSettings(IgnoreApi = true)]
-        public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadModelImagesReq req)
+        public async Task<IActionResult> UploadAllImages([FromRoute] Guid modelId, [FromForm] UploadImagesReq req)
         {
             var res = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
             return Ok(res);

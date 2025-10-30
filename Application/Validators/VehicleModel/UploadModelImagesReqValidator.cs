@@ -1,5 +1,5 @@
 ﻿using Application.Constants;
-using Application.Dtos.VehicleModel.Request;
+using Application.Dtos.Common.Request;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Application.Validators.VehicleModel
 {
-    public class UploadModelImagesReqValidator : AbstractValidator<UploadModelImagesReq>
+    public class UploadModelImagesReqValidator : AbstractValidator<UploadImagesReq>
     {
         public UploadModelImagesReqValidator()
         {
