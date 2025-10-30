@@ -216,5 +216,20 @@ namespace API.Controllers
             var res = await _modelImageService.UploadAllModelImagesAsync(modelId, req.Files);
             return Ok(res);
         }
+
+        /// <summary>
+        /// Uploads both the main image and gallery images for a specific vehicle model.
+        /// </summary>
+        /// <param name="id">Model id.</param>
+        /// <param name="req">Update model component req.</param>
+        /// <returns>The uploaded main image and gallery image URLs with a success message.</returns>
+        /// <response code="200">Success.</response>
+        [RoleAuthorize(RoleName.Admin)]
+        [HttpPut("{id}/components")]
+        public async Task<IActionResult> UpdateVehicleModelComponents([FromRoute] Guid id, [FromBody] UpdateModelComponentsReq req)
+        {
+            await _vehicleModelService.UpdateVehicleModelComponentsAsync(id, req);
+            return Ok();
+        }
     }
 }

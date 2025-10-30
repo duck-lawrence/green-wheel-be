@@ -18,13 +18,18 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IMediaUow _uow;
         private readonly IPhotoService _photoService;
+        private readonly IVehicleModelUow _vehicleModelUow;
+        private readonly IVehicleComponentService _vehicleComponentService;
 
-        public VehicleModelService(IVehicleModelRepository vehicleModelRepository, IMapper mapper, IMediaUow uow, IPhotoService photoService)
+        public VehicleModelService(IVehicleModelRepository vehicleModelRepository, IMapper mapper, IMediaUow uow,
+            IPhotoService photoService, IVehicleModelUow vehicleModelUow, IVehicleComponentService vehicleComponentService)
         {
             _vehicleModelRepository = vehicleModelRepository;
             _mapper = mapper;
             _uow = uow;
             _photoService = photoService;
+            _vehicleModelUow = vehicleModelUow;
+            _vehicleComponentService = vehicleComponentService;
         }
 
         public async Task<Guid> CreateVehicleModelAsync(CreateVehicleModelReq createVehicleModelReq)
@@ -127,6 +132,32 @@ namespace Application
 
             await _uow.VehicleModels.UpdateAsync(model);
             await _uow.SaveChangesAsync();
+        }
+
+        public async Task UpdateVehicleModelComponentsAsync(Guid id, UpdateModelComponentsReq req)
+        {
+            IEnumerable<ModelComponent> modelComponents = await _vehicleModelUow.ModelComponentRepository.GetByModelIdAsync(id);
+            IEnumerable<Guid> needAddItem = req.ComponentIds.Where(id => !modelComponents.Any(m => m.ComponentId == id));
+            IEnumerable<ModelComponent> needDeleteItem = modelComponents.Where(item => !req.ComponentIds.Any(id => id == item.ComponentId));
+            await _vehicleModelUow.BeginTransactionAsync();
+            try
+            {
+                IEnumerable<ModelComponent> addItems = needAddItem.Select(componentId => new ModelComponent
+                {
+                    Id = Guid.NewGuid(),
+                    ModelId = id,
+                    ComponentId = componentId,
+                });
+                await _vehicleModelUow.ModelComponentRepository.DeleteRangeAsync(needDeleteItem);
+                await _vehicleModelUow.ModelComponentRepository.AddRangeAsync(addItems);
+                await _vehicleModelUow.SaveChangesAsync();
+                await _vehicleModelUow.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await _vehicleModelUow.RollbackAsync();
+                throw;
+            }
         }
     }
 }

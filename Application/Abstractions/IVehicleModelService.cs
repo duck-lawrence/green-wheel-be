@@ -25,6 +25,6 @@ namespace Application.Abstractions
         Task<string> UploadMainImageAsync(Guid modelId, IFormFile file);
         Task<IEnumerable<VehicleModelViewRes>> GetAllAsync(string? name, Guid? segmentId);
         Task DeleteMainImageAsync(Guid modelId);
-
+        Task UpdateVehicleModelComponentsAsync(Guid id, UpdateModelComponentsReq req);
     }
 }

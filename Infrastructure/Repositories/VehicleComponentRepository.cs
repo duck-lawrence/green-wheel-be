@@ -21,6 +21,7 @@ namespace Infrastructure.Repositories
             var components = await _dbContext.Vehicles
                 .Where(v => v.Id == vehicleId)
                 .SelectMany(v => v.Model.ModelComponents.Select(mc => mc.Component))
+                .OrderBy(c => c.CreatedAt)
                 .ToListAsync();
             //lấy ra list linh kiện của xe
             return components;
@@ -35,6 +36,7 @@ namespace Infrastructure.Repositories
                 components = components
                                 .Where(vc => vc.ModelComponents
                                     .Any(mc => mc.ModelId == modelId))
+                                .OrderBy(c => c.CreatedAt)
                                 .ToList();
             }
             return components;

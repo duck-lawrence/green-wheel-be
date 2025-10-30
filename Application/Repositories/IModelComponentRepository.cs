@@ -9,6 +9,7 @@ namespace Application.Repositories
 {
     public interface IModelComponentRepository : IGenericRepository<ModelComponent>
     {
-        Task DeleteRangeAsync(IEnumerable<VehicleComponent> components);
+        Task DeleteRangeAsync(IEnumerable<ModelComponent> items);
+        Task<IEnumerable<ModelComponent>> GetByModelIdAsync(Guid ModelId);
     }
 }
