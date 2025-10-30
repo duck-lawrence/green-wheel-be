@@ -6,17 +6,13 @@ using Application.Dtos.Common.Request;
 using Application.Dtos.Common.Response;
 using Application.Dtos.Invoice.Request;
 using Application.Dtos.Invoice.Response;
-using Application.Dtos.InvoiceItem.Request;
 using Application.Dtos.Momo.Request;
 using Application.Helpers;
-using Application.Repositories;
 using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 
 namespace Application
 {
@@ -150,7 +146,7 @@ namespace Application
 
         public async Task<string> PayHandoverInvoiceOnline(Invoice invoice, string fallbackUrl)
         {
-            Invoice reservationInvoice = null;
+            Invoice? reservationInvoice = null;
             reservationInvoice = (await _uow.InvoiceRepository.GetByContractAsync(invoice.ContractId)).FirstOrDefault(i => i.Type == (int)InvoiceType.Reservation);
             var amount = InvoiceHelper.CalculateTotalAmount(invoice)
                               - (reservationInvoice != null ? reservationInvoice.Status == (int)InvoiceStatus.Paid ? reservationInvoice.Subtotal : 0 : 0);
@@ -238,7 +234,7 @@ namespace Application
                          .Replace("{PaymentMethod}", Enum.GetName(typeof(PaymentMethod), invoice.PaymentMethod))
                          .Replace("{InvoiceType}", Enum.GetName(typeof(InvoiceType), invoice.Type))
                          .Replace("{PaidAt}", invoice.PaidAt?.ToString("dd/MM/yyyy HH:mm"));
-                    await _emailService.SendEmailAsync(customer.Email, subject, body);
+                    await _emailService.SendEmailAsync(customer.Email!, subject, body);
                 }
                 await _uow.CommitAsync();
             }catch(Exception)
@@ -248,12 +244,12 @@ namespace Application
             }
         }
 
-        public async Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination)
+        public async Task<PageResult<Invoice>?> GetAllInvoicesAsync(PaginationParams pagination)
         {
             var invoices = await _uow.InvoiceRepository.GetAllInvoicesAsync(pagination);
 
             if (invoices == null || !invoices.Items.Any())
-                return null;
+                return default;
 
             return invoices;
         }

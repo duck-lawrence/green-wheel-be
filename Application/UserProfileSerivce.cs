@@ -56,7 +56,11 @@ namespace Application
 
         public async Task<UserProfileViewRes> GetMeAsync(ClaimsPrincipal userClaims)
         {
-            Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            //Guid userID = Guid.Parse(userClaims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString());
+            var sidClaim = userClaims.FindFirst(JwtRegisteredClaimNames.Sid);
+            if (sidClaim == null || string.IsNullOrEmpty(sidClaim.Value))
+                throw new NotFoundException(Message.UserMessage.NotFound);
+            Guid userID = Guid.Parse(sidClaim.Value);
             //User userFromDb = await _userRepository.GetByIdAsync(userID);
             // Lấy hồ sơ người dùng KÈM theo thông tin Role (Phúc thêm)
             // Mục đích: khi trả về UserProfileViewRes cần có tên/quyền của vai trò (vd: "Customer", "Staff")

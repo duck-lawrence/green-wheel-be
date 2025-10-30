@@ -18,7 +18,7 @@ namespace Application.Abstractions
 
         Task<InvoiceViewRes> GetInvoiceById(Guid id, bool includeItems = false, bool includeDeposit = false);
 
-        Task<PageResult<Invoice>> GetAllInvoicesAsync(PaginationParams pagination);
+        Task<PageResult<Invoice>?> GetAllInvoicesAsync(PaginationParams pagination);
 
         Task<IEnumerable<InvoiceViewRes>?> GetByContractIdAndStatus(Guid? contractId, int? status);
 

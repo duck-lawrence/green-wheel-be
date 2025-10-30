@@ -5,20 +5,14 @@ using Application.Constants;
 using Application.Dtos.User.Request;
 using Application.Helpers;
 using Application.Repositories;
-using Application.UnitOfWorks;
 using AutoMapper;
 using Domain.Entities;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application
 {
@@ -61,7 +55,7 @@ namespace Application
         }
         public async Task<string?> Login(UserLoginReq user)
         {
-            User userFromDB = await _userRepository.GetByEmailAsync(user.Email);
+            User? userFromDB = await _userRepository.GetByEmailAsync(user.Email);
 
             if (userFromDB != null)
             {
@@ -69,7 +63,8 @@ namespace Application
                 {
                     throw new ForbidenException(Message.UserMessage.NotHavePassword);
                 }
-                if (PasswordHelper.VerifyPassword(user.Password, userFromDB.Password))
+                //if (PasswordHelper.VerifyPassword(user.Password, userFromDB.Password))
+                if (userFromDB.Password != null && PasswordHelper.VerifyPassword(user.Password, userFromDB.Password))
                 {
                     //tạo refreshtoken và lưu nó vào DB lẫn cookie
                     await GenerateRefreshToken(userFromDB.Id, null);
@@ -110,8 +105,8 @@ namespace Application
                 _jwtSettings.RefreshTokenExpiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, oldClaims);
             ClaimsPrincipal claims = JwtHelper.VerifyToken(token, _jwtSettings.RefreshTokenSecret, TokenType.RefreshToken.ToString(),
                 _jwtSettings.Issuer, _jwtSettings.Audience);
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Iat).Value, out long iatSeconds);
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Iat)?.Value, out long iatSeconds);
+            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp)?.Value, out long expSeconds);
 
             await _refreshTokenRepository.AddAsync(new RefreshToken()
             {
@@ -124,13 +119,16 @@ namespace Application
                 IsRevoked = false
             });
             //lưu vào cookie
-            _context.Response.Cookies.Append(CookieKeys.RefreshToken, token, new CookieOptions
+            if(_context != null)
             {
-                HttpOnly = true,
-                Secure = true,         // chỉ gửi qua HTTPS
-                SameSite = SameSiteMode.Strict, // tránh CSRF
-                Expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiredTime) // hạn sử dụng
-            });
+                _context.Response.Cookies.Append(CookieKeys.RefreshToken, token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,         // chỉ gửi qua HTTPS
+                    SameSite = SameSiteMode.Strict, // tránh CSRF
+                    Expires = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiredTime) // hạn sử dụng
+                });
+            }
             return token;
         }
 
@@ -214,13 +212,16 @@ namespace Application
                 expiredTime = _jwtSettings.ForgotPasswordTokenExpiredTime;
             }
             string token = JwtHelper.GenerateEmailToken(verifyOTPDto.Email, secret, type.ToString(), expiredTime, _jwtSettings.Issuer, _jwtSettings.Audience, null);
-            _context.Response.Cookies.Append(cookieKey, token, new CookieOptions
+            if (_context != null)
             {
-                HttpOnly = true,
-                Secure = true,         // chỉ gửi qua HTTPS
-                SameSite = SameSiteMode.Strict, // tránh CSRF
-                Expires = DateTime.UtcNow.AddMinutes(expiredTime) // hạn sử dụng
-            });
+                _context.Response.Cookies.Append(cookieKey, token, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,         // chỉ gửi qua HTTPS
+                    SameSite = SameSiteMode.Strict, // tránh CSRF
+                    Expires = DateTime.UtcNow.AddMinutes(expiredTime) // hạn sử dụng
+                });
+            }
             return token;
         }
 
@@ -254,7 +255,13 @@ namespace Application
             var claims = JwtHelper.VerifyToken(token, _jwtSettings.RegisterTokenSecret,
                 TokenType.RegisterToken.ToString(), _jwtSettings.Issuer, _jwtSettings.Audience);
 
-            var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+            //var email = claims.FindFirst(JwtRegisteredClaimNames.Sid).Value.ToString();
+            var sidClaim = claims.FindFirst(JwtRegisteredClaimNames.Sid);
+            if (sidClaim == null || string.IsNullOrEmpty(sidClaim.Value))
+            {
+                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+            }
+            var email = sidClaim.Value;
             var userFromDB = await _userRepository.GetByEmailAsync(email);
 
             if (userFromDB != null)
@@ -272,14 +279,26 @@ namespace Application
             user.Id = id;
             user.CreatedAt = user.UpdatedAt = DateTime.UtcNow;
             user.Email = email;
-            user.RoleId = roles.FirstOrDefault(r => r.Name == RoleName.Customer).Id;
+            //user.RoleId = roles.FirstOrDefault(r => r.Name == RoleName.Customer).Id;
+            var customerRole = roles?.FirstOrDefault(r => r.Name == RoleName.Customer);
+            if (customerRole == null)
+            {
+                throw new InvalidOperationException("Customer role not found in roles cache.");
+            }
+            user.RoleId = customerRole.Id;
             user.DeletedAt = null;
             Guid userId = await _userRepository.AddAsync(user);
             string accesstoken = GenerateAccessToken(userId);
             string refreshToken = await GenerateRefreshToken(userId, null);
 
             //----save to black list
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            //long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            long expSeconds = 0;
+            var expClaim = claims.FindFirst(JwtRegisteredClaimNames.Exp);
+            if (expClaim != null && !string.IsNullOrEmpty(expClaim.Value))
+            {
+                long.TryParse(expClaim.Value, out expSeconds);
+            }
             await _jwtBackListRepository.SaveTokenAsyns(token, expSeconds);
 
             return accesstoken;
@@ -305,7 +324,10 @@ namespace Application
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
             }
-            if (userFromDB.Password != null && !PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
+            //if (userFromDB.Password != null && !PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
+            if (userFromDB.Password != null && 
+                !string.IsNullOrEmpty(userChangePasswordReq.OldPassword) && 
+                !PasswordHelper.VerifyPassword(userChangePasswordReq.OldPassword, userFromDB.Password))
             {
                 throw new UnauthorizedAccessException(Message.UserMessage.OldPasswordIsIncorrect);
             }
@@ -353,7 +375,13 @@ namespace Application
             userFromDB.Password = PasswordHelper.HashPassword(password);
             await _userRepository.UpdateAsync(userFromDB);
             //---- save to black list
-            long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            //long.TryParse(claims.FindFirst(JwtRegisteredClaimNames.Exp).Value, out long expSeconds);
+            long expSeconds = 0;
+            var expClaim = claims.FindFirst(JwtRegisteredClaimNames.Exp);
+            if (expClaim != null && !string.IsNullOrEmpty(expClaim.Value))
+            {
+                long.TryParse(expClaim.Value, out expSeconds);
+            }
             await _jwtBackListRepository.SaveTokenAsyns(forgotPasswordToken, expSeconds);
         }
 
@@ -390,7 +418,7 @@ namespace Application
 
             if (claims != null)
             {
-                RefreshToken refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
+                RefreshToken? refreshTokenFromDB = await _refreshTokenRepository.GetByRefreshToken(refreshToken, getRevoked);
                 if (refreshTokenFromDB == null)
                 {
                     throw new UnauthorizedAccessException(Message.UserMessage.InvalidRefreshToken);
@@ -408,7 +436,7 @@ namespace Application
         public async Task<Dictionary<string, string>> LoginWithGoogle(GoogleJsonWebSignature.Payload req)
         {
             var _context = _contextAccessor.HttpContext;
-            User user = await _userRepository.GetByEmailAsync(req.Email);
+            User? user = await _userRepository.GetByEmailAsync(req.Email);
             if (user == null)
             {
                 Guid id;
@@ -417,6 +445,10 @@ namespace Application
                     id = Guid.NewGuid();
                 } while (await _userRepository.GetByIdAsync(id) != null);
                 var roles = _cache.Get<List<Role>>("AllRoles");
+                if (roles == null)
+                {
+                    throw new InvalidOperationException("Roles cache is not initialized.");
+                }
                 user = new User
                 {
                     Id = id,

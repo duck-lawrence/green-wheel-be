@@ -21,6 +21,7 @@ namespace Application.Dtos.User.Respone
         public RoleViewRes? Role { get; set; }
         public StationViewRes? Station { get; set; }
         public bool NeedSetPassword { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }
 

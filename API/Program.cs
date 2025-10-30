@@ -160,6 +160,7 @@ namespace API
             builder.Services.AddScoped<IEmailSerivce, EmailService>();
             builder.Services.AddScoped<IAuthService, AuthSerivce>();
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
+            builder.Services.AddScoped<IStatisticService, StatisticService>();
             builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();

@@ -1,11 +1,12 @@
 using Application.Dtos.CitizenIdentity.Response;
 using Application.Dtos.DriverLicense.Response;
-using System;
+using Application.Dtos.Statistic.Responses;
 using Application.Dtos.User.Request;
 using Application.Dtos.User.Respone;
 using Application.Helpers;
 using AutoMapper;
 using Domain.Entities;
+using System;
 
 namespace Application.Mappers
 {
@@ -47,6 +48,7 @@ namespace Application.Mappers
                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.Phone))
                 .ForMember(dest => dest.LicenseUrl, opt => opt.MapFrom(src => src.User.DriverLicense.ImageUrl))
                 .ForMember(dest => dest.CitizenUrl, opt => opt.MapFrom(src => src.User.CitizenIdentity.ImageUrl));
+            CreateMap<UserProfileViewRes, CustomerRes>();
         }
     }
 }
