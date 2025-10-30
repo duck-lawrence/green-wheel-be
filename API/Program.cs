@@ -136,6 +136,7 @@ namespace API
             builder.Services.AddScoped<IStationFeedbackRepository, StationFeedbackRepository>();
             builder.Services.AddScoped<IVehicleComponentRepository, VehicleComponentRepository>();
             builder.Services.AddScoped<IBusinessVariableRepository, BusinessVariableRepository>();
+            builder.Services.AddScoped<IModelComponentRepository, ModelComponentRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -159,6 +160,7 @@ namespace API
             builder.Services.AddScoped<IEmailSerivce, EmailService>();
             builder.Services.AddScoped<IAuthService, AuthSerivce>();
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
+            builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -171,6 +173,7 @@ namespace API
             builder.Services.AddScoped<IMediaUow, MediaUow>();
             builder.Services.AddScoped<IModelImageUow, ModelImageUow>();
             builder.Services.AddScoped<IVehicleChecklistUow, VehicleChecklistUow>();
+            builder.Services.AddScoped<IVehicleModelUow, VehicleModelUow>();
             //Mapper
             builder.Services.AddAutoMapper(typeof(UserProfile)); // auto mapper sẽ tự động scan hết assembly đó và xem tất cả thằng kết thừa Profile rồi tạo lun
                                                                  // mình chỉ cần truyền một thằng đại diện thoi
@@ -195,7 +198,7 @@ namespace API
             builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
             //middleware
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
-            //sử dụng cahce
+            //sử dụng cache
             builder.Services.AddMemoryCache();
 
             //thêm filter cho validation

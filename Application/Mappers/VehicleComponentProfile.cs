@@ -1,4 +1,5 @@
-﻿using Application.Dtos.VehicleComponent.Respone;
+﻿using Application.Dtos.VehicleComponent.Request;
+using Application.Dtos.VehicleComponent.Respone;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -14,6 +15,7 @@ namespace Application.Mappers
         public VehicleComponentProfile()
         {
             CreateMap<VehicleComponent, VehicleComponentViewRes>();
+            CreateMap<CreateVehicleComponentReq, VehicleComponent>();
         }
     }
 }

@@ -2,6 +2,7 @@
 using Application;
 using Application.Abstractions;
 using Application.Constants;
+using Application.Dtos.Common.Request;
 using Application.Dtos.VehicleChecklist.Request;
 using Application.Dtos.VehicleChecklistItem.Request;
 using Application.Dtos.VehicleModel.Respone;
@@ -95,15 +96,16 @@ namespace API.Controllers
         /// </summary>
         /// <param name="contractId">Optional filter for the rental contract ID.</param>
         /// <param name="type">Optional filter for the checklist type (e.g., handover, return).</param>
+        /// <param name="pagination">option pagiantion.</param>
         /// <returns>List of vehicle checklists matching the specified filters.</returns>
         /// <response code="200">Success.</response>
         /// <response code="404">No vehicle checklists found.</response>
         [HttpGet]
         [RoleAuthorize(RoleName.Staff, RoleName.Customer)]
-        public async Task<IActionResult> GetAll(Guid? contractId, int? type)
+        public async Task<IActionResult> GetAll([FromQuery] Guid? contractId, [FromQuery] int? type, [FromQuery] PaginationParams pagination)
         {
             var user = HttpContext.User;
-            var checklistsViewRes = await _vehicleChecklistService.GetAll(contractId, type, user);
+            var checklistsViewRes = await _vehicleChecklistService.GetAllPagination(contractId, type, user, pagination);
             return Ok(checklistsViewRes);
         }
 
@@ -144,12 +146,21 @@ namespace API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Update customer sign.
+        /// </summary>
+        /// <param name="id">The checklist id.</param>
+        /// <returns>Success message if the image is deleted successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="403">Forbidden — user does not have permission to delete this image.</response>
+        /// <response code="404">Checklist item or image not found.</response>
         [HttpPut("{id}/customer-sign")]
         [RoleAuthorize(RoleName.Customer)]
         public async Task<IActionResult> CustomerSignVehicleChecklist(Guid id)
         {
             var user = HttpContext.User;
-            await _vehicleChecklistService.CustomerSignVehicleChecklistAsync(id, user);
+            await _vehicleChecklistService.SignByCustomerAsync(id, user);
             return Ok();
         }
     }

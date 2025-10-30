@@ -26,13 +26,13 @@ namespace API.Filters
             //check user login or not?
             if (!user.Identity?.IsAuthenticated ?? true)
             {
-                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidAccessToken);
             }
             //take userId
             var userId = user.FindFirstValue(JwtRegisteredClaimNames.Sid)!.ToString();
             if (userId == null)
             {
-                throw new UnauthorizedAccessException(Message.UserMessage.Unauthorized);
+                throw new UnauthorizedAccessException(Message.UserMessage.InvalidAccessToken);
             }
             var userService = context.HttpContext.RequestServices.GetService<IUserService>();
             if (userService == null)

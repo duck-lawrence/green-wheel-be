@@ -85,19 +85,19 @@ namespace Infrastructure.ExternalService
             {
                 if ((int)response.StatusCode == 400)
                 {
-                    throw new BadRequestException(Message.MomoMessage.InvalidSignature);
+                    throw new BadRequestException(Message.PaymentMessage.InvalidSignature);
                 }
                 if ((int)response.StatusCode == 401)
                 {
-                    throw new UnauthorizedAccessException(Message.MomoMessage.MissingAccessKeyPartnerCodeSecretKey);
+                    throw new UnauthorizedAccessException(Message.PaymentMessage.MissingAccessKeyPartnerCodeSecretKey);
                 }
                 if ((int)response.StatusCode == 403)
                 {
-                    throw new BadRequestException(Message.MomoMessage.NotHavePermission);
+                    throw new BadRequestException(Message.PaymentMessage.NotHavePermission);
                 }
                 if ((int)response.StatusCode == 404)
                 {
-                    throw new BadRequestException(Message.MomoMessage.InvalidEndpoint);
+                    throw new BadRequestException(Message.PaymentMessage.InvalidEndpoint);
                 }
             }
             // Deserialize phản hồi JSON
@@ -111,7 +111,7 @@ namespace Infrastructure.ExternalService
 
             if (momoResponse.ResultCode != 0)
             {
-                throw new Exception(Message.MomoMessage.FailedToCreateMomoPayment);
+                throw new Exception(Message.PaymentMessage.FailedToCreateMomoPayment);
             }
             //save to redis
             await _momoPaymentLinkRepositorys.SavePaymentLinkPAsyns(invoiceId.ToString(), momoResponse.ShortLink);

@@ -23,7 +23,6 @@ namespace Application.Constants
 
             //otp
             public const string InvalidOTP = "user.invalid_otp";
-
             public const string OTPCanNotEmpty = "user.otp_can_not_empty";
             public const string OTPMustHave6Digits = "user.otp_must_have_6_digits";
             public const string RateLimitOtp = "user.rate_limit_otp";
@@ -31,7 +30,6 @@ namespace Application.Constants
 
             //register
             public const string EmailAlreadyExists = "user.email_already_exists";
-
             public const string EmailIsRequired = "user.email_require";
             public const string InvalidEmail = "user.invalid_email";
             public const string PasswordTooShort = "user.password_too_short";
@@ -64,7 +62,7 @@ namespace Application.Constants
 
             //Citizen Identity
             public const string CitizenIdentityNotFound = "user.citizen_identity_not_found";
-
+            public const string CitizenIdentityNumberIsRequired = "user.citizen_identity_number_require";
             public const string InvalidCitizenIdData = "user.invalid_citizen_identity_data";
             public const string CitizenIdentityDuplicate = "user.citizen_identity_duplicate";
 
@@ -82,8 +80,11 @@ namespace Application.Constants
 
             public const string BankAccountNumberIsRequired = "user.bank_account_number_require";
             public const string InvalidBankAccountNumber = "user.invalid_bank_account_number";
-
             public const string BankAccountNameIsRequired = "user.bank_account_name_require";
+
+            public static string FullNameIsRequired = "user.full_name_require";
+
+
         }
 
         //Common error
@@ -164,6 +165,8 @@ namespace Application.Constants
 
             // Input
             public const string InvalidStatus = "dispatch.invalid_status";
+
+            public static string FromStationIsRequire = "dispatch.from_station_is_required";
         }
 
         //Rental Contract
@@ -191,13 +194,20 @@ namespace Application.Constants
             public const string NotFound = "station.not_found";
         }
 
-        public static class MomoMessage
+        public static class PaymentMessage
         {
-            public const string InvalidSignature = "momo.invalid_signature";
-            public const string MissingAccessKeyPartnerCodeSecretKey = "momo.missing_access_key_partner_code_secret_key";
-            public const string NotHavePermission = "momo.not_have_permission";
-            public const string InvalidEndpoint = "momo.invalid_end_point";
-            public const string FailedToCreateMomoPayment = "momo.failed_to_create_momo_payment";
+            public const string InvalidSignature = "payment.invalid_signature";
+            public const string MissingAccessKeyPartnerCodeSecretKey = "payment.missing_access_key_partner_code_secret_key";
+            public const string NotHavePermission = "payment.not_have_permission";
+            public const string InvalidEndpoint = "payment.invalid_end_point";
+            public const string FailedToCreateMomoPayment = "payment.failed_to_create_momo_payment";
+
+            public static string InvoiceIdIsRequired = "payment.invoice_id_required";
+
+            public static string FallBackUrlIsRequired = "payment.fallback_url_required";
+
+            public static string ỊnvalidFallBackUrl = "payment.fallback_url_invalid";
+            public static string InvalidPaymentMethod = "payment.invalid_payment_method";
         }
 
         public static class InvoiceMessage
@@ -213,6 +223,14 @@ namespace Application.Constants
             public static string? InvalidInvoiceType = "invoice.invalid_invoice_type";
 
             public static string ForbiddenInvoiceAccess = "invoice.forbidden_invoice_access";
+
+            
+
+            public static string InvalidUnitPrice = "invoice_item.invalid_unit_price";
+
+            public static string InvalidQuantity = "invoice_item.invalid_quantity";
+
+            public static string InvoiceItemInvalidType = "invoice_item.invalid_type";
         }
 
         public static class JsonMessage
@@ -269,6 +287,14 @@ namespace Application.Constants
         public static class VehicleComponentMessage
         {
             public const string NotFound = "vehicle_component.not_found";
+
+            public static string NameIsRequired = "vehicle_component.name_required";
+
+            public static string DescriptionIsRequired = "vehicle_component.description_required";
+
+            public static string DamageFeeIsRequired = "vehicle_component.damage_fee_required";
+
+            public static string DamageFeeMustBePositive = "vehicle_component.damage_fee_must_be_non_negative";
         }
 
         public static class VehicleChecklistMessage
@@ -276,16 +302,9 @@ namespace Application.Constants
             public const string NotFound = "vehicle_checklist.not_found";
 
             public static string ThisChecklistAlreadyProcess = "vehicle_checklist.already_process";
+            public static string AtLeastOnePartyMustSign = "vehicle_checklist.at_least_one_party_must_sign";
 
-            internal static string AtLeastOnePartyMustSign(UpdateVehicleChecklistReq req)
-            {
-                throw new NotImplementedException();
-            }
-
-            internal static string InvalidStatus(CreateVehicleChecklistReq req)
-            {
-                throw new NotImplementedException();
-            }
+            public static string InvalidType = "vehicle_checklist.invalid_type";
         }
 
         public static class VehicleChecklistItemMessage
