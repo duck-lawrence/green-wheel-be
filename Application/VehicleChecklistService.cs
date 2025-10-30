@@ -318,12 +318,13 @@ namespace Application
             }
         }
 
-        public async Task CustomerSignVehicleChecklistAsync(Guid id, ClaimsPrincipal user)
+        public async Task SignByCustomerAsync(Guid id, ClaimsPrincipal user)
         {
             if (Guid.TryParse(user.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString(), out Guid userId))
             {
-                var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id);
-                if (checklist.Id != userId)
+                var checklist = await _uow.VehicleChecklistRepository.GetByIdAsync(id)
+                    ?? throw new NotFoundException(Message.VehicleChecklistMessage.NotFound);
+                if (checklist.Type == (int)VehicleChecklistType.OutOfContract ||  checklist.CustomerId != userId)
                 {
                     throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
                 }

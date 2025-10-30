@@ -149,7 +149,7 @@ namespace API.Controllers
         public async Task<IActionResult> CustomerSignVehicleChecklist(Guid id)
         {
             var user = HttpContext.User;
-            await _vehicleChecklistService.CustomerSignVehicleChecklistAsync(id, user);
+            await _vehicleChecklistService.SignByCustomerAsync(id, user);
             return Ok();
         }
     }

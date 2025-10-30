@@ -16,6 +16,6 @@ namespace Application.Abstractions
         Task<IEnumerable<VehicleChecklistViewRes>>GetAll(Guid? contractId, int? type, ClaimsPrincipal userClaims);
         Task UpdateAsync(UpdateVehicleChecklistReq req, Guid id);
         Task UpdateItemsAsync(Guid id, int status, string? notes);
-        Task CustomerSignVehicleChecklistAsync(Guid id, ClaimsPrincipal user);
+        Task SignByCustomerAsync(Guid id, ClaimsPrincipal user);
     }
 }
