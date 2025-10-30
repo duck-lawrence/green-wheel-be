@@ -33,7 +33,7 @@ namespace Application.Abstractions
 
         Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, UploadImagesReq req);
 
-        Task<DriverLicenseRes> UploadDriverLicenseAsync(Guid userId, IFormFile file);
+        Task<DriverLicenseRes> UploadDriverLicenseAsync(Guid userId, UploadImagesReq req);
 
         Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId);
 

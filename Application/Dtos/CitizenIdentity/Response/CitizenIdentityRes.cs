@@ -10,6 +10,8 @@
         public DateTimeOffset DateOfBirth { get; set; }
 
         public DateTimeOffset ExpiresAt { get; set; }
-        public string ImageUrl { get; set; } = null!;
+        public string FrontImageUrl { get; set; } = null!;
+
+        public string BackImageUrl { get; set; } = null!;
     }
 }

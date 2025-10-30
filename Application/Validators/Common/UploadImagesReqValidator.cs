@@ -2,17 +2,12 @@
 using Application.Dtos.Common.Request;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Application.Validators.VehicleModel
+namespace Application.Validators.Common
 {
-    public class UploadModelImagesReqValidator : AbstractValidator<UploadImagesReq>
+    public class UploadImagesReqValidator : AbstractValidator<UploadImagesReq>
     {
-        public UploadModelImagesReqValidator()
+        public UploadImagesReqValidator()
         {
             RuleFor(x => x.Files)
             .NotEmpty()
