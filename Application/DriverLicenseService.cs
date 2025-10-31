@@ -72,9 +72,10 @@ namespace Application
             return license;
         }
 
-        public async Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId, string imageUrl, string publicId)
+        public async Task<DriverLicense?> ProcessDriverLicenseAsync(Guid userId,
+            string frontImageUrl, string frontPublicId, string backImageUrl, string backPublicId)
         {
-            var dto = await _geminiService.ExtractDriverLicenseAsync(imageUrl);
+            var dto = await _geminiService.ExtractDriverLicenseAsync(frontImageUrl);
             if (dto == null)
                 throw new BusinessException(Message.UserMessage.InvalidDriverLicenseData);
 
@@ -96,8 +97,10 @@ namespace Application
                 Sex = sex,
                 DateOfBirth = dob == default ? DateTimeOffset.MinValue : dob,
                 ExpiresAt = exp == default ? DateTimeOffset.MinValue : exp,
-                FrontImageUrl = imageUrl,
-                FrontImagePublicId = publicId,
+                FrontImageUrl = frontImageUrl,
+                FrontImagePublicId = frontPublicId,
+                BackImageUrl = backImageUrl,
+                BackImagePublicId = backPublicId,
                 Class = licenseClass
             };
 

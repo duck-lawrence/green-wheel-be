@@ -1,5 +1,6 @@
 ﻿using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.CitizenIdentity.Response;
+using Application.Dtos.Common.Request;
 using Application.Dtos.DriverLicense.Request;
 using Application.Dtos.DriverLicense.Response;
 using Application.Dtos.User.Request;
@@ -21,7 +22,7 @@ namespace Application.Abstractions
         Task UpdateAsync(Guid userId, UserUpdateReq req);
 
         Task UpdateBankAccountAsync(Guid userId, UpdateBankAccountReq req);
-        
+
         Task DeleteBankAccountAsync(Guid userId);
 
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
@@ -30,9 +31,9 @@ namespace Application.Abstractions
 
         Task CheckDupEmailAsync(string email);
 
-        Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, IFormFile file);
+        Task<CitizenIdentityRes> UploadCitizenIdAsync(Guid userId, UploadImagesReq req);
 
-        Task<DriverLicenseRes> UploadDriverLicenseAsync(Guid userId, IFormFile file);
+        Task<DriverLicenseRes> UploadDriverLicenseAsync(Guid userId, UploadImagesReq req);
 
         Task<CitizenIdentityRes?> GetMyCitizenIdentityAsync(Guid userId);
 

@@ -11,7 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace API.Controllers
 {
     /// <summary>
-    /// Manages user profile operations such as retrieving, updating, 
+    /// Manages user profile operations such as retrieving, updating,
     /// and linking Google account information.
     /// </summary>
     [Route("api/me")]
@@ -125,7 +125,7 @@ namespace API.Controllers
         /// <summary>
         /// Uploads a citizen identity image for the currently authenticated user.
         /// </summary>
-        /// <param name="file">The image file of the citizen identity card to upload.</param>
+        /// <param name="req">Request containing one or more image files to upload.</param>
         /// <returns>Uploaded citizen identity information.</returns>
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
@@ -135,17 +135,17 @@ namespace API.Controllers
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadCitizenId([FromForm] IFormFile file)
+        public async Task<IActionResult> UploadCitizenId([FromForm] UploadImagesReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userProfileService.UploadCitizenIdAsync(userId, file);
+            var result = await _userProfileService.UploadCitizenIdAsync(userId, req);
             return Ok(result);
         }
 
         /// <summary>
         /// Uploads a driver license image for the currently authenticated user.
         /// </summary>
-        /// <param name="file">The image file of the driver license to upload.</param>
+        /// <param name="req">Request containing one or more image files to upload.</param>
         /// <returns>Uploaded driver license information.</returns>
         /// <response code="200">Success.</response>
         /// <response code="400">Invalid file format or upload error.</response>
@@ -155,10 +155,10 @@ namespace API.Controllers
         [Authorize]
         [ApiExplorerSettings(IgnoreApi = true)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadDriverLicense([FromForm] IFormFile file)
+        public async Task<IActionResult> UploadDriverLicense([FromForm] UploadImagesReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
-            var result = await _userProfileService.UploadDriverLicenseAsync(userId, file);
+            var result = await _userProfileService.UploadDriverLicenseAsync(userId, req);
             return Ok(result);
         }
 
