@@ -19,28 +19,59 @@ namespace Application
         private readonly IMediaUow _uow;
         private readonly IPhotoService _photoService;
         private readonly IVehicleModelUow _vehicleModelUow;
-        private readonly IVehicleComponentService _vehicleComponentService;
+        private readonly IVehicleSegmentRepository _vehicleSegmentRepository;
+        private readonly IBrandRepository _branchRepository;
 
         public VehicleModelService(IVehicleModelRepository vehicleModelRepository, IMapper mapper, IMediaUow uow,
-            IPhotoService photoService, IVehicleModelUow vehicleModelUow, IVehicleComponentService vehicleComponentService)
+            IPhotoService photoService, IVehicleModelUow vehicleModelUow, IVehicleSegmentRepository vehicleSegmentRepository, IBrandRepository branchRepository)
         {
             _vehicleModelRepository = vehicleModelRepository;
             _mapper = mapper;
             _uow = uow;
             _photoService = photoService;
             _vehicleModelUow = vehicleModelUow;
-            _vehicleComponentService = vehicleComponentService;
+            _vehicleSegmentRepository = vehicleSegmentRepository;
+            _branchRepository = branchRepository;
         }
 
-        public async Task<Guid> CreateVehicleModelAsync(CreateVehicleModelReq createVehicleModelReq)
+        public async Task<Guid> CreateVehicleModelAsync(CreateVehicleModelReq req)
         {
-            Guid id;
-            do
+            await _vehicleModelUow.BeginTransactionAsync();
+            try
             {
-                id = new Guid();
-            } while (await _vehicleModelRepository.GetByIdAsync(id) != null);
-            var vehicleModel = _mapper.Map<VehicleModel>(createVehicleModelReq);
-            return await _vehicleModelRepository.AddAsync(vehicleModel);
+                if((await _vehicleSegmentRepository.GetByIdAsync(req.SegmentId) == null))
+                {
+                    throw new NotFoundException(Message.VehicleSegmentMessage.NotFound);
+                }
+                if ((await _branchRepository.GetByIdAsync(req.BrandId) == null))
+                {
+                    throw new NotFoundException(Message.BrandMessage.NotFound);
+                }
+                var id = Guid.NewGuid();
+                var vehicleModel = _mapper.Map<VehicleModel>(req);
+                vehicleModel.Id = id;
+                await _vehicleModelRepository.AddAsync(vehicleModel);
+                if(!(await _vehicleModelUow.VehicleComponentRepository.VerifyComponentsAsync(req.ComponentIds)))
+                {
+                    throw new BadRequestException(Message.VehicleComponentMessage.InvalidComponentIds);
+                }
+                IEnumerable<ModelComponent> addItems = req.ComponentIds.Select(componentId => new ModelComponent
+                {
+                    Id = Guid.NewGuid(),
+                    ModelId = id,
+                    ComponentId = componentId,
+                });
+                await _vehicleModelUow.ModelComponentRepository.AddRangeAsync(addItems);
+                await _vehicleModelUow.SaveChangesAsync();
+                await _vehicleModelUow.CommitAsync();
+                return id;
+            }
+            catch (Exception)
+            {
+                await _vehicleModelUow.RollbackAsync();
+                throw;
+            }
+           
         }
 
         public async Task<bool> DeleteVehicleModleAsync(Guid id)
@@ -69,9 +100,15 @@ namespace Application
         public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq req)
         {
             var model = await _vehicleModelRepository.GetByIdAsync(Id) ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
-
+            if(req.SegmentId != null && (await _vehicleSegmentRepository.GetByIdAsync((Guid)req.SegmentId) == null))
+            {
+                throw new NotFoundException(Message.VehicleSegmentMessage.NotFound);
+            }
+            if (req.BrandId != null && (await _branchRepository.GetByIdAsync((Guid)req.BrandId) == null))
+            {
+                throw new NotFoundException(Message.BrandMessage.NotFound);
+            }
             _mapper.Map(req, model);
-            model.UpdatedAt = DateTimeOffset.UtcNow;
 
             return await _vehicleModelRepository.UpdateAsync(model);
         }
@@ -134,6 +171,10 @@ namespace Application
 
         public async Task UpdateVehicleModelComponentsAsync(Guid id, UpdateModelComponentsReq req)
         {
+            if (!(await _vehicleModelUow.VehicleComponentRepository.VerifyComponentsAsync(req.ComponentIds)))
+            {
+                throw new BadRequestException(Message.VehicleComponentMessage.InvalidComponentIds);
+            }
             IEnumerable<ModelComponent> modelComponents = await _vehicleModelUow.ModelComponentRepository.GetByModelIdAsync(id);
             IEnumerable<Guid> needAddItem = req.ComponentIds.Where(id => !modelComponents.Any(m => m.ComponentId == id));
             IEnumerable<ModelComponent> needDeleteItem = modelComponents.Where(item => !req.ComponentIds.Any(id => id == item.ComponentId));

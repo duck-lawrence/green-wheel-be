@@ -13,5 +13,6 @@ namespace Application.Repositories
     {
         Task<IEnumerable<VehicleComponent>> GetByVehicleIdAsync(Guid vehicleId); 
         Task<PageResult<VehicleComponent>> GetAllAsync(Guid? modelId, string? name, PaginationParams pagination);
+        Task<bool> VerifyComponentsAsync(IEnumerable<Guid> componentIds);
     }
 }
