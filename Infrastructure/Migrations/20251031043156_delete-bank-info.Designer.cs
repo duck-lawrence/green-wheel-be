@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GreenWheelDbContext))]
-    [Migration("20251030125330_update_indentity_and_driver_license")]
-    partial class update_indentity_and_driver_license
+    [Migration("20251031043156_delete-bank-info")]
+    partial class deletebankinfo
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1115,18 +1115,6 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("avatar_url");
-
-                    b.Property<string>("BankAccountName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_account_name");
-
-                    b.Property<string>("BankAccountNumber")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_account_number");
-
-                    b.Property<string>("BankName")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("bank_name");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()

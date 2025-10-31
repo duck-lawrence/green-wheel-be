@@ -116,7 +116,7 @@ namespace Application
                 Guid handoverInvoiceId = Guid.NewGuid();
                 Guid reservationInvoiceId = Guid.NewGuid();
 
-                var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+                var businessVariables = _cache!.Get<List<BusinessVariable>>(Common.SystemCache.BusinessVariables);
                 var baseVat = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.BaseVAT)?.Value;
                 var handoverInvoice = new Invoice()
                 {
@@ -199,7 +199,7 @@ namespace Application
                 var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
                     ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 if (contract.ActualStartDate != null) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
-                if(contract.StartDate > DateTimeOffset.UtcNow)
+                if (contract.StartDate > DateTimeOffset.UtcNow)
                 {
                     throw new BadRequestException(Message.RentalContractMessage.ContractNotStartYet);
                 }
@@ -253,17 +253,16 @@ namespace Application
                 var contract = await _uow.RentalContractRepository.GetByIdAsync(contractId)
                    ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 if (contract.Status == (int)RentalContractStatus.Returned) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
+
                 contract.Status = (int)RentalContractStatus.Returned;
                 contract.ReturnStaffId = Guid.Parse(staffId);
-                //var actualEndDate = contract.EndDate.AddHours(2); // test
                 var actualEndDate = DateTimeOffset.UtcNow;
                 if (contract == null) throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 contract.ActualEndDate = actualEndDate;
-                var hours = (actualEndDate - contract.EndDate).TotalHours; //tính thời gian trể
-                hours = Double.Ceiling(hours);
+                var actualLateReturnHours = CalculateLateReturnHours(contract.EndDate, actualEndDate);
                 IEnumerable<Invoice> invoices = [];
                 Guid returnInvoiceId = Guid.NewGuid();
-                var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+                var businessVariables = _cache!.Get<List<BusinessVariable>>(Common.SystemCache.BusinessVariables);
                 var baseVat = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.BaseVAT)?.Value;
                 var returnInvoice = new Invoice()
                 {
@@ -279,13 +278,13 @@ namespace Application
                 IEnumerable<InvoiceItem> returnInvoiceItems = []; //tạo trước invoice item
                 var maxLateReturnHours = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.MaxLateReturnHours)?.Value;
                 var lateReturnFeePerHour = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.LateReturnFeePerHour)?.Value;
-                if (hours > (int)maxLateReturnHours!)
+                if (actualLateReturnHours > 0)
                 {
                     //phí trể giờ
                     returnInvoiceItems = returnInvoiceItems.Append(new InvoiceItem()
                     {
                         InvoiceId = returnInvoiceId,
-                        Quantity = (int)hours,
+                        Quantity = (int)actualLateReturnHours,
                         UnitPrice = (decimal)lateReturnFeePerHour!,
                         Type = (int)InvoiceItemType.LateReturn,
                     });
@@ -316,7 +315,6 @@ namespace Application
                 throw;
             }
         }
-
         public async Task CancelRentalContract(Guid id)
         {
             var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
@@ -365,7 +363,7 @@ namespace Application
                                 if (startBuffer <= contract_.EndDate && endBuffer >= contract_.StartDate)
                                 {
                                     await CancelContractAndSendEmail(contract_,
-                                     ". Booking was canceled as another customer successfully paid for the same vehicle earlier.");
+                                     "\r\nBooking was canceled as another customer successfully paid for the same vehicle earlier.");
                                 }
                             }
                         }
@@ -517,8 +515,7 @@ namespace Application
                                     || contract_.Status == (int)RentalContractStatus.PaymentPending)
                                 {
                                     await CancelContractAndSendEmail(contract_,
-                                                            ". Booking was canceled because vehicle was maintained");
-
+                                        "\r\nBooking was canceled because vehicle was maintained");
                                 }
                                 else if (contract_.Status == (int)RentalContractStatus.Active)
                                 {
@@ -572,8 +569,7 @@ namespace Application
             }
         }
 
-        private async Task CancelContractAndSendEmail(RentalContract contract_, string description
-                                                   )
+        private async Task CancelContractAndSendEmail(RentalContract contract_, string description)
         {
             contract_.Status = (int)RentalContractStatus.Cancelled;
             contract_.Description += "\r\n" + description;
@@ -673,7 +669,6 @@ namespace Application
                     }
                     await _uow.InvoiceRepository.AddAsync(invoice);
                     await _uow.InvoiceItemRepository.AddAsync(item);
-
                 }
                 await _uow.RentalContractRepository.UpdateAsync(contract);
                 await _uow.SaveChangesAsync();
@@ -685,6 +680,7 @@ namespace Application
                 throw;
             }
         }
+
         public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(
             GetAllRentalContactReq req, PaginationParams pagination)
         {
@@ -724,6 +720,15 @@ namespace Application
                 result.PageSize,
                 result.Total
             );
+        }
+        private int CalculateLateReturnHours(DateTimeOffset expectedReturnDate, DateTimeOffset actualReturnDate)
+        {
+            var businessVariables = _cache!.Get<List<BusinessVariable>>(Common.SystemCache.BusinessVariables);
+            var maxLateReturnHour = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.MaxLateReturnHours)!.Value;
+            var totalHoursLate = (actualReturnDate - expectedReturnDate).TotalHours;
+            totalHoursLate = Math.Ceiling(totalHoursLate);
+            totalHoursLate -= (int)maxLateReturnHour!;
+            return (int)totalHoursLate;
         }
     }
 }

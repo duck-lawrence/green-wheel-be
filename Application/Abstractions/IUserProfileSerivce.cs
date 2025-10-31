@@ -21,10 +21,6 @@ namespace Application.Abstractions
 
         Task UpdateAsync(Guid userId, UserUpdateReq req);
 
-        Task UpdateBankAccountAsync(Guid userId, UpdateBankAccountReq req);
-
-        Task DeleteBankAccountAsync(Guid userId);
-
         Task<string> UploadAvatarAsync(Guid userId, IFormFile file);
 
         Task DeleteAvatarAsync(Guid pulicId);

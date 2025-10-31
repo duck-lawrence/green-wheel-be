@@ -1,4 +1,6 @@
-﻿using Application.Dtos.VehicleChecklist.Request;
+﻿using Application.Dtos.BusinessVariable.Request;
+using Application.Dtos.VehicleChecklist.Request;
+using Application.Dtos.VehicleSegment.Request;
 
 namespace Application.Constants
 {
@@ -243,6 +245,9 @@ namespace Application.Constants
         public static class VehicleSegmentMessage
         {
             public const string NotFound = "vehicle_segment.not_found";
+            public const string NameIsRequired = "vehicle_segment.name_required";
+            public const string DescriptionIsRequired = "vehicle_segment.description_required";
+            public const string NameAlreadyExists = "vehicle_segment.name_already_exists";
         }
 
         //VEHICLE IMAGE
@@ -335,6 +340,12 @@ namespace Application.Constants
             public const string CountryIsRequired = "brand.Country_require";
             public const string NotFound = "brand.not_found";
 
+            public static class BusinessVariable
+            {
+                public const string NotFound = "business_variable.not_found";
+                public const string ValueIsRequired = "business_variable.value_is_required";
+                public const string ValueMustBeGreaterThanZero = "business_variable.value_must_be_greater_than_zero";
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Application.Dtos.VehicleSegment.Respone;
+﻿using Application.Dtos.CitizenIdentity.Request;
+using Application.Dtos.VehicleSegment.Request;
+using Application.Dtos.VehicleSegment.Respone;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -14,6 +16,7 @@ namespace Application.Mappers
         public VehicleSegmentProfile()
         {
             CreateMap<VehicleSegment, VehicleSegmentViewRes>();
+            CreateMap<CreateSegmentReq, VehicleSegment>();
         }
     }
 }
