@@ -340,6 +340,7 @@ namespace Application.Constants
             public const string CountryIsRequired = "brand.Country_require";
             public const string NotFound = "brand.not_found";
 
+        }
         public static class BusinessVariable
         {
             public const string NotFound = "business_variable.not_found";
