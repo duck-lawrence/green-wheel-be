@@ -1,4 +1,6 @@
-﻿using Application.Abstractions;
+﻿using API.Filters;
+using Application;
+using Application.Abstractions;
 using Application.Constants;
 using Application.Dtos.CitizenIdentity.Request;
 using Application.Dtos.Common.Request;
@@ -228,6 +230,36 @@ namespace API.Controllers
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             await _userProfileService.DeleteDriverLicenseAsync(userId);
             return Ok();
+        }
+
+        /// <summary>
+        /// Get the citizen identity information of the user id.
+        /// </summary>
+        /// <returns>Success message if the citizen identity information is get successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="404">Driver license record not found.</response>
+        [HttpGet("{id}/citizen-identity")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> GetCitizenIdentityByUserIdAsync(Guid id)
+        {
+            var result = await _userProfileService.GetMyCitizenIdentityAsync(id);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Get the driver license information of the user id.
+        /// </summary>
+        /// <returns>Success message if the driver license information is get successfully.</returns>
+        /// <response code="200">Success.</response>
+        /// <response code="401">Unauthorized — user is not authenticated.</response>
+        /// <response code="404">Driver license record not found.</response>
+        [HttpGet("{id}/driver-license")]
+        [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
+        public async Task<IActionResult> GeDriverLicensetByUserIdAsync(Guid id)
+        {
+            var result = await _userProfileService.GetMyDriverLicenseAsync(id);
+            return Ok(result);
         }
     }
 }
