@@ -138,6 +138,7 @@ namespace API
             builder.Services.AddScoped<IVehicleComponentRepository, VehicleComponentRepository>();
             builder.Services.AddScoped<IBusinessVariableRepository, BusinessVariableRepository>();
             builder.Services.AddScoped<IModelComponentRepository, ModelComponentRepository>();
+            builder.Services.AddScoped<IBrandRepository, BrandRepository>();
             //Add Services
             builder.Services.AddScoped<IVehicleChecklistService, VehicleChecklistService>();
             builder.Services.AddScoped<IVehicleSegmentService, VehicleSegmentService>();
@@ -163,6 +164,7 @@ namespace API
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
             builder.Services.AddScoped<IStatisticService, StatisticService>();
             builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
+            builder.Services.AddScoped<IBrandService, BrandService>();
             builder.Services.AddScoped<IBusinessVariableService, BusinessVariableService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
