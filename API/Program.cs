@@ -19,6 +19,7 @@ using Microsoft.Extensions.Caching.Memory;
 using AutoMapper;
 using Infrastructure.ExternalService;
 using API.Middlewares;
+using Application.Constants;
 
 namespace API
 {
@@ -164,6 +165,7 @@ namespace API
             builder.Services.AddScoped<IStatisticService, StatisticService>();
             builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
             builder.Services.AddScoped<IBrandService, BrandService>();
+            builder.Services.AddScoped<IBusinessVariableService, BusinessVariableService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
@@ -252,7 +254,7 @@ namespace API
                 var cache = scope.ServiceProvider.GetRequiredService<IMemoryCache>();
                 var roleRepo = scope.ServiceProvider.GetRequiredService<IUserRoleRepository>();
                 var roles = await roleRepo.GetAllAsync();
-                cache.Set("AllRoles", roles, new MemoryCacheEntryOptions
+                cache.Set(Common.SystemCache.AllRoles, roles, new MemoryCacheEntryOptions
                 {
                     //cache này sẽ tồn tại suốt vòng đời của cache
                     Priority = CacheItemPriority.NeverRemove
@@ -260,7 +262,7 @@ namespace API
                 var businessVariableRepo = scope.ServiceProvider.GetRequiredService<IBusinessVariableRepository>();
                 var businessVariables = await businessVariableRepo.GetAllAsync();
                 //set cache và đảm bảo nó chạy xuyên suốt app
-                cache.Set("BusinessVariables", businessVariables, new MemoryCacheEntryOptions
+                cache.Set(Common.SystemCache.BusinessVariables, businessVariables, new MemoryCacheEntryOptions
                 {
                     Priority = CacheItemPriority.NeverRemove
                 });

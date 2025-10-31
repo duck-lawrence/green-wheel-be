@@ -1,14 +1,13 @@
-﻿using Application.Dtos.VehicleSegment.Respone;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Dtos.VehicleSegment.Request;
+using Application.Dtos.VehicleSegment.Respone;
 
 namespace Application.Abstractions
 {
     public interface IVehicleSegmentService
     {
         Task<IEnumerable<VehicleSegmentViewRes>> GetAllVehicleSegment();
+        Task<Guid> CreateAsync(CreateSegmentReq req);
+        Task UpdateAsync(Guid id, UpdateSegmentReq req);
+        Task DeleteAsync(Guid id);
     }
 }

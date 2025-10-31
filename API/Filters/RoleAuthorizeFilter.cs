@@ -39,7 +39,7 @@ namespace API.Filters
             {
                 throw new Exception();
             }
-            var roleList = _cache!.Get<List<Role>>("AllRoles");
+            var roleList = _cache!.Get<List<Role>>(Common.SystemCache.AllRoles);
             var userInDB = await userService.GetByIdAsync(Guid.Parse(userId))
                 ?? throw new NotFoundException(Message.UserMessage.NotFound);
             var userRole = roleList!.FirstOrDefault(r => r.Id == userInDB.Role!.Id)!.Name;

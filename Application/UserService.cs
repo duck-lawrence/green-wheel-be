@@ -52,7 +52,7 @@ namespace Application
                 req.RoleName = RoleName.Customer;
 
             var user = _mapper.Map<User>(req);
-            var roles = _cache.Get<List<Role>>("AllRoles");
+            var roles = _cache.Get<List<Role>>(Common.SystemCache.AllRoles);
             var userRoleId = roles.FirstOrDefault(r => string.Compare(r.Name, req.RoleName, StringComparison.OrdinalIgnoreCase) == 0)!.Id;
             user.RoleId = userRoleId;
             await _userRepository.AddAsync(user);

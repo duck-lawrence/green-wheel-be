@@ -307,7 +307,7 @@ namespace Application
         }
         private async Task<bool> CheckAuthorize(Guid userId, Guid? contractId = null)
         {
-            var roles = _cache.Get<List<Role>>("AllRoles");
+            var roles = _cache.Get<List<Role>>(Common.SystemCache.AllRoles);
             var userInDB = await _userRepository.GetByIdAsync(userId);
             var userRole = roles!.FirstOrDefault(r => r.Id == userInDB!.RoleId)!.Name;
             if (userRole == RoleName.Staff)
