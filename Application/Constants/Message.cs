@@ -342,11 +342,13 @@ namespace Application.Constants
             public const string CountryIsRequired = "brand.Country_require";
             public const string NotFound = "brand.not_found";
 
+        }
         public static class BusinessVariable
         {
             public const string NotFound = "business_variable.not_found";
             public const string ValueIsRequired = "business_variable.value_is_required";
             public const string ValueMustBeGreaterThanZero = "business_variable.value_must_be_greater_than_zero";
         }
+
     }
 }
