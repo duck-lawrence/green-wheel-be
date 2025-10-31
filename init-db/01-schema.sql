@@ -41,10 +41,6 @@ CREATE TABLE [users] (
     [email] varchar(255),
     [password] nvarchar(255),
     [phone] varchar(15),
-    
-    [bank_name] varchar(100),
-    [bank_account_name] varchar(200),
-    [bank_account_number] varchar(64),
 
     [sex] int, -- Male, Female
     [date_of_birth] datetimeoffset,

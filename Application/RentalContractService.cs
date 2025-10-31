@@ -199,7 +199,7 @@ namespace Application
                 var contract = await _uow.RentalContractRepository.GetByIdAsync(id)
                     ?? throw new NotFoundException(Message.RentalContractMessage.NotFound);
                 if (contract.ActualStartDate != null) throw new BusinessException(Message.RentalContractMessage.ContractAlreadyProcess);
-                if(contract.StartDate > DateTimeOffset.UtcNow)
+                if (contract.StartDate > DateTimeOffset.UtcNow)
                 {
                     throw new BadRequestException(Message.RentalContractMessage.ContractNotStartYet);
                 }
@@ -365,7 +365,7 @@ namespace Application
                                 if (startBuffer <= contract_.EndDate && endBuffer >= contract_.StartDate)
                                 {
                                     await CancelContractAndSendEmail(contract_,
-                                     ". Booking was canceled as another customer successfully paid for the same vehicle earlier.");
+                                     "\r\nBooking was canceled as another customer successfully paid for the same vehicle earlier.");
                                 }
                             }
                         }
@@ -517,8 +517,7 @@ namespace Application
                                     || contract_.Status == (int)RentalContractStatus.PaymentPending)
                                 {
                                     await CancelContractAndSendEmail(contract_,
-                                                            ". Booking was canceled because vehicle was maintained");
-
+                                        "\r\nBooking was canceled because vehicle was maintained");
                                 }
                                 else if (contract_.Status == (int)RentalContractStatus.Active)
                                 {
@@ -572,8 +571,7 @@ namespace Application
             }
         }
 
-        private async Task CancelContractAndSendEmail(RentalContract contract_, string description
-                                                   )
+        private async Task CancelContractAndSendEmail(RentalContract contract_, string description)
         {
             contract_.Status = (int)RentalContractStatus.Cancelled;
             contract_.Description += "\r\n" + description;
@@ -673,7 +671,6 @@ namespace Application
                     }
                     await _uow.InvoiceRepository.AddAsync(invoice);
                     await _uow.InvoiceItemRepository.AddAsync(item);
-
                 }
                 await _uow.RentalContractRepository.UpdateAsync(contract);
                 await _uow.SaveChangesAsync();
@@ -685,6 +682,7 @@ namespace Application
                 throw;
             }
         }
+
         public async Task<PageResult<RentalContractViewRes>> GetAllByPagination(
             GetAllRentalContactReq req, PaginationParams pagination)
         {
