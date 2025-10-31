@@ -12,6 +12,6 @@ namespace Application.Repositories
     public interface IVehicleComponentRepository : IGenericRepository<VehicleComponent>
     {
         Task<IEnumerable<VehicleComponent>> GetByVehicleIdAsync(Guid vehicleId); 
-        Task<PageResult<VehicleComponent>> GetAllAsync(Guid? modelId, PaginationParams pagination);
+        Task<PageResult<VehicleComponent>> GetAllAsync(Guid? modelId, string? name, PaginationParams pagination);
     }
 }

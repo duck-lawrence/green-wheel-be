@@ -40,9 +40,9 @@ namespace Application
             await _vehicleComponentRepository.DeleteAsync(id);
         }
 
-        public async Task<PageResult<VehicleComponentViewRes>> GetAllAsync(Guid? id, PaginationParams pagination)
+        public async Task<PageResult<VehicleComponentViewRes>> GetAllAsync(Guid? id, string? name, PaginationParams pagination)
         {
-            var pageResult = await  _vehicleComponentRepository.GetAllAsync(id, pagination);
+            var pageResult = await  _vehicleComponentRepository.GetAllAsync(id, name, pagination);
             var itemsMapped = _mapper.Map<IEnumerable<VehicleComponentViewRes>>(pageResult.Items);
             return new PageResult<VehicleComponentViewRes>(
                 itemsMapped,
