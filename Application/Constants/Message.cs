@@ -349,6 +349,5 @@ namespace Application.Constants
             public const string ValueIsRequired = "business_variable.value_is_required";
             public const string ValueMustBeGreaterThanZero = "business_variable.value_must_be_greater_than_zero";
         }
-
     }
 }

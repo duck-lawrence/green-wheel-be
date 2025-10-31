@@ -1,25 +1,26 @@
-﻿using API.Extentions;
+﻿using API.BackgroundJob;
+using API.Extentions;
 using API.Filters;
 using API.Middleware;
+using API.Middlewares;
 using Application;
 using Application.Abstractions;
 using Application.AppSettingConfigurations;
+using Application.Constants;
 using Application.Mappers;
 using Application.Repositories;
 using Application.UnitOfWorks;
 using Application.Validators.User;
+using AutoMapper;
 using CloudinaryDotNet;
 using DotNetEnv;
 using FluentValidation;
+using Infrastructure.ExternalService;
 using Infrastructure.Interceptor;
 using Infrastructure.Repositories;
 using Infrastructure.UnitOfWorks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using AutoMapper;
-using Infrastructure.ExternalService;
-using API.Middlewares;
-using Application.Constants;
 
 namespace API
 {
@@ -205,7 +206,9 @@ namespace API
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             //sử dụng cache
             builder.Services.AddMemoryCache();
-
+            //background job
+            builder.Services.AddHostedService<ExpiredRentalContracCleanupJob>();
+            builder.Services.AddHostedService<LateReturnWarningJob>();
             //thêm filter cho validation
             builder.Services.AddControllers(options =>
             {
