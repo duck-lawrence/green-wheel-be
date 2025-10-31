@@ -10,7 +10,10 @@ namespace Application.Mappers
         public BrandProfile()
         {
             CreateMap<Brand, BrandViewRes>();
+
+            CreateMap<BrandReq, Brand>();
             CreateMap<UpdateBrandReq, Brand>();
+
             CreateMap<BrandFilterReq, Brand>();
         }
     }
