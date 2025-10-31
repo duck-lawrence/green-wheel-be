@@ -100,9 +100,15 @@ namespace Application
         public async Task<int> UpdateVehicleModelAsync(Guid Id, UpdateVehicleModelReq req)
         {
             var model = await _vehicleModelRepository.GetByIdAsync(Id) ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
-
+            if(req.SegmentId != null && (await _vehicleSegmentRepository.GetByIdAsync((Guid)req.SegmentId) == null))
+            {
+                throw new NotFoundException(Message.VehicleSegmentMessage.NotFound);
+            }
+            if (req.BrandId != null && (await _branchRepository.GetByIdAsync((Guid)req.BrandId) == null))
+            {
+                throw new NotFoundException(Message.BrandMessage.NotFound);
+            }
             _mapper.Map(req, model);
-            model.UpdatedAt = DateTimeOffset.UtcNow;
 
             return await _vehicleModelRepository.UpdateAsync(model);
         }
