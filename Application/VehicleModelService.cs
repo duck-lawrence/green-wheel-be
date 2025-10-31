@@ -39,9 +39,7 @@ namespace Application
             {
                 id = new Guid();
             } while (await _vehicleModelRepository.GetByIdAsync(id) != null);
-            var vehicleModel = _mapper.Map<Domain.Entities.VehicleModel>(createVehicleModelReq);
-            vehicleModel.CreatedAt = vehicleModel.UpdatedAt = DateTimeOffset.UtcNow;
-            vehicleModel.DeletedAt = null;
+            var vehicleModel = _mapper.Map<VehicleModel>(createVehicleModelReq);
             return await _vehicleModelRepository.AddAsync(vehicleModel);
         }
 

@@ -173,8 +173,8 @@ namespace Application
 
             if (string.IsNullOrEmpty(user.AvatarPublicId))
                 throw new Exception(Message.UserMessage.AvatarNotFound);
-
-            await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+            if( user.AvatarPublicId != null)
+                await _photoService.DeletePhotoAsync(user.AvatarPublicId);
 
             user.AvatarUrl = null;
             user.AvatarPublicId = null;

@@ -274,7 +274,7 @@ namespace Application
                 id = Guid.NewGuid();
             } while (await _userRepository.GetByIdAsync(id) != null);
             //lấy ra list role trong cache
-            var roles = _cache.Get<List<Role>>("AllRoles");
+            var roles = _cache.Get<List<Role>>(Common.SystemCache.AllRoles);
 
             user.Id = id;
             user.CreatedAt = user.UpdatedAt = DateTime.UtcNow;
@@ -444,7 +444,7 @@ namespace Application
                 {
                     id = Guid.NewGuid();
                 } while (await _userRepository.GetByIdAsync(id) != null);
-                var roles = _cache.Get<List<Role>>("AllRoles");
+                var roles = _cache.Get<List<Role>>(Common.SystemCache.AllRoles);
                 if (roles == null)
                 {
                     throw new InvalidOperationException("Roles cache is not initialized.");
@@ -454,8 +454,7 @@ namespace Application
                     Id = id,
                     FirstName = req.GivenName,
                     LastName = req.FamilyName,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
+                    AvatarUrl = req.Picture,
                     Email = req.Email,
                     Password = null,
                     DateOfBirth = null,
