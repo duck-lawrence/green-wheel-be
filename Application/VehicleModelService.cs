@@ -157,5 +157,18 @@ namespace Application
                 throw;
             }
         }
+
+        public async Task<IEnumerable<string>> GetAllModelMainImage()
+        {
+            var vehicleModels = await _vehicleModelRepository.GetAllAsync(null, null);
+            IEnumerable<string> imageUrls = [];
+            if (vehicleModels != null || vehicleModels.Any())
+            {
+                imageUrls = vehicleModels
+                    .Where(vm => !string.IsNullOrEmpty(vm.ImageUrl))
+                    .Select(vm => vm.ImageUrl!);
+            }
+            return imageUrls;
+        }
     }
 }

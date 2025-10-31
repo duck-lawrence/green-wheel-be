@@ -232,5 +232,16 @@ namespace API.Controllers
             await _vehicleModelService.UpdateVehicleModelComponentsAsync(id, req);
             return Ok();
         }
+
+        /// <summary>
+        /// Get All main image.
+        /// </summary>
+        /// <response code="200">Success.</response>
+        [HttpGet("main-images")]
+        public async Task<IActionResult> GetAllModelMainImage()
+        {
+            var res = await _vehicleModelService.GetAllModelMainImage();
+            return Ok(res);
+        }
     }
 }
