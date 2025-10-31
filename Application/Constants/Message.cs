@@ -331,6 +331,15 @@ namespace Application.Constants
             public const string FailedToCalculateCustomerChange = "statistic.failed_to_calculate_customer_change";
             public const string FailedToCalculateInvoiceChange = "statistic.failed_to_calculate_invoice_change";
         }
+
+        public static class BrandMessage
+        {
+            public const string NameIsRequired = "brand.name_require";
+            public const string DescriptionIsRequired = "brand.description_require";
+            public const string FoundedYearIsRequired = "brand.founded_year_require";
+            public const string CountryIsRequired = "brand.Country_require";
+            public const string NotFound = "brand.not_found";
+
         public static class BusinessVariable
         {
             public const string NotFound = "business_variable.not_found";
