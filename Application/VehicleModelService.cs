@@ -20,10 +20,10 @@ namespace Application
         private readonly IPhotoService _photoService;
         private readonly IVehicleModelUow _vehicleModelUow;
         private readonly IVehicleSegmentRepository _vehicleSegmentRepository;
-        //private readonly IBrandRepository _branchRepository;
+        private readonly IBrandRepository _branchRepository;
 
         public VehicleModelService(IVehicleModelRepository vehicleModelRepository, IMapper mapper, IMediaUow uow,
-            IPhotoService photoService, IVehicleModelUow vehicleModelUow, IVehicleSegmentRepository vehicleSegmentRepository)
+            IPhotoService photoService, IVehicleModelUow vehicleModelUow, IVehicleSegmentRepository vehicleSegmentRepository, IBrandRepository branchRepository)
         {
             _vehicleModelRepository = vehicleModelRepository;
             _mapper = mapper;
@@ -31,6 +31,7 @@ namespace Application
             _photoService = photoService;
             _vehicleModelUow = vehicleModelUow;
             _vehicleSegmentRepository = vehicleSegmentRepository;
+            _branchRepository = branchRepository;
         }
 
         public async Task<Guid> CreateVehicleModelAsync(CreateVehicleModelReq req)
@@ -41,6 +42,10 @@ namespace Application
                 if((await _vehicleSegmentRepository.GetByIdAsync(req.SegmentId) == null))
                 {
                     throw new NotFoundException(Message.VehicleSegmentMessage.NotFound);
+                }
+                if ((await _branchRepository.GetByIdAsync(req.BrandId) == null))
+                {
+                    throw new NotFoundException(Message.BrandMessage.NotFound);
                 }
                 var id = Guid.NewGuid();
                 var vehicleModel = _mapper.Map<VehicleModel>(req);
