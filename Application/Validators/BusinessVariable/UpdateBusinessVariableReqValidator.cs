@@ -14,8 +14,8 @@ namespace Application.Validators.BusinessVariable
         public UpdateBusinessVariableReqValidator()
         {
             RuleFor(x => x.Value)
-                .NotEmpty().WithMessage(Message.BusinessVariable.ValueIsRequired)
-                .GreaterThan(0).WithMessage(Message.BusinessVariable.ValueMustBeGreaterThanZero);
+                .NotEmpty().WithMessage(Message.BrandMessage.BusinessVariable.ValueIsRequired)
+                .GreaterThan(0).WithMessage(Message.BrandMessage.BusinessVariable.ValueMustBeGreaterThanZero);
         }
     }
 }

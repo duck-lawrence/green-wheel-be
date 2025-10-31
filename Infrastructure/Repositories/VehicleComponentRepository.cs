@@ -29,7 +29,7 @@ namespace Infrastructure.Repositories
             //lấy ra list linh kiện của xe
             return components;
         }
-        public async Task<PageResult<VehicleComponent>> GetAllAsync(Guid? modelId, PaginationParams pagination)
+        public async Task<PageResult<VehicleComponent>> GetAllAsync(Guid? modelId, string? name, PaginationParams pagination)
         {
             var query = _dbContext.VehicleComponents
                                     .Include(vc => vc.ModelComponents)
@@ -40,9 +40,13 @@ namespace Infrastructure.Repositories
             {
                 query = query
                         .Where(vc => vc.ModelComponents
-                            .Any(mc => mc.ModelId == modelId))
-                        .OrderByDescending(c => c.CreatedAt);
+                            .Any(mc => mc.ModelId == modelId));
             }
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(vc => vc.Name.ToLower().Contains(name.ToLower()));
+            }
+            query = query.OrderByDescending(c => c.CreatedAt);
             var totalCount = await query.CountAsync();
             var components = await query
                             .ApplyPagination(pagination)
