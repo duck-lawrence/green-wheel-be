@@ -77,7 +77,7 @@ namespace API.Controllers
             //kiểm tra phải hoá đơn của nó không
             var userId = Guid.Parse(HttpContext.User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value.ToString());
             var invoice = await _invoiceService.GetRawInvoiceById(id, true, true);
-            var roles = _cache.Get<List<Domain.Entities.Role>>("AllRoles")
+            var roles = _cache.Get<List<Domain.Entities.Role>>(Common.SystemCache.AllRoles)
                 ?? throw new NotFoundException(Message.RoleMessage.NotFound);
             var userInDB = await _userService.GetByIdAsync(userId)
                 ?? throw new NotFoundException(Message.UserMessage.NotFound);

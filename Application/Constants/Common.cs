@@ -9,14 +9,14 @@ namespace Application.Constants
 {
     public static class Common
     {
-        public static class Fee
-        {
-            public const decimal Cleaning = 10000;
-        }
-
         public static class Tax
         {
             public const decimal NoneVAT = 0m;
+        }
+        public enum SystemCache
+        {
+            AllRoles = 0,
+            BusinessVariables = 1,
         }
     }
 }

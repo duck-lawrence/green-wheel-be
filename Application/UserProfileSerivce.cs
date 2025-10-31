@@ -173,8 +173,8 @@ namespace Application
 
             if (string.IsNullOrEmpty(user.AvatarPublicId))
                 throw new Exception(Message.UserMessage.AvatarNotFound);
-
-            await _photoService.DeletePhotoAsync(user.AvatarPublicId);
+            if( user.AvatarPublicId != null)
+                await _photoService.DeletePhotoAsync(user.AvatarPublicId);
 
             user.AvatarUrl = null;
             user.AvatarPublicId = null;
@@ -365,6 +365,8 @@ namespace Application
 
             if (!string.IsNullOrEmpty(citizenIdentity.FrontImagePublicId))
                 await _photoService.DeletePhotoAsync(citizenIdentity.FrontImagePublicId);
+            if (!string.IsNullOrEmpty(citizenIdentity.BackImagePublicId))
+                await _photoService.DeletePhotoAsync(citizenIdentity.BackImagePublicId);
             citizenIdentity.DeletedAt = DateTimeOffset.UtcNow;
             await _mediaUow.SaveChangesAsync();
         }
@@ -377,6 +379,8 @@ namespace Application
 
             if (!string.IsNullOrEmpty(driverLicense.FrontImagePublicId))
                 await _photoService.DeletePhotoAsync(driverLicense.FrontImagePublicId);
+            if (!string.IsNullOrEmpty(driverLicense.BackImagePublicId))
+                await _photoService.DeletePhotoAsync(driverLicense.BackImagePublicId);
             driverLicense.DeletedAt = DateTimeOffset.UtcNow;
             await _mediaUow.SaveChangesAsync();
         }

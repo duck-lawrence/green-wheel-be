@@ -42,7 +42,7 @@ namespace Infrastructure.Repositories
         {
             if ((endDate - startDate).TotalHours < 24)
                 throw new ArgumentException(Message.VehicleModelMessage.RentTimeIsNotAvailable);
-            var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+            var businessVariables = _cache!.Get<List<BusinessVariable>>(Common.SystemCache.BusinessVariables);
             var bufferDay = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.RentalContractBufferDay)?.Value;
             var startBuffer = startDate.AddDays(-(int)bufferDay!);
             var endBuffer = endDate.AddDays((int)bufferDay!);
@@ -77,7 +77,7 @@ namespace Infrastructure.Repositories
             DateTimeOffset startDate,
             DateTimeOffset endDate)
         {
-            var businessVariables = _cache!.Get<List<BusinessVariable>>("BusinessVariables");
+            var businessVariables = _cache!.Get<List<BusinessVariable>>(Common.SystemCache.BusinessVariables);
             var bufferDay = businessVariables!.FirstOrDefault(b => b.Key == (int)BusinessVariableKey.RentalContractBufferDay)?.Value;
             var startBuffer = startDate.AddDays(-(int)bufferDay!);
             var endBuffer = endDate.AddDays((int)bufferDay!);
