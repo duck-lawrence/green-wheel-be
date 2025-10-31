@@ -30,7 +30,7 @@ namespace Application
         public async Task UpdateAsync(Guid id, UpdateBusinessVariableReq req)
         {
             var businessVariable = await _businessVariableRepository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException(Message.BusinessVariable.NotFound);
+                ?? throw new KeyNotFoundException(Message.BrandMessage.BusinessVariable.NotFound);
             businessVariable.Value = req.Value;
             await _businessVariableRepository.UpdateAsync(businessVariable);
         }

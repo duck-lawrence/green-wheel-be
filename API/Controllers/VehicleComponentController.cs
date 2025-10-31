@@ -27,10 +27,10 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="401">Unauthorized — user is not authenticated.</response>
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery]Guid? modelId, [FromQuery] PaginationParams pagination)
+        public async Task<IActionResult> GetAll([FromQuery]Guid? modelId, [FromQuery] string? name, [FromQuery] PaginationParams pagination)
         {
 
-            var vehicleComponents = await _vehicleComponentService.GetAllAsync(modelId, pagination);
+            var vehicleComponents = await _vehicleComponentService.GetAllAsync(modelId, name, pagination);
             return Ok(vehicleComponents);
         }
 

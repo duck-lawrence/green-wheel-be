@@ -31,10 +31,10 @@ public class StationFeedbackService : IStationFeedbackService
         return _mapper.Map<StationFeedbackRes>(created);
     }
 
-    public async Task DeleteAsync(Guid id, Guid customerId)
+    public async Task DeleteAsync(Guid id)
     {
         var feedback = await _repo.GetByIdAsync(id);
-        if (feedback == null || feedback.CustomerId != customerId)
+        if (feedback == null)
             throw new Exception(Message.StationFeedbackMessage.NotFound);
 
         await _repo.DeleteAsync(id);
