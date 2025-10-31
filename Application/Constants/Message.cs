@@ -1,4 +1,5 @@
-﻿using Application.Dtos.VehicleChecklist.Request;
+﻿using Application.Dtos.BusinessVariable.Request;
+using Application.Dtos.VehicleChecklist.Request;
 using Application.Dtos.VehicleSegment.Request;
 
 namespace Application.Constants
@@ -329,6 +330,12 @@ namespace Application.Constants
             public const string FailedToCalculateRevenue = "statistic.failed_to_calculate_revenue";
             public const string FailedToCalculateCustomerChange = "statistic.failed_to_calculate_customer_change";
             public const string FailedToCalculateInvoiceChange = "statistic.failed_to_calculate_invoice_change";
+        }
+        public static class BusinessVariable
+        {
+            public const string NotFound = "business_variable.not_found";
+            public const string ValueIsRequired = "business_variable.value_is_required";
+            public const string ValueMustBeGreaterThanZero = "business_variable.value_must_be_greater_than_zero";
         }
     }
 }

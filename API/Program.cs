@@ -163,6 +163,7 @@ namespace API
             builder.Services.AddScoped<IUserProfileSerivce, UserProfileSerivce>();
             builder.Services.AddScoped<IStatisticService, StatisticService>();
             builder.Services.AddScoped<IVehicleComponentService, VehicleComponentService>();
+            builder.Services.AddScoped<IBusinessVariableService, BusinessVariableService>();
             //Interceptor
             builder.Services.AddScoped<UpdateTimestampInterceptor>();
             //Add Client
