@@ -241,9 +241,9 @@ namespace API.Controllers
         /// <response code="200">Success.</response>
         /// <response code="404">Vehicle model not found.</response>
 
-        [HttpGet("img")]
+        [HttpGet("images")]
         [RoleAuthorize([RoleName.Admin, RoleName.Staff])]
-        public async Task<IActionResult> GetAllVehicelModelImg()
+        public async Task<IActionResult> GetAllVehicelModelImages()
         {
             var res = await _modelImageService.GetAllVehicleModelMainImagesAsync();
             return Ok(res);
