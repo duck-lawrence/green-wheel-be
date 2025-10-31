@@ -302,6 +302,8 @@ namespace Application.Constants
             public static string DamageFeeIsRequired = "vehicle_component.damage_fee_required";
 
             public static string DamageFeeMustBePositive = "vehicle_component.damage_fee_must_be_non_negative";
+
+            public static string InvalidComponentIds = "vehicle_component.invalid_component_ids";
         }
 
         public static class VehicleChecklistMessage

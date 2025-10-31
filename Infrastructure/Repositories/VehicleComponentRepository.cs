@@ -49,5 +49,12 @@ namespace Infrastructure.Repositories
                             .ToListAsync();
             return new PageResult<VehicleComponent>(components, pagination.PageNumber, pagination.PageSize, totalCount);
         }
+
+        public async Task<bool> VerifyComponentsAsync(IEnumerable<Guid> componentIds)
+        {
+            var existingComponentIds = await GetAllAsync();
+            var flag = componentIds.All(id => existingComponentIds.Any(c => c.Id == id));
+            return flag;
+        }
     }
 }
