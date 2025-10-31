@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Dtos.Brand.Respone
+namespace Application.Dtos.Brand.Request
 {
-    public class BrandViewRes
+    public class BrandReq
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = null!;
 
         public string Description { get; set; } = null!;
@@ -16,7 +15,5 @@ namespace Application.Dtos.Brand.Respone
         public string Country { get; set; } = null!;
 
         public int FoundedYear { get; set; }
-        public DateTimeOffset CreatedAt { get; set; }
-        public DateTimeOffset UpdatedAt { get; set; }
     }
 }
