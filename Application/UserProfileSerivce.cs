@@ -93,29 +93,6 @@ namespace Application
             await _userRepository.UpdateAsync(userFromDb);
         }
 
-        public async Task UpdateBankAccountAsync(Guid userId, UpdateBankAccountReq req)
-        {
-            User userFromDb = await _userRepository.GetByIdAsync(userId)
-                ?? throw new DirectoryNotFoundException(Message.UserMessage.NotFound);
-
-            userFromDb.BankName = req.BankName;
-            userFromDb.BankAccountNumber = req.BankAccountNumber;
-            userFromDb.BankAccountName = req.BankAccountName;
-
-            await _userRepository.UpdateAsync(userFromDb);
-        }
-
-        public async Task DeleteBankAccountAsync(Guid userId)
-        {
-            User userFromDb = await _userRepository.GetByIdAsync(userId)
-                ?? throw new DirectoryNotFoundException(Message.UserMessage.NotFound);
-
-            userFromDb.BankName = null;
-            userFromDb.BankAccountNumber = null;
-            userFromDb.BankAccountName = null;
-
-            await _userRepository.UpdateAsync(userFromDb);
-        }
 
         public async Task<string> UploadAvatarAsync(Guid userId, IFormFile file)
         {
