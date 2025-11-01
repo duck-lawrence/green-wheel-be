@@ -20,6 +20,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -32,47 +33,49 @@ jobs:
       - name: Get ACR registry
         id: acr
         run: |
-          REGISTRY=$(az acr show -n ${{ secrets.ACR_NAME }} --query loginServer -o tsv)
+          REGISTRY=$(az acr show -n "${{ secrets.ACR_NAME }}" --query loginServer -o tsv)
           echo "REGISTRY=$REGISTRY" >> $GITHUB_ENV
 
       - name: ACR Login
         run: az acr login -n ${{ secrets.ACR_NAME }}
 
-      - name: Build & Push Image
+      - name: Build & Push Docker Image
         run: |
-          docker compose -f docker-compose.prod.yml build
-          docker tag ${{ env.IMAGE_NAME }}:prod ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t $IMAGE_NAME:prod -f Dockerfile .
+          docker tag $IMAGE_NAME:prod $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+          docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
 
       - name: Ensure Container Apps Environment exists
         run: |
           az containerapp env show -g $RG -n $ENV_NAME || \
           az containerapp env create -g $RG -n $ENV_NAME -l $LOCATION
 
-      - name: Create Container App (if not exists)
+      - name: Create Container App if not exists
         run: |
           if ! az containerapp show -g $RG -n $APP_NAME >/dev/null 2>&1; then
             az containerapp create \
-              -g $RG -n $APP_NAME \
+              -g $RG \
+              -n $APP_NAME \
               --environment $ENV_NAME \
               --image mcr.microsoft.com/dotnet/aspnet:8.0 \
               --system-assigned \
               --ingress external --target-port $PORT
           fi
 
-      - name: Configure ACR credentials for Container App
+      - name: Configure ACR credentials
         run: |
           az containerapp registry set \
             -g $RG -n $APP_NAME \
-            --server ${{ env.REGISTRY }} \
+            --server $REGISTRY \
             --username '${{ secrets.ACR_USERNAME }}' \
             --password '${{ secrets.ACR_PASSWORD }}'
 
       - name: Deploy Container App
         run: |
-          set -e
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          IMAGE="$REGISTRY/$IMAGE_NAME:${{ github.sha }}"
           echo "Deploying image: $IMAGE"
+
           az containerapp update \
             -g $RG -n $APP_NAME \
             --image "$IMAGE" \
@@ -96,6 +99,8 @@ jobs:
               CloudinarySettings__CloudName='${{ secrets.CLOUDINARY_CLOUD_NAME }}' \
               CloudinarySettings__ApiKey='${{ secrets.CLOUDINARY_API_KEY }}' \
               CloudinarySettings__ApiSecret='${{ secrets.CLOUDINARY_API_SECRET }}' \
+              GoogleAuthSettings__ClientID='${{ secrets.GOOGLE_CLIENT_ID }}' \
+              GoogleAuthSettings__ClientSecret='${{ secrets.GOOGLE_CLIENT_SECRET }}' \
               MomoSettings__PartnerCode='${{ secrets.MOMO_PARTNER_CODE }}' \
               MomoSettings__AccessKey='${{ secrets.MOMO_ACCESS_KEY }}' \
               MomoSettings__SecretKey='${{ secrets.MOMO_SECRET_KEY }}' \
@@ -104,21 +109,10 @@ jobs:
               MomoSettings__RequestType='${{ secrets.MOMO_REQUEST_TYPE }}' \
               MomoSettings__Lang='${{ secrets.MOMO_LANG }}' \
               MomoSettings__OrderExpireTime='${{ secrets.MOMO_ORDER_EXPIRE_TIME }}' \
-              MomoSettings__Ttl='${{ secrets.MOMO_TTL }}' \
-              GoogleAuthSettings__ClientID='${{ secrets.GOOGLE_CLIENT_ID }}' \
-              GoogleAuthSettings__ClientSecret='${{ secrets.GOOGLE_CLIENT_SECRET }}' \
-              Gemini__ApiKey='${{ secrets.GEMINI_API_KEY }}' \
-              Gemini__ModelName='${{ secrets.GEMINI_MODEL_NAME }}' \
-              Gemini__ApiBaseUrl='${{ secrets.GEMINI_API_BASE_URL }}' \
-              Gemini__MaxImageBytes='${{ secrets.GEMINI_MAX_IMAGE_BYTES }}' \
-              Gemini__HttpTimeoutSeconds='${{ secrets.GEMINI_HTTP_TIMEOUT_SECONDS }}' \
-              RateLimteSettings__TokenLimit='${{ secrets.RATE_TOKEN_LIMIT }}' \
-              RateLimteSettings__TokensPerPeriod='${{ secrets.RATE_TOKENS_PER_PERIOD }}' \
-              RateLimteSettings__ReplenishmentPeriod='${{ secrets.RATE_REPLENISHMENT_PERIOD }}' \
-              RateLimteSettings__QueueLimit='${{ secrets.RATE_QUEUE_LIMIT }}'
+              MomoSettings__Ttl='${{ secrets.MOMO_TTL }}'
 
       - name: Show app URL
         run: |
           FQDN=$(az containerapp show -g $RG -n $APP_NAME --query properties.configuration.ingress.fqdn -o tsv)
-          echo "Deployed successfully!"
-          echo "URL: https://$FQDN"
+          echo "✅ Deployed successfully!"
+          echo "🌎 URL: https://$FQDN"
