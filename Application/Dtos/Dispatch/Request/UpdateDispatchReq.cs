@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Dtos.Dispatch.Request
 {
-    public sealed class UpdateApproveDispatchReq
+    public sealed class UpdateDispatchReq
     {
         public int Status { get; set; }
         public Guid[] StaffIds { get; set; } = [];

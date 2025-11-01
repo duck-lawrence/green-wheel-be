@@ -43,8 +43,8 @@ namespace Application
             var requestAdminStaff = await _staffRepository.GetByUserIdAsync(adminId)
                 ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
 
-            var fromStationId = req.FromStationId;  
-            var toStationId = requestAdminStaff.StationId;  
+            var fromStationId = req.FromStationId;
+            var toStationId = requestAdminStaff.StationId;
 
             DispatchValidationHelper.EnsureDifferentStations(fromStationId, toStationId);
 
@@ -73,8 +73,9 @@ namespace Application
             {
                 foreach (var v in req.Vehicles)
                 {
-                    var model = await _vehicleModelRepository.GetByIdAsync(v.ModelId);
-                    var modelName = model?.Name ?? "Unknown Model";
+                    var model = await _vehicleModelRepository.GetByIdAsync(v.ModelId)
+                        ?? throw new NotFoundException(Message.VehicleModelMessage.NotFound);
+                    var modelName = model.Name;
 
                     vehicleLines.AppendLine($"      - Model: {modelName} (ID: {v.ModelId}) | Quantity: {v.NumberOfVehicle}");
                 }
@@ -85,21 +86,15 @@ namespace Application
             }
 
             var description = $@"
-Dispatch Request Summary
-───────────────────────────────
-
 Requested Staff: {req.NumberOfStaff}
 Requested Vehicles:
-{vehicleLines}
-
-───────────────────────────────
-";
+{vehicleLines}";
             var entity = new DispatchRequest
             {
                 Id = Guid.NewGuid(),
                 RequestAdminId = adminId,
-                FromStationId = fromStationId, 
-                ToStationId = toStationId,   
+                FromStationId = fromStationId,
+                ToStationId = toStationId,
                 Status = (int)DispatchRequestStatus.Pending,
                 Description = description.Trim()
             };
@@ -129,11 +124,11 @@ Requested Vehicles:
         }
 
         // ================= UPDATE STATUS =================
-        public async Task UpdateStatusAsync(
+        public async Task UpdateAsync(
             Guid currentAdminId,
             Guid currentAdminStationId,
             Guid id,
-            UpdateApproveDispatchReq req)
+            UpdateDispatchReq req)
         {
             var entity = await _repository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
@@ -148,7 +143,7 @@ Requested Vehicles:
                         currentAdminStationId,
                         entity.FromStationId,
                         currentStatus,
-                        DispatchRequestStatus.Pending,
+                        [DispatchRequestStatus.Pending],
                         Message.UserMessage.DoNotHavePermission,
                         Message.DispatchMessage.OnlyPendingCanApproveReject);
 
@@ -187,7 +182,7 @@ Requested Vehicles:
                         currentAdminStationId,
                         entity.ToStationId,
                         currentStatus,
-                        DispatchRequestStatus.Approved,
+                        [DispatchRequestStatus.Approved],
                         Message.UserMessage.DoNotHavePermission,
                         Message.DispatchMessage.OnlyApproveCanConfirm);
 
@@ -199,7 +194,7 @@ Requested Vehicles:
                         currentAdminStationId,
                         entity.ToStationId,
                         currentStatus,
-                        DispatchRequestStatus.ConfirmApproved,
+                        [DispatchRequestStatus.ConfirmApproved],
                         Message.UserMessage.DoNotHavePermission,
                         Message.DispatchMessage.OnlyConfirmCanReceive);
 
@@ -214,7 +209,7 @@ Requested Vehicles:
                         currentAdminStationId,
                         entity.ToStationId,
                         currentStatus,
-                        DispatchRequestStatus.Approved,
+                        [DispatchRequestStatus.Pending, DispatchRequestStatus.Approved],
                         Message.UserMessage.DoNotHavePermission,
                         Message.DispatchMessage.OnlyPendingCanCancel);
 
@@ -226,7 +221,7 @@ Requested Vehicles:
                         currentAdminStationId,
                         entity.FromStationId,
                         currentStatus,
-                        DispatchRequestStatus.Pending,
+                        [DispatchRequestStatus.Pending],
                         Message.UserMessage.DoNotHavePermission,
                         Message.DispatchMessage.OnlyPendingCanApproveReject);
 

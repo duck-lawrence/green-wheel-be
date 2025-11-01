@@ -9,12 +9,12 @@ using static Application.Constants.Message;
 
 namespace Application.Validators.Dispatch
 {
-    public class UpdateDispatchReqValidator : AbstractValidator<UpdateApproveDispatchReq>
+    public class UpdateDispatchReqValidator : AbstractValidator<UpdateDispatchReq>
     {
         public UpdateDispatchReqValidator()
         {
             RuleFor(x => x.Status)
-                .InclusiveBetween(0, 3) 
+                .InclusiveBetween(0, 5) 
                 .WithMessage(DispatchMessage.InvalidStatus);
         }
     }

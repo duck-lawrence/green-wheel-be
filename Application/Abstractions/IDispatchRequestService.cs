@@ -14,10 +14,10 @@ namespace Application.Abstractions
     {
         Task<Guid> CreateAsync(Guid adminId, CreateDispatchReq req);
 
-        Task UpdateStatusAsync(Guid currentAdminId,
+        Task UpdateAsync(Guid currentAdminId,
             Guid currentAdminStationId,
             Guid id,
-            UpdateApproveDispatchReq req);
+            UpdateDispatchReq req);
 
         Task<IEnumerable<DispatchRes>> GetAllAsync(Guid? fromStationId, Guid? toStationId, DispatchRequestStatus? status);
 

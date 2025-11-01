@@ -44,13 +44,13 @@ namespace Application.Helpers
             Guid currentStationId,
             Guid expectedStationId,
             DispatchRequestStatus currentStatus,
-            DispatchRequestStatus requiredStatus,
+            DispatchRequestStatus[] requiredStatus,
             string forbiddenMessage,
             string invalidStatusMessage)
         {
             if (currentStationId != expectedStationId)
                 throw new ForbidenException(forbiddenMessage);
-            if (currentStatus != requiredStatus)
+            if (!requiredStatus.Contains(currentStatus))
                 throw new BadRequestException(invalidStatusMessage);
         }
 
