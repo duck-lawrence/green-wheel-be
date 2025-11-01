@@ -41,7 +41,7 @@ namespace API
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
             var frontendPublicOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
-                ?? "https://www.greenwheel.site";
+                ?? frontendOrigin;
 
             // Add services to the container.
             // Add services to the container.
@@ -91,25 +91,15 @@ namespace API
                 });
             });
 
-            //Cors frontEnd
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowFrontend",
-                    policy =>
-                    {
-                        policy.WithOrigins(frontendOrigin) // FE origin
-                              .AllowAnyHeader()
-                              .AllowAnyMethod()
-                              .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
-                    });
-                options.AddPolicy("AllowPublicFrontend",
-                    policy =>
-                    {
-                        policy.WithOrigins(frontendPublicOrigin) // FE public origin
-                              .AllowAnyHeader()
-                              .AllowAnyMethod()
-                              .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
-                    });
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins(frontendOrigin, frontendPublicOrigin)
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
+                });
             });
             // Kết nối DB
             var connectionString = builder.Configuration["MSSQL_CONNECTION_STRING"];
@@ -300,14 +290,8 @@ namespace API
             builder.Services.AddSingleton(cloudinary);
 
             var app = builder.Build();
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseCors("AllowFrontend");
-            }
-            else
-            {
-                app.UseCors("AllowPublicFrontend");
-            }
+            app.UseCors("AllowFrontend");
+
             //run cache and add list roll to cache
             using (var scope = app.Services.CreateScope())
             {
