@@ -29,28 +29,20 @@ namespace Application
             _staffRepository = staffRepository;
         }
 
-        // ========== CREATE ==========
+        // ================= CREATE =================
         public async Task<Guid> CreateAsync(Guid adminId, CreateDispatchReq req)
         {
             if (req is null)
                 throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
 
-            // admin A (trạm gửi) tạo
-            var adminStaff = await _staffRepository.GetByUserIdAsync(adminId)
+            var requestAdminStaff = await _staffRepository.GetByUserIdAsync(adminId)
                 ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
 
-            var toStationId = req.FromStationId;         // Đây mới là trạm NHẬN (B)
-            var fromStationId = adminStaff.StationId;
-            // bạn flow: admin gửi -> admin B approve -> ... 
-            // Ở đây ta hiểu: admin A đang ngồi ở FROM station và gửi sang B
-            // => toStationId phải là req.ToStationId? nhưng bạn đang để FromStationId trong req
-            // nên ta giữ nguyên logic bạn đang chạy: admin A chọn "fromStationId" để gửi sang "trạm của mình"
-            // muốn clear thì đổi dto sau.
+            var fromStationId = req.FromStationId;  
+            var toStationId = requestAdminStaff.StationId;  
 
-            // 2 trạm phải khác
             DispatchValidationHelper.EnsureDifferentStations(fromStationId, toStationId);
 
-            // validate staff
             if (req.NumberOfStaff is > 0)
             {
                 var availableStaffCount =
@@ -59,7 +51,6 @@ namespace Application
                     throw new BadRequestException(Message.DispatchMessage.StaffNotInFromStation);
             }
 
-            // validate vehicle
             if (req.Vehicles is { Length: > 0 })
             {
                 foreach (var v in req.Vehicles)
@@ -69,7 +60,7 @@ namespace Application
 
                     if (availableVehicles < v.NumberOfVehicle)
                         throw new BadRequestException(
-                            $"{Message.DispatchMessage.VehicleNotInFromStation} - model {v.ModelId} only {availableVehicles} available at this station.");
+                            $"{Message.DispatchMessage.VehicleNotInFromStation} - model {v.ModelId} only {availableVehicles} available.");
                 }
             }
 
@@ -77,8 +68,8 @@ namespace Application
             {
                 Id = Guid.NewGuid(),
                 RequestAdminId = adminId,
-                FromStationId = fromStationId,
-                ToStationId = toStationId,
+                FromStationId = fromStationId, 
+                ToStationId = toStationId,   
                 Status = (int)DispatchRequestStatus.Pending,
             };
 
@@ -86,7 +77,7 @@ namespace Application
             return entity.Id;
         }
 
-        // ========== GET ==========
+        // ================= GET =================
         public async Task<IEnumerable<DispatchRes>> GetAllAsync(
             Guid? fromStationId,
             Guid? toStationId,
@@ -106,7 +97,7 @@ namespace Application
             return entity == null ? null : _mapper.Map<DispatchRes>(entity);
         }
 
-        // ========== UPDATE STATUS ==========
+        // ================= UPDATE STATUS =================
         public async Task UpdateStatusAsync(
             Guid currentAdminId,
             Guid currentAdminStationId,
@@ -121,14 +112,10 @@ namespace Application
 
             switch (newStatus)
             {
-                // --------------------------------------------------
-                // 1) ADMIN B (TRẠM NHẬN) DUYỆT  -> Approved
-                // --------------------------------------------------
                 case DispatchRequestStatus.Approved:
-                    // chỉ TO station mới được duyệt
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
-                        entity.ToStationId,
+                        entity.FromStationId,
                         currentStatus,
                         DispatchRequestStatus.Pending,
                         Message.UserMessage.DoNotHavePermission,
@@ -137,17 +124,13 @@ namespace Application
                     if (req.StaffIds == null || req.VehicleIds == null)
                         throw new BadRequestException(Message.DispatchMessage.IdNull);
 
-                    // staff + vehicle phải đang ở FROM station (vì FROM station gửi đồ sang B)
                     await DispatchValidationHelper.ValidateStaffsInStationAsync(
                         _staffRepository, req.StaffIds, entity.FromStationId);
-
                     await DispatchValidationHelper.ValidateVehiclesInStationAsync(
                         _vehicleRepository, req.VehicleIds, entity.FromStationId);
 
-                    // clear cũ
                     await _repository.ClearDispatchRelationsAsync(entity.Id);
 
-                    // add mới
                     var newStaffs = req.StaffIds.Select(staffId => new DispatchRequestStaff
                     {
                         Id = Guid.NewGuid(),
@@ -168,65 +151,49 @@ namespace Application
                     entity.Status = (int)DispatchRequestStatus.Approved;
                     break;
 
-                // --------------------------------------------------
-                // 2) ADMIN A (TRẠM GỬI) XÁC NHẬN -> ConfirmApproved
-                // --------------------------------------------------
                 case DispatchRequestStatus.ConfirmApproved:
-                    // chỉ FROM station mới được confirm
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
-                        entity.FromStationId,
+                        entity.ToStationId,
                         currentStatus,
                         DispatchRequestStatus.Approved,
                         Message.UserMessage.DoNotHavePermission,
-                        "Only approved request can be confirmed.");
+                        Message.DispatchMessage.OnlyApproveCanConfirm);
 
                     entity.Status = (int)DispatchRequestStatus.ConfirmApproved;
                     break;
 
-                // --------------------------------------------------
-                // 3) ADMIN A (TRẠM GỬI) ĐÁNH DẤU ĐÃ GIAO XONG -> Received
-                // --------------------------------------------------
                 case DispatchRequestStatus.Received:
-                    // vẫn là FROM station (vì bên gửi đóng request)
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
-                        entity.FromStationId,
+                        entity.ToStationId,
                         currentStatus,
                         DispatchRequestStatus.ConfirmApproved,
                         Message.UserMessage.DoNotHavePermission,
-                        "Only confirmed request can be received.");
+                        Message.DispatchMessage.OnlyConfirmCanReceive);
 
                     entity.Status = (int)DispatchRequestStatus.Received;
 
-                    // lúc này thực sự chuyển staff + vehicle sang TRẠM NHẬN
                     await _staffRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
                     await _vehicleRepository.UpdateStationForDispatchAsync(entity.Id, entity.ToStationId);
                     break;
 
-                // --------------------------------------------------
-                // 4) ADMIN B (TRẠM NHẬN) không nhận -> Cancelled
-                // --------------------------------------------------
                 case DispatchRequestStatus.Cancelled:
-                    // chỉ TO station được huỷ, và chỉ khi đang Approved
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
                         entity.ToStationId,
                         currentStatus,
                         DispatchRequestStatus.Approved,
                         Message.UserMessage.DoNotHavePermission,
-                        "Only approved request can be cancelled.");
+                        Message.DispatchMessage.OnlyPendingCanCancel);
 
                     entity.Status = (int)DispatchRequestStatus.Cancelled;
                     break;
 
-                // --------------------------------------------------
-                // 5) ADMIN B (TRẠM NHẬN) từ chối ngay từ Pending -> Rejected
-                // --------------------------------------------------
                 case DispatchRequestStatus.Rejected:
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
-                        entity.ToStationId,
+                        entity.FromStationId,
                         currentStatus,
                         DispatchRequestStatus.Pending,
                         Message.UserMessage.DoNotHavePermission,

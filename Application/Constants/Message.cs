@@ -163,9 +163,10 @@ namespace Application.Constants
 
             // Flow cập nhật trạng thái
             public const string OnlyPendingCanApproveReject = "dispatch.only_pending_can_approve_reject";
-
             public const string OnlyApprovedCanReceive = "dispatch.only_approved_can_receive";
             public const string OnlyPendingCanCancel = "dispatch.only_pending_can_cancel";
+            public const string OnlyApproveCanConfirm = "dispatch.only_approved_can_confirm";
+            public const string OnlyConfirmCanReceive = "dispatch.only_confirm_can_receive";
 
             // Quyền
             public const string MustBeToStationAdminForThisAction = "dispatch.must_be_to_station_admin";

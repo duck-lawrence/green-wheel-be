@@ -53,6 +53,8 @@ namespace Application.Helpers
             if (currentStatus != requiredStatus)
                 throw new BadRequestException(invalidStatusMessage);
         }
+
+
         public static async Task ValidateStaffQuantityAsync(
             IStaffRepository staffRepository,
             Guid stationId,
