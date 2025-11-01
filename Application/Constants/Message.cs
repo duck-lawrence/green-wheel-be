@@ -85,11 +85,6 @@ namespace Application.Constants
 
             // Bank info
 
-            public const string BankNameIsRequired = "user.bank_name_require";
-            public const string BankAccountNumberIsRequired = "user.bank_account_number_require";
-            public const string InvalidBankAccountNumber = "user.invalid_bank_account_number";
-            public const string BankAccountNameIsRequired = "user.bank_account_name_require";
-
             public const string FullNameIsRequired = "user.full_name_require";
         }
 
