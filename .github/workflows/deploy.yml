@@ -79,6 +79,7 @@ jobs:
             --set-env-vars \
               ASPNETCORE_ENVIRONMENT=Production \
               FRONTEND_ORIGIN='${{ secrets.FRONTEND_ORIGIN }}' \
+              FRONTEND_PUBLIC_ORIGIN='${{ secrets.FRONTEND_PUBLIC_ORIGIN }}' \
               MSSQL_CONNECTION_STRING='Server=tcp:${{ secrets.AZURE_SQL_SERVER }},1433;Database=${{ secrets.AZURE_SQL_DB }};User Id=${{ secrets.AZURE_SQL_USER }};Password=${{ secrets.AZURE_SQL_PASSWORD }};TrustServerCertificate=True;' \
               REDIS_CONFIGURATION='${{ secrets.AZURE_REDIS_HOST }}:6380,password=${{ secrets.AZURE_REDIS_KEY }},ssl=True,abortConnect=False' \
               JwtSettings__AccessTokenSecret='${{ secrets.JWT_ACCESS_TOKEN_SECRET }}' \

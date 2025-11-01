@@ -40,6 +40,8 @@ namespace API
             // Frontend Url
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
+            var frontendPublicOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
+                ?? "https://greenwheel.site";
 
             // Add services to the container.
             // Add services to the container.
@@ -96,6 +98,14 @@ namespace API
                     policy =>
                     {
                         policy.WithOrigins(frontendOrigin) // FE origin
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
+                    });
+                options.AddPolicy("AllowPublicFrontend",
+                    policy =>
+                    {
+                        policy.WithOrigins(frontendPublicOrigin) // FE public origin
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials(); // nếu bạn gửi cookie (refresh_token)
@@ -292,6 +302,7 @@ namespace API
             var app = builder.Build();
             //accept frontend
             app.UseCors("AllowFrontend");
+            app.UseCors("AllowPublicFrontend");
             //run cache and add list roll to cache
             using (var scope = app.Services.CreateScope())
             {
@@ -319,7 +330,7 @@ namespace API
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             // app.UseMiddleware<RateLimitMiddleware>();
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();
