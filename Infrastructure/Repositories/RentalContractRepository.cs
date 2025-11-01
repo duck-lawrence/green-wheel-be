@@ -221,7 +221,6 @@ namespace Infrastructure.Repositories
         {
             return await _dbContext.RentalContracts.Where(r => (r.Status == (int)RentalContractStatus.Active || r.Status == (int)RentalContractStatus.PaymentPending || r.Status == (int)RentalContractStatus.RequestPeding)
                                                             && r.ActualStartDate == null
-                                                            && r.ActualEndDate == null
                                                             && r.EndDate < DateTimeOffset.UtcNow)
                                                     .Include(r => r.Customer)
                                                     .Include(r => r.Vehicle)
