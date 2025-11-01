@@ -17,7 +17,11 @@ namespace Application
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IStaffRepository _staffRepository;
 
-        public DispatchService(IDispatchRepository repository, IMapper mapper, IVehicleRepository vehicleRepository, IStaffRepository staffRepository)
+        public DispatchService(
+            IDispatchRepository repository,
+            IMapper mapper,
+            IVehicleRepository vehicleRepository,
+            IStaffRepository staffRepository)
         {
             _repository = repository;
             _mapper = mapper;
@@ -30,44 +34,45 @@ namespace Application
             if (req is null)
                 throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
 
-            // Lấy thông tin staff của admin gửi yêu cầu
             var adminStaff = await _staffRepository.GetByUserIdAsync(adminId)
                 ?? throw new ForbidenException(Message.UserMessage.DoNotHavePermission);
 
-            var toStationId = adminStaff.StationId; 
+            var fromStationId = req.FromStationId;
+            var toStationId = adminStaff.StationId;
 
-            DispatchValidationHelper.EnsureDifferentStations(req.FromStationId, toStationId);
+            DispatchValidationHelper.EnsureDifferentStations(fromStationId, toStationId);
 
-            await DispatchValidationHelper.ValidateStaffsInStationAsync(_staffRepository, req.StaffIds, req.FromStationId);
-            await DispatchValidationHelper.ValidateVehiclesInStationAsync(_vehicleRepository, req.VehicleIds, req.FromStationId);
+            if (req.NumberOfStaff.HasValue && req.NumberOfStaff > 0)
+            {
+                var availableStaffCount = await _staffRepository.CountAvailableStaffInStationAsync(fromStationId);
+                if (req.NumberOfStaff > availableStaffCount)
+                    throw new BadRequestException(Message.DispatchMessage.StaffNotInFromStation);
+            }
 
-            var entity = _mapper.Map<DispatchRequest>(req);
-            entity.Id = Guid.NewGuid();
-            entity.RequestAdminId = adminId;
-            entity.FromStationId = req.FromStationId;
-            entity.ToStationId = toStationId;
-            entity.Status = (int)DispatchRequestStatus.Pending;
-            entity.CreatedAt = DateTimeOffset.UtcNow;
-            entity.UpdatedAt = entity.CreatedAt;
-
-            if (req.StaffIds is { Length: > 0 })
-                entity.DispatchRequestStaffs = req.StaffIds.Select(id => new DispatchRequestStaff
+            if (req.Vehicles is { Length: > 0 })
+            {
+                foreach (var v in req.Vehicles)
                 {
-                    DispatchRequestId = entity.Id,
-                    StaffId = id
-                }).ToList();
+                    var availableVehicles = await _vehicleRepository
+                        .CountAvailableVehiclesByModelAsync(fromStationId, v.ModelId);
+                    if (availableVehicles < v.NumberOfVehicle)
+                        throw new BadRequestException(
+                            $"{Message.DispatchMessage.VehicleNotInFromStation} - model {v.ModelId} chỉ có {availableVehicles} xe sẵn có tại trạm này.");
+                }
+            }
 
-            if (req.VehicleIds is { Length: > 0 })
-                entity.DispatchRequestVehicles = req.VehicleIds.Select(id => new DispatchRequestVehicle
-                {
-                    DispatchRequestId = entity.Id,
-                    VehicleId = id
-                }).ToList();
+            var entity = new DispatchRequest
+            {
+                Id = Guid.NewGuid(),
+                RequestAdminId = adminId,
+                FromStationId = fromStationId,
+                ToStationId = toStationId,
+                Status = (int)DispatchRequestStatus.Pending
+            };
 
-            var dispatchId = await _repository.AddAsync(entity);
-            return dispatchId;
+            await _repository.AddAsync(entity);
+            return entity.Id;
         }
-
 
         public async Task<IEnumerable<DispatchRes>> GetAllAsync(Guid? fromStationId, Guid? toStationId, DispatchRequestStatus? status)
         {
@@ -81,7 +86,7 @@ namespace Application
             return entity == null ? null : _mapper.Map<DispatchRes>(entity);
         }
 
-        public async Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateDispatchReq req)
+        public async Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateApproveDispatchReq req)
         {
             var entity = await _repository.GetByIdAsync(id)
                 ?? throw new NotFoundException(Message.DispatchMessage.NotFound);
@@ -92,6 +97,71 @@ namespace Application
             switch (newStatus)
             {
                 case DispatchRequestStatus.Approved:
+                    DispatchValidationHelper.EnsureCanUpdate(
+                        currentAdminStationId,
+                        entity.FromStationId,
+                        currentStatus,
+                        DispatchRequestStatus.Pending,
+                        Message.UserMessage.DoNotHavePermission,
+                        Message.DispatchMessage.OnlyPendingCanApproveReject);
+
+                    if (req.StaffId == null || req.VehicleId == null)
+                        throw new BadRequestException(Message.DispatchMessage.IdNull);
+
+                    await DispatchValidationHelper.ValidateStaffsInStationAsync(
+                        _staffRepository, req.StaffId, entity.FromStationId);
+
+                    await DispatchValidationHelper.ValidateVehiclesInStationAsync(
+                        _vehicleRepository, req.VehicleId, entity.FromStationId);
+
+                    await _repository.ClearDispatchRelationsAsync(entity.Id);
+
+                    var newStaffs = req.StaffId.Select(staffId => new DispatchRequestStaff
+                    {
+                        Id = Guid.NewGuid(),
+                        DispatchRequestId = entity.Id,
+                        StaffId = staffId
+                    }).ToList();
+
+                    var newVehicles = req.VehicleId.Select(vehicleId => new DispatchRequestVehicle
+                    {
+                        Id = Guid.NewGuid(),
+                        DispatchRequestId = entity.Id,
+                        VehicleId = vehicleId
+                    }).ToList();
+
+                    await _repository.AddDispatchRelationsAsync(newStaffs, newVehicles);
+
+                    entity.ApprovedAdminId = currentAdminId;
+                    entity.Status = (int)DispatchRequestStatus.Approved;
+                    break;
+
+                case DispatchRequestStatus.ConfirmApproved:
+                    DispatchValidationHelper.EnsureCanUpdate(
+                        currentAdminStationId,
+                        entity.ToStationId,
+                        currentStatus,
+                        DispatchRequestStatus.Approved,
+                        Message.UserMessage.DoNotHavePermission,
+                        "Chỉ có yêu cầu đã được duyệt mới có thể xác nhận.");
+                    entity.Status = (int)DispatchRequestStatus.ConfirmApproved;
+                    break;
+
+                case DispatchRequestStatus.Received:
+                    DispatchValidationHelper.EnsureCanUpdate(
+                        currentAdminStationId,
+                        entity.FromStationId,
+                        currentStatus,
+                        DispatchRequestStatus.ConfirmApproved,
+                        Message.UserMessage.DoNotHavePermission,
+                        "Chỉ có yêu cầu đã xác nhận mới có thể nhận người/xe.");
+
+                    entity.Status = (int)DispatchRequestStatus.Received;
+
+                    await _staffRepository.UpdateStationForDispatchAsync(entity.Id, entity.FromStationId);
+                    await _vehicleRepository.UpdateStationForDispatchAsync(entity.Id, entity.FromStationId);
+                    break;
+
                 case DispatchRequestStatus.Rejected:
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
@@ -100,34 +170,29 @@ namespace Application
                         DispatchRequestStatus.Pending,
                         Message.UserMessage.DoNotHavePermission,
                         Message.DispatchMessage.OnlyPendingCanApproveReject);
-                    entity.ApprovedAdminId = currentAdminId;
-                    entity.Status = (int)newStatus;
+
+                    entity.Status = (int)DispatchRequestStatus.Rejected;
+                    entity.ApprovedAdminId = null;
+                    entity.Description = DispatchValidationHelper.AppendDescription(entity.Description, req.Description);
                     break;
 
-                case DispatchRequestStatus.Received:
+                case DispatchRequestStatus.Cancelled:
                     DispatchValidationHelper.EnsureCanUpdate(
                         currentAdminStationId,
                         entity.ToStationId,
                         currentStatus,
                         DispatchRequestStatus.Approved,
                         Message.UserMessage.DoNotHavePermission,
-                        Message.DispatchMessage.OnlyApprovedCanReceive);
-                    break;
+                        "Chỉ có yêu cầu đã được duyệt mới có thể hủy.");
 
-                case DispatchRequestStatus.Cancel:
-                    DispatchValidationHelper.EnsureCanUpdate(
-                        currentAdminStationId,
-                        entity.ToStationId,
-                        currentStatus,
-                        DispatchRequestStatus.Pending,
-                        Message.UserMessage.DoNotHavePermission,
-                        Message.DispatchMessage.OnlyPendingCanCancel);
-                    entity.Status = (int)DispatchRequestStatus.Cancel;
+                    entity.Status = (int)DispatchRequestStatus.Cancelled;
                     break;
 
                 default:
                     throw new BadRequestException(Message.DispatchMessage.InvalidStatus);
             }
+
+            entity.UpdatedAt = DateTimeOffset.UtcNow;
             await _repository.UpdateAsync(entity);
         }
     }

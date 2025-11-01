@@ -154,6 +154,9 @@ namespace Application.Constants
 
             // Validation khi tạo
             public const string ToStationMustDifferent = "dispatch.to_station_must_different";
+            public const string ToStationRequied = "dispatch.to_station_require";
+            public const string ModelRequied = "dispatch.model_require";
+            public const string NumberOfVehicleShouldGreaterThanZero = "dispatch.number_vehicle_greater_than_zero";
 
             public const string StaffNotInFromStation = "dispatch.staff_not_in_from_station";
             public const string VehicleNotInFromStation = "dispatch.vehicle_not_in_from_station";
@@ -171,6 +174,7 @@ namespace Application.Constants
 
             // Input
             public const string InvalidStatus = "dispatch.invalid_status";
+            public const string IdNull = "dispatch.id_null";
 
             public static string FromStationIsRequire = "dispatch.from_station_is_required";
         }

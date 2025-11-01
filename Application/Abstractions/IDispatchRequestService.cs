@@ -14,7 +14,7 @@ namespace Application.Abstractions
     {
         Task<Guid> CreateAsync(Guid adminId, CreateDispatchReq req);
 
-        Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateDispatchReq req);
+        Task UpdateStatusAsync(Guid currentAdminId, Guid currentAdminStationId, Guid id, UpdateApproveDispatchReq req);
 
         Task<IEnumerable<DispatchRes>> GetAllAsync(Guid? fromStationId, Guid? toStationId, DispatchRequestStatus? status);
 

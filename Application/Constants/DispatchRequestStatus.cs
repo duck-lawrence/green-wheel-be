@@ -10,8 +10,9 @@ namespace Application.Constants
     {
         Pending = 0,
         Approved = 1,
-        Rejected = 2,
-        Received = 3,
-        Cancel = 4,
+        ConfirmApproved = 2,
+        Rejected = 3,
+        Received = 4,
+        Cancelled = 5
     }
 }

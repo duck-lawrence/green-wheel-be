@@ -55,7 +55,7 @@ namespace API.Controllers
         /// <response code="403">Forbidden — user does not have permission to perform this action.</response>
         /// <response code="404">Dispatch request not found.</response>
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateStatus([FromRoute] Guid id, [FromBody] UpdateDispatchReq req)
+        public async Task<IActionResult> UpdateStatus([FromRoute] Guid id, [FromBody] UpdateApproveDispatchReq req)
         {
             var userId = Guid.Parse(User.FindFirst(JwtRegisteredClaimNames.Sid)!.Value);
             var staff = await _staffRepository.GetByUserIdAsync(userId)
