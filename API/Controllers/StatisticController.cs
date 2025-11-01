@@ -80,5 +80,17 @@ namespace API.Controllers
             var result = await _statisticService.GetVehicleTotal(stationId);
             return Ok(result);
         }
+        /// <summary>
+        /// Get total number of vehicles by status for current station.
+        /// </summary>
+        [HttpGet("vehicle-models")]
+        public async Task<ActionResult> GetVehicleModelTotal()
+        {
+            var stationId = await GetCurrentStationIdAsync();
+            var result = await _statisticService.GetVehicleModelTotal(stationId);
+            return Ok(result == null ? [] : result.VehicleModelsForStatisticRes);
+        }
+
+
     }
 }

@@ -159,7 +159,9 @@ namespace Application.Constants
             public const string NumberOfVehicleShouldGreaterThanZero = "dispatch.number_vehicle_greater_than_zero";
 
             public const string StaffNotInFromStation = "dispatch.staff_not_in_from_station";
+            public const string StaffNotEnoughtInFromStation = "dispatch.staff_not_enought_in_from_station";
             public const string VehicleNotInFromStation = "dispatch.vehicle_not_in_from_station";
+            public const string VehicleOrStaffNotInFromStation = "dispatch.vehicle_or_staff_not_in_from_station";
 
             // Flow cập nhật trạng thái
             public const string OnlyPendingCanApproveReject = "dispatch.only_pending_can_approve_reject";
@@ -335,6 +337,8 @@ namespace Application.Constants
             public const string FailedToCalculateRevenue = "statistic.failed_to_calculate_revenue";
             public const string FailedToCalculateCustomerChange = "statistic.failed_to_calculate_customer_change";
             public const string FailedToCalculateInvoiceChange = "statistic.failed_to_calculate_invoice_change";
+
+            public const string NoVehicleModelData = "";
         }
 
         public static class BrandMessage

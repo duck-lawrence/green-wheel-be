@@ -7,6 +7,8 @@ using Application.Helpers;
 using Application.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using System.Text;
+using System.Text.Json;
 
 namespace Application
 {
@@ -16,17 +18,20 @@ namespace Application
         private readonly IMapper _mapper;
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IStaffRepository _staffRepository;
+        private readonly IVehicleModelRepository _vehicleModelRepository;
 
         public DispatchService(
             IDispatchRepository repository,
             IMapper mapper,
             IVehicleRepository vehicleRepository,
-            IStaffRepository staffRepository)
+            IStaffRepository staffRepository,
+            IVehicleModelRepository vehicleModelRepository)
         {
             _repository = repository;
             _mapper = mapper;
             _vehicleRepository = vehicleRepository;
             _staffRepository = staffRepository;
+            _vehicleModelRepository = vehicleModelRepository;
         }
 
         // ================= CREATE =================
@@ -48,7 +53,7 @@ namespace Application
                 var availableStaffCount =
                     await _staffRepository.CountAvailableStaffInStationAsync(fromStationId);
                 if (req.NumberOfStaff > availableStaffCount)
-                    throw new BadRequestException(Message.DispatchMessage.StaffNotInFromStation);
+                    throw new BadRequestException(Message.DispatchMessage.StaffNotEnoughtInFromStation);
             }
 
             if (req.Vehicles is { Length: > 0 })
@@ -59,11 +64,36 @@ namespace Application
                         .CountAvailableVehiclesByModelAsync(fromStationId, v.ModelId);
 
                     if (availableVehicles < v.NumberOfVehicle)
-                        throw new BadRequestException(
-                            $"{Message.DispatchMessage.VehicleNotInFromStation} - model {v.ModelId} only {availableVehicles} available.");
+                        throw new BadRequestException(Message.DispatchMessage.VehicleOrStaffNotInFromStation);
                 }
             }
+            var vehicleLines = new StringBuilder();
 
+            if (req.Vehicles is { Length: > 0 })
+            {
+                foreach (var v in req.Vehicles)
+                {
+                    var model = await _vehicleModelRepository.GetByIdAsync(v.ModelId);
+                    var modelName = model?.Name ?? "Unknown Model";
+
+                    vehicleLines.AppendLine($"      - Model: {modelName} (ID: {v.ModelId}) | Quantity: {v.NumberOfVehicle}");
+                }
+            }
+            else
+            {
+                vehicleLines.AppendLine("      (No vehicle requested)");
+            }
+
+            var description = $@"
+Dispatch Request Summary
+───────────────────────────────
+
+Requested Staff: {req.NumberOfStaff}
+Requested Vehicles:
+{vehicleLines}
+
+───────────────────────────────
+";
             var entity = new DispatchRequest
             {
                 Id = Guid.NewGuid(),
@@ -71,6 +101,7 @@ namespace Application
                 FromStationId = fromStationId, 
                 ToStationId = toStationId,   
                 Status = (int)DispatchRequestStatus.Pending,
+                Description = description.Trim()
             };
 
             await _repository.AddAsync(entity);

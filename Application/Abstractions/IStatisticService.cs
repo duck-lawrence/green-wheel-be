@@ -16,5 +16,6 @@ namespace Application.Abstractions
         Task<TotalRevenueRes?> GetTotalRevenue(Guid? stationId, [FromQuery] PaginationParams pagination);
         Task<TotalStatisticRes?> GetTotalStatistic(Guid? stationId, [FromQuery] PaginationParams pagination);
         Task<VehicleTotalRes?> GetVehicleTotal(Guid? stationId);
+        Task<VehicleModelsStatisticRes?> GetVehicleModelTotal(Guid? stationId);
     }
 }

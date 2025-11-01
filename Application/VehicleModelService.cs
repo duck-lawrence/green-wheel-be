@@ -157,5 +157,11 @@ namespace Application
                 throw;
             }
         }
+
+        public async Task<IEnumerable<VehicleModelViewRes>> GetAllAsync()
+        {
+            var models = await _uow.VehicleModels.GetAllAsync(null, null);
+            return _mapper.Map<IEnumerable<VehicleModelViewRes>>(models) ?? [];
+        }
     }
 }

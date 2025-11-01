@@ -4,9 +4,11 @@ using Application.Constants;
 using Application.Dtos.Common.Request;
 using Application.Dtos.RentalContract.Request;
 using Application.Dtos.Statistic.Responses;
+using Application.Dtos.Vehicle.Respone;
 using Application.Helpers;
 using Domain.Commons;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,15 +22,18 @@ namespace Application
         private readonly IUserService _userService;
         private readonly IVehicleService _vehicleService;
         private readonly IInvoiceService _invoiceService;
+        private readonly IVehicleModelService _vehicleModelService;
 
         public StatisticService(
             IUserService userService,
             IVehicleService vehicleService,
-            IInvoiceService invoiceService)
+            IInvoiceService invoiceService,
+            IVehicleModelService vehicleModelService)
         {
             _userService = userService;
             _vehicleService = vehicleService;
             _invoiceService = invoiceService;
+            _vehicleModelService = vehicleModelService;
         }
 
         public async Task<CustomerAnonymusRes?> GetAnonymusCustomer([FromQuery] PaginationParams pagination)
@@ -189,6 +194,47 @@ namespace Application
             };
         }
 
+        
+
+        public async Task<VehicleModelsStatisticRes?> GetVehicleModelTotal(Guid? stationId)
+        {
+            var vehicles = await _vehicleService.GetAllAsync(stationId, null);
+            if (vehicles == null || !vehicles.Any())
+                throw new NotFoundException(Message.StatisticMessage.NoVehicleData);
+
+            var vehicleModels = await _vehicleModelService.GetAllAsync();
+            if (vehicleModels == null || !vehicleModels.Any())
+                throw new NotFoundException(Message.VehicleModelMessage.NotFound);
+
+            var groupedByModel = vehicles
+                .GroupBy(v => v.ModelId)
+                .ToList();
+
+            var items = new List<VehicleModelsForStatisticRes>();
+
+            foreach (var group in groupedByModel)
+            {
+                var model = vehicleModels.FirstOrDefault(m => m.Id == group.Key);
+                var modelName = model?.Name ?? "Unknown Model";
+
+                var availableCount = group.Count(v => v.Status == (int)VehicleStatus.Available);
+                var rentedCount = group.Count(v => v.Status == (int)VehicleStatus.Rented);
+                var maintenanceCount = group.Count(v => v.Status == (int)VehicleStatus.Maintenance);
+
+                items.Add(new VehicleModelsForStatisticRes(
+                    group.Key,
+                    modelName,
+                    availableCount,
+                    rentedCount,
+                    maintenanceCount
+                ));
+            }
+
+            return new VehicleModelsStatisticRes
+            {
+                VehicleModelsForStatisticRes = items.ToArray()
+            };
+        }
 
         public async Task<VehicleTotalRes?> GetVehicleTotal(Guid? stationId)
         {
