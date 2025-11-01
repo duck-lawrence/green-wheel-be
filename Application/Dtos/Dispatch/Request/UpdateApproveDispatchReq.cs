@@ -9,8 +9,8 @@ namespace Application.Dtos.Dispatch.Request
     public sealed class UpdateApproveDispatchReq
     {
         public int Status { get; set; }
-        public Guid[]? StaffId { get; set; }
-        public Guid[]? VehicleId {get; set; }
+        public Guid[] StaffIds { get; set; } = [];
+        public Guid[] VehicleIds { get; set; } = [];
         public string? Description { get; set; }
     }
 }
