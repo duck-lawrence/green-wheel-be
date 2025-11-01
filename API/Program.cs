@@ -33,10 +33,14 @@ namespace API
             var builder = WebApplication.CreateBuilder(args);
 
             Env.Load("../.env");
-            builder.Configuration
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-            .AddEnvironmentVariables();
+            if (builder.Environment.IsDevelopment())
+            {
+                Env.Load("../.env");
+                builder.Configuration.AddJsonFile("appsettings.json", optional: true);
+                builder.Configuration.AddJsonFile($"appsettings.Development.json", optional: true);
+            }
+
+            builder.Configuration.AddEnvironmentVariables();
             // Frontend Url
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
