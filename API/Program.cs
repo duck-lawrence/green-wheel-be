@@ -290,7 +290,6 @@ namespace API
             builder.Services.AddSingleton(cloudinary);
 
             var app = builder.Build();
-            app.UseCors("AllowFrontend");
 
             //run cache and add list roll to cache
             using (var scope = app.Services.CreateScope())
@@ -320,6 +319,8 @@ namespace API
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             // app.UseMiddleware<RateLimitMiddleware>();
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowFrontend");
 
             app.UseAuthentication();
             app.UseAuthorization();
