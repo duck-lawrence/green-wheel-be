@@ -31,8 +31,7 @@ namespace API
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            Env.Load("../.env");
+            builder.Configuration.AddEnvironmentVariables();
             if (builder.Environment.IsDevelopment())
             {
                 Env.Load("../.env");
@@ -40,7 +39,7 @@ namespace API
                 builder.Configuration.AddJsonFile($"appsettings.Development.json", optional: true);
             }
 
-            builder.Configuration.AddEnvironmentVariables();
+            
             // Frontend Url
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
@@ -322,7 +321,8 @@ namespace API
             }
             app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             // app.UseMiddleware<RateLimitMiddleware>();
-            app.UseHttpsRedirection();
+            if (builder.Environment.IsDevelopment())
+                app.UseHttpsRedirection();
 
             app.UseCors("AllowFrontend");
 
