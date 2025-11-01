@@ -300,9 +300,14 @@ namespace API
             builder.Services.AddSingleton(cloudinary);
 
             var app = builder.Build();
-            //accept frontend
-            app.UseCors("AllowFrontend");
-            app.UseCors("AllowPublicFrontend");
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseCors("AllowFrontend");
+            }
+            else
+            {
+                app.UseCors("AllowPublicFrontend");
+            }
             //run cache and add list roll to cache
             using (var scope = app.Services.CreateScope())
             {
