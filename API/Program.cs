@@ -41,7 +41,7 @@ namespace API
             var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
                 ?? "http://localhost:3000";
             var frontendPublicOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
-                ?? "https://greenwheel.site";
+                ?? "https://www.greenwheel.site/";
 
             // Add services to the container.
             // Add services to the container.

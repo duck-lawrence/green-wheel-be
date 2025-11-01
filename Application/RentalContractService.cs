@@ -436,8 +436,8 @@ namespace Application
                     templatePath = Path.Combine(basePath, "Templates", "PaymentEmailTemplate.html");
                     body = System.IO.File.ReadAllText(templatePath);
 
-                    var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                        ?? "http://localhost:3000/";
+                    var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
+                            ?? "https://greenwheel.site/";
                     var contractDetailUrl = $"{frontendOrigin}/rental-contracts/{rentalContract.Id}";
 
                     body = body.Replace("{CustomerName}", customer.LastName + " " + customer.FirstName)
@@ -539,8 +539,8 @@ namespace Application
                                         var station = contract_.Station;
                                         var vehicleToCancel = contract_.Vehicle
                                             ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
-                                        var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                                            ?? "http://localhost:3000/";
+                                        var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
+                                                            ?? "https://greenwheel.site/";
                                         var contractDetailUrl = $"{frontendOrigin}";
 
                                         body = body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
@@ -585,8 +585,8 @@ namespace Application
                     ?? throw new NotFoundException(Message.VehicleMessage.NotFound);
                 var model = vehicleToCancel.Model;
 
-                var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                    ?? "http://localhost:3000/";
+                var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
+                            ?? "https://greenwheel.site/";
                 var contractDetailUrl = $"{frontendOrigin}/vehicle-models";
 
                 body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
@@ -626,8 +626,8 @@ namespace Application
                     var customer = contract.Customer;
                     if (customer.Email != null)
                     {
-                        var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_ORIGIN")
-                            ?? "http://localhost:3000/";
+                        var frontendOrigin = Environment.GetEnvironmentVariable("FRONTEND_PUBLIC_ORIGIN")
+                            ?? "https://greenwheel.site/";
                         var contractDetailUrl = $"{frontendOrigin}/vehicle-models";
 
                         body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
