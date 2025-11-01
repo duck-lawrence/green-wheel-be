@@ -25,5 +25,6 @@ namespace Application.Dtos.VehicleModel.Request
         public decimal SportRangeKm { get; set; }
         public Guid BrandId { get; set; }
         public Guid SegmentId { get; set; }
+        public IEnumerable<Guid> ComponentIds { get; set; } = [];
     }
 }

@@ -33,5 +33,7 @@ namespace Application.Abstractions
         Task CancelRentalContract(Guid id);
         Task ChangeVehicleAsync(Guid id);
         Task ProcessCustomerConfirm(Guid id, int resolutionOption);
+        Task LateReturnContractWarningAsync();
+        Task ExpiredContractCleanUpAsync();
     }
 }

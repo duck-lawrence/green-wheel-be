@@ -204,5 +204,31 @@ namespace Infrastructure.Repositories
             );
         }
 
+        public async Task<IEnumerable<RentalContract>> GetLateReturnContract()
+        {
+            return await _dbContext.RentalContracts.Where(r => r.Status == (int)RentalContractStatus.Active
+                                                            && r.ActualEndDate == null
+                                                            && r.ActualStartDate != null
+                                                            && r.EndDate < DateTimeOffset.UtcNow)
+                                                    .Include(r => r.Customer)
+                                                    .Include(r => r.Vehicle)
+                                                        .ThenInclude(v => v!.Model)
+                                                    .Include(r => r.Station)
+                                                    .ToArrayAsync();
+        }
+
+        public async Task<IEnumerable<RentalContract>> GetExpiredContractAsync()
+        {
+            return await _dbContext.RentalContracts.Where(r => (r.Status == (int)RentalContractStatus.Active || r.Status == (int)RentalContractStatus.PaymentPending || r.Status == (int)RentalContractStatus.RequestPeding)
+                                                            && r.ActualStartDate == null
+                                                            && r.ActualEndDate == null
+                                                            && r.EndDate < DateTimeOffset.UtcNow)
+                                                    .Include(r => r.Customer)
+                                                    .Include(r => r.Vehicle)
+                                                        .ThenInclude(v => v!.Model)
+                                                    .Include(r => r.Station)
+                                                    .ToArrayAsync();
+        }
+
     }
 }

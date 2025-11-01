@@ -20,6 +20,8 @@ namespace Application.Repositories
         Task<PageResult<RentalContract>> GetAllByPaginationAsync(int? status = null, string? phone = null, string? citizenIdentityNumber = null, string? driverLicenseNumber = null, Guid? stationId = null, PaginationParams? pagination = null);
         Task<PageResult<RentalContract>> GetMyContractsAsync(Guid customerId, PaginationParams pagination,
             int? status, Guid? stationId = null);
+        Task<IEnumerable<RentalContract>> GetLateReturnContract();
+        Task<IEnumerable<RentalContract>> GetExpiredContractAsync();
 
     }
 }

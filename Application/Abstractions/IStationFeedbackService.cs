@@ -11,7 +11,7 @@ namespace Application.Abstractions
 
         Task<IEnumerable<StationFeedbackRes>> GetByCustomerIdAsync(Guid customerId);
 
-        Task DeleteAsync(Guid id, Guid customerId);
+        Task DeleteAsync(Guid id);
         Task<IEnumerable<StationFeedbackRes>> GetAllAsync();
     }
 }

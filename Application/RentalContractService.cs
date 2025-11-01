@@ -13,9 +13,11 @@ using AutoMapper;
 using Domain.Entities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using System.Diagnostics.Contracts;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Application
 {
@@ -24,17 +26,15 @@ namespace Application
         private readonly IRentalContractUow _uow;
         private readonly IMapper _mapper;
         private readonly IEmailSerivce _emailService;
-        private readonly IVehicleCheckListRepository _vehicleCheckListRepository;
         private readonly IMemoryCache _cache;
 
         public RentalContractService(IRentalContractUow uow, IMapper mapper,
             IOptions<EmailSettings> emailSettings, IEmailSerivce emailService,
-            IVehicleCheckListRepository vehicleCheckListRepository, IMemoryCache cache)
+            IMemoryCache cache)
         {
             _uow = uow;
             _mapper = mapper;
             _emailService = emailService;
-            _vehicleCheckListRepository = vehicleCheckListRepository;
             _cache = cache;
         }
 
@@ -93,7 +93,8 @@ namespace Application
                 {
                     Id = contractId,
                     Description = $"This contract was created by the customer through the online booking system." +
-                    $"\r\nThe vehicle will be reserved at {station.Name} from {createReq.StartDate} to {createReq.EndDate}. Customer rented the vehicle for {days} days.",
+                    $"\r\nThe vehicle will be reserved at {station.Name} from {createReq.StartDate} to {createReq.EndDate}." +
+                    $"\r\nCustomer rented the vehicle for {days} days.",
                     Notes = createReq.Notes,
                     StartDate = createReq.StartDate,
                     ActualStartDate = null,
@@ -729,6 +730,85 @@ namespace Application
             totalHoursLate = Math.Ceiling(totalHoursLate);
             totalHoursLate -= (int)maxLateReturnHour!;
             return (int)totalHoursLate;
+        }
+
+        public async Task LateReturnContractWarningAsync()
+        {
+            var targetContracts = await _uow.RentalContractRepository.GetLateReturnContract();
+            if(targetContracts == null || !targetContracts.Any())
+            {
+                return;
+            }
+            var subject = "[GreenWheel] Vehicle Return Overdue Notice – Immediate Attention Required";
+            var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "LateReturnEmailTemplate.html");
+            var body = System.IO.File.ReadAllText(templatePath);
+            foreach ( var contract in targetContracts )
+            {
+                var customer = contract.Customer;
+                var model = contract.Vehicle!.Model;
+                var vehicle = contract.Vehicle;
+                var station = contract.Station;
+
+                body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
+                       .Replace("{BookingId}", contract.Id.ToString())
+                       .Replace("{VehicleModelName}", model.Name)
+                       .Replace("{LicensePlate}", vehicle.LicensePlate)
+                       .Replace("{StationName}", station.Name)
+                       .Replace("{EndDate}", contract.EndDate.ToString("dd/MM/yyyy"));
+                await _emailService.SendEmailAsync(customer.Email!, subject, body);
+            }
+        }
+
+        public async Task ExpiredContractCleanUpAsync()
+        {
+            var targetContracts = await _uow.RentalContractRepository.GetExpiredContractAsync();
+            if (targetContracts == null || !targetContracts.Any())
+            {
+                return;
+            }
+            var subject = "[GreenWheel] Rental Contract Cancelled – Pickup Deadline Missed";
+            var templatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "CancelExpiredContractEmailTemplate.html");
+            var body = System.IO.File.ReadAllText(templatePath);
+            await _uow.BeginTransactionAsync();
+            try
+            {
+                foreach (var contract in targetContracts)
+                {
+                    var customer = contract.Customer;
+                    var model = contract.Vehicle!.Model;
+                    var vehicle = contract.Vehicle;
+                    var station = contract.Station;
+
+                    body = body.Replace("{CustomerName}", $"{customer.LastName} {customer.FirstName}")
+                                    .Replace("{BookingId}", contract.Id.ToString())
+                                    .Replace("{VehicleModelName}", model.Name)
+                                    .Replace("{LicensePlate}", vehicle.LicensePlate)
+                                    .Replace("{StationName}", station.Name)
+                                    .Replace("{EndDate}", contract.EndDate.ToString("dd/MM/yyyy"));
+
+                    await _emailService.SendEmailAsync(customer.Email!, subject, body);
+                    if(contract.Status == (int)RentalContractStatus.Active)
+                    {
+                        var ortherContracts = (await _uow.RentalContractRepository.GetByVehicleIdAsync((Guid)contract.VehicleId!))
+                                                        .Where(r => r.Id != contract.Id && r.Status == (int)RentalContractStatus.Active);
+                        if (!ortherContracts.Any())
+                        {
+                            vehicle.Status = (int)VehicleStatus.Available;
+                            await _uow.VehicleRepository.UpdateAsync(vehicle);
+                        }
+                    }
+                    contract.Status = (int)RentalContractStatus.Cancelled;
+                    contract.Description += "\r\nCustomer did not pick up the vehicle before the scheduled deadline.";
+                    await _uow.RentalContractRepository.UpdateAsync(contract);
+                }
+                await _uow.SaveChangesAsync();
+                await _uow.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await _uow.RollbackAsync();
+                throw;
+            }
         }
     }
 }
